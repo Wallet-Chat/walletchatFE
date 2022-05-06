@@ -1,0 +1,2 @@
+!function(){"use strict";var t;!function(t){t[t.React=0]="React",t[t.Content=1]="Content"}(t||(t={}));var n=function(n,e,o){var c=function(n,e){return e.id===chrome.runtime.id&&n.from===t.React}(n,e);c&&o(document.title)};console.log("[content.ts] Main"),chrome.runtime.onMessage.addListener(n)}();
+//# sourceMappingURL=content.js.map

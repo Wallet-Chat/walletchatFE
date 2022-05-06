@@ -1,0 +1,18 @@
+export const currencyList = [
+    {"name":"US Dollar","code":"USD","symbol":"$"},
+    {"name":"Australian Dollar","code":"AUD","symbol":"$"},
+    {"name":"Brazilian Real","code":"BRL","symbol":"R$"},
+    {"name":"Canadian Dollar","code":"CAD","symbol":"$"},
+    {"name":"Chinese Yuan","code":"CNY","symbol":"¥"},
+    {"name":"Czech Republic Koruna","code":"CZK","symbol":"Kč"},
+    {"name":"Euro","code":"EUR","symbol":"€"},
+    {"name":"Israeli New Sheqel","code":"ILS","symbol":"₪"},
+    {"name":"Japanese Yen","code":"JPY","symbol":"¥"},
+    {"name":"Malaysian Ringgit","code":"MYR","symbol":"RM"},
+    {"name":"New Zealand Dollar","code":"NZD","symbol":"$"},
+    {"name":"Philippine Peso","code":"PHP","symbol":"₱"},
+    {"name":"Russian Ruble","code":"RUB","symbol":"₽"},
+    {"name":"Singapore Dollar","code":"SGD","symbol":"$"},
+    {"name":"Swiss Franc","code":"CHF","symbol":"CHf"},
+    {"name":"Thai Baht","code":"THB","symbol":"฿"},
+];

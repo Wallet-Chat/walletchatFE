@@ -1,0 +1,17 @@
+body {
+    background: var(--chakra-colors-lightGray-300);
+}
+
+a {
+    color: var(--chakra-colors-gray-600) !important;
+
+    &:hover {
+        text-decoration: underline;
+    }
+
+    &.disabled {
+        pointer-events: none;
+        text-decoration: none;
+        color: var(--chakra-colors-lightGray-600) !important;
+    }
+}
