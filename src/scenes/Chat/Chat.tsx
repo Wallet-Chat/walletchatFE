@@ -9,13 +9,12 @@ const Chat = () => {
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState('')
 
-
    useEffect(() => {
        updateChatData()
    }, [])
 
    const fetchPost = (data: MessageType[]) => {
-      fetch(` ${process.env.restApiUrl}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -25,24 +24,24 @@ const Chat = () => {
          .then((response) => response.json()) //Then with the data from the response in JSON...
          .then((data) => {
             console.log('$$$kl - Post to REST API:', data)
-         }) //Then with the error genereted...
+         })
          .catch((error) => {
             console.error('Post to REST API error!!!!!!!!!!!!:', error)
          })
    }
 
    const fetchPut = (data: MessageType, id: number) => {
-      fetch(` ${process.env.restApiUrl}/${id}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${id}`, {
          method: 'PUT',
          headers: {
             'Content-Type': 'application/json',
          },
          body: JSON.stringify(data),
       })
-         .then((response) => response.json()) //Then with the data from the response in JSON...
+         .then((response) => response.json())
          .then((data) => {
             console.log('$$$kl - PUT to REST API:', data)
-         }) //Then with the error genereted...
+         })
          .catch((error) => {
             console.error('PUT to REST API error!!!!!!!!!!!!:', error)
          })
@@ -94,7 +93,7 @@ const Chat = () => {
 
    function updateChatData() {
       //GET request to get off-chain data for RX user
-      fetch(` ${process.env.restApiUrl}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',
@@ -102,9 +101,8 @@ const Chat = () => {
       })
          .then((response) => response.json()) //Then with the data from the response in JSON...
          .then((data: MessageType[]) => {
-            //console.log('$$$kl - GET to REST API:', data);
-            // @ts-ignore
-            //const test = document.getElementById('sendaddr').value;
+            console.log('$$$kl - GET to REST API:', data);
+            
             for (let i = 0; i < data.length; i++) {
                //console.log("processing id: ", data[i].id)
                const streamToDecrypt = data[i].streamID
@@ -146,6 +144,7 @@ const Chat = () => {
 
    return (
       <Box>
+         {console.log(loadedMsgs)}
          {loadedMsgs.map((msg: MessageUIType, i) => (
             <Message key={msg.streamID} msg={msg} />
          ))}

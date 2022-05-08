@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 module.exports = {
    webpack: {
       configure: (webpackConfig, { env, paths }) => {
@@ -28,7 +29,7 @@ module.exports = {
                   chunks: ['options'],
                   template: paths.appHtml,
                   filename: 'options.html',
-               }),
+               })
             ],
          }
       },

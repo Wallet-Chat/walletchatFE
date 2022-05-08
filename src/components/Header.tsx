@@ -16,13 +16,13 @@ const Header = () => {
       >
          <Link to="/" style={{ display: "flex" }}><Image src={logo} alt="" /></Link>
 
-         <Box p={2}>
+         {/* <Box p={2}>
             <Button variant="black" borderRadius="1.5rem">
                <Flex alignItems="center">
                   <Box mr={1}>Sign in</Box>
                </Flex>
             </Button>
-         </Box>
+         </Box> */}
       </Flex>
    )
 }

@@ -1,12 +1,13 @@
 import { ColorModeScript } from '@chakra-ui/react'
 import * as React from 'react'
 import ReactDOM from 'react-dom'
+import { BrowserRouter } from 'react-router-dom'
+import axios from 'axios'
 
 import { App } from './App'
 import reportWebVitals from './reportWebVitals'
 import * as serviceWorker from './serviceWorker'
-import axios from 'axios'
-import { BrowserRouter } from 'react-router-dom'
+import WalletProvider from './context/WalletProvider'
 
 axios.defaults.baseURL = `${process.env['REACT_APP_COVALENT_API_URL']}`
 
@@ -14,7 +15,9 @@ ReactDOM.render(
    <React.StrictMode>
       <ColorModeScript />
       <BrowserRouter>
-         <App />
+         <WalletProvider>
+            <App />
+         </WalletProvider>
       </BrowserRouter>
    </React.StrictMode>,
    document.getElementById('root')
