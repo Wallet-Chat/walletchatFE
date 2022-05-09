@@ -45,8 +45,12 @@
       "web3": "^1.7.3"
    },
    "devDependencies": {
-      "@types/chrome": "0.0.184"
+      "@types/chrome": "0.0.184",
+      "react-error-overlay": "^6.0.9"
    },
+   "resolutions": {
+      "react-error-overlay": "6.0.9"
+    },
    "scripts": {
       "start": "react-scripts start",
       "build": "craco build",

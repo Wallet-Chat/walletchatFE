@@ -10,7 +10,7 @@ const Chat = () => {
    const [msgInput, setMsgInput] = useState('')
 
    useEffect(() => {
-      //  updateChatData()
+       updateChatData()
    }, [])
 
    const fetchPost = (data: MessageType[]) => {
@@ -93,13 +93,17 @@ const Chat = () => {
 
    function updateChatData() {
       //GET request to get off-chain data for RX user
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
       fetch(` ${process.env.REACT_APP_REST_API}`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',
          },
       })
-         .then((response) => response.json()) //Then with the data from the response in JSON...
+         .then((response) => response.json())
          .then((data: MessageType[]) => {
             console.log('$$$kl - GET to REST API:', data);
             
