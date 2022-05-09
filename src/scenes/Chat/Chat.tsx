@@ -10,7 +10,7 @@ const Chat = () => {
    const [msgInput, setMsgInput] = useState('')
 
    useEffect(() => {
-       updateChatData()
+      //  updateChatData()
    }, [])
 
    const fetchPost = (data: MessageType[]) => {

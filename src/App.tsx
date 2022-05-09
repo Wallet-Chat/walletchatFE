@@ -1,26 +1,40 @@
 import { Route, Routes, Navigate } from 'react-router-dom'
-import { ChakraProvider, Button, Box, Flex } from '@chakra-ui/react'
-import { theme } from './theme'
+import { Button, Box, Flex, Image, Heading } from '@chakra-ui/react'
 
-import Header from './components/Header'
+import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
 import Chat from './scenes/Chat'
 import { useWallet } from './context/WalletProvider'
+import { IconX } from '@tabler/icons'
 
 export const App = () => {
-   const { isAuthenticated, connectWallet, disconnectWallet } = useWallet()
+   const { isAuthenticated, connectWallet } = useWallet()
 
-   return (
-      <ChakraProvider theme={theme}>
+   if (!isAuthenticated) {
+      return (
+         <Flex p={2} flexFlow="column" position="absolute" top="15px" bottom="15px" left="10px" right="10px">
+            {/* <Header /> */}
+            <Box textAlign="right" position="fixed" top={0} right={0}>
+               <Button borderBottomLeftRadius="lg" borderBottomRightRadius="lg" borderTopLeftRadius={0} borderTopRightRadius={0} background="lightGray.500" py={0} px={1} size="lg" height="30px">
+                  <IconX />
+               </Button>
+            </Box>
+            <Box borderRadius="lg" className="bg-pattern" padding="70px 40px" flexGrow={1}>
+               <Image src={logoThumb} mb={3} />
+               <Heading size="xl" mb={5}>Login to start chatting</Heading>
+               <Button
+                  variant="black"
+                  onClick={() => connectWallet()}
+                  size="lg"
+               >
+                  Sign in using wallet
+               </Button>
+            </Box>
+         </Flex>
+      )
+   } else {
+      return (
          <Box>
-            <Header />
-            <Button
-               variant="black"
-               onClick={isAuthenticated ? disconnectWallet : connectWallet}
-               id="wallet-connect"
-            >
-               {isAuthenticated ? 'Disconnect Wallet' : 'Connect Wallet'}
-            </Button>
             <Flex px={8} py={6}>
                <Box>
                   <Routes>
@@ -33,6 +47,6 @@ export const App = () => {
                </Box>
             </Flex>
          </Box>
-      </ChakraProvider>
-   )
+      )
+   }
 }

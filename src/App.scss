@@ -1,6 +1,9 @@
 html {
     min-height: 100%;
     min-width: 400px;
+    border: var(--chakra-colors-lightGray-300);
+    border-radius: var(--chakra-borderRadius-sm);
+    box-shadow: 0px 4px 4px 2px #00000026;
 }
 
 body {
@@ -19,4 +22,8 @@ a {
         text-decoration: none;
         color: var(--chakra-colors-lightGray-600) !important;
     }
+}
+
+.bg-pattern {
+    background: #FFF url('./images/bg-pattern.svg') repeat;
 }
