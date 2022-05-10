@@ -3,6 +3,8 @@ import { Button, Box, Flex, Image, Heading } from '@chakra-ui/react'
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
+import Inbox from './scenes/Inbox'
+import NewConversation from './scenes/NewConversation'
 import Chat from './scenes/Chat'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
@@ -10,8 +12,9 @@ import { IconX } from '@tabler/icons'
 import LoadingIndicator from './components/LoadingIndicator'
 
 export const App = () => {
-   const { appLoading, isAuthenticated, connectWallet, account } = useWallet()
-console.log(account)
+   const { appLoading, isAuthenticated, connectWallet, account, web3 } =
+      useWallet()
+
    if (appLoading || !isAuthenticated) {
       return (
          <Flex
@@ -72,10 +75,15 @@ console.log(account)
                <Sidebar currAccountAddress={account} />
                <Box flex="1">
                   <Routes>
-                     <Route path="/chat" element={<Chat />} />
+                     <Route path="/inbox" element={<Inbox />} />
+                     <Route
+                        path="/new"
+                        element={<NewConversation web3={web3} />}
+                     />
+                     <Route path="/chat/:address" element={<Chat />} />
                      <Route
                         path="/"
-                        element={<Navigate to="/chat" replace />}
+                        element={<Navigate to="/inbox" replace />}
                      />
                   </Routes>
                </Box>

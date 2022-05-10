@@ -40,8 +40,13 @@ const LinkElem = styled(NavLink)`
    &:hover,
    &.active {
       background: var(--chakra-colors-lightGray-400);
+
       &::before {
         background: var(--chakra-colors-darkGray-900);
+      }
+
+      svg {
+          stroke: var(--chakra-colors-darkGray-900);
       }
    }
 `
@@ -88,7 +93,7 @@ const Sidebar = ({ currAccountAddress }: { currAccountAddress: string }) => {
          justifyContent="space-between"
          alignItems="center"
          flexFlow="column nowrap"
-         borderBottom="1px solid var(--chakra-colors-gray-200)"
+         borderRight="1px solid var(--chakra-colors-gray-200)"
          background="white"
          height="100vh"
          padding="0.2rem"
@@ -100,7 +105,7 @@ const Sidebar = ({ currAccountAddress }: { currAccountAddress: string }) => {
             <Box mt={2}></Box>
             <Divider />
             <Box mb={5}></Box>
-            <LinkElem to={'/chat'}>
+            <LinkElem to={'/inbox'}>
                <IconMessageCircle2 size="30" stroke={1.5} />
                {inboxNotificationCount > 0 && (
                   <NotificationCount>
@@ -108,7 +113,6 @@ const Sidebar = ({ currAccountAddress }: { currAccountAddress: string }) => {
                   </NotificationCount>
                )}
             </LinkElem>
-            <Divider />
             <LinkElem to={`/nft/`}>
                <Image src={coolcat2356} alt="" width="40px" />
                {nftNotificationCount > 0 && (
