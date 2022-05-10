@@ -1,5 +1,6 @@
-import { Box } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+import { Box, FormControl } from '@chakra-ui/react'
+import { useEffect, useRef, useState } from 'react'
+
 import MessageType from '../../types/Message'
 import { MessageUIType } from '../../types/MessageUI'
 import Message from './components/Message'
@@ -7,11 +8,20 @@ import Message from './components/Message'
 const Chat = () => {
    const [selectedWalletAddress, setSelectedWalletAddress] = useState('none')
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-   const [msgInput, setMsgInput] = useState('')
+   const [msgInput, setMsgInput] = useState<string>('')
+   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
    useEffect(() => {
-       updateChatData()
+      updateChatData()
    }, [])
+
+   useEffect(() => {
+      if (textareaRef && textareaRef.current) {
+        textareaRef.current.style.height = "0px";
+        const scrollHeight = textareaRef.current.scrollHeight;
+        textareaRef.current.style.height = scrollHeight + "px";
+      }
+    }, [msgInput]);
 
    const fetchPost = (data: MessageType[]) => {
       fetch(` ${process.env.REACT_APP_REST_API}`, {
@@ -23,10 +33,10 @@ const Chat = () => {
       })
          .then((response) => response.json()) //Then with the data from the response in JSON...
          .then((data) => {
-            console.log('$$$kl - Post to REST API:', data)
+            console.log('✅ POST:', data)
          })
          .catch((error) => {
-            console.error('Post to REST API error!!!!!!!!!!!!:', error)
+            console.error('🚨🚨REST API Error [POST]:', error)
          })
    }
 
@@ -40,10 +50,10 @@ const Chat = () => {
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('$$$kl - PUT to REST API:', data)
+            console.log('✅ PUT:', data)
          })
          .catch((error) => {
-            console.error('PUT to REST API error!!!!!!!!!!!!:', error)
+            console.error('🚨🚨REST API Error [PUT]:', error)
          })
    }
 
@@ -105,8 +115,8 @@ const Chat = () => {
       })
          .then((response) => response.json())
          .then((data: MessageType[]) => {
-            console.log('$$$kl - GET to REST API:', data);
-            
+            console.log('✅ GET:', data)
+
             for (let i = 0; i < data.length; i++) {
                //console.log("processing id: ", data[i].id)
                const streamToDecrypt = data[i].streamID
@@ -124,8 +134,7 @@ const Chat = () => {
                      data[i].id,
                      'left'
                   )
-               }
-               else if (
+               } else if (
                   data[i].fromAddr.toLowerCase() ===
                   selectedWalletAddress.toLowerCase()
                ) {
@@ -140,11 +149,11 @@ const Chat = () => {
                   )
                }
             }
-         }) //Then with the error genereted...
-         .catch((error) => {
-            console.error('GET to REST API error!!!!!!!!!!!!:', error)
          })
-   } //end LitChat copied functions
+         .catch((error) => {
+            console.error('🚨🚨REST API Error [GET]:', error)
+         })
+   }
 
    return (
       <Box>
@@ -152,6 +161,16 @@ const Chat = () => {
          {loadedMsgs.map((msg: MessageUIType, i) => (
             <Message key={msg.streamID} msg={msg} />
          ))}
+         <FormControl>
+            <textarea
+               placeholder="Message"
+               ref={textareaRef}
+               value={msgInput}
+               onChange={(e) => setMsgInput(e.target.value)}
+               style={{ resize: "none", padding: '.5rem', width: '100%'}}
+               rows={1}
+            />
+         </FormControl>
       </Box>
    )
 }

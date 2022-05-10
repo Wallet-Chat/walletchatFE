@@ -148,6 +148,7 @@ const WalletProvider = React.memo(({ children }) => {
    return (
       <WalletContext.Provider
          value={{
+            account,
             disconnectWallet,
             connectWallet,
             isAuthenticated,
