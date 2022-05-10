@@ -80,7 +80,10 @@ export const App = () => {
                         path="/new"
                         element={<NewConversation web3={web3} />}
                      />
-                     <Route path="/chat/:address" element={<Chat />} />
+                     <Route
+                        path="/chat/:address"
+                        element={<Chat web3={web3} />}
+                     />
                      <Route
                         path="/"
                         element={<Navigate to="/inbox" replace />}

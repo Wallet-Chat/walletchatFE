@@ -7,6 +7,7 @@
       "@craco/craco": "^6.4.3",
       "@emotion/react": "^11.8.1",
       "@emotion/styled": "^11.8.1",
+      "@ensdomains/ensjs": "^2.1.0",
       "@fontsource/roboto": "^4.5.3",
       "@tabler/icons": "^1.54.0",
       "@testing-library/jest-dom": "^5.16.2",

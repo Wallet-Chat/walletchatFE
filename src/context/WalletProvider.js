@@ -28,6 +28,27 @@ const WalletProvider = React.memo(({ children }) => {
    console.log({ chainId, account, web3, isAuthenticated })
 
    React.useEffect(() => {
+      const connectEagerly = async () => {
+         const metamask = await storage.get('metamask-connected')
+         if (metamask?.connected) {
+            await connectWallet()
+         }
+      }
+      const unsubscribeToEvents = (provider) => {
+         if (provider && provider.removeListener) {
+            provider.removeListener(
+               EthereumEvents.CHAIN_CHANGED,
+               handleChainChanged
+            )
+            provider.removeListener(
+               EthereumEvents.ACCOUNTS_CHANGED,
+               handleAccountsChanged
+            )
+            provider.removeListener(EthereumEvents.CONNECT, handleConnect)
+            provider.removeListener(EthereumEvents.DISCONNECT, handleDisconnect)
+         }
+      }
+      
       connectEagerly()
       return () => {
          const provider = getProvider()
@@ -41,28 +62,6 @@ const WalletProvider = React.memo(({ children }) => {
          provider.on(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged)
          provider.on(EthereumEvents.CONNECT, handleConnect)
          provider.on(EthereumEvents.DISCONNECT, handleDisconnect)
-      }
-   }
-
-   const unsubscribeToEvents = (provider) => {
-      if (provider && provider.removeListener) {
-         provider.removeListener(
-            EthereumEvents.CHAIN_CHANGED,
-            handleChainChanged
-         )
-         provider.removeListener(
-            EthereumEvents.ACCOUNTS_CHANGED,
-            handleAccountsChanged
-         )
-         provider.removeListener(EthereumEvents.CONNECT, handleConnect)
-         provider.removeListener(EthereumEvents.DISCONNECT, handleDisconnect)
-      }
-   }
-
-   const connectEagerly = async () => {
-      const metamask = await storage.get('metamask-connected')
-      if (metamask?.connected) {
-         await connectWallet()
       }
    }
 

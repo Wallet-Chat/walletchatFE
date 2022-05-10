@@ -10,6 +10,7 @@ import reportWebVitals from './reportWebVitals'
 import * as serviceWorker from './serviceWorker'
 import WalletProvider from './context/WalletProvider'
 import { theme } from './theme'
+import ENSProvider from './context/ENSProvider'
 
 axios.defaults.baseURL = `${process.env['REACT_APP_COVALENT_API_URL']}`
 
@@ -18,9 +19,11 @@ ReactDOM.render(
       <ColorModeScript />
       <BrowserRouter>
          <WalletProvider>
-            <ChakraProvider theme={theme}>
-               <App />
-            </ChakraProvider>
+            {/* <ENSProvider> */}
+               <ChakraProvider theme={theme}>
+                  <App />
+               </ChakraProvider>
+            {/* </ENSProvider> */}
          </WalletProvider>
       </BrowserRouter>
    </React.StrictMode>,
