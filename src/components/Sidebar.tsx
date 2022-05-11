@@ -47,14 +47,14 @@ const LinkElem = styled(NavLink)`
 
    &:hover,
    &.active {
-      background: var(--chakra-colors-lightGray-400);
+      background: var(--chakra-colors-lightgray-400);
 
       &::before {
-         background: var(--chakra-colors-darkGray-900);
+         background: var(--chakra-colors-darkgray-900);
       }
 
       svg {
-         stroke: var(--chakra-colors-darkGray-900);
+         stroke: var(--chakra-colors-darkgray-900);
       }
    }
 `
@@ -62,7 +62,7 @@ const NotificationCount = styled.div`
    position: absolute;
    top: 5px;
    right: 5px;
-   background: var(--chakra-colors-darkGray-800);
+   background: var(--chakra-colors-darkgray-800);
    border-radius: 50%;
    width: 22px;
    height: 22px;
@@ -76,7 +76,7 @@ const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
    border-radius: 0.5rem;
    text-align: center;
-   background: var(--chakra-colors-lightGray-400);
+   background: var(--chakra-colors-lightgray-400);
 `
 const Divider = styled.div`
    display: block;
@@ -149,7 +149,7 @@ const Sidebar = ({
                         <span
                            style={{
                               fontSize: '80%',
-                              color: 'var(--chakra-colors-darkGray-500)',
+                              color: 'var(--chakra-colors-darkgray-500)',
                            }}
                         >
                            {currAccountAddress.substring(0, 5)}

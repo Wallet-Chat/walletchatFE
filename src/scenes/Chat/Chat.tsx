@@ -34,8 +34,15 @@ const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
    height: auto;
-   background: linear-gradient(90deg, var(--chakra-colors-lightGray-200) 14px, transparent 1%) center,
-      linear-gradient(var(--chakra-colors-lightGray-200) 14px, transparent 1%) center, #9dadc3 !important;
+   background: linear-gradient(
+            90deg,
+            var(--chakra-colors-lightgray-200) 14px,
+            transparent 1%
+         )
+         center,
+      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
+         center,
+      #9dadc3 !important;
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);
@@ -70,18 +77,23 @@ const DottedBackground = styled.div`
 //    position: 'right',
 // }]
 
-const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
+const Chat = ({
+   account,
+   web3,
+   chatData,
+}: {
+   account: string
+   web3: Web3
+   chatData: MessageType[]
+}) => {
    let { address: toAddr = '' } = useParams()
    const [ens, setEns] = useState<string>('')
-   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([]
+   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>(
+      []
       // [...testloadingmsgs]
    )
    const [msgInput, setMsgInput] = useState<string>('')
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
-
-   useEffect(() => {
-      getChatData()
-   }, [])
 
    useEffect(() => {
       const getENS = async () => {
@@ -92,6 +104,44 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
       }
       getENS()
    }, [toAddr])
+
+   useEffect(() => {
+      const toAddToUI = []
+
+      for (let i = 0; i < chatData.length; i++) {
+         //console.log("processing id: ", chatData[i].id)
+         const streamToDecrypt = chatData[i].streamID
+
+         if (chatData[i].toAddr.toLowerCase() === account.toLowerCase()) {
+            toAddToUI.push({
+               streamID: chatData[i].streamID,
+               fromName: chatData[i].fromName,
+               fromAddr: chatData[i].fromAddr,
+               toAddr: chatData[i].toAddr,
+               timestamp: chatData[i].timestamp,
+               read: chatData[i].read,
+               id: chatData[i].id - 1,
+               position: 'left',
+               isFetching: false,
+            })
+         } else if (
+            chatData[i].fromAddr.toLowerCase() === account.toLowerCase()
+         ) {
+            toAddToUI.push({
+               streamID: chatData[i].streamID,
+               fromName: chatData[i].fromName,
+               fromAddr: chatData[i].fromAddr,
+               toAddr: chatData[i].toAddr,
+               timestamp: chatData[i].timestamp,
+               read: chatData[i].read,
+               id: chatData[i].id - 1,
+               position: 'right',
+               isFetching: false,
+            })
+         }
+      }
+      setLoadedMsgs(toAddToUI)
+   }, [chatData])
 
    const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter') {
@@ -158,7 +208,7 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
             console.log('✅ POST/Send Message:', data)
             if (data.id - 1) {
                let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-               newLoadedMsgs[data.id - 1]["isFetching"] = false
+               newLoadedMsgs[data.id - 1]['isFetching'] = false
                setLoadedMsgs(newLoadedMsgs)
             }
          })
@@ -195,95 +245,36 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
       position: string,
       isFetching: boolean
    ) => {
-         console.log(`Add message of id ${id} to UI: ${streamID}`)
+      console.log(`Add message of id ${id} to UI: ${streamID}`)
 
-         const newMsg: MessageUIType = {
-            streamID,
-            fromName,
-            fromAddr,
-            toAddr,
-            timestamp,
-            read,
-            id,
-            position,
-            isFetching,
-         }
-         let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-         newLoadedMsgs[id] = newMsg
-         setLoadedMsgs(newLoadedMsgs)
+      const newMsg: MessageUIType = {
+         streamID,
+         fromName,
+         fromAddr,
+         toAddr,
+         timestamp,
+         read,
+         id,
+         position,
+         isFetching,
       }
-
-   function getChatData() {
-      // GET request to get off-chain data for RX user
-      if (!process.env.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
-         return
-      }
-      fetch(` ${process.env.REACT_APP_REST_API}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-      })
-         .then((response) => response.json())
-         .then((data: MessageType[]) => {
-            console.log('✅ GET:', data)
-
-            const toAddToUI = []
-
-            for (let i = 0; i < data.length; i++) {
-               //console.log("processing id: ", data[i].id)
-               const streamToDecrypt = data[i].streamID
-
-               if (data[i].toAddr.toLowerCase() === account.toLowerCase()) {
-                  toAddToUI.push({
-                     streamID: data[i].streamID,
-                     fromName: data[i].fromName,
-                     fromAddr: data[i].fromAddr,
-                     toAddr: data[i].toAddr,
-                     timestamp: data[i].timestamp,
-                     read: data[i].read,
-                     id: data[i].id - 1,
-                     position: 'left',
-                     isFetching: false
-                  })
-               } else if (
-                  data[i].fromAddr.toLowerCase() === account.toLowerCase()
-               ) {
-                  toAddToUI.push({
-                     streamID: data[i].streamID,
-                     fromName: data[i].fromName,
-                     fromAddr: data[i].fromAddr,
-                     toAddr: data[i].toAddr,
-                     timestamp: data[i].timestamp,
-                     read: data[i].read,
-                     id: data[i].id - 1,
-                     position: 'right',
-                     isFetching: false
-                  })
-               }
-            }
-            setLoadedMsgs(toAddToUI)
-         })
-         .catch((error) => {
-            console.error('🚨🚨REST API Error [GET]:', error)
-         })
+      let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
+      newLoadedMsgs[id] = newMsg
+      setLoadedMsgs(newLoadedMsgs)
    }
-
-   console.log(loadedMsgs)
 
    return (
       <Flex background="white" height="100vh" flexDirection="column">
          <Box
             p={5}
             pb={3}
-            borderBottom="1px solid var(--chakra-colors-lightGray-400)"
+            borderBottom="1px solid var(--chakra-colors-lightgray-400)"
          >
             <Box mb={4}>
                <Link to="/chat" style={{ textDecoration: 'none' }}>
                   <Button
                      colorScheme="gray"
-                     background="lightGray.300"
+                     background="lightgray.300"
                      size="sm"
                   >
                      <Flex alignItems="center">
@@ -300,11 +291,11 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
                      <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
                   </BlockieWrapper>
                   <Box>
-                     <Text ml={2} fontWeight="bold" color="darkGray.800">
+                     <Text ml={2} fontWeight="bold" color="darkgray.800">
                         {truncateAddress(toAddr)}
                      </Text>
                      {ens && (
-                        <Text fontWeight="bold" color="darkGray.800">
+                        <Text fontWeight="bold" color="darkgray.800">
                            {ens}
                         </Text>
                      )}
@@ -319,13 +310,13 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
                         {copiedAddr ? (
                            <IconCheck
                               size={20}
-                              color="var(--chakra-colors-darkGray-800)"
+                              color="var(--chakra-colors-darkgray-800)"
                               stroke="1.5"
                            />
                         ) : (
                            <IconCopy
                               size={20}
-                              color="var(--chakra-colors-darkGray-500)"
+                              color="var(--chakra-colors-darkgray-500)"
                               stroke="1.5"
                            />
                         )}
@@ -339,7 +330,7 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
                   >
                      <IconExternalLink
                         size={20}
-                        color="var(--chakra-colors-darkGray-500)"
+                        color="var(--chakra-colors-darkgray-500)"
                         stroke="1.5"
                      />
                   </Button>
@@ -369,9 +360,9 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
                      padding: '.5rem 1rem',
                      width: '100%',
                      fontSize: '90%',
-                     background: 'var(--chakra-colors-lightGray-400)',
+                     background: 'var(--chakra-colors-lightgray-400)',
                      borderRadius: '0.3rem',
-                     marginBottom: '-6px'
+                     marginBottom: '-6px',
                   }}
                   maxRows={8}
                />
