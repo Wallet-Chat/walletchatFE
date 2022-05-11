@@ -156,9 +156,9 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
          .then((response) => response.json()) //Then with the data from the response in JSON...
          .then((data) => {
             console.log('✅ POST/Send Message:', data)
-            if (data.id) {
+            if (data.id - 1) {
                let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-               newLoadedMsgs[data.id]["isFetching"] = false
+               newLoadedMsgs[data.id - 1]["isFetching"] = false
                setLoadedMsgs(newLoadedMsgs)
             }
          })

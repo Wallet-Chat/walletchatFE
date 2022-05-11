@@ -89,7 +89,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
 
             <span className="read-status">
                {msg.isFetching ? (
-                  <Spinner />
+                  <Spinner size="xs" />
                ) : msg.read ? (
                   <IconChecks size={15} />
                ) : (
