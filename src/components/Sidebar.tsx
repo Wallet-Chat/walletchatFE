@@ -1,4 +1,12 @@
-import { Box, Image, Flex } from '@chakra-ui/react'
+import {
+   Box,
+   Image,
+   Flex,
+   MenuButton,
+   MenuList,
+   MenuItem,
+   Menu,
+} from '@chakra-ui/react'
 import { NavLink } from 'react-router-dom'
 import {
    IconChevronDown,
@@ -25,16 +33,16 @@ const LinkElem = styled(NavLink)`
    background: #fff;
 
    &::before {
-       content: '';
-       width: 5px;
-       height: 35%;
-       position: absolute;
-       top: 50%;
-       left: 0;
-       transform: translateY(-50%);
-       background: transparent;
-       border-top-right-radius: 0.2rem;
-       border-bottom-right-radius: 0.2rem;
+      content: '';
+      width: 5px;
+      height: 35%;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      background: transparent;
+      border-top-right-radius: 0.2rem;
+      border-bottom-right-radius: 0.2rem;
    }
 
    &:hover,
@@ -42,11 +50,11 @@ const LinkElem = styled(NavLink)`
       background: var(--chakra-colors-lightGray-400);
 
       &::before {
-        background: var(--chakra-colors-darkGray-900);
+         background: var(--chakra-colors-darkGray-900);
       }
 
       svg {
-          stroke: var(--chakra-colors-darkGray-900);
+         stroke: var(--chakra-colors-darkGray-900);
       }
    }
 `
@@ -84,7 +92,13 @@ const Divider = styled.div`
    }
 `
 
-const Sidebar = ({ currAccountAddress }: { currAccountAddress: string }) => {
+const Sidebar = ({
+   currAccountAddress,
+   disconnectWallet,
+}: {
+   currAccountAddress: string
+   disconnectWallet: () => void
+}) => {
    const inboxNotificationCount = 3
    const nftNotificationCount = 0
 
@@ -124,26 +138,37 @@ const Sidebar = ({ currAccountAddress }: { currAccountAddress: string }) => {
             <LinkElem to={`/new`}>
                <IconCirclePlus size="30" stroke={1.5} />
             </LinkElem>
-            <AccountInfo>
-               {currAccountAddress && (
-                  <>
-                     <Blockies
-                        seed={currAccountAddress.toLocaleLowerCase()}
-                        scale={4}
-                     />
-                     <span
-                        style={{
-                           fontSize: '80%',
-                           color: 'var(--chakra-colors-darkGray-500)',
-                        }}
-                     >
-                        {currAccountAddress.substring(0, 5)}
-                     </span>
-                  </>
-               )}
-               <Box marginTop="0.1rem"></Box>
-               <IconChevronDown size={18} stroke={1.5} />
-            </AccountInfo>
+            <Menu>
+               <MenuButton as={AccountInfo}>
+                  {currAccountAddress && (
+                     <>
+                        <Blockies
+                           seed={currAccountAddress.toLocaleLowerCase()}
+                           scale={4}
+                        />
+                        <span
+                           style={{
+                              fontSize: '80%',
+                              color: 'var(--chakra-colors-darkGray-500)',
+                           }}
+                        >
+                           {currAccountAddress.substring(0, 5)}
+                        </span>
+                     </>
+                  )}
+                  <Box marginTop="0.1rem"></Box>
+                  <IconChevronDown
+                     size={18}
+                     stroke={1.5}
+                     style={{ margin: '0 auto' }}
+                  />
+               </MenuButton>
+               <MenuList>
+                  <MenuItem onClick={() => disconnectWallet()}>
+                     Sign out
+                  </MenuItem>
+               </MenuList>
+            </Menu>
          </Flex>
       </Flex>
    )

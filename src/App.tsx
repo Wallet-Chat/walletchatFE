@@ -12,27 +12,33 @@ import { IconX } from '@tabler/icons'
 import LoadingIndicator from './components/LoadingIndicator'
 
 export const App = () => {
-   const { appLoading, isAuthenticated, connectWallet, account, web3 } =
-      useWallet()
+   const {
+      appLoading,
+      isAuthenticated,
+      connectWallet,
+      disconnectWallet,
+      account,
+      web3,
+   } = useWallet()
 
-      const closeBtn = (
-         <Flex textAlign="right" position="fixed" top={0} right={0}>
-               <Button
-                  borderBottomLeftRadius="lg"
-                  borderBottomRightRadius="lg"
-                  borderTopLeftRadius={0}
-                  borderTopRightRadius={0}
-                  background="lightGray.500"
-                  py={0}
-                  px={1}
-                  size="lg"
-                  height="24px"
-                  onClick={() => window.close()}
-               >
-                  <IconX size={18} color="var(--chakra-colors-darkGray-700)" />
-               </Button>
-            </Flex>
-      )
+   const closeBtn = (
+      <Flex textAlign="right" position="fixed" top={0} right={0}>
+         <Button
+            borderBottomLeftRadius="lg"
+            borderBottomRightRadius="lg"
+            borderTopLeftRadius={0}
+            borderTopRightRadius={0}
+            background="lightGray.500"
+            py={0}
+            px={1}
+            size="lg"
+            height="24px"
+            onClick={() => window.close()}
+         >
+            <IconX size={18} color="var(--chakra-colors-darkGray-700)" />
+         </Button>
+      </Flex>
+   )
 
    if (appLoading || !isAuthenticated) {
       return (
@@ -53,12 +59,12 @@ export const App = () => {
                padding="70px 40px"
                flexGrow={1}
             >
-               <Image src={logoThumb} mb={3} />
+               <Image src={logoThumb} mb={5} width="40px" />
                {appLoading ? (
                   <LoadingIndicator />
                ) : (
                   <>
-                     <Heading size="xl" mb={5}>
+                     <Heading size="2xl" mb={8}>
                         Login to start chatting
                      </Heading>
                      <Button
@@ -78,7 +84,10 @@ export const App = () => {
          <Box>
             <Flex>
                {closeBtn}
-               <Sidebar currAccountAddress={account} />
+               <Sidebar
+                  currAccountAddress={account}
+                  disconnectWallet={disconnectWallet}
+               />
                <Box flex="1">
                   <Routes>
                      <Route
