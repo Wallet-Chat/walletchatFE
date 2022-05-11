@@ -15,6 +15,25 @@ export const App = () => {
    const { appLoading, isAuthenticated, connectWallet, account, web3 } =
       useWallet()
 
+      const closeBtn = (
+         <Flex textAlign="right" position="fixed" top={0} right={0}>
+               <Button
+                  borderBottomLeftRadius="lg"
+                  borderBottomRightRadius="lg"
+                  borderTopLeftRadius={0}
+                  borderTopRightRadius={0}
+                  background="lightGray.500"
+                  py={0}
+                  px={1}
+                  size="lg"
+                  height="24px"
+                  onClick={() => window.close()}
+               >
+                  <IconX size={18} />
+               </Button>
+            </Flex>
+      )
+
    if (appLoading || !isAuthenticated) {
       return (
          <Flex
@@ -27,21 +46,7 @@ export const App = () => {
             right="10px"
          >
             {/* <Header /> */}
-            <Box textAlign="right" position="fixed" top={0} right={0}>
-               <Button
-                  borderBottomLeftRadius="lg"
-                  borderBottomRightRadius="lg"
-                  borderTopLeftRadius={0}
-                  borderTopRightRadius={0}
-                  background="lightGray.500"
-                  py={0}
-                  px={1}
-                  size="lg"
-                  height="30px"
-               >
-                  <IconX />
-               </Button>
-            </Box>
+            {closeBtn}
             <Box
                borderRadius="lg"
                className="bg-pattern"
@@ -72,6 +77,7 @@ export const App = () => {
       return (
          <Box>
             <Flex>
+               {closeBtn}
                <Sidebar currAccountAddress={account} />
                <Box flex="1">
                   <Routes>

@@ -6,7 +6,7 @@ import { formatMessageDate } from '../../../../helpers/date'
 import { MessageUIType } from '../../../../types/MessageUI'
 
 const MessageBox = styled.div`
-position: relative;
+   position: relative;
    width: auto;
    max-width: 80%;
    height: auto;
@@ -42,14 +42,14 @@ position: relative;
       user-select: none;
       line-height: 1.2;
    }
-.read-status {
-   position: absolute;
-   right: var(--chakra-space-2);
-   bottom: var(--chakra-space-2);
-   svg {
-            stroke: var(--chakra-colors-lightGray-800);
-         }
-}
+   .read-status {
+      position: absolute;
+      right: var(--chakra-space-2);
+      bottom: var(--chakra-space-2);
+      svg {
+         stroke: var(--chakra-colors-lightGray-800);
+      }
+   }
    &.read {
       .timestamp {
          color: darkgreen;
@@ -64,14 +64,14 @@ position: relative;
    &.right {
       &.read {
          .timestamp {
-         color: var(--chakra-colors-success-500);
-         user-select: none;
-      }
-      .read-status {
-         svg {
-            stroke: var(--chakra-colors-success-500);
+            color: var(--chakra-colors-success-500);
+            user-select: none;
          }
-      }
+         .read-status {
+            svg {
+               stroke: var(--chakra-colors-success-500);
+            }
+         }
       }
    }
 `
@@ -84,13 +84,11 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
          ></Box>
          <Box className="msg-bubble">
             {msg.streamID}
-               <span className="timestamp">
-                  {formatMessageDate(new Date())}
-               </span>
-               
-                  <span className="read-status">
-                     {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
-                  </span>
+            <span className="timestamp">{formatMessageDate(new Date())}</span>
+
+            <span className="read-status">
+               {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
+            </span>
          </Box>
       </MessageBox>
    )
