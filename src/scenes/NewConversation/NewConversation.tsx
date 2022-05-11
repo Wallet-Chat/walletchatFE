@@ -57,7 +57,7 @@ const NewConversation = ({ web3 }: { web3: any }) => {
                   <Flex
                      alignItems="center"
                      p={3}
-                     background="lightGray.300"
+                     background="lightgray.300"
                      borderRadius="md"
                      mt={2}
                   >

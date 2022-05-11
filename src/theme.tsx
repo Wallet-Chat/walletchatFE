@@ -101,7 +101,7 @@ export const theme = extendTheme(
             800: '#930F35',
             900: '#7A0933',
          },
-         lightGray: {
+         lightgray: {
             100: '#FAFAFB',
             200: '#F5F6F7',
             300: '#EEEFF2',
@@ -112,7 +112,7 @@ export const theme = extendTheme(
             800: '#959CAB',
             900: '#8C93A3',
          },
-         darkGray: {
+         darkgray: {
             100: '#747c90',
             200: '#656E85',
             300: '#5C657D',
@@ -162,7 +162,7 @@ export const theme = extendTheme(
       components: {
          Divider: {
             baseStyle: {
-               borderColor: 'lightGray.200',
+               borderColor: 'lightgray.200',
                opacity: 1,
             },
          },
@@ -170,32 +170,32 @@ export const theme = extendTheme(
             variants: {
                micro: {
                   fontSize: '0.5rem',
-                  color: 'lightGray.400',
+                  color: 'lightgray.400',
                   fontWeight: 'semibold',
                },
                caption: {
                   fontSize: '0.75rem',
-                  color: 'lightGray.400',
+                  color: 'lightgray.400',
                   fontWeight: 'semibold',
                },
                body4: {
                   fontSize: '1rem',
-                  color: 'lightGray.700',
+                  color: 'lightgray.700',
                   fontWeight: 'semibold',
                },
                body3: {
                   fontSize: '1.25rem',
-                  color: 'lightGray.700',
+                  color: 'lightgray.700',
                   fontWeight: 'semibold',
                },
                body2: {
                   fontSize: '1.5rem',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                   fontWeight: 'semibold',
                },
                body1: {
                   fontSize: '1.75rem',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                   fontWeight: 'semibold',
                },
             },
@@ -203,7 +203,7 @@ export const theme = extendTheme(
          Heading: {
             variants: {
                subheader: {
-                  color: 'lightGray.400',
+                  color: 'lightgray.400',
                   fontWeight: 'semibold',
                   fontSize: '1.5rem',
                   letterSpacing: '4px',
@@ -211,42 +211,42 @@ export const theme = extendTheme(
                header6: {
                   fontSize: '1.25rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                header5: {
                   fontSize: '1.5rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                header4: {
                   fontSize: '1.75rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                header3: {
                   fontSize: '2rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                header2: {
                   fontSize: '2.25rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                header1: {
                   fontSize: '2.5rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                big2: {
                   fontSize: '4rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                big1: {
                   fontSize: '5rem',
                   fontWeight: 'semibold',
-                  color: 'lightGray.900',
+                  color: 'lightgray.900',
                },
                huge: {
                   fontSize: '8rem',
@@ -258,7 +258,7 @@ export const theme = extendTheme(
             baseStyle: {
                fontWeight: 'normal',
                _hover: {
-                  boxShadow: '0px 0px 0px 1px var(--chakra-colors-darkGray-100)',
+                  boxShadow: '0px 0px 0px 1px var(--chakra-colors-darkgray-100)',
                   _disabled: {
                      boxShadow: 'none'
                   }
@@ -297,8 +297,8 @@ export const theme = extendTheme(
                },
                white: {
                   bg: 'white',
-                  color: 'darkGray.800',
-                  _hover: { bg: 'lightGray.200' },
+                  color: 'darkgray.800',
+                  _hover: { bg: 'lightgray.200' },
                },
                morePadding: {
                   paddingLeft: 8,

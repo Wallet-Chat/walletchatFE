@@ -1,13 +1,13 @@
 html {
     min-height: 100%;
     min-width: 400px;
-    border: var(--chakra-colors-lightGray-300);
+    border: var(--chakra-colors-lightgray-300);
     border-radius: var(--chakra-borderRadius-sm);
     box-shadow: 0px 4px 4px 2px #00000026;
 }
 
 body {
-    background: var(--chakra-colors-lightGray-300);
+    background: var(--chakra-colors-lightgray-300);
 }
 
 a {
@@ -20,7 +20,7 @@ a {
     &.disabled {
         pointer-events: none;
         text-decoration: none;
-        color: var(--chakra-colors-lightGray-600) !important;
+        color: var(--chakra-colors-lightgray-600) !important;
     }
 }
 
