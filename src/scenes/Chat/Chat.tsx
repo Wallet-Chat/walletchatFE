@@ -34,53 +34,53 @@ const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
    height: auto;
-   background: linear-gradient(90deg, #fcfcfc 14px, transparent 1%) center,
-      linear-gradient(#fcfcfc 14px, transparent 1%) center, #9dadc3 !important;
+   background: linear-gradient(90deg, var(--chakra-colors-lightGray-200) 14px, transparent 1%) center,
+      linear-gradient(var(--chakra-colors-lightGray-200) 14px, transparent 1%) center, #9dadc3 !important;
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);
 `
 
-const testloadingmsgs = [{
-   streamID: 'Message 2 test. Mauris tempor lacus vel mollis viverra. Donec rutrum quis ex ut cursus. Nunc tincidunt odio non maximus vulputate. Nunc hendrerit dictum maximus.',
-   fromName: 'Steven',
-   fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
-   toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
-   read: false,
-   timestamp: new Date(),
-   id: 2,
-   position: 'left',
-}, {
-   streamID: 'Hello there',
-   fromName: 'Steven',
-   fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
-   toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
-   read: true,
-   timestamp: new Date(),
-   id: 1,
-   position: 'left',
-}, {
-   streamID: ' Pellentesque augue elit, gravida nec sapien a, lobortis bibendum purus.',
-   fromName: '',
-   fromAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
-   toAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
-   read: true,
-   timestamp: new Date(),
-   id: 0,
-   position: 'right',
-}]
+// const testloadingmsgs = [{
+//    streamID: 'Message 2 test. Mauris tempor lacus vel mollis viverra. Donec rutrum quis ex ut cursus. Nunc tincidunt odio non maximus vulputate. Nunc hendrerit dictum maximus.',
+//    fromName: 'Steven',
+//    fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
+//    toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
+//    read: false,
+//    timestamp: new Date(),
+//    id: 2,
+//    position: 'left',
+// }, {
+//    streamID: 'Hello there',
+//    fromName: 'Steven',
+//    fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
+//    toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
+//    read: true,
+//    timestamp: new Date(),
+//    id: 1,
+//    position: 'left',
+// }, {
+//    streamID: ' Pellentesque augue elit, gravida nec sapien a, lobortis bibendum purus.',
+//    fromName: '',
+//    fromAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
+//    toAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
+//    read: true,
+//    timestamp: new Date(),
+//    id: 0,
+//    position: 'right',
+// }]
 
 const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
    let { address: toAddr = '' } = useParams()
    const [ens, setEns] = useState<string>('')
-   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([
-      ...testloadingmsgs,
-   ])
+   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([]
+      // [...testloadingmsgs]
+   )
    const [msgInput, setMsgInput] = useState<string>('')
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
 
    useEffect(() => {
-      // updateChatData()
+      getChatData()
    }, [])
 
    useEffect(() => {
@@ -119,19 +119,18 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
    const sendMessage = () => {
       if (msgInput.length <= 0) return
 
-      setMsgInput('') // clear message upon sending it
-
       const timestamp = new Date()
 
-      const data: MessageType = {
+      const data = {
          streamID: msgInput,
          fromName: account,
          fromAddr: account,
          toAddr: toAddr,
          timestamp,
          read: false,
-         id: -1,
       }
+
+      const tempId = loadedMsgs.length
 
       addMessageToUI(
          msgInput,
@@ -140,9 +139,12 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
          toAddr,
          timestamp,
          false,
-         loadedMsgs.length,
-         'right'
+         tempId,
+         'right',
+         true
       )
+
+      setMsgInput('') // clear message upon sending it
 
       fetch(` ${process.env.REACT_APP_REST_API}`, {
          method: 'POST',
@@ -154,6 +156,11 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
          .then((response) => response.json()) //Then with the data from the response in JSON...
          .then((data) => {
             console.log('✅ POST/Send Message:', data)
+            if (data.id) {
+               let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
+               newLoadedMsgs[data.id]["isFetching"] = false
+               setLoadedMsgs(newLoadedMsgs)
+            }
          })
          .catch((error) => {
             console.error('🚨🚨REST API Error [POST]:', error)
@@ -185,10 +192,10 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
       timestamp: Date,
       read: boolean,
       id: number,
-      position: string
+      position: string,
+      isFetching: boolean
    ) => {
-      if (!loadedMsgs[id]) {
-         console.log('Add message to UI:', streamID)
+         console.log(`Add message of id ${id} to UI: ${streamID}`)
 
          const newMsg: MessageUIType = {
             streamID,
@@ -199,14 +206,14 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
             read,
             id,
             position,
+            isFetching,
          }
          let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
          newLoadedMsgs[id] = newMsg
          setLoadedMsgs(newLoadedMsgs)
       }
-   }
 
-   function updateChatData() {
+   function getChatData() {
       // GET request to get off-chain data for RX user
       if (!process.env.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
@@ -222,38 +229,41 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
          .then((data: MessageType[]) => {
             console.log('✅ GET:', data)
 
+            const toAddToUI = []
+
             for (let i = 0; i < data.length; i++) {
                //console.log("processing id: ", data[i].id)
                const streamToDecrypt = data[i].streamID
 
                if (data[i].toAddr.toLowerCase() === account.toLowerCase()) {
-                  console.log('add message receiver', data[i].streamID)
-                  addMessageToUI(
-                     data[i].streamID,
-                     data[i].fromName,
-                     data[i].fromAddr,
-                     data[i].toAddr,
-                     data[i].timestamp,
-                     data[i].read,
-                     data[i].id,
-                     'left'
-                  )
+                  toAddToUI.push({
+                     streamID: data[i].streamID,
+                     fromName: data[i].fromName,
+                     fromAddr: data[i].fromAddr,
+                     toAddr: data[i].toAddr,
+                     timestamp: data[i].timestamp,
+                     read: data[i].read,
+                     id: data[i].id - 1,
+                     position: 'left',
+                     isFetching: false
+                  })
                } else if (
                   data[i].fromAddr.toLowerCase() === account.toLowerCase()
                ) {
-                  console.log('add message sender', data[i].streamID)
-                  addMessageToUI(
-                     data[i].streamID,
-                     data[i].fromName,
-                     data[i].fromAddr,
-                     data[i].toAddr,
-                     data[i].timestamp,
-                     data[i].read,
-                     data[i].id,
-                     'right'
-                  )
+                  toAddToUI.push({
+                     streamID: data[i].streamID,
+                     fromName: data[i].fromName,
+                     fromAddr: data[i].fromAddr,
+                     toAddr: data[i].toAddr,
+                     timestamp: data[i].timestamp,
+                     read: data[i].read,
+                     id: data[i].id - 1,
+                     position: 'right',
+                     isFetching: false
+                  })
                }
             }
+            setLoadedMsgs(toAddToUI)
          })
          .catch((error) => {
             console.error('🚨🚨REST API Error [GET]:', error)
@@ -338,9 +348,12 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
          </Box>
 
          <DottedBackground>
-            {loadedMsgs.map((msg: MessageUIType, i) => (
-               <Message key={msg.streamID} msg={msg} />
-            ))}
+            {loadedMsgs.map((msg: MessageUIType, i) => {
+               if (msg && msg.streamID) {
+                  return <Message key={msg.streamID} msg={msg} />
+               }
+               return null
+            })}
          </DottedBackground>
 
          <Flex>
@@ -356,8 +369,9 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
                      padding: '.5rem 1rem',
                      width: '100%',
                      fontSize: '90%',
-                     background: 'var(--chakra-colors-lightGray-300)',
+                     background: 'var(--chakra-colors-lightGray-400)',
                      borderRadius: '0.3rem',
+                     marginBottom: '-6px'
                   }}
                   maxRows={8}
                />

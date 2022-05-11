@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react'
+import { Box, Spinner } from '@chakra-ui/react'
 import { IconCheck, IconChecks } from '@tabler/icons'
 import styled from 'styled-components'
 
@@ -8,6 +8,7 @@ import { MessageUIType } from '../../../../types/MessageUI'
 const MessageBox = styled.div`
    position: relative;
    width: auto;
+   min-width: 75px;
    max-width: 80%;
    height: auto;
    background: #fff;
@@ -87,7 +88,13 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             <span className="timestamp">{formatMessageDate(new Date())}</span>
 
             <span className="read-status">
-               {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
+               {msg.isFetching ? (
+                  <Spinner />
+               ) : msg.read ? (
+                  <IconChecks size={15} />
+               ) : (
+                  <IconCheck size={15} />
+               )}
             </span>
          </Box>
       </MessageBox>

@@ -29,7 +29,7 @@ export const App = () => {
                   height="24px"
                   onClick={() => window.close()}
                >
-                  <IconX size={18} />
+                  <IconX size={18} color="var(--chakra-colors-darkGray-700)" />
                </Button>
             </Flex>
       )
