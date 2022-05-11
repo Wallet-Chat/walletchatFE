@@ -23,7 +23,6 @@ const NewConversation = ({ web3 }: { web3: any }) => {
    let navigate = useNavigate()
 
    const onSubmit = (values: any) => {
-        alert(JSON.stringify(values, null, 2))
         navigate(`/chat/${toAddr}`)
    }
 

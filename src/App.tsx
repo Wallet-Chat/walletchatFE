@@ -75,14 +75,14 @@ export const App = () => {
                <Sidebar currAccountAddress={account} />
                <Box flex="1">
                   <Routes>
-                     <Route path="/inbox" element={<Inbox />} />
+                     <Route path="/inbox" element={<Inbox web3={web3} />} />
                      <Route
                         path="/new"
                         element={<NewConversation web3={web3} />}
                      />
                      <Route
                         path="/chat/:address"
-                        element={<Chat web3={web3} />}
+                        element={<Chat account={account} web3={web3} />}
                      />
                      <Route
                         path="/"
