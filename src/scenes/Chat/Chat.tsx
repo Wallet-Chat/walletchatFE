@@ -270,7 +270,7 @@ const Chat = ({ account, web3 }: { account: string; web3: Web3 }) => {
             borderBottom="1px solid var(--chakra-colors-lightGray-400)"
          >
             <Box mb={4}>
-               <Link to="/inbox" style={{ textDecoration: 'none' }}>
+               <Link to="/chat" style={{ textDecoration: 'none' }}>
                   <Button
                      colorScheme="gray"
                      background="lightGray.300"

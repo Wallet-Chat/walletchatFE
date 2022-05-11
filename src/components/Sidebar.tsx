@@ -105,7 +105,7 @@ const Sidebar = ({ currAccountAddress }: { currAccountAddress: string }) => {
             <Box mt={2}></Box>
             <Divider />
             <Box mb={5}></Box>
-            <LinkElem to={'/inbox'}>
+            <LinkElem to={'/chat'}>
                <IconMessageCircle2 size="30" stroke={1.5} />
                {inboxNotificationCount > 0 && (
                   <NotificationCount>
