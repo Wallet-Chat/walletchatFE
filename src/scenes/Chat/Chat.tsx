@@ -5,6 +5,7 @@ import {
    Flex,
    Text,
    Link as CLink,
+   Spinner,
 } from '@chakra-ui/react'
 import { KeyboardEvent, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
@@ -80,11 +81,11 @@ const DottedBackground = styled.div`
 const Chat = ({
    account,
    web3,
-   chatData,
+   isAuthenticated,
 }: {
    account: string
    web3: Web3
-   chatData: MessageType[]
+   isAuthenticated: boolean
 }) => {
    let { address: toAddr = '' } = useParams()
    const [ens, setEns] = useState<string>('')
@@ -94,6 +95,10 @@ const Chat = ({
    )
    const [msgInput, setMsgInput] = useState<string>('')
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
+   const [chatData, setChatData] = useState<MessageType[]>(
+      new Array<MessageType>()
+   )
+   const [isFetchingChatData, setIsFetchingChatData] = useState<boolean>(false)
 
    useEffect(() => {
       const getENS = async () => {
@@ -106,12 +111,47 @@ const Chat = ({
    }, [toAddr])
 
    useEffect(() => {
+      function getChatData() {
+         // GET request to get off-chain data for RX user
+         if (!process.env.REACT_APP_REST_API) {
+            console.log('REST API url not in .env', process.env)
+            return
+         }
+         if (!account) {
+            console.log('No account connected')
+            return
+         }
+         setIsFetchingChatData(true)
+         fetch(
+            ` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}`,
+            {
+               method: 'GET',
+               headers: {
+                  'Content-Type': 'application/json',
+               },
+            }
+         )
+            .then((response) => response.json())
+            .then((data: MessageType[]) => {
+               console.log('✅ GET:', data)
+               setChatData(data)
+               // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
+               setIsFetchingChatData(false)
+            })
+            .catch((error) => {
+               console.error('🚨🚨REST API Error [GET]:', error)
+               setIsFetchingChatData(false)
+            })
+      }
+      if (isAuthenticated && account) {
+         getChatData()
+      }
+   }, [isAuthenticated, account])
+
+   useEffect(() => {
       const toAddToUI = []
 
       for (let i = 0; i < chatData.length; i++) {
-         //console.log("processing id: ", chatData[i].id)
-         const streamToDecrypt = chatData[i].streamID
-
          if (chatData[i].toAddr.toLowerCase() === account.toLowerCase()) {
             toAddToUI.push({
                streamID: chatData[i].streamID,
@@ -139,7 +179,7 @@ const Chat = ({
          }
       }
       setLoadedMsgs(toAddToUI)
-   }, [chatData])
+   }, [chatData, account])
 
    const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter') {
@@ -178,15 +218,7 @@ const Chat = ({
          read: false,
       }
 
-      addMessageToUI(
-         msgInput,
-         account,
-         toAddr,
-         timestamp,
-         false,
-         'right',
-         true
-      )
+      addMessageToUI(msgInput, account, toAddr, timestamp, false, 'right', true)
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
 
@@ -331,6 +363,11 @@ const Chat = ({
          </Box>
 
          <DottedBackground>
+            {isFetchingChatData && (
+               <Flex justifyContent="center" alignItems="center" height="100%">
+                  <Spinner />
+               </Flex>
+            )}
             {loadedMsgs.map((msg: MessageUIType, i) => {
                if (msg && msg.streamID) {
                   return <Message key={msg.streamID} msg={msg} />

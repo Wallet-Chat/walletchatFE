@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { IconX } from '@tabler/icons'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import { Button, Box, Flex, Image, Heading } from '@chakra-ui/react'
@@ -11,7 +10,6 @@ import Chat from './scenes/Chat'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import LoadingIndicator from './components/LoadingIndicator'
-import MessageType from './types/Message'
 
 export const App = () => {
    const {
@@ -22,44 +20,6 @@ export const App = () => {
       account,
       web3,
    } = useWallet()
-
-   const [chatData, setChatData] = useState<MessageType[]>(new Array<MessageType>())
-   const [isFetchingChatData, setIsFetchingChatData] = useState<boolean>(false)
-
-   useEffect(() => {
-      function getChatData() {
-         // GET request to get off-chain data for RX user
-         if (!process.env.REACT_APP_REST_API) {
-            console.log('REST API url not in .env', process.env)
-            return
-         }
-         if (!account) {
-            console.log('No account connected')
-            return
-         }
-         setIsFetchingChatData(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}`, {
-            method: 'GET',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-         })
-            .then((response) => response.json())
-            .then((data: MessageType[]) => {
-               console.log('✅ GET:', data)
-               setChatData(data)
-               // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-               setIsFetchingChatData(false)
-            })
-            .catch((error) => {
-               console.error('🚨🚨REST API Error [GET]:', error)
-               setIsFetchingChatData(false)
-            })
-      }
-      if (isAuthenticated && account) {
-         getChatData()
-      }
-   }, [isAuthenticated, account])
 
    const closeBtn = (
       <Flex textAlign="right" position="fixed" top={0} right={0}>
@@ -136,9 +96,23 @@ export const App = () => {
                      />
                      <Route
                         path="/chat/:address"
-                        element={<Chat account={account} web3={web3} chatData={chatData} />}
+                        element={
+                           <Chat
+                              account={account}
+                              web3={web3}
+                              isAuthenticated={isAuthenticated}
+                           />
+                        }
                      />
-                     <Route path="/chat" element={<Inbox chatData={chatData} isFetchingChatData={isFetchingChatData} />} />
+                     <Route
+                        path="/chat"
+                        element={
+                           <Inbox
+                              account={account}
+                              isAuthenticated={isAuthenticated}
+                           />
+                        }
+                     />
                      <Route
                         path="/"
                         element={<Navigate to="/chat" replace />}
