@@ -24,6 +24,7 @@ export const App = () => {
    } = useWallet()
 
    const [chatData, setChatData] = useState<MessageType[]>(new Array<MessageType>())
+   const [isFetchingChatData, setIsFetchingChatData] = useState<boolean>(false)
 
    useEffect(() => {
       function getChatData() {
@@ -32,7 +33,12 @@ export const App = () => {
             console.log('REST API url not in .env', process.env)
             return
          }
-         fetch(` ${process.env.REACT_APP_REST_API}`, {
+         if (!account) {
+            console.log('No account connected')
+            return
+         }
+         setIsFetchingChatData(true)
+         fetch(` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}`, {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
@@ -42,9 +48,12 @@ export const App = () => {
             .then((data: MessageType[]) => {
                console.log('✅ GET:', data)
                setChatData(data)
+               // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
+               setIsFetchingChatData(false)
             })
             .catch((error) => {
                console.error('🚨🚨REST API Error [GET]:', error)
+               setIsFetchingChatData(false)
             })
       }
       if (isAuthenticated && account) {
@@ -129,7 +138,7 @@ export const App = () => {
                         path="/chat/:address"
                         element={<Chat account={account} web3={web3} chatData={chatData} />}
                      />
-                     <Route path="/chat" element={<Inbox chatData={chatData} />} />
+                     <Route path="/chat" element={<Inbox chatData={chatData} isFetchingChatData={isFetchingChatData} />} />
                      <Route
                         path="/"
                         element={<Navigate to="/chat" replace />}

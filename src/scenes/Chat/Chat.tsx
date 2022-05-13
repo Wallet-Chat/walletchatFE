@@ -115,12 +115,11 @@ const Chat = ({
          if (chatData[i].toAddr.toLowerCase() === account.toLowerCase()) {
             toAddToUI.push({
                streamID: chatData[i].streamID,
-               fromName: chatData[i].fromName,
                fromAddr: chatData[i].fromAddr,
                toAddr: chatData[i].toAddr,
                timestamp: chatData[i].timestamp,
                read: chatData[i].read,
-               id: chatData[i].id - 1,
+               id: chatData[i].id,
                position: 'left',
                isFetching: false,
             })
@@ -129,12 +128,11 @@ const Chat = ({
          ) {
             toAddToUI.push({
                streamID: chatData[i].streamID,
-               fromName: chatData[i].fromName,
                fromAddr: chatData[i].fromAddr,
                toAddr: chatData[i].toAddr,
                timestamp: chatData[i].timestamp,
                read: chatData[i].read,
-               id: chatData[i].id - 1,
+               id: chatData[i].id,
                position: 'right',
                isFetching: false,
             })
@@ -180,23 +178,21 @@ const Chat = ({
          read: false,
       }
 
-      const tempId = loadedMsgs.length
-
       addMessageToUI(
          msgInput,
-         account,
          account,
          toAddr,
          timestamp,
          false,
-         tempId,
          'right',
          true
       )
 
+      // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
+
       setMsgInput('') // clear message upon sending it
 
-      fetch(` ${process.env.REACT_APP_REST_API}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -236,30 +232,26 @@ const Chat = ({
 
    const addMessageToUI = (
       streamID: string,
-      fromName: string,
       fromAddr: string,
       toAddr: string,
       timestamp: Date,
       read: boolean,
-      id: number,
       position: string,
       isFetching: boolean
    ) => {
-      console.log(`Add message of id ${id} to UI: ${streamID}`)
+      console.log(`Add message to UI: ${streamID}`)
 
       const newMsg: MessageUIType = {
          streamID,
-         fromName,
          fromAddr,
          toAddr,
          timestamp,
          read,
-         id,
          position,
          isFetching,
       }
       let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-      newLoadedMsgs[id] = newMsg
+      newLoadedMsgs.push(newMsg)
       setLoadedMsgs(newLoadedMsgs)
    }
 
