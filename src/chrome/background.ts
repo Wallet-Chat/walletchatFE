@@ -1,7 +1,15 @@
 chrome.runtime.onMessage.addListener((data) => {
+   console.log("chrome.runtime.onMessage", data)
    if (data.type === 'notification') {
       notify(data.message)
    }
+   // if (data.open) {
+   //    return new Promise(resolve => {
+   //      chrome.browserAction.getPopup({}, (popup) => {
+   //        return resolve(popup)
+   //      })
+   //    })
+   //  }
 })
 
 chrome.runtime.onInstalled.addListener((details) => {
