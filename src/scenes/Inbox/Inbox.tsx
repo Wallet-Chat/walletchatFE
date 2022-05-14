@@ -6,9 +6,12 @@ import {
    Stack,
    SkeletonCircle,
    SkeletonText,
+   Text
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import Web3 from 'web3'
+import StartConversationWithAddress from '../../components/StartConversationWithAddress'
 import MessageType from '../../types/Message'
 import ConversationItem from './components/ConversationItem'
 
@@ -29,9 +32,11 @@ const Divider = styled.div`
 
 const Inbox = ({
    account,
+   web3,
    isAuthenticated,
 }: {
    account: string
+   web3: Web3,
    isAuthenticated: boolean
 }) => {
    const [inboxData, setInboxData] = useState<MessageType[]>(
@@ -122,10 +127,9 @@ const Inbox = ({
             <ConversationItem key={conversation.id} data={conversation} />
          ))}
          {inboxData.length === 0 && (
-            <Box>
-               You have no messages.
-               <br />
-               <Button variant="black">Start a conversation</Button>
+            <Box p={5}>
+               <Text mb={4}>You have no messages.</Text>
+               <StartConversationWithAddress web3={web3} />
             </Box>
          )}
       </Box>

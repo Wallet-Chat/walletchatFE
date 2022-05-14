@@ -310,7 +310,8 @@ const Chat = ({
             </Box>
 
             {toAddr && (
-               <Flex alignItems="center">
+               <Flex alignItems="center" justifyContent="space-between">
+                  <Flex alignItems="center">
                   <BlockieWrapper>
                      <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
                   </BlockieWrapper>
@@ -324,6 +325,8 @@ const Chat = ({
                         </Text>
                      )}
                   </Box>
+                  </Flex>
+                  <Box>
                   {document.queryCommandSupported('copy') && (
                      <Button
                         onClick={() => copyToClipboard()}
@@ -334,13 +337,13 @@ const Chat = ({
                         {copiedAddr ? (
                            <IconCheck
                               size={20}
-                              color="var(--chakra-colors-darkgray-800)"
+                              color="var(--chakra-colors-darkgray-500)"
                               stroke="1.5"
                            />
                         ) : (
                            <IconCopy
                               size={20}
-                              color="var(--chakra-colors-darkgray-500)"
+                              color="var(--chakra-colors-lightgray-900)"
                               stroke="1.5"
                            />
                         )}
@@ -354,10 +357,11 @@ const Chat = ({
                   >
                      <IconExternalLink
                         size={20}
-                        color="var(--chakra-colors-darkgray-500)"
+                        color="var(--chakra-colors-lightgray-900)"
                         stroke="1.5"
                      />
                   </Button>
+                  </Box>
                </Flex>
             )}
          </Box>
