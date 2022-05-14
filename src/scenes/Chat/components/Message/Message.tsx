@@ -3,7 +3,7 @@ import { IconCheck, IconChecks } from '@tabler/icons'
 import styled from 'styled-components'
 
 import { formatMessageDate } from '../../../../helpers/date'
-import { MessageUIType } from '../../../../types/MessageUI'
+import MessageUIType from '../../../../types/MessageUI'
 
 const MessageBox = styled.div`
    position: relative;
@@ -85,7 +85,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
          ></Box>
          <Box className="msg-bubble">
             {msg.message}
-            <span className="timestamp">{formatMessageDate(new Date())}</span>
+            <span className="timestamp">{formatMessageDate(new Date(msg.timestamp))}</span>
 
             <span className="read-status">
                {msg.isFetching ? (

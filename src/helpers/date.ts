@@ -163,7 +163,9 @@ export const isWithinRanges = (date: Date, ranges: Date[][]) => {
 }
 
 export const formatMessageDate = (date: Date) => {
-   const h = '0' + date.getHours()
-   const m = '0' + date.getMinutes()
-   return `${h.slice(-2)}:${m.slice(-2)}`
+   if (date instanceof Date) {
+      const h = '0' + date.getHours()
+      const m = '0' + date.getMinutes()
+      return `${h.slice(-2)}:${m.slice(-2)}`
+   }
 }

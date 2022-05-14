@@ -2,18 +2,25 @@ import { Box, Flex } from '@chakra-ui/react'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
 
-import MessageType from '../../../../types/Message'
+import MessageUIType from '../../../../types/MessageUI'
 import { formatMessageDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { Link } from 'react-router-dom'
 
-const ConversationItem = ({ data }: { data: MessageType }) => {
+const ConversationItem = ({
+   data,
+   account,
+}: {
+   data: MessageUIType
+   account: string
+}) => {
    const Wrapper = styled.button`
       display: block;
       width: 100%;
       padding: var(--chakra-space-3) var(--chakra-space-5);
       background: #fff;
       text-align: left;
+      color: var(--chakra-colors-darkgray-900);
 
       &:not(:last-child) {
          border-bottom: 1px solid var(--chakra-colors-lightgray-300);
@@ -31,7 +38,7 @@ const ConversationItem = ({ data }: { data: MessageType }) => {
          line-height: 1.7;
       }
    `
-   const FromAddress = styled.div`
+   const RecipientAddress = styled.div`
       font-size: var(--chakra-fontSizes-lg);
       font-weight: bold;
    `
@@ -39,24 +46,26 @@ const ConversationItem = ({ data }: { data: MessageType }) => {
       border-radius: 0.3rem;
       overflow: hidden;
    `
+
+   const recipientAddress =
+      data.toAddr.toLocaleLowerCase() === account
+         ? data.fromAddr.toLocaleLowerCase()
+         : data.toAddr.toLocaleLowerCase()
    return (
-      <Link to={`/chat/${data.toAddr}`} style={{ textDecoration: 'none' }}>
+      <Link to={`/chat/${recipientAddress}`} style={{ textDecoration: 'none' }}>
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>
                   <Box mr={2}>
                      <BlockieWrapper>
-                        <Blockies
-                           seed={data.toAddr.toLocaleLowerCase()}
-                           scale={5}
-                        />
+                        <Blockies seed={recipientAddress} scale={5} />
                      </BlockieWrapper>
                   </Box>
                   <Box>
-                     {data.fromAddr && (
-                        <FromAddress>
-                           {truncateAddress(data.fromAddr)}
-                        </FromAddress>
+                     {recipientAddress && (
+                        <RecipientAddress>
+                           {truncateAddress(recipientAddress)}
+                        </RecipientAddress>
                      )}
                      {data.message && (
                         <Box fontSize="md" color="darkgray.100">

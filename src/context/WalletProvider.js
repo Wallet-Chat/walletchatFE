@@ -23,7 +23,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [account, setAccount] = React.useState(null)
    const [web3, setWeb3] = React.useState(null)
    const [isAuthenticated, setAuthenticated] = React.useState(false)
-   const [appLoading, setAppLoading] = React.useState(false)
+   const [appLoading, setAppLoading] = React.useState(true)
 
    console.log({ chainId, account, web3, isAuthenticated })
 
@@ -48,7 +48,7 @@ const WalletProvider = React.memo(({ children }) => {
             provider.removeListener(EthereumEvents.DISCONNECT, handleDisconnect)
          }
       }
-      
+
       connectEagerly()
       return () => {
          const provider = getProvider()

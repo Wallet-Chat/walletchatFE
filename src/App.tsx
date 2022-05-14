@@ -1,6 +1,6 @@
 import { IconX } from '@tabler/icons'
 import { Route, Routes, Navigate } from 'react-router-dom'
-import { Button, Box, Flex, Image, Heading } from '@chakra-ui/react'
+import { Button, Box, Flex, Image, Heading, Spinner } from '@chakra-ui/react'
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
@@ -9,7 +9,6 @@ import NewConversation from './scenes/NewConversation'
 import Chat from './scenes/Chat'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
-import LoadingIndicator from './components/LoadingIndicator'
 
 export const App = () => {
    const {
@@ -39,7 +38,7 @@ export const App = () => {
          </Button>
       </Flex>
    )
-
+   console.log(appLoading)
    if (appLoading || !isAuthenticated) {
       return (
          <Flex
@@ -53,30 +52,35 @@ export const App = () => {
          >
             {/* <Header /> */}
             {closeBtn}
-            <Box
-               borderRadius="lg"
-               className="bg-pattern"
-               padding="70px 40px"
-               flexGrow={1}
-            >
-               <Image src={logoThumb} mb={5} width="40px" />
-               {appLoading ? (
-                  <LoadingIndicator />
-               ) : (
-                  <>
-                     <Heading size="2xl" mb={8}>
-                        Login to start chatting
-                     </Heading>
-                     <Button
-                        variant="black"
-                        onClick={() => connectWallet()}
-                        size="lg"
-                     >
-                        Sign in using wallet
-                     </Button>
-                  </>
-               )}
-            </Box>
+            {appLoading ? (
+               <Flex
+                  w="100vw"
+                  h="100vh"
+                  justifyContent="center"
+                  alignItems="center"
+               >
+                  <Spinner />
+               </Flex>
+            ) : (
+               <Box
+                  borderRadius="lg"
+                  className="bg-pattern"
+                  padding="70px 40px"
+                  flexGrow={1}
+               >
+                  <Image src={logoThumb} mb={5} width="40px" />
+                  <Heading size="2xl" mb={8}>
+                     Login to start chatting
+                  </Heading>
+                  <Button
+                     variant="black"
+                     onClick={() => connectWallet()}
+                     size="lg"
+                  >
+                     Sign in using wallet
+                  </Button>
+               </Box>
+            )}
          </Flex>
       )
    } else {
