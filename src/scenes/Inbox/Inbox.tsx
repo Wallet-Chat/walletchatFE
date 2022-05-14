@@ -5,7 +5,8 @@ import {
    Stack,
    SkeletonCircle,
    SkeletonText,
-   Text
+   Text,
+   Spinner
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
@@ -67,7 +68,8 @@ const Inbox = ({
             .then((response) => response.json())
             .then((data: MessageType[]) => {
                console.log('✅ GET:', data)
-               setInboxData(data)
+               if (data === null) setInboxData([])
+               else setInboxData(data)
                // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
                setIsFetchingInboxData(false)
             })
@@ -120,7 +122,7 @@ const Inbox = ({
       setLoadedMsgs(toAddToUI)
    }, [inboxData, account])
 
-   if (isFetchingInboxData) {
+   if (isFetchingInboxData && inboxData.length !== 0) {
       return (
          <Box background="white" height="100vh">
             <Box py={8} px={3} height="100vh">
@@ -158,7 +160,7 @@ const Inbox = ({
       <Box background="white" minHeight="100vh">
          <Box p={5}>
             <Heading size="xl">
-               Inbox
+               Inbox {isFetchingInboxData && <Spinner />}
             </Heading>
          </Box>
          <Divider />
