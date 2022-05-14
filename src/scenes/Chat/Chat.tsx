@@ -50,7 +50,7 @@ const DottedBackground = styled.div`
 `
 
 // const testloadingmsgs = [{
-//    streamID: 'Message 2 test. Mauris tempor lacus vel mollis viverra. Donec rutrum quis ex ut cursus. Nunc tincidunt odio non maximus vulputate. Nunc hendrerit dictum maximus.',
+//    message: 'Message 2 test. Mauris tempor lacus vel mollis viverra. Donec rutrum quis ex ut cursus. Nunc tincidunt odio non maximus vulputate. Nunc hendrerit dictum maximus.',
 //    fromName: 'Steven',
 //    fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
 //    toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
@@ -59,7 +59,7 @@ const DottedBackground = styled.div`
 //    id: 2,
 //    position: 'left',
 // }, {
-//    streamID: 'Hello there',
+//    message: 'Hello there',
 //    fromName: 'Steven',
 //    fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
 //    toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
@@ -68,7 +68,7 @@ const DottedBackground = styled.div`
 //    id: 1,
 //    position: 'left',
 // }, {
-//    streamID: ' Pellentesque augue elit, gravida nec sapien a, lobortis bibendum purus.',
+//    message: ' Pellentesque augue elit, gravida nec sapien a, lobortis bibendum purus.',
 //    fromName: '',
 //    fromAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
 //    toAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
@@ -154,7 +154,7 @@ const Chat = ({
       for (let i = 0; i < chatData.length; i++) {
          if (chatData[i].toAddr.toLowerCase() === account.toLowerCase()) {
             toAddToUI.push({
-               streamID: chatData[i].streamID,
+               message: chatData[i].message,
                fromAddr: chatData[i].fromAddr,
                toAddr: chatData[i].toAddr,
                timestamp: chatData[i].timestamp,
@@ -167,7 +167,7 @@ const Chat = ({
             chatData[i].fromAddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
-               streamID: chatData[i].streamID,
+               message: chatData[i].message,
                fromAddr: chatData[i].fromAddr,
                toAddr: chatData[i].toAddr,
                timestamp: chatData[i].timestamp,
@@ -210,8 +210,7 @@ const Chat = ({
       const timestamp = new Date()
 
       const data = {
-         streamID: msgInput,
-         fromName: account,
+         message: msgInput,
          fromAddr: account,
          toAddr: toAddr,
          timestamp,
@@ -241,7 +240,7 @@ const Chat = ({
             }
          })
          .catch((error) => {
-            console.error('🚨🚨REST API Error [POST]:', error)
+            console.error('🚨🚨REST API Error [POST]:', error, JSON.stringify(data))
          })
    }
 
@@ -263,7 +262,7 @@ const Chat = ({
    }
 
    const addMessageToUI = (
-      streamID: string,
+      message: string,
       fromAddr: string,
       toAddr: string,
       timestamp: Date,
@@ -271,10 +270,10 @@ const Chat = ({
       position: string,
       isFetching: boolean
    ) => {
-      console.log(`Add message to UI: ${streamID}`)
+      console.log(`Add message to UI: ${message}`)
 
       const newMsg: MessageUIType = {
-         streamID,
+         message,
          fromAddr,
          toAddr,
          timestamp,
@@ -373,8 +372,8 @@ const Chat = ({
                </Flex>
             )}
             {loadedMsgs.map((msg: MessageUIType, i) => {
-               if (msg && msg.streamID) {
-                  return <Message key={msg.streamID} msg={msg} />
+               if (msg && msg.message) {
+                  return <Message key={msg.message} msg={msg} />
                }
                return null
             })}

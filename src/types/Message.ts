@@ -1,5 +1,5 @@
 export default interface MessageType {
-   streamID: string
+   message: string
    fromAddr: string
    toAddr: string
    timestamp: Date,

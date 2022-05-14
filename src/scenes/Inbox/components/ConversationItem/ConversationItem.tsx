@@ -58,10 +58,10 @@ const ConversationItem = ({ data }: { data: MessageType }) => {
                            {truncateAddress(data.fromAddr)}
                         </FromAddress>
                      )}
-                     {data.streamID && (
+                     {data.message && (
                         <Box fontSize="md" color="darkgray.100">
-                           {data.streamID.substring(0, 25)}
-                           {data.streamID.length > 25 && '...'}
+                           {data.message.substring(0, 25)}
+                           {data.message.length > 25 && '...'}
                         </Box>
                      )}
                   </Box>
