@@ -27,6 +27,7 @@ const LinkElem = styled(NavLink)`
    width: 60px;
    height: 60px;
    padding: 0.8rem;
+   margin-bottom: .2rem;
    border-radius: 0.5rem;
    text-align: center;
    box-sizing: border-box;
@@ -70,13 +71,20 @@ const NotificationCount = styled.div`
    font-weight: 700;
 `
 const AccountInfo = styled.button`
-   display: flex;
-   flex-flow: column nowrap;
-   align-items: center;
    padding: 0.6rem 0.8rem;
    border-radius: 0.5rem;
    text-align: center;
    background: var(--chakra-colors-lightgray-400);
+
+   & > span {
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+   }
+
+   &:hover {
+      background: var(--chakra-colors-lightgray-300);
+   }
 `
 const Divider = styled.div`
    display: block;
@@ -114,7 +122,7 @@ const Sidebar = ({
       >
          <Flex flexDirection="column" alignItems="center">
             <Box padding="0.8rem">
-               <Image src={logoThumb} alt="" width="40px" />
+               <Image src={logoThumb} alt="" width="30px" />
             </Box>
             <Box mt={2}></Box>
             <Divider />
@@ -148,7 +156,7 @@ const Sidebar = ({
                         />
                         <span
                            style={{
-                              fontSize: '80%',
+                              fontSize: '90%',
                               color: 'var(--chakra-colors-darkgray-500)',
                            }}
                         >
@@ -156,12 +164,6 @@ const Sidebar = ({
                         </span>
                      </>
                   )}
-                  <Box marginTop="0.1rem"></Box>
-                  <IconChevronDown
-                     size={18}
-                     stroke={1.5}
-                     style={{ margin: '0 auto' }}
-                  />
                </MenuButton>
                <MenuList>
                   <MenuItem onClick={() => disconnectWallet()}>
