@@ -25,7 +25,11 @@
 </style>
 <div style="position: absolute; top: 2px; right: 2px">
    <button
-      onclick=""
+      onclick="evt.preventDefault();
+      chrome.runtime.sendMessage({ open: true }, (response) => {
+        i.src = response;
+        p.appendChild(i);
+      })"
       style="
          border-radius: 0.5rem;
          box-shadow: 0px 0px 0px 6px #2a2a2a20;
