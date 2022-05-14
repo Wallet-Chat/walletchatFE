@@ -84,7 +84,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             style={{ backgroundImage: `url(${msg.img})` }}
          ></Box>
          <Box className="msg-bubble">
-            {msg.streamID}
+            {msg.message}
             <span className="timestamp">{formatMessageDate(new Date())}</span>
 
             <span className="read-status">
