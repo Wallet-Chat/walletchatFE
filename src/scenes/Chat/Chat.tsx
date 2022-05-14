@@ -22,7 +22,7 @@ import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
 import MessageType from '../../types/Message'
-import { MessageUIType } from '../../types/MessageUI'
+import MessageUIType from '../../types/MessageUI'
 import Message from './components/Message'
 import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
@@ -47,6 +47,7 @@ const DottedBackground = styled.div`
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);
+   overflow-y: scroll;
 `
 
 // const testloadingmsgs = [{
@@ -110,53 +111,55 @@ const Chat = ({
       getENS()
    }, [toAddr])
 
-   useEffect(() => {
-      function getChatData() {
-         // GET request to get off-chain data for RX user
-         if (!process.env.REACT_APP_REST_API) {
-            console.log('REST API url not in .env', process.env)
-            return
-         }
-         if (!account) {
-            console.log('No account connected')
-            return
-         }
-         setIsFetchingChatData(true)
-         fetch(
-            ` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}`,
-            {
-               method: 'GET',
-               headers: {
-                  'Content-Type': 'application/json',
-               },
-            }
-         )
-            .then((response) => response.json())
-            .then((data: MessageType[]) => {
-               console.log('✅ GET:', data)
-               setChatData(data)
-               // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-               setIsFetchingChatData(false)
-            })
-            .catch((error) => {
-               console.error('🚨🚨REST API Error [GET]:', error)
-               setIsFetchingChatData(false)
-            })
+   function getChatData() {
+      // GET request to get off-chain data for RX user
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
       }
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+      setIsFetchingChatData(true)
+      fetch(` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+         .then((response) => response.json())
+         .then((data: MessageType[]) => {
+            console.log('✅ GET:', data)
+            setChatData(data)
+            // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
+            setIsFetchingChatData(false)
+         })
+         .catch((error) => {
+            console.error('🚨🚨REST API Error [GET]:', error)
+            setIsFetchingChatData(false)
+         })
+   }
+
+   useEffect(() => {
       if (isAuthenticated && account) {
          getChatData()
       }
    }, [isAuthenticated, account])
 
    useEffect(() => {
-      const toAddToUI = []
+      const toAddToUI = [] as MessageUIType[]
 
       for (let i = 0; i < chatData.length; i++) {
-         if (chatData[i].toAddr.toLowerCase() === account.toLowerCase()) {
+         if (
+            chatData[i] &&
+            chatData[i].toaddr &&
+            chatData[i].toaddr.toLowerCase() === account.toLowerCase()
+         ) {
             toAddToUI.push({
                message: chatData[i].message,
-               fromAddr: chatData[i].fromAddr,
-               toAddr: chatData[i].toAddr,
+               fromAddr: chatData[i].fromaddr,
+               toAddr: chatData[i].toaddr,
                timestamp: chatData[i].timestamp,
                read: chatData[i].read,
                id: chatData[i].id,
@@ -164,12 +167,14 @@ const Chat = ({
                isFetching: false,
             })
          } else if (
-            chatData[i].fromAddr.toLowerCase() === account.toLowerCase()
+            chatData[i] &&
+            chatData[i].toaddr &&
+            chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
                message: chatData[i].message,
-               fromAddr: chatData[i].fromAddr,
-               toAddr: chatData[i].toAddr,
+               fromAddr: chatData[i].fromaddr,
+               toAddr: chatData[i].toaddr,
                timestamp: chatData[i].timestamp,
                read: chatData[i].read,
                id: chatData[i].id,
@@ -209,6 +214,8 @@ const Chat = ({
 
       const timestamp = new Date()
 
+      const latestLoadedMsgs = [...loadedMsgs]
+
       const data = {
          message: msgInput,
          fromAddr: account,
@@ -230,17 +237,41 @@ const Chat = ({
          },
          body: JSON.stringify(data),
       })
-         .then((response) => response.json()) //Then with the data from the response in JSON...
+         .then((response) => response.json())
          .then((data) => {
-            console.log('✅ POST/Send Message:', data)
-            if (data.id - 1) {
-               let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-               newLoadedMsgs[data.id - 1]['isFetching'] = false
-               setLoadedMsgs(newLoadedMsgs)
-            }
+            console.log('✅ POST/Send Message:', data, latestLoadedMsgs)
+            getChatData()
+
+            // let indexOfMsg = -1
+
+            // for (let i = latestLoadedMsgs.length - 1; i > 0; i--) {
+            //    console.log(latestLoadedMsgs[i], data)
+            //    if (
+            //       latestLoadedMsgs[i].message === data.message &&
+            //       latestLoadedMsgs[i].timestamp.getTime() === data.timestamp.getTime()
+            //    ) {
+            //       indexOfMsg = i
+            //       break
+            //    }
+            // }
+            // if (indexOfMsg !== -1) {
+            //    let newLoadedMsgs: MessageUIType[] = [...latestLoadedMsgs] // copy the old array
+            //    newLoadedMsgs[indexOfMsg]['isFetching'] = false
+            //    setLoadedMsgs(newLoadedMsgs)
+            // } else {
+            //    let newLoadedMsgs: MessageUIType[] = [...latestLoadedMsgs] // copy the old array
+            //    newLoadedMsgs.push({
+            //       ...data,
+            //       isFetching: false
+            //    })
+            // }
          })
          .catch((error) => {
-            console.error('🚨🚨REST API Error [POST]:', error, JSON.stringify(data))
+            console.error(
+               '🚨🚨REST API Error [POST]:',
+               error,
+               JSON.stringify(data)
+            )
          })
    }
 
@@ -311,62 +342,63 @@ const Chat = ({
             {toAddr && (
                <Flex alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center">
-                  <BlockieWrapper>
-                     <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
-                  </BlockieWrapper>
-                  <Box>
-                     <Text ml={2} fontWeight="bold" color="darkgray.800">
-                        {truncateAddress(toAddr)}
-                     </Text>
-                     {ens && (
-                        <Text fontWeight="bold" color="darkgray.800">
-                           {ens}
+                     <BlockieWrapper>
+                        <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
+                     </BlockieWrapper>
+                     <Box>
+                        <Text ml={2} fontWeight="bold" color="darkgray.800">
+                           {truncateAddress(toAddr)}
                         </Text>
-                     )}
-                  </Box>
+                        {ens && (
+                           <Text fontWeight="bold" color="darkgray.800">
+                              {ens}
+                           </Text>
+                        )}
+                     </Box>
                   </Flex>
                   <Box>
-                  {document.queryCommandSupported('copy') && (
+                     {document.queryCommandSupported('copy') && (
+                        <Button
+                           onClick={() => copyToClipboard()}
+                           size="xs"
+                           disabled={copiedAddr}
+                           ml={3}
+                        >
+                           {copiedAddr ? (
+                              <IconCheck
+                                 size={20}
+                                 color="var(--chakra-colors-darkgray-500)"
+                                 stroke="1.5"
+                              />
+                           ) : (
+                              <IconCopy
+                                 size={20}
+                                 color="var(--chakra-colors-lightgray-900)"
+                                 stroke="1.5"
+                              />
+                           )}
+                        </Button>
+                     )}
                      <Button
-                        onClick={() => copyToClipboard()}
+                        href={`https://etherscan.io/address/${toAddr}`}
+                        target="_blank"
+                        as={CLink}
                         size="xs"
-                        disabled={copiedAddr}
-                        ml={3}
+                        ml={2}
                      >
-                        {copiedAddr ? (
-                           <IconCheck
-                              size={20}
-                              color="var(--chakra-colors-darkgray-500)"
-                              stroke="1.5"
-                           />
-                        ) : (
-                           <IconCopy
-                              size={20}
-                              color="var(--chakra-colors-lightgray-900)"
-                              stroke="1.5"
-                           />
-                        )}
+                        <IconExternalLink
+                           size={20}
+                           color="var(--chakra-colors-lightgray-900)"
+                           stroke="1.5"
+                        />
                      </Button>
-                  )}
-                  <Button
-                     href={`https://etherscan.io/address/${toAddr}`}
-                     as={CLink}
-                     size="xs"
-                     ml={2}
-                  >
-                     <IconExternalLink
-                        size={20}
-                        color="var(--chakra-colors-lightgray-900)"
-                        stroke="1.5"
-                     />
-                  </Button>
                   </Box>
                </Flex>
             )}
          </Box>
 
-         <DottedBackground>
-            {isFetchingChatData && (
+         <DottedBackground className="custom-scrollbar">
+            {isFetchingChatData && loadedMsgs.length === 0 && (
                <Flex justifyContent="center" alignItems="center" height="100%">
                   <Spinner />
                </Flex>

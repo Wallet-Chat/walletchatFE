@@ -1,6 +1,5 @@
 import {
    Box,
-   Button,
    Heading,
    Flex,
    Stack,
@@ -13,6 +12,7 @@ import styled from 'styled-components'
 import Web3 from 'web3'
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
 import MessageType from '../../types/Message'
+import MessageUIType from '../../types/MessageUI'
 import ConversationItem from './components/ConversationItem'
 
 const Divider = styled.div`
@@ -44,6 +44,7 @@ const Inbox = ({
    )
    const [isFetchingInboxData, setIsFetchingInboxData] =
       useState<boolean>(false)
+      const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    useEffect(() => {
       function getInboxData() {
@@ -79,6 +80,45 @@ const Inbox = ({
          getInboxData()
       }
    }, [isAuthenticated, account])
+
+   useEffect(() => {
+      const toAddToUI = [] as MessageUIType[]
+
+      for (let i = 0; i < inboxData.length; i++) {
+         if (
+            inboxData[i] &&
+            inboxData[i].toaddr &&
+            inboxData[i].toaddr.toLowerCase() === account.toLowerCase()
+         ) {
+            toAddToUI.push({
+               message: inboxData[i].message,
+               fromAddr: inboxData[i].fromaddr,
+               toAddr: inboxData[i].toaddr,
+               timestamp: inboxData[i].timestamp,
+               read: inboxData[i].read,
+               id: inboxData[i].id,
+               position: 'left',
+               isFetching: false,
+            })
+         } else if (
+            inboxData[i] &&
+            inboxData[i].toaddr &&
+            inboxData[i].fromaddr.toLowerCase() === account.toLowerCase()
+         ) {
+            toAddToUI.push({
+               message: inboxData[i].message,
+               fromAddr: inboxData[i].fromaddr,
+               toAddr: inboxData[i].toaddr,
+               timestamp: inboxData[i].timestamp,
+               read: inboxData[i].read,
+               id: inboxData[i].id,
+               position: 'right',
+               isFetching: false,
+            })
+         }
+      }
+      setLoadedMsgs(toAddToUI)
+   }, [inboxData, account])
 
    if (isFetchingInboxData) {
       return (
@@ -117,16 +157,16 @@ const Inbox = ({
    return (
       <Box background="white" minHeight="100vh">
          <Box p={5}>
-            <Heading size="xl" mt={2}>
+            <Heading size="xl">
                Inbox
             </Heading>
          </Box>
          <Divider />
 
-         {inboxData.map((conversation, i) => (
-            <ConversationItem key={conversation.id} data={conversation} />
+         {loadedMsgs.map((conversation, i) => (
+            <ConversationItem key={conversation.timestamp.toString()} data={conversation} account={account} />
          ))}
-         {inboxData.length === 0 && (
+         {loadedMsgs.length === 0 && (
             <Box p={5}>
                <Text mb={4}>You have no messages.</Text>
                <StartConversationWithAddress web3={web3} />

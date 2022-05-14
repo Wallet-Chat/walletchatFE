@@ -29,20 +29,20 @@ a {
 }
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: var(--gray-medium) var(--white);
+    scrollbar-color: var(--chakra-colors-lightgray-600) #FFF;
   
     &::-webkit-scrollbar {
-      width: 13px;
+      width: 6px;
     }
   
     &::-webkit-scrollbar-track {
-      background: var(--gray-light);
+      background: var(--chakra-colors-lightgray-300);
       border-radius: 10px;
     }
   
     &::-webkit-scrollbar-thumb {
-      background-color: var(--gray-medium);
+      background-color: var(--chakra-colors-lightgray-600);
       border-radius: 6px;
-      border: 3px solid var(--white);
+      // border: 3px solid #FFF;
     }
   }

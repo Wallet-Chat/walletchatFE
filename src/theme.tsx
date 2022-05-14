@@ -289,9 +289,9 @@ export const theme = extendTheme(
                   bg: 'black',
                   color: 'white',
                   _hover: {
-                     bg: 'gray.800',
+                     bg: 'darkgray.900',
                      _disabled: {
-                        bg: 'gray.800',
+                        bg: 'darkgray.900',
                      },
                   },
                },
