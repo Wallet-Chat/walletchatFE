@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { IconX } from '@tabler/icons'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import { Button, Box, Flex, Image, Heading, Spinner } from '@chakra-ui/react'
@@ -9,10 +10,12 @@ import NewConversation from './scenes/NewConversation'
 import Chat from './scenes/Chat'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
-import { useEffect, useState } from 'react'
+import { useUnreadCount } from './context/UnreadCountProvider'
 
 export const App = () => {
-   const [unreadCount, setUnreadCount] = useState<number>(0)
+
+   const { unreadCount, setUnreadCount } = useUnreadCount()
+
    const {
       appLoading,
       isAuthenticated,
