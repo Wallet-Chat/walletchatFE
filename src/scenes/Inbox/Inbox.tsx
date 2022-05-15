@@ -68,7 +68,7 @@ const Inbox = ({
          })
             .then((response) => response.json())
             .then((data: MessageType[]) => {
-               console.log('✅ GET:', data)
+               console.log('✅ GET [Inbox]:', data)
                if (data === null) setInboxData([])
                else setInboxData(data)
                // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js

@@ -101,13 +101,15 @@ const Divider = styled.div`
 `
 
 const Sidebar = ({
+   unreadCount,
    currAccountAddress,
    disconnectWallet,
 }: {
-   currAccountAddress: string
+   unreadCount: number,
+   currAccountAddress: string,
    disconnectWallet: () => void
 }) => {
-   const inboxNotificationCount = 3
+
    const nftNotificationCount = 0
 
    return (
@@ -129,9 +131,9 @@ const Sidebar = ({
             <Box mb={5}></Box>
             <LinkElem to={'/chat'}>
                <IconMessageCircle2 size="30" stroke={1.5} />
-               {inboxNotificationCount > 0 && (
+               {unreadCount > 0 && (
                   <NotificationCount>
-                     {inboxNotificationCount}
+                     {unreadCount}
                   </NotificationCount>
                )}
             </LinkElem>
