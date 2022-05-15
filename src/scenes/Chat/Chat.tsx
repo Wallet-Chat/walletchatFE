@@ -24,7 +24,7 @@ import TextareaAutosize from 'react-textarea-autosize'
 import MessageType from '../../types/Message'
 import MessageUIType from '../../types/MessageUI'
 import Message from './components/Message'
-import { reverseENSLookup } from '../../helpers/ens'
+// import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
 import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
@@ -51,35 +51,6 @@ const DottedBackground = styled.div`
    overflow-y: scroll;
 `
 
-// const testloadingmsgs = [{
-//    message: 'Message 2 test. Mauris tempor lacus vel mollis viverra. Donec rutrum quis ex ut cursus. Nunc tincidunt odio non maximus vulputate. Nunc hendrerit dictum maximus.',
-//    fromName: 'Steven',
-//    fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
-//    toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
-//    read: false,
-//    timestamp: new Date(),
-//    id: 2,
-//    position: 'left',
-// }, {
-//    message: 'Hello there',
-//    fromName: 'Steven',
-//    fromAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
-//    toAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
-//    read: true,
-//    timestamp: new Date(),
-//    id: 1,
-//    position: 'left',
-// }, {
-//    message: ' Pellentesque augue elit, gravida nec sapien a, lobortis bibendum purus.',
-//    fromName: '',
-//    fromAddr: '0xd07310e7427744BE216CD4b3068b99632aB6f83a',
-//    toAddr: '0x4A8a9147ab0DF5A8949f964bDBA22dc4583280E2',
-//    read: true,
-//    timestamp: new Date(),
-//    id: 0,
-//    position: 'right',
-// }]
-
 const Chat = ({
    account,
    web3,
@@ -90,11 +61,8 @@ const Chat = ({
    isAuthenticated: boolean
 }) => {
    let { address: toAddr = '' } = useParams()
-   const [ens, setEns] = useState<string>('')
-   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>(
-      []
-      // [...testloadingmsgs]
-   )
+   // const [ens, setEns] = useState<string>('')
+   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [chatData, setChatData] = useState<MessageType[]>(
@@ -102,15 +70,29 @@ const Chat = ({
    )
    const [isFetchingChatData, setIsFetchingChatData] = useState<boolean>(false)
 
+   let timer: ReturnType<typeof setTimeout>
+
    useEffect(() => {
-      const getENS = async () => {
-         const ensValue = await reverseENSLookup(toAddr, web3)
-         if (ensValue) {
-            setEns(ensValue)
-         }
-      }
-      getENS()
-   }, [toAddr])
+      const interval = setInterval(() => {
+         getChatData()
+         }, 30000) // every 30s
+      
+         return () => clearInterval(interval)
+   }, [])
+
+   // useEffect(() => {
+   //    const getENS = async () => {
+   //       const ensValue = await reverseENSLookup(toAddr, web3)
+   //       if (ensValue) {
+   //          setEns(ensValue)
+   //       }
+   //    }
+   //    getENS()
+   // }, [toAddr])
+
+   useEffect(() => {
+      getChatData()
+   }, [isAuthenticated, account])
 
    function getChatData() {
       // GET request to get off-chain data for RX user
@@ -120,6 +102,10 @@ const Chat = ({
       }
       if (!account) {
          console.log('No account connected')
+         return
+      }
+      if (!isAuthenticated) {
+         console.log('Not authenticated')
          return
       }
       setIsFetchingChatData(true)
@@ -133,14 +119,16 @@ const Chat = ({
          .then(async (data: MessageType[]) => {
             console.log('✅ GET [Chat items]:', data)
 
-            //Get data from IPFS and replace the message with the fetched text
-            for (let i = 0; i < data.length; i++) {
-               const rawmsg = await getIpfsData(data[i].message)
-               //console.log("raw message decoded", rawmsg)
-               data[i].message = rawmsg
-            }
+            const replica = [...data]
 
-            setChatData(data)
+            //Get data from IPFS and replace the message with the fetched text
+            // for (let i = 0; i < replica.length; i++) {
+            //    const rawmsg = await getIpfsData(replica[i].message)
+            //    //console.log("raw message decoded", rawmsg)
+            //    replica[i].message = rawmsg
+            // }
+
+            setChatData(replica)
 
             // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
             setIsFetchingChatData(false)
@@ -150,12 +138,6 @@ const Chat = ({
             setIsFetchingChatData(false)
          })
    }
-
-   useEffect(() => {
-      if (isAuthenticated && account) {
-         getChatData()
-      }
-   }, [isAuthenticated, account])
 
    useEffect(() => {
       const toAddToUI = [] as MessageUIType[]
@@ -214,7 +196,8 @@ const Chat = ({
          textField.remove()
          setCopiedAddr(true)
 
-         setTimeout(() => {
+         window.clearTimeout(timer)
+         timer = setTimeout(() => {
             setCopiedAddr(false)
          }, 3000)
       }
@@ -366,11 +349,11 @@ const Chat = ({
                         <Text ml={2} fontWeight="bold" color="darkgray.800">
                            {truncateAddress(toAddr)}
                         </Text>
-                        {ens && (
+                        {/* {ens && (
                            <Text fontWeight="bold" color="darkgray.800">
                               {ens}
                            </Text>
-                        )}
+                        )} */}
                      </Box>
                   </Flex>
                   <Box>
@@ -422,7 +405,7 @@ const Chat = ({
             )}
             {loadedMsgs.map((msg: MessageUIType, i) => {
                if (msg && msg.message) {
-                  return <Message key={msg.message} account={account} msg={msg} updateRead={updateRead} />
+                  return <Message key={`${msg.message}${msg.timestamp}`} account={account} msg={msg} updateRead={updateRead} />
                }
                return null
             })}
