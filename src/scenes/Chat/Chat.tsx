@@ -21,16 +21,12 @@ import {
 import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
-   import SettingsType from '../../types/Message'
 import MessageType from '../../types/Message'
 import MessageUIType from '../../types/MessageUI'
 import Message from './components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
 import { getIpfsData, postIpfsData } from '../../services/ipfs'
-
-import EthCrypto, { Encrypted } from 'eth-crypto'
-import sigUtil from 'eth-sig-util'
 
 const BlockieWrapper = styled.div`
    border-radius: 0.3rem;
@@ -56,14 +52,10 @@ const DottedBackground = styled.div`
 `
 
 const Chat = ({
-   publicKey,
-   privateKey,
    account,
    web3,
    isAuthenticated,
 }: {
-   publicKey: string
-   privateKey: string 
    account: string
    web3: Web3
    isAuthenticated: boolean
@@ -133,14 +125,7 @@ const Chat = ({
             for (let i = 0; i < replica.length; i++) {
                const rawmsg = await getIpfsData(replica[i].message)
                //console.log("raw message decoded", rawmsg)
-
-               let encdata: Encrypted = JSON.parse(rawmsg);
-               const decrypted = await EthCrypto.decryptWithPrivateKey(
-                  privateKey,
-                  encdata
-              );
-
-               replica[i].message = decrypted
+               replica[i].message = rawmsg
             }
 
             setChatData(replica)
@@ -219,76 +204,6 @@ const Chat = ({
       }
    }
 
-   // async function encrypt (msg: string, toAddrPublicKey: string) {
-   //    const encrypted = await EthCrypto.encryptWithPublicKey(
-   //       toAddrPublicKey, 
-   //       msg
-   //   )
-
-   //   return encrypted;
-   //  }
-
-   //  async function decrypt (msg: Encrypted) {
-   //    const decrypted = await EthCrypto.decryptWithPrivateKey(
-   //       privateKey,
-   //       msg
-   //   );
-
-   //   return decrypted;
-   //  }
-
-   //  async function encrypt (msg: string) {
-   //    //get TO address public key from setting API
-
-   //    const buf = Buffer.from(
-   //      JSON.stringify(
-   //        sigUtil.encrypt(
-   //          publicKey, //this needs to be TO address public key
-   //          { data: msg },
-   //          'x25519-xsalsa20-poly1305'
-   //        )
-   //      ),
-   //      'utf8'
-   //    )
-    
-   //    return '0x' + buf.toString('hex')
-   //  }
-
-   //  async function decrypt (msgbuf: string) {
-   //    //convert msgbuf string to correct data type
-
-   //    const buf = Buffer.from(
-   //      JSON.stringify(
-   //        sigUtil.decrypt(
-   //           { data: msg },
-   //           privateKey,
-   //        )
-   //      ),
-   //      'utf8'
-   //    )
-    
-   //    return '0x' + buf.toString('hex')
-   //  }
-
-   //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
-   const getPublicKeyFromSettings = async () => {
-      let toAddrPublicKey = ""
-      await fetch(` ${process.env.REACT_APP_REST_API}/get_settings/${toAddr}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-      })
-      .then((response) => response.json())
-      .then(async (settings: SettingsType[]) => {
-         console.log('✅ GET [Public Key]:', settings)
-         toAddrPublicKey = settings[0].publickey
-      })
-
-      return await toAddrPublicKey
-   }
-   //end get public key that should only need to be done once per conversation
-
    const sendMessage = async () => {
       if (msgInput.length <= 0) return
 
@@ -311,16 +226,9 @@ const Chat = ({
       addMessageToUI(msgInputCopy, account, toAddr, timestamp, false, 'right', true)
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-      let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
- 
-      console.log("encrypt with public key: ", toAddrPublicKey)
-      const encrypted = await EthCrypto.encryptWithPublicKey(
-         toAddrPublicKey, 
-         msgInputCopy
-     )
-       
+
       //lets try and use IPFS instead of any actual data stored on our server
-      const cid = await postIpfsData(JSON.stringify(encrypted))
+      const cid = await postIpfsData(msgInputCopy)
       data.message = cid
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
