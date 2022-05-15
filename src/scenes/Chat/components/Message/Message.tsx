@@ -1,10 +1,10 @@
 import { Box, Spinner } from '@chakra-ui/react'
 import { IconCheck, IconChecks } from '@tabler/icons'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
+import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../helpers/date'
-import { useIntersection } from '../../../../helpers/useIntersection'
 import MessageUIType from '../../../../types/MessageUI'
 
 const MessageBox = styled.div`
@@ -88,18 +88,19 @@ const Message = ({
    msg: MessageUIType
    updateRead: (data: MessageUIType) => void
 }) => {
-   const ref = useRef<HTMLHeadingElement>(null)
-   const inViewport = useIntersection(ref, '0px')
+   const { ref, inView } = useInView({
+      triggerOnce: true,
+   })
 
    useEffect(() => {
       if (
-         inViewport &&
+         inView &&
          msg.read === false &&
          msg.toAddr.toLocaleLowerCase() === account.toLocaleLowerCase()
       ) {
          setMessageAsRead()
       }
-   }, [inViewport])
+   }, [inView])
 
    const setMessageAsRead = () => {
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
