@@ -21,7 +21,8 @@ import {
 import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
-   import SettingsType from '../../types/Message'
+import SettingsType from '../../types/Message'
+import EncryptedMsgBlock from '../../types/Message'
 import MessageType from '../../types/Message'
 import MessageUIType from '../../types/MessageUI'
 import Message from './components/Message'
@@ -129,16 +130,26 @@ const Chat = ({
 
             const replica = JSON.parse(JSON.stringify(data));
 
+
             // Get data from IPFS and replace the message with the fetched text
             for (let i = 0; i < replica.length; i++) {
                const rawmsg = await getIpfsData(replica[i].message)
-               //console.log("raw message decoded", rawmsg)
+               console.log("raw message decoded", rawmsg)
 
-               let encdata: Encrypted = JSON.parse(rawmsg);
-               const decrypted = await EthCrypto.decryptWithPrivateKey(
+               let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
+
+               //we only need to decrypt the side we are print to UI (to or from)
+               let decrypted;
+               if(replica[i].toaddr === account) {
+                  decrypted = await EthCrypto.decryptWithPrivateKey(
                   privateKey,
-                  encdata
-              );
+                  encdatablock.to)
+               }
+               else {
+                  decrypted = await EthCrypto.decryptWithPrivateKey(
+                  privateKey,
+                  encdatablock.from)
+               }
 
                replica[i].message = decrypted
             }
@@ -314,14 +325,18 @@ const Chat = ({
       let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
  
       console.log("encrypt with public key: ", toAddrPublicKey)
-      const encrypted = await EthCrypto.encryptWithPublicKey(
+      const encryptedTo = await EthCrypto.encryptWithPublicKey(
          toAddrPublicKey, 
-         msgInputCopy
-     )
-       
+         msgInputCopy)
+
+      //we have to encrypt the sender side with its own public key, if we want to refresh data from server 
+      const encryptedFrom = await EthCrypto.encryptWithPublicKey(
+         publicKey, 
+         msgInputCopy) 
+
       //lets try and use IPFS instead of any actual data stored on our server
-      const cid = await postIpfsData(JSON.stringify(encrypted))
-      data.message = cid
+      const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
+      data.message = await cid
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
          method: 'POST',

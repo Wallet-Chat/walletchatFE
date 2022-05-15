@@ -125,12 +125,14 @@ const WalletProvider = React.memo(({ children }) => {
             setWeb3(web3)
             setAuthenticated(true)
 
-            const keyPair = await createEncryptionKeyPair(account)
-            console.log('key pair', keyPair)
-            const publicKey = keyPair.publicKey;
-            const privateKey = keyPair.privateKey;
-            setPublicKey(publicKey)
-            setPrivateKey(privateKey)
+            //only do this once at first login, never again or we can't decrypt previous data
+            //until this is moved we likely will have a few latenet issues decrypting older data
+            if(!publicKey) {
+               const keyPair = await createEncryptionKeyPair(account)
+               console.log('key pair', keyPair)
+               setPublicKey(keyPair.publicKey)
+               setPrivateKey(keyPair.privateKey)
+            }
 
             storage.set('metamask-connected', { connected: true })
             subscribeToEvents(provider)

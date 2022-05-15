@@ -112,6 +112,7 @@ const Message = ({
    }, [inView])
 
    const setMessageAsRead = () => {
+      //TODO: If we enable message test updates, we need to re-encrypt the data and resend to IPFS
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
          fetch(
             ` ${process.env.REACT_APP_REST_API}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
