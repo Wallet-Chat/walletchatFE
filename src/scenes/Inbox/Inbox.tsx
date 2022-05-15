@@ -49,40 +49,51 @@ const Inbox = ({
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    useEffect(() => {
-      function getInboxData() {
-         // GET request to get off-chain data for RX user
-         if (!process.env.REACT_APP_REST_API) {
-            console.log('REST API url not in .env', process.env)
-            return
-         }
-         if (!account) {
-            console.log('No account connected')
-            return
-         }
-         setIsFetchingInboxData(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/get_inbox/${account}`, {
-            method: 'GET',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-         })
-            .then((response) => response.json())
-            .then((data: MessageType[]) => {
-               console.log('✅ GET [Inbox]:', data)
-               if (data === null) setInboxData([])
-               else setInboxData(data)
-               // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-               setIsFetchingInboxData(false)
-            })
-            .catch((error) => {
-               console.error('🚨🚨REST API Error [GET]:', error)
-               setIsFetchingInboxData(false)
-            })
-      }
-      if (isAuthenticated && account) {
+      const interval = setInterval(() => {
          getInboxData()
-      }
+       }, 30000) // every 30s
+     
+       return () => clearInterval(interval)
+   }, [])
+
+   useEffect(() => {
+      getInboxData()
    }, [isAuthenticated, account])
+
+   function getInboxData() {
+      // GET request to get off-chain data for RX user
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+      if (!isAuthenticated) {
+         console.log('Not authenticated')
+         return
+      }
+      setIsFetchingInboxData(true)
+      fetch(` ${process.env.REACT_APP_REST_API}/get_inbox/${account}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+         .then((response) => response.json())
+         .then((data: MessageType[]) => {
+            console.log('✅ GET [Inbox]:', data)
+            if (data === null) setInboxData([])
+            else setInboxData(data)
+            // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
+            setIsFetchingInboxData(false)
+         })
+         .catch((error) => {
+            console.error('🚨🚨REST API Error [GET]:', error)
+            setIsFetchingInboxData(false)
+         })
+   }
 
    useEffect(() => {
       const populateUI = async () => {

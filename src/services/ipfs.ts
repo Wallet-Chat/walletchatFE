@@ -6,17 +6,23 @@ const ipfsClient = create({
 })
 
 export const getIpfsData = async (cid: string) => {
-   let returnData = '**failed - call devs**'
-   const rawmessage = await fetch(`https://ipfs.infura.io/ipfs/${cid}`)
-   returnData = await rawmessage.text()
-   return returnData
+   
+   if (cid.length === 46) {
+      let returnData = '**failed - call devs**'
+      const rawmessage = await fetch(`https://ipfs.infura.io/ipfs/${cid}`)
+      returnData = await rawmessage.text()
+      return returnData
+   } else {
+      return cid
+   }
 }
 
 export const postIpfsData = async (text: string) => {
    let cidReturn = 'failed'
    let cid = await ipfsClient.add(text)
    // const url = `https://ipfs.infura.io/ipfs/${cid.path}`
-   //console.log('IPFS link: ', url)
+   // console.log('IPFS link: ', url)
+   console.log("text/cid:", text, cid)
    cidReturn = `${cid.path}`
    return cidReturn
 }
