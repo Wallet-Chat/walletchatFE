@@ -106,12 +106,10 @@ const Inbox = ({
                inboxData[i].toaddr.toLowerCase() === account.toLowerCase()
             ) {
                toAddToUI.push({
+                  ...inboxData[i],
                   message: await getIpfsData(inboxData[i].message),
                   fromAddr: inboxData[i].fromaddr,
                   toAddr: inboxData[i].toaddr,
-                  timestamp: inboxData[i].timestamp,
-                  read: inboxData[i].read,
-                  id: inboxData[i].id,
                   position: 'left',
                   isFetching: false,
                })
@@ -121,12 +119,10 @@ const Inbox = ({
                inboxData[i].fromaddr.toLowerCase() === account.toLowerCase()
             ) {
                toAddToUI.push({
+                  ...inboxData[i],
                   message: await getIpfsData(inboxData[i].message),
                   fromAddr: inboxData[i].fromaddr,
                   toAddr: inboxData[i].toaddr,
-                  timestamp: inboxData[i].timestamp,
-                  read: inboxData[i].read,
-                  id: inboxData[i].id,
                   position: 'right',
                   isFetching: false,
                })

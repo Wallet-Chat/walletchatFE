@@ -63,7 +63,7 @@ const NotificationCount = styled.div`
    position: absolute;
    top: 5px;
    right: 5px;
-   background: var(--chakra-colors-darkgray-800);
+   background: var(--chakra-colors-error-600);
    border-radius: 50%;
    width: 22px;
    height: 22px;
