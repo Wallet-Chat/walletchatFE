@@ -23,7 +23,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [account, setAccount] = React.useState(null)
    const [web3, setWeb3] = React.useState(null)
    const [isAuthenticated, setAuthenticated] = React.useState(false)
-   const [appLoading, setAppLoading] = React.useState(true)
+   const [appLoading, setAppLoading] = React.useState(false)
 
    console.log({ chainId, account, web3, isAuthenticated })
 

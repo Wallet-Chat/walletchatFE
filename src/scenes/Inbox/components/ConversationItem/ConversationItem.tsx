@@ -47,10 +47,14 @@ const ConversationItem = ({
       overflow: hidden;
    `
 
-   const recipientAddress =
-      data.toAddr.toLocaleLowerCase() === account
-         ? data.fromAddr.toLocaleLowerCase()
-         : data.toAddr.toLocaleLowerCase()
+   let recipientAddress = ""
+   if (data && data.toAddr && data.fromAddr) {
+      recipientAddress =
+         data.toAddr.toLocaleLowerCase() === account
+            ? data.fromAddr.toLocaleLowerCase()
+            : data.toAddr.toLocaleLowerCase()
+   }
+
    return (
       <Link to={`/chat/${recipientAddress}`} style={{ textDecoration: 'none' }}>
          <Wrapper>
