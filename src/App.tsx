@@ -23,6 +23,18 @@ export const App = () => {
    } = useWallet()
 
    useEffect(() => {
+      const interval = setInterval(() => {
+         getUnreadCount()
+       }, 30000) // every 30s
+     
+       return () => clearInterval(interval)
+   }, [])
+
+   useEffect(() => {
+      getUnreadCount()
+   }, [isAuthenticated, account])
+
+   const getUnreadCount = () => {
       if (account) {
          fetch(` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`, {
             method: 'GET',
@@ -39,7 +51,7 @@ export const App = () => {
             console.error('🚨🚨REST API Error [GET]:', error)
          })
       }
-   }, [account])
+   }
 
    const closeBtn = (
       <Flex textAlign="right" position="fixed" top={0} right={0}>

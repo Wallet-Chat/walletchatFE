@@ -206,27 +206,29 @@ const Chat = ({
    const sendMessage = async () => {
       if (msgInput.length <= 0) return
 
+      // Make a copy and clear input field
+      const msgInputCopy = (' ' + msgInput).slice(1)
+      setMsgInput('')
+
       const timestamp = new Date()
 
       const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs));
 
       let data = {
-         message: msgInput,
+         message: msgInputCopy,
          fromAddr: account,
          toAddr: toAddr,
          timestamp,
          read: false,
       }
 
-      addMessageToUI(msgInput, account, toAddr, timestamp, false, 'right', true)
+      addMessageToUI(msgInputCopy, account, toAddr, timestamp, false, 'right', true)
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
 
       //lets try and use IPFS instead of any actual data stored on our server
-      const cid = await postIpfsData(msgInput)
+      const cid = await postIpfsData(msgInputCopy)
       data.message = cid
-
-      setMsgInput('') // clear message upon sending it
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
          method: 'POST',
