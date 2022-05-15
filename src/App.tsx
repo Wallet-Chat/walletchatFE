@@ -9,8 +9,10 @@ import NewConversation from './scenes/NewConversation'
 import Chat from './scenes/Chat'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
+import { useEffect, useState } from 'react'
 
 export const App = () => {
+   const [unreadCount, setUnreadCount] = useState<number>(0)
    const {
       appLoading,
       isAuthenticated,
@@ -19,6 +21,25 @@ export const App = () => {
       account,
       web3,
    } = useWallet()
+
+   useEffect(() => {
+      if (account) {
+         fetch(` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`, {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         })
+         .then((response) => response.json())
+         .then((count: number) => {
+            console.log('✅ [GET] UNREAD COUNT:', count)
+            setUnreadCount(count)
+         })
+         .catch((error) => {
+            console.error('🚨🚨REST API Error [GET]:', error)
+         })
+      }
+   }, [account])
 
    const closeBtn = (
       <Flex textAlign="right" position="fixed" top={0} right={0}>
@@ -38,7 +59,7 @@ export const App = () => {
          </Button>
       </Flex>
    )
-   console.log(appLoading)
+
    if (appLoading || !isAuthenticated) {
       return (
          <Flex
@@ -89,6 +110,7 @@ export const App = () => {
             <Flex>
                {closeBtn}
                <Sidebar
+                  unreadCount={unreadCount}
                   currAccountAddress={account}
                   disconnectWallet={disconnectWallet}
                />

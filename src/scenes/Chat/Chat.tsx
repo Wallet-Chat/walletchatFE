@@ -131,7 +131,7 @@ const Chat = ({
       })
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            console.log('✅ GET:', data)
+            console.log('✅ GET [Chat items]:', data)
 
             //Get data from IPFS and replace the message with the fetched text
             for (let i = 0; i < data.length; i++) {
@@ -299,7 +299,7 @@ const Chat = ({
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅ PUT/Edit Message:', data)
+            console.log('✅ PUT Message:', data)
          })
          .catch((error) => {
             console.error('🚨🚨REST API Error [PUT]:', error)
