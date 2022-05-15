@@ -27,6 +27,9 @@ import Message from './components/Message'
 import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
 
+const { create } = require('ipfs-http-client')
+const ipfsclient = create('https://ipfs.infura.io:5001/api/v0')
+
 const BlockieWrapper = styled.div`
    border-radius: 0.3rem;
    overflow: hidden;
@@ -101,6 +104,23 @@ const Chat = ({
    )
    const [isFetchingChatData, setIsFetchingChatData] = useState<boolean>(false)
 
+   //KL - feel free to move any of this to new file just added here so everything is in one place
+   async function getIpfsData(cid: string) {
+      let returnData = "**failed - call devs**"
+      const rawmessage = await fetch(`https://ipfs.infura.io/ipfs/${cid}`)
+      returnData = await rawmessage.text()
+      return returnData;
+   }
+
+   async function uploadToIPFS (text: string) {
+      let cidReturn = "failed";
+      let cid = await ipfsclient.add(text)
+      const url = `https://ipfs.infura.io/ipfs/${cid.path}`
+      //console.log('IPFS link: ', url)
+      cidReturn = `${cid.path}`
+      return cidReturn;
+    }
+
    useEffect(() => {
       const getENS = async () => {
          const ensValue = await reverseENSLookup(toAddr, web3)
@@ -129,9 +149,18 @@ const Chat = ({
          },
       })
          .then((response) => response.json())
-         .then((data: MessageType[]) => {
+         .then(async (data: MessageType[]) => {
             console.log('✅ GET:', data)
+            
+            //Get data from IPFS and replace the message with the fetched text
+            for (let i = 0; i < data.length; i++) {
+               const rawmsg = await getIpfsData(data[i].message)
+               //console.log("raw message decoded", rawmsg)
+               data[i].message = rawmsg
+            }
+
             setChatData(data)
+
             // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
             setIsFetchingChatData(false)
          })
@@ -209,14 +238,14 @@ const Chat = ({
       }
    }
 
-   const sendMessage = () => {
+   const sendMessage = async () => {
       if (msgInput.length <= 0) return
 
       const timestamp = new Date()
 
       const latestLoadedMsgs = [...loadedMsgs]
 
-      const data = {
+      let data = {
          message: msgInput,
          fromAddr: account,
          toAddr: toAddr,
@@ -227,6 +256,10 @@ const Chat = ({
       addMessageToUI(msgInput, account, toAddr, timestamp, false, 'right', true)
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
+
+      //lets try and use IPFS instead of any actual data stored on our server
+      const cid = await uploadToIPFS(msgInput)
+      data.message = cid
 
       setMsgInput('') // clear message upon sending it
 
