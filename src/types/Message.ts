@@ -15,8 +15,3 @@ export default interface MessageType {
    read: boolean
    id?: number
 }
-
-export default interface SettingsType {
-   walletaddr: string
-   publickey: string
-}
