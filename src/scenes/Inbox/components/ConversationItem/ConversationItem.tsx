@@ -46,6 +46,17 @@ const ConversationItem = ({
       border-radius: 0.3rem;
       overflow: hidden;
    `
+   const NotificationCount = styled.div`
+      background: var(--chakra-colors-error-600);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 90%;
+      text-align: center;
+      margin-left: auto;
+   `
 
    let recipientAddress = ""
    if (data && data.toAddr && data.fromAddr) {
@@ -83,6 +94,11 @@ const ConversationItem = ({
                   <Box className="timestamp">
                      {formatMessageDate(new Date(data.timestamp))}
                   </Box>
+                  {data.unread && data.unread > 0 && (
+                     <NotificationCount>
+                        {data.unread}
+                     </NotificationCount>
+                  )}
                </Box>
             </Flex>
          </Wrapper>
