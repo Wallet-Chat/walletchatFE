@@ -216,8 +216,8 @@ const Chat = ({
 
       let data = {
          message: msgInputCopy,
-         fromAddr: account,
-         toAddr: toAddr,
+         fromAddr: account.toLocaleLowerCase(),
+         toAddr: toAddr.toLocaleLowerCase(),
          timestamp,
          read: false,
       }
