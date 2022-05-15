@@ -180,6 +180,7 @@ const Chat = ({
 
    const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter') {
+         event.preventDefault()
          sendMessage()
       }
    }
