@@ -119,14 +119,14 @@ const Chat = ({
          .then(async (data: MessageType[]) => {
             console.log('✅ GET [Chat items]:', data)
 
-            const replica = [...data]
+            const replica = JSON.parse(JSON.stringify(data));
 
-            //Get data from IPFS and replace the message with the fetched text
-            // for (let i = 0; i < replica.length; i++) {
-            //    const rawmsg = await getIpfsData(replica[i].message)
-            //    //console.log("raw message decoded", rawmsg)
-            //    replica[i].message = rawmsg
-            // }
+            // Get data from IPFS and replace the message with the fetched text
+            for (let i = 0; i < replica.length; i++) {
+               const rawmsg = await getIpfsData(replica[i].message)
+               //console.log("raw message decoded", rawmsg)
+               replica[i].message = rawmsg
+            }
 
             setChatData(replica)
 
@@ -208,7 +208,7 @@ const Chat = ({
 
       const timestamp = new Date()
 
-      const latestLoadedMsgs = [...loadedMsgs]
+      const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs));
 
       let data = {
          message: msgInput,
