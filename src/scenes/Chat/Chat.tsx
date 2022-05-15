@@ -204,6 +204,7 @@ const Chat = ({
 
    const copyToClipboard = () => {
       if (toAddr) {
+         console.log('Copy to clipboard', toAddr)
          let textField = document.createElement('textarea')
          textField.innerText = toAddr
          document.body.appendChild(textField)
@@ -289,23 +290,6 @@ const Chat = ({
          })
    }
 
-   const editMessage = (data: MessageType, id: number) => {
-      fetch(` ${process.env.REACT_APP_REST_API}/${id}`, {
-         method: 'PUT',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
-         .then((data) => {
-            console.log('✅ PUT Message:', data)
-         })
-         .catch((error) => {
-            console.error('🚨🚨REST API Error [PUT]:', error)
-         })
-   }
-
    const addMessageToUI = (
       message: string,
       fromAddr: string,
@@ -329,6 +313,25 @@ const Chat = ({
       let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
       newLoadedMsgs.push(newMsg)
       setLoadedMsgs(newLoadedMsgs)
+   }
+
+   const updateRead = (data: MessageUIType) => {
+      let indexOfMsg = -1
+      let newLoadedMsgs = [...loadedMsgs]
+      for (let i = newLoadedMsgs.length - 1; i > 0; i--) {
+         if (newLoadedMsgs[i].timestamp === data.timestamp) {
+            indexOfMsg = i
+            break
+         }
+      }
+      if (indexOfMsg !== -1) {
+         newLoadedMsgs[indexOfMsg] = {
+            ...newLoadedMsgs[indexOfMsg],
+            read: true
+         }
+         setLoadedMsgs(newLoadedMsgs)
+      }
+      
    }
 
    return (
@@ -419,7 +422,7 @@ const Chat = ({
             )}
             {loadedMsgs.map((msg: MessageUIType, i) => {
                if (msg && msg.message) {
-                  return <Message key={msg.message} msg={msg} />
+                  return <Message key={msg.message} account={account} msg={msg} updateRead={updateRead} />
                }
                return null
             })}

@@ -1,8 +1,10 @@
 import { Box, Spinner } from '@chakra-ui/react'
 import { IconCheck, IconChecks } from '@tabler/icons'
+import { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
 import { formatMessageDate } from '../../../../helpers/date'
+import { useIntersection } from '../../../../helpers/useIntersection'
 import MessageUIType from '../../../../types/MessageUI'
 
 const MessageBox = styled.div`
@@ -76,16 +78,69 @@ const MessageBox = styled.div`
       }
    }
 `
-const Message = ({ msg }: { msg: MessageUIType }) => {
+
+const Message = ({
+   account,
+   msg,
+   updateRead,
+}: {
+   account: string
+   msg: MessageUIType
+   updateRead: (data: MessageUIType) => void
+}) => {
+   const ref = useRef<HTMLHeadingElement>(null)
+   const inViewport = useIntersection(ref, '0px')
+
+   useEffect(() => {
+      if (
+         inViewport &&
+         msg.read === false &&
+         msg.toAddr.toLocaleLowerCase() === account.toLocaleLowerCase()
+      ) {
+         setMessageAsRead()
+      }
+   }, [inViewport])
+
+   const setMessageAsRead = () => {
+      if (msg.toAddr && msg.fromAddr && msg.timestamp) {
+         fetch(
+            ` ${process.env.REACT_APP_REST_API}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
+            {
+               method: 'PUT',
+               headers: {
+                  'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({
+                  ...msg,
+                  read: true,
+               }),
+            }
+         )
+            .then((response) => response.json())
+            .then((data) => {
+               console.log('✅ PUT Message:', data)
+               updateRead(data)
+            })
+            .catch((error) => {
+               console.error('🚨🚨REST API Error [PUT]:', error)
+            })
+      }
+   }
+
    return (
-      <MessageBox className={`msg ${msg.position} ${msg.read && 'read'}`}>
+      <MessageBox
+         className={`msg ${msg.position} ${msg.read && 'read'}`}
+         ref={ref}
+      >
          <Box
             className="msg-img"
             style={{ backgroundImage: `url(${msg.img})` }}
          ></Box>
          <Box className="msg-bubble">
             {msg.message}
-            <span className="timestamp">{formatMessageDate(new Date(msg.timestamp))}</span>
+            <span className="timestamp">
+               {formatMessageDate(new Date(msg.timestamp))}
+            </span>
 
             <span className="read-status">
                {msg.isFetching ? (
