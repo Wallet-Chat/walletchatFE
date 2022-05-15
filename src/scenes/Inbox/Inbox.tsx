@@ -6,12 +6,13 @@ import {
    SkeletonCircle,
    SkeletonText,
    Text,
-   Spinner
+   Spinner,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Web3 from 'web3'
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
+import { getIpfsData } from '../../services/ipfs'
 import MessageType from '../../types/Message'
 import MessageUIType from '../../types/MessageUI'
 import ConversationItem from './components/ConversationItem'
@@ -37,7 +38,7 @@ const Inbox = ({
    isAuthenticated,
 }: {
    account: string
-   web3: Web3,
+   web3: Web3
    isAuthenticated: boolean
 }) => {
    const [inboxData, setInboxData] = useState<MessageType[]>(
@@ -45,7 +46,7 @@ const Inbox = ({
    )
    const [isFetchingInboxData, setIsFetchingInboxData] =
       useState<boolean>(false)
-      const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    useEffect(() => {
       function getInboxData() {
@@ -84,45 +85,48 @@ const Inbox = ({
    }, [isAuthenticated, account])
 
    useEffect(() => {
-      const toAddToUI = [] as MessageUIType[]
+      const populateUI = async () => {
+         const toAddToUI = [] as MessageUIType[]
 
-      for (let i = 0; i < inboxData.length; i++) {
-         if (
-            inboxData[i] &&
-            inboxData[i].toaddr &&
-            inboxData[i].toaddr.toLowerCase() === account.toLowerCase()
-         ) {
-            toAddToUI.push({
-               message: inboxData[i].message,
-               fromAddr: inboxData[i].fromaddr,
-               toAddr: inboxData[i].toaddr,
-               timestamp: inboxData[i].timestamp,
-               read: inboxData[i].read,
-               id: inboxData[i].id,
-               position: 'left',
-               isFetching: false,
-            })
-         } else if (
-            inboxData[i] &&
-            inboxData[i].toaddr &&
-            inboxData[i].fromaddr.toLowerCase() === account.toLowerCase()
-         ) {
-            toAddToUI.push({
-               message: inboxData[i].message,
-               fromAddr: inboxData[i].fromaddr,
-               toAddr: inboxData[i].toaddr,
-               timestamp: inboxData[i].timestamp,
-               read: inboxData[i].read,
-               id: inboxData[i].id,
-               position: 'right',
-               isFetching: false,
-            })
+         for (let i = 0; i < inboxData.length; i++) {
+            if (
+               inboxData[i] &&
+               inboxData[i].toaddr &&
+               inboxData[i].toaddr.toLowerCase() === account.toLowerCase()
+            ) {
+               toAddToUI.push({
+                  message: await getIpfsData(inboxData[i].message),
+                  fromAddr: inboxData[i].fromaddr,
+                  toAddr: inboxData[i].toaddr,
+                  timestamp: inboxData[i].timestamp,
+                  read: inboxData[i].read,
+                  id: inboxData[i].id,
+                  position: 'left',
+                  isFetching: false,
+               })
+            } else if (
+               inboxData[i] &&
+               inboxData[i].toaddr &&
+               inboxData[i].fromaddr.toLowerCase() === account.toLowerCase()
+            ) {
+               toAddToUI.push({
+                  message: inboxData[i].message,
+                  fromAddr: inboxData[i].fromaddr,
+                  toAddr: inboxData[i].toaddr,
+                  timestamp: inboxData[i].timestamp,
+                  read: inboxData[i].read,
+                  id: inboxData[i].id,
+                  position: 'right',
+                  isFetching: false,
+               })
+            }
          }
+         setLoadedMsgs(toAddToUI)
       }
-      setLoadedMsgs(toAddToUI)
+      populateUI()
    }, [inboxData, account])
 
-   if (isFetchingInboxData && inboxData.length !== 0) {
+   if (isFetchingInboxData && inboxData.length === 0) {
       return (
          <Box background="white" height="100vh">
             <Box py={8} px={3} height="100vh">
@@ -166,7 +170,11 @@ const Inbox = ({
          <Divider />
 
          {loadedMsgs.map((conversation, i) => (
-            <ConversationItem key={conversation.timestamp.toString()} data={conversation} account={account} />
+            <ConversationItem
+               key={conversation.timestamp.toString()}
+               data={conversation}
+               account={account}
+            />
          ))}
          {loadedMsgs.length === 0 && (
             <Box p={5}>
