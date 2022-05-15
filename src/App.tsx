@@ -22,6 +22,8 @@ export const App = () => {
       connectWallet,
       disconnectWallet,
       account,
+      publicKey,
+      privateKey,
       web3,
    } = useWallet()
 
@@ -139,6 +141,8 @@ export const App = () => {
                         path="/chat/:address"
                         element={
                            <Chat
+                              publicKey={publicKey}
+                              privateKey={privateKey}
                               account={account}
                               web3={web3}
                               isAuthenticated={isAuthenticated}
