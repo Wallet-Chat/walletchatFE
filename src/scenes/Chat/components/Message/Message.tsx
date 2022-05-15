@@ -45,6 +45,11 @@ const MessageBox = styled.div`
       user-select: none;
       line-height: 1.2;
    }
+   &.left {
+      .timestamp {
+         right: var(--chakra-space-2);
+      }
+   }
    .read-status {
       position: absolute;
       right: var(--chakra-space-2);
@@ -53,7 +58,7 @@ const MessageBox = styled.div`
          stroke: var(--chakra-colors-lightgray-800);
       }
    }
-   &.read {
+   &.read:not(.left) {
       .timestamp {
          color: darkgreen;
          user-select: none;
@@ -143,6 +148,7 @@ const Message = ({
                {formatMessageDate(new Date(msg.timestamp))}
             </span>
 
+            {msg.position === 'right' && (
             <span className="read-status">
                {msg.isFetching ? (
                   <Spinner size="xs" />
@@ -152,6 +158,7 @@ const Message = ({
                   <IconCheck size={15} />
                )}
             </span>
+            )}
          </Box>
       </MessageBox>
    )
