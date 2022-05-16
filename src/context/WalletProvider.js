@@ -101,6 +101,7 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(chainId)
             setWeb3(web3)
             setAuthenticated(true)
+            storage.set('current-address', { address: account })
             storage.set('metamask-connected', { connected: true })
             subscribeToEvents(provider)
          }
@@ -115,6 +116,7 @@ const WalletProvider = React.memo(({ children }) => {
       console.log('disconnectWallet')
       try {
          storage.set('metamask-connected', { connected: false })
+         storage.set('current-address', { address: null })
          setAccount(null)
          setChainId(null)
          setAuthenticated(false)
@@ -126,6 +128,7 @@ const WalletProvider = React.memo(({ children }) => {
 
    const handleAccountsChanged = (accounts) => {
       setAccount(getNormalizeAddress(accounts))
+      storage.set('current-address', { address: getNormalizeAddress(accounts)})
       console.log('[account changes]: ', getNormalizeAddress(accounts))
    }
 
