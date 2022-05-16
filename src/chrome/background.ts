@@ -21,6 +21,8 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 chrome.runtime.onInstalled.addListener((details) => {
    console.log('[background.ts] onInstalled', details)
 
+   scheduleRequest(5000)
+
    chrome.contextMenus.create({
       id: 'notify',
       title: 'WalletChat: %s',
@@ -85,19 +87,21 @@ async function getUnreadNotificationsCount() {
          .then((response) => response.json())
          .then((count) => {
             console.log('✅ [GET][Unread Notifications] UNREAD COUNT:', count)
-            chrome.browserAction.setBadgeBackgroundColor(
-               { color: '#F00' },
-               () => {
-                  chrome.browserAction.setBadgeText({
-                     text: count.toString(),
-                  })
-               }
-            )
+            setCount(count.toString())
          })
          .catch((error) => {
             console.error('🚨🚨REST API Error [GET]:', error)
          })
    }
+}
+
+function setCount(count: string) {
+   chrome.action.setBadgeText({
+      text: count,
+   })
+   chrome.action.setBadgeBackgroundColor(
+      { color: '#F00000' }
+   )
 }
 
 // let unread = new UnreadNotifications()
