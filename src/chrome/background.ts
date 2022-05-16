@@ -1,15 +1,21 @@
+import UnreadNotifications from './UnreadNotifications'
+import createMetaMaskProvider from 'metamask-extension-provider'
+import { getNormalizeAddress } from '../utils'
+
 chrome.runtime.onMessage.addListener((data) => {
-   console.log("chrome.runtime.onMessage", data)
+   console.log('chrome.runtime.onMessage', data)
    if (data.type === 'notification') {
       notify(data.message)
    }
-   // if (data.open) {
-   //    return new Promise(resolve => {
-   //      chrome.browserAction.getPopup({}, (popup) => {
-   //        return resolve(popup)
-   //      })
-   //    })
-   //  }
+})
+
+chrome.storage.onChanged.addListener((changes, namespace) => {
+   for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+      console.log(
+         `Storage key "${key}" in namespace "${namespace}" changed.`,
+         `Old value was "${oldValue}", new value is "${newValue}".`
+      )
+   }
 })
 
 chrome.runtime.onInstalled.addListener((details) => {
@@ -51,5 +57,65 @@ chrome.runtime.onConnect.addListener((port) => {
 chrome.runtime.onSuspend.addListener(() => {
    console.log('[background.ts] onSuspend')
 })
+
+async function getUnreadNotificationsCount() {
+
+   console.log('[background.ts][getUnreadNotificationsCount]')
+   let provider = window.ethereum ? window.ethereum : createMetaMaskProvider()
+
+   if (provider) {
+      const [accounts, chainId] = await Promise.all([
+         provider.request({
+            method: 'eth_requestAccounts',
+         }),
+         provider.request({ method: 'eth_chainId' }),
+      ])
+
+      const account = getNormalizeAddress(accounts)
+
+      fetch(
+         ` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`,
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         }
+      )
+         .then((response) => response.json())
+         .then((count) => {
+            console.log('✅ [GET][Unread Notifications] UNREAD COUNT:', count)
+            chrome.browserAction.setBadgeBackgroundColor(
+               { color: '#F00' },
+               () => {
+                  chrome.browserAction.setBadgeText({
+                     text: count.toString(),
+                  })
+               }
+            )
+         })
+         .catch((error) => {
+            console.error('🚨🚨REST API Error [GET]:', error)
+         })
+   }
+}
+
+// let unread = new UnreadNotifications()
+let requestTimer
+
+console.log('[background.ts] body')
+
+function scheduleRequest(interval: number) {
+   console.log('[background.ts] scheduleRequest')
+
+   if (interval != null) {
+      window.setTimeout(getUnreadNotificationsCount, interval)
+   } else {
+      requestTimer = window.setTimeout(getUnreadNotificationsCount, 10000)
+      window.setTimeout(scheduleRequest, 10000)
+   }
+}
+
+scheduleRequest(5000)
 
 export {}
