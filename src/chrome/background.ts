@@ -1,6 +1,6 @@
 import createMetaMaskProvider from 'metamask-extension-provider'
 import { getNormalizeAddress } from '../utils'
-import WalletAccount from './Wallet.class'
+import WalletAccount from './wallet'
 
 let unreadCount = 0
 let _accounts: WalletAccount[] | null = []
@@ -99,7 +99,7 @@ function handleAccountsChanged(accounts: any) {
       // Stop all old account schedulers
       if (_accounts != null) {
          accounts.forEach((acc: WalletAccount) => {
-            accounts.stopScheduler()
+            acc.stopScheduler()
          })
       }
 
