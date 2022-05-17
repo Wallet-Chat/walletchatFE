@@ -1,6 +1,21 @@
-import UnreadNotifications from './UnreadNotifications'
 import createMetaMaskProvider from 'metamask-extension-provider'
 import { getNormalizeAddress } from '../utils'
+import WalletAccount from './Wallet.class'
+
+let unreadCount = 0
+let _accounts: WalletAccount[] | null = []
+let provider = createMetaMaskProvider()
+provider.on('accountsChanged', handleAccountsChanged)
+
+provider
+   .request({ method: 'eth_accounts' })
+   .then(handleAccountsChanged)
+   .catch((err) => {
+      // Some unexpected error.
+      // For backwards compatibility reasons, if no accounts are available,
+      // eth_accounts will return an empty array.
+      console.error(err)
+   })
 
 chrome.runtime.onMessage.addListener((data) => {
    console.log('chrome.runtime.onMessage', data)
@@ -20,8 +35,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 chrome.runtime.onInstalled.addListener((details) => {
    console.log('[background.ts] onInstalled', details)
-
-   scheduleRequest(5000)
 
    chrome.contextMenus.create({
       id: 'notify',
@@ -60,66 +73,101 @@ chrome.runtime.onSuspend.addListener(() => {
    console.log('[background.ts] onSuspend')
 })
 
-async function getUnreadNotificationsCount() {
+function reloadSettings() {
+   unreadCount = 0
 
-   console.log('[background.ts][getUnreadNotificationsCount]')
-   let provider = window.ethereum ? window.ethereum : createMetaMaskProvider()
-
-   if (provider) {
-      const [accounts, chainId] = await Promise.all([
-         provider.request({
-            method: 'eth_requestAccounts',
-         }),
-         provider.request({ method: 'eth_chainId' }),
-      ])
-
-      const account = getNormalizeAddress(accounts)
-
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`,
-         {
-            method: 'GET',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-         }
-      )
-         .then((response) => response.json())
-         .then((count) => {
-            console.log('✅ [GET][Unread Notifications] UNREAD COUNT:', count)
-            setCount(count.toString())
-         })
-         .catch((error) => {
-            console.error('🚨🚨REST API Error [GET]:', error)
-         })
+   if (_accounts != null) {
+      _accounts.forEach((account) => {
+         account.stopScheduler()
+      })
+      _accounts = null
    }
+   _accounts = new Array<WalletAccount>()
+   chrome.browserAction.setBadgeText({ text: '...' })
+   chrome.browserAction.setTitle({ title: 'Polling accounts...' })
+
+   window.setTimeout(startRequest, 0)
 }
 
-function setCount(count: string) {
-   chrome.action.setBadgeText({
-      text: count,
-   })
-   chrome.action.setBadgeBackgroundColor(
-      { color: '#F00000' }
-   )
-}
+function handleAccountsChanged(accounts: any) {
+   console.log('handleAccountsChanged()', accounts)
 
-// let unread = new UnreadNotifications()
-let requestTimer
-
-console.log('[background.ts] body')
-
-function scheduleRequest(interval: number) {
-   console.log('[background.ts] scheduleRequest')
-
-   if (interval != null) {
-      window.setTimeout(getUnreadNotificationsCount, interval)
+   if (accounts.length === 0) {
+      // MetaMask is locked or the user has not connected any accounts
+      console.log('Please connect to MetaMask.')
    } else {
-      requestTimer = window.setTimeout(getUnreadNotificationsCount, 10000)
-      window.setTimeout(scheduleRequest, 10000)
+      // Stop all old account schedulers
+      if (_accounts != null) {
+         accounts.forEach((acc: WalletAccount) => {
+            accounts.stopScheduler()
+         })
+      }
+
+      // Start new account schedulers
+      let accts = new Array<WalletAccount>()
+      accounts.forEach((address: string) => {
+         let acc = new WalletAccount(address)
+         // acc.onError = walletError;
+         // acc.onUpdate = walletUpdate;
+         accts.push(acc)
+      })
+      _accounts = accts
    }
 }
 
-scheduleRequest(5000)
+function startRequest() {
+   if (_accounts !== null) {
+      _accounts.forEach((account, i) => {
+         if (account != null) {
+            window.setTimeout(account.startScheduler, 500 * i)
+         }
+      })
+   }
+}
+
+function walletUpdate(_account: string) {
+   let newUnreadCount = 0
+
+   if (_accounts !== null) {
+      _accounts.forEach((account) => {
+         if (account != null && account.getUnreadCount() > 0) {
+            newUnreadCount += account.getUnreadCount()
+         }
+      })
+   }
+
+   switch (newUnreadCount) {
+      case 0:
+         chrome.browserAction.setBadgeBackgroundColor({
+            color: [110, 140, 180, 255],
+         })
+         chrome.browserAction.setTitle({ title: 'No unread messages' })
+         break
+      case 1:
+         chrome.browserAction.setBadgeBackgroundColor({
+            color: [200, 100, 100, 255],
+         })
+         chrome.browserAction.setTitle({
+            title: newUnreadCount + ' unread message',
+         })
+         break
+      default:
+         chrome.browserAction.setBadgeBackgroundColor({
+            color: [200, 100, 100, 255],
+         })
+         chrome.browserAction.setTitle({
+            title: newUnreadCount + ' unread messages',
+         })
+         break
+   }
+}
+
+// Called when an account has experienced an error
+function walletError(_account: string) {
+   chrome.browserAction.setBadgeBackgroundColor({ color: [190, 190, 190, 255] })
+   chrome.browserAction.setBadgeText({ text: 'X' })
+   chrome.browserAction.setTitle({ title: 'Wallet not connected' })
+   unreadCount = 0
+}
 
 export {}
