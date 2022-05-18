@@ -149,6 +149,7 @@ function walletUpdate(_account: string) {
             color: [110, 140, 180, 255],
          })
          chrome.action.setTitle({ title: 'No unread messages' })
+         hrome.action.setBadgeText({ text: "" })
          break
       case 1:
          chrome.action.setBadgeBackgroundColor({
