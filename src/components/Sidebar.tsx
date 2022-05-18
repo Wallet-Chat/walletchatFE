@@ -158,7 +158,7 @@ const Sidebar = ({
                         />
                         <span
                            style={{
-                              fontSize: '90%',
+                              fontSize: 'var(--chakra-fontSizes-md)',
                               color: 'var(--chakra-colors-darkgray-500)',
                            }}
                         >
