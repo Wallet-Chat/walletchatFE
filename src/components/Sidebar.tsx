@@ -9,7 +9,6 @@ import {
 } from '@chakra-ui/react'
 import { NavLink } from 'react-router-dom'
 import {
-   IconChevronDown,
    IconCirclePlus,
    IconMessageCircle2,
 } from '@tabler/icons'
