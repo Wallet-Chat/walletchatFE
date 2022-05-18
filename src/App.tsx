@@ -9,6 +9,7 @@ import Inbox from './scenes/Inbox'
 import NewConversation from './scenes/NewConversation'
 import Chat from './scenes/Chat'
 import Sidebar from './components/Sidebar'
+import NFT from './scenes/NFT'
 import { useWallet } from './context/WalletProvider'
 import { useUnreadCount } from './context/UnreadCountProvider'
 
@@ -155,6 +156,12 @@ export const App = () => {
                               web3={web3}
                               isAuthenticated={isAuthenticated}
                            />
+                        }
+                     />
+                     <Route
+                        path="/nft"
+                        element={
+                           <NFT />
                         }
                      />
                      <Route
