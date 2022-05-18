@@ -1,14 +1,9 @@
 import createMetaMaskProvider from 'metamask-extension-provider'
 import WalletAccount from './wallet'
 
-let unreadCount = 0
-let isStopped = false
 let _accounts: WalletAccount[] | null = []
 let provider = createMetaMaskProvider()
 provider.on('accountsChanged', handleAccountsChanged)
-
-// Start scheduler upon start-up
-scheduleRequest()
 
 provider
    .request({ method: 'eth_accounts' })
@@ -77,7 +72,6 @@ chrome.runtime.onSuspend.addListener(() => {
 })
 
 function reloadSettings() {
-   unreadCount = 0
 
    if (_accounts != null) {
       _accounts.forEach((account) => {
@@ -113,8 +107,8 @@ function handleAccountsChanged(accounts: any) {
       let accts = new Array<WalletAccount>()
       accounts.forEach((address: string) => {
          let acc = new WalletAccount(address)
-         // acc.onError = walletError;
-         // acc.onUpdate = walletUpdate;
+         acc.onError = walletError;
+         acc.onUpdate = walletUpdate;
          accts.push(acc)
       })
       _accounts = accts
@@ -132,18 +126,18 @@ function startRequest() {
    }
 }
 
-function walletUpdate(_account: string) {
-   let newUnreadCount = 0
+function walletUpdate() {
+   let unreadCount = 0
 
    if (_accounts !== null) {
       _accounts.forEach((account) => {
          if (account != null && account.getUnreadCount() > 0) {
-            newUnreadCount += account.getUnreadCount()
+            unreadCount += account.getUnreadCount()
          }
       })
    }
 
-   switch (newUnreadCount) {
+   switch (unreadCount) {
       case 0:
          chrome.action.setBadgeBackgroundColor({
             color: [110, 140, 180, 255],
@@ -156,39 +150,27 @@ function walletUpdate(_account: string) {
             color: "#F00",
          })
          chrome.action.setTitle({
-            title: newUnreadCount + ' unread message',
+            title: unreadCount + ' unread message',
          })
-         chrome.action.setBadgeText({ text: newUnreadCount.toString() })
+         chrome.action.setBadgeText({ text: unreadCount.toString() })
          break
       default:
          chrome.action.setBadgeBackgroundColor({
             color: "#F00",
          })
          chrome.action.setTitle({
-            title: newUnreadCount + ' unread messages',
+            title: unreadCount + ' unread messages',
          })
-         chrome.action.setBadgeText({ text: newUnreadCount.toString() })
+         chrome.action.setBadgeText({ text: unreadCount.toString() })
          break
    }
-   
-   unreadCount = newUnreadCount
 }
 
 // Called when an account has experienced an error
-function walletError(_account: string) {
+function walletError() {
    chrome.browserAction.setBadgeBackgroundColor({ color: [190, 190, 190, 255] })
    chrome.browserAction.setBadgeText({ text: 'X' })
    chrome.browserAction.setTitle({ title: 'Wallet not connected' })
-   unreadCount = 0
-}
-
-// Schedules a new walletUpdate call
-function scheduleRequest() {
-   console.log("[background.ts][scheduleRequest]")
-   if (isStopped) {
-      return;
-   }
-   window.setTimeout(walletUpdate, 10000);
 }
 
 export {}

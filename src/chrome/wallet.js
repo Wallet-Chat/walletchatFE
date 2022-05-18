@@ -10,8 +10,8 @@ export default function WalletAccount(address) {
     // Debug output (if enabled, might cause memory leaks)
     let verbose = false;
 
-    let onError;
-    let onUpdate;
+    this.onError = function () {};
+    this.onUpdate = function () {};
 
     // Without this/that, no internal calls to onUpdate or onError can be made...
     let that = this;
@@ -48,7 +48,7 @@ export default function WalletAccount(address) {
     async function getInboxCount() {
 
         if (address) {
-            console.log(`[getInboxCount][${address}`)
+            // console.log(`[getInboxCount][${address}`)
 
             fetch(
                 ` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${address}`,
