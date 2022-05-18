@@ -3,9 +3,13 @@ import { getNormalizeAddress } from '../utils'
 import WalletAccount from './wallet'
 
 let unreadCount = 0
+let isStopped = false
 let _accounts: WalletAccount[] | null = []
 let provider = createMetaMaskProvider()
 provider.on('accountsChanged', handleAccountsChanged)
+
+// Start scheduler upon start-up
+scheduleRequest()
 
 provider
    .request({ method: 'eth_accounts' })
@@ -98,8 +102,11 @@ function handleAccountsChanged(accounts: any) {
    } else {
       // Stop all old account schedulers
       if (_accounts != null) {
-         accounts.forEach((acc: WalletAccount) => {
-            acc.stopScheduler()
+         _accounts.forEach((acc: WalletAccount) => {
+            console.log('stop address: ', acc)
+            if (acc) {
+               acc.stopScheduler()
+            }
          })
       }
 
@@ -112,6 +119,7 @@ function handleAccountsChanged(accounts: any) {
          accts.push(acc)
       })
       _accounts = accts
+      startRequest()
    }
 }
 
@@ -138,24 +146,24 @@ function walletUpdate(_account: string) {
 
    switch (newUnreadCount) {
       case 0:
-         chrome.browserAction.setBadgeBackgroundColor({
+         chrome.action.setBadgeBackgroundColor({
             color: [110, 140, 180, 255],
          })
-         chrome.browserAction.setTitle({ title: 'No unread messages' })
+         chrome.action.setTitle({ title: 'No unread messages' })
          break
       case 1:
-         chrome.browserAction.setBadgeBackgroundColor({
+         chrome.action.setBadgeBackgroundColor({
             color: [200, 100, 100, 255],
          })
-         chrome.browserAction.setTitle({
+         chrome.action.setTitle({
             title: newUnreadCount + ' unread message',
          })
          break
       default:
-         chrome.browserAction.setBadgeBackgroundColor({
+         chrome.action.setBadgeBackgroundColor({
             color: [200, 100, 100, 255],
          })
-         chrome.browserAction.setTitle({
+         chrome.action.setTitle({
             title: newUnreadCount + ' unread messages',
          })
          break
@@ -168,6 +176,15 @@ function walletError(_account: string) {
    chrome.browserAction.setBadgeText({ text: 'X' })
    chrome.browserAction.setTitle({ title: 'Wallet not connected' })
    unreadCount = 0
+}
+
+// Schedules a new walletUpdate call
+function scheduleRequest() {
+   console.log("[background.ts][scheduleRequest]")
+   if (isStopped) {
+      return;
+   }
+   window.setTimeout(walletUpdate, 10000);
 }
 
 export {}

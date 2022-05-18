@@ -10,10 +10,11 @@ export default function WalletAccount(address) {
     // Debug output (if enabled, might cause memory leaks)
     let verbose = false;
 
-    // Without this/that, no internal calls to onUpdate or onError can be made...
-    let that = this;
     let onError;
     let onUpdate;
+
+    // Without this/that, no internal calls to onUpdate or onError can be made...
+    let that = this;
 
     // Retrieves unread count
     this.getUnreadCount = function () {
@@ -30,8 +31,7 @@ export default function WalletAccount(address) {
     }
 
     // Handles a unsuccessful getInboxCount call and schedules a new one
-    function handleError(xhr, text, err) {
-        logToConsole("error! " + xhr + " " + text + " " + err);
+    function handleError() {
         window.clearTimeout(abortTimerId);
 
         if (errorLives > 0)
@@ -61,11 +61,12 @@ export default function WalletAccount(address) {
             )
                 .then((response) => response.json())
                 .then((count) => {
-                    console.log('✅ [GET][Unread Notifications] UNREAD COUNT:', count)
-                    unreadCount = count
+                    console.log('✅ [GET][Unread Count] UNREAD COUNT:', count)
+                    handleSuccess(count)
                 })
                 .catch((error) => {
-                    console.error('🚨🚨REST API Error [GET]:', error)
+                    console.error('🚨🚨[GET][Unread Count] Error:', error)
+                    handleError()
                 })
         }
     }
