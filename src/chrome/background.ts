@@ -1,5 +1,4 @@
 import createMetaMaskProvider from 'metamask-extension-provider'
-import { getNormalizeAddress } from '../utils'
 import WalletAccount from './wallet'
 
 let unreadCount = 0
@@ -153,21 +152,25 @@ function walletUpdate(_account: string) {
          break
       case 1:
          chrome.action.setBadgeBackgroundColor({
-            color: [200, 100, 100, 255],
+            color: "#F00",
          })
          chrome.action.setTitle({
             title: newUnreadCount + ' unread message',
          })
+         chrome.action.setBadgeText({ text: newUnreadCount.toString() })
          break
       default:
          chrome.action.setBadgeBackgroundColor({
-            color: [200, 100, 100, 255],
+            color: "#F00",
          })
          chrome.action.setTitle({
             title: newUnreadCount + ' unread messages',
          })
+         chrome.action.setBadgeText({ text: newUnreadCount.toString() })
          break
    }
+   
+   unreadCount = newUnreadCount
 }
 
 // Called when an account has experienced an error
