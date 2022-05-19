@@ -87,6 +87,7 @@ export const isDateTimePassed = (inputDate: string) => {
 }
 
 export const getFormattedDate = (inputDate: string) => {
+   console.log(inputDate, isValidISODate(inputDate))
    if (!isValidISODate(inputDate)) return
    const monthNames = [
       'Jan',
@@ -111,7 +112,12 @@ export const getFormattedDate = (inputDate: string) => {
 }
 
 export const timeSince = (dateStr: string) => {
+
    let date = new Date(dateStr)
+
+   if (isYesterday(dateStr)) {
+      return `Yesterday, ${formatAMPM(date)}`
+   }
 
    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
    let interval = seconds / 31536000
@@ -125,6 +131,7 @@ export const timeSince = (dateStr: string) => {
    }
    interval = seconds / 86400
    if (interval > 1) {
+      console.log(interval)
       return Math.floor(interval) + ' days ago'
    }
    interval = seconds / 3600
