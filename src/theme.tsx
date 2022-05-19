@@ -162,9 +162,17 @@ export const theme = extendTheme(
       components: {
          Divider: {
             baseStyle: {
-               borderColor: 'lightgray.200',
+               borderColor: 'lightgray.400',
                opacity: 1,
             },
+         },
+         Badge: {
+            variants: {
+               black: {
+                  background: 'darkgray.800',
+                  color: 'lightgray.200'
+               }
+            }
          },
          Text: {
             variants: {

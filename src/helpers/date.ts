@@ -131,7 +131,6 @@ export const timeSince = (dateStr: string) => {
    }
    interval = seconds / 86400
    if (interval > 1) {
-      console.log(interval)
       return Math.floor(interval) + ' days ago'
    }
    interval = seconds / 3600
