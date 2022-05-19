@@ -6,6 +6,7 @@ import {
    MenuList,
    MenuItem,
    Menu,
+   Badge,
 } from '@chakra-ui/react'
 import { NavLink } from 'react-router-dom'
 import {
@@ -58,17 +59,7 @@ const LinkElem = styled(NavLink)`
       }
    }
 `
-const NotificationCount = styled.div`
-   position: absolute;
-   top: 5px;
-   right: 5px;
-   background: var(--chakra-colors-error-600);
-   border-radius: 50%;
-   width: 22px;
-   height: 22px;
-   color: #fff;
-   font-weight: 700;
-`
+
 const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
    border-radius: 0.5rem;
@@ -131,15 +122,14 @@ const Sidebar = ({
             <LinkElem to={'/chat'}>
                <IconMessageCircle2 size="30" stroke={1.5} />
                {unreadCount > 0 && (
-                  <NotificationCount>
-                     {unreadCount}
-                  </NotificationCount>
+                  <Badge variant="black" position="absolute" bottom="0" right="0" fontSize="lg">{unreadCount}</Badge>
                )}
+               
             </LinkElem>
             <LinkElem to={`/nft/`}>
                <Image src={coolcat2356} alt="" width="40px" />
                {nftNotificationCount > 0 && (
-                  <NotificationCount>{nftNotificationCount}</NotificationCount>
+                  <Badge variant="black" position="absolute" bottom="0" right="0" fontSize="lg">{nftNotificationCount}</Badge>
                )}
             </LinkElem>
          </Flex>
