@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import CommentType from '../../../../types/Comment'
 import { truncateAddress } from '../../../../helpers/truncateString'
-import { getFormattedDate, timeSince } from '../../../../helpers/date'
+import { timeSince } from '../../../../helpers/date'
 
 const BlockieWrapper = styled.div`
    border-radius: var(--chakra-radii-md);
@@ -14,14 +14,17 @@ const BlockieWrapper = styled.div`
 `
 
 const Comment = ({ data }: { data: CommentType }) => {
+   console.log(data)
    return (
-      <Box>
-         <Flex alignItems="center">
+      <Box mb={3}>
+         <Flex alignItems="center" mb="1">
+             <Box mr={3}>
             <BlockieWrapper>
-               <Blockies seed={data.fromAddr.toLocaleLowerCase()} scale={4} />
+               <Blockies seed={data.fromAddr && data.fromAddr.toLocaleLowerCase()} scale={4} />
             </BlockieWrapper>
+            </Box>
             <Box>
-               <Text>
+               <Flex alignItems="center">
                   {truncateAddress(data.fromAddr)}
                   <Link
                      to={`https://etherscan.io/address/${data.fromAddr}`}
@@ -29,21 +32,22 @@ const Comment = ({ data }: { data: CommentType }) => {
                      style={{
                         display: 'inline-block',
                         verticalAlign: 'middle',
+                        marginLeft: '.3rem'
                      }}
                   >
                      <IconExternalLink
                         size={16}
-                        color="var(--chakra-colors-lightgray-900)"
+                        color="var(--chakra-colors-darkgray-200)"
                         stroke="1.5"
                      />
                   </Link>
-               </Text>
+               </Flex>
                {data.timestamp && (
                   <Text color="lightgray.900" fontSize="md">{timeSince(data.timestamp)}</Text>
                )}
             </Box>
          </Flex>
-         <Text>{data.message}</Text>
+         <Text fontSize="md">{data.message}</Text>
       </Box>
    )
 }

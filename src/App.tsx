@@ -161,7 +161,7 @@ export const App = () => {
                      <Route
                         path="/nft"
                         element={
-                           <NFT />
+                           <NFT account={account} />
                         }
                      />
                      <Route

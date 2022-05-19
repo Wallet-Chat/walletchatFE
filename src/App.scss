@@ -25,6 +25,10 @@ a {
     }
 }
 
+:focus:not(:focus-visible):not([role="dialog"]):not([role="menu"]) {
+	box-shadow: none !important;
+}
+
 .bg-pattern {
     background: #FFF url('./images/bg-pattern.svg') repeat;
 }
