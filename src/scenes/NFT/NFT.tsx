@@ -277,7 +277,7 @@ const NFT = ({ account }: { account: string }) => {
       }
       setIsFetchingMessages(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${nftContractAddr}/${nftId}`,
+         ` ${process.env.REACT_APP_REST_API}/getnft_chatitems/${account}/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
             headers: {
