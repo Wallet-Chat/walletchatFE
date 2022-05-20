@@ -14,7 +14,7 @@ const BlockieWrapper = styled.div`
 `
 
 const Comment = ({ data }: { data: CommentType }) => {
-   console.log(data)
+
    return (
       <Box mb={3}>
          <Flex alignItems="center" mb="1">
