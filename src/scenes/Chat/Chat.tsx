@@ -108,8 +108,13 @@ const Chat = ({
          console.log('Not authenticated')
          return
       }
+      if (!toAddr) {
+         console.log('Recipient address is not available');
+         return
+      }
       setIsFetchingChatData(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}`, {
+      console.log(`getall_chatitems/${account}/${toAddr}`)
+      fetch(` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${toAddr}`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',
