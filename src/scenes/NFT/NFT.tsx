@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react'
 import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
 import { useState, useEffect, KeyboardEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
@@ -35,8 +35,8 @@ import Message from './components/Message'
 
 // const nftContractAddr = '0x1a92f7381b9f03921564a437210bb9396471050c'
 // const nftId = '878'
-const nftContractAddr = '0x716f29b8972d551294d9e02b3eb0fc1107fbf4aa'
-const nftId = '1484'
+// const nftContractAddr = '0x716f29b8972d551294d9e02b3eb0fc1107fbf4aa'
+// const nftId = '1484'
 const tokenType = 'erc721'
 
 const BlockieWrapper = styled.div`
@@ -63,10 +63,13 @@ const DottedBackground = styled.div`
 `
 
 const NFT = ({ account }: { account: string }) => {
+   let { nftContractAddr = '', nftId = 0 } = useParams()
+
    // Basic data
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [ownerAddress, setOwnerAddress] = useState<string>()
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
+   const [imageUrl, setImageUrl] = useState<string>()
 
    // Chat
    const [unreadCount, setUnreadCount] = useState<number>(0)
@@ -80,8 +83,7 @@ const NFT = ({ account }: { account: string }) => {
 
    // Comment
    const [commentInput, setCommentInput] = useState<string>('')
-   const [loadedComments, setLoadedComments] =
-      useState<CommentType[]>(dummyComments)
+   const [loadedComments, setLoadedComments] = useState<CommentType[]>([])
    const [isFetchingComments, setIsFetchingComments] = useState<boolean>(false)
    const [isPostingComment, setIsPostingComment] = useState<boolean>(false)
 
@@ -140,6 +142,14 @@ const NFT = ({ account }: { account: string }) => {
             console.log('✅[GET][NFT data]:', result)
             // console.log(JSON.stringify(result, null, 2))
             setNftData(result)
+
+            let url = result.metadata && result.metadata.image
+            if (url?.includes("ipfs://")) {
+               let parts = url.split("ipfs://")
+               let cid = parts[parts.length - 1]
+               url = `https://ipfs.io/ipfs/${cid}`
+               setImageUrl(url)
+            }
          })
          .catch((error) => console.log('error', error))
    }
@@ -209,7 +219,7 @@ const NFT = ({ account }: { account: string }) => {
       let data = {
          fromAddr: account.toLocaleLowerCase(),
          nftAddr: nftContractAddr,
-         nftId: parseInt(nftId),
+         nftId: nftId,
          timestamp: new Date(),
          message: commentInputCopy,
       }
@@ -228,7 +238,7 @@ const NFT = ({ account }: { account: string }) => {
             addCommentToUI(
                account,
                nftContractAddr,
-               nftId,
+               nftId.toString(),
                timestamp,
                commentInputCopy
             )
@@ -480,14 +490,14 @@ const NFT = ({ account }: { account: string }) => {
    return (
       <Flex flexDirection="column" background="white" height="100vh">
          <Flex alignItems="center" mb={2} p={5}>
-            {metadata && metadata.image && (
-               <Image
-                  src={metadata.image}
-                  alt=""
-                  height="60px"
-                  borderRadius="var(--chakra-radii-xl)"
-                  mr={3}
-               />
+            {imageUrl && (
+                  <Image
+                     src={imageUrl}
+                     alt=""
+                     height="60px"
+                     borderRadius="var(--chakra-radii-xl)"
+                     mr={3}
+                  />
             )}
             <Box>
                {metadata && metadata.name && (
@@ -525,11 +535,13 @@ const NFT = ({ account }: { account: string }) => {
             <TabList padding="0 var(--chakra-space-5)">
                <Tab>
                   Chat{' '}
-                  {(unreadCount && unreadCount !== 0) ? (
+                  {unreadCount && unreadCount !== 0 ? (
                      <Badge variant="black" ml={1}>
                         {unreadCount} xx
                      </Badge>
-                  ): <></>}
+                  ) : (
+                     <></>
+                  )}
                </Tab>
                <Tab>
                   Comments{' '}
@@ -562,6 +574,7 @@ const NFT = ({ account }: { account: string }) => {
                               <Box>
                                  <Text
                                     ml={2}
+                                    fontSize="md"
                                     fontWeight="bold"
                                     color="darkgray.800"
                                  >
@@ -672,7 +685,7 @@ const NFT = ({ account }: { account: string }) => {
                   </Flex>
                </TabPanel>
                <TabPanel p={5}>
-                  {(isFetchingComments && loadedComments.length === 0) ? (
+                  {isFetchingComments && loadedComments.length === 0 ? (
                      <Spinner />
                   ) : (
                      <Flex mb={5}>
@@ -721,51 +734,51 @@ const NFT = ({ account }: { account: string }) => {
    )
 }
 
-const dummyComments: CommentType[] = [
-   {
-      fromAddr: '0x8999531b12D3577c50D9bEb8E2C1857C7cA62808',
-      nftAddr: nftContractAddr,
-      nftId: parseInt(nftId),
-      timestamp: new Date().toISOString(),
-      message:
-         'Sed lacus mi, rutrum sed sem sagittis, imperdiet pellentesque purus. Pellentesque mi libero, varius non fermentum sed, bibendum sed metus. Quisque id turpis ut dui posuere luctus.',
-   },
-   {
-      fromAddr: '0x19871B6F5f64657d6Bf35C88b628F3d1778db81d',
-      nftAddr: nftContractAddr,
-      nftId: parseInt(nftId),
-      timestamp: new Date().toISOString(),
-      message: 'Proin ac diam ac elit molestie vehicula vitae nec felis.',
-   },
-   {
-      fromAddr: '0x91D7A110E0cE462d428F3ac700b4371990735517',
-      nftAddr: nftContractAddr,
-      nftId: parseInt(nftId),
-      timestamp: new Date(
-         new Date().setDate(new Date().getDate() - 1)
-      ).toISOString(),
-      message:
-         'Donec tristique, magna sed sodales eleifend, lectus ligula tempor enim, non porttitor ipsum nibh id odio. Sed lorem nisl, venenatis sed lorem et, euismod porttitor orci. ',
-   },
-   {
-      fromAddr: '0xbf9ceF53327Be908CBcFe1D8d217852d44b027de',
-      nftAddr: nftContractAddr,
-      nftId: parseInt(nftId),
-      timestamp: new Date(
-         new Date().setDate(new Date().getDate() - 1)
-      ).toISOString(),
-      message: 'Vivamus vel lectus a neque blandit viverra.',
-   },
-   {
-      fromAddr: '0x785F375F2B819d875Ce07009a15779E9c3679C1D',
-      nftAddr: nftContractAddr,
-      nftId: parseInt(nftId),
-      timestamp: new Date(
-         new Date().setDate(new Date().getDate() - 2)
-      ).toISOString(),
-      message:
-         'Quisque vitae neque nunc. In hac habitasse platea dictumst. Phasellus gravida fringilla nisl at malesuada. Pellentesque vitae ipsum at elit ultrices facilisis.',
-   },
-]
+// const dummyComments: CommentType[] = [
+//    {
+//       fromAddr: '0x8999531b12D3577c50D9bEb8E2C1857C7cA62808',
+//       nftAddr: nftContractAddr,
+//       nftId: parseInt(nftId),
+//       timestamp: new Date().toISOString(),
+//       message:
+//          'Sed lacus mi, rutrum sed sem sagittis, imperdiet pellentesque purus. Pellentesque mi libero, varius non fermentum sed, bibendum sed metus. Quisque id turpis ut dui posuere luctus.',
+//    },
+//    {
+//       fromAddr: '0x19871B6F5f64657d6Bf35C88b628F3d1778db81d',
+//       nftAddr: nftContractAddr,
+//       nftId: parseInt(nftId),
+//       timestamp: new Date().toISOString(),
+//       message: 'Proin ac diam ac elit molestie vehicula vitae nec felis.',
+//    },
+//    {
+//       fromAddr: '0x91D7A110E0cE462d428F3ac700b4371990735517',
+//       nftAddr: nftContractAddr,
+//       nftId: parseInt(nftId),
+//       timestamp: new Date(
+//          new Date().setDate(new Date().getDate() - 1)
+//       ).toISOString(),
+//       message:
+//          'Donec tristique, magna sed sodales eleifend, lectus ligula tempor enim, non porttitor ipsum nibh id odio. Sed lorem nisl, venenatis sed lorem et, euismod porttitor orci. ',
+//    },
+//    {
+//       fromAddr: '0xbf9ceF53327Be908CBcFe1D8d217852d44b027de',
+//       nftAddr: nftContractAddr,
+//       nftId: parseInt(nftId),
+//       timestamp: new Date(
+//          new Date().setDate(new Date().getDate() - 1)
+//       ).toISOString(),
+//       message: 'Vivamus vel lectus a neque blandit viverra.',
+//    },
+//    {
+//       fromAddr: '0x785F375F2B819d875Ce07009a15779E9c3679C1D',
+//       nftAddr: nftContractAddr,
+//       nftId: parseInt(nftId),
+//       timestamp: new Date(
+//          new Date().setDate(new Date().getDate() - 2)
+//       ).toISOString(),
+//       message:
+//          'Quisque vitae neque nunc. In hac habitasse platea dictumst. Phasellus gravida fringilla nisl at malesuada. Pellentesque vitae ipsum at elit ultrices facilisis.',
+//    },
+// ]
 
 export default NFT

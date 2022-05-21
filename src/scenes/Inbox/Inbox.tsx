@@ -47,11 +47,14 @@ const Inbox = ({
    const [isFetchingInboxData, setIsFetchingInboxData] =
       useState<boolean>(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+   const [beenHereFor3Secs, setBeenHereFor3Secs] = useState(false)
 
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
        }, 5000) // every 5s
+
+       setTimeout(() => setBeenHereFor3Secs(true), 3000)
      
        return () => clearInterval(interval)
    }, [])
@@ -133,7 +136,7 @@ const Inbox = ({
       populateUI()
    }, [inboxData, account])
 
-   if (isFetchingInboxData && inboxData.length === 0) {
+   if (isFetchingInboxData && inboxData.length === 0 && !beenHereFor3Secs) {
       return (
          <Box background="white" height="100vh">
             <Box py={8} px={3} height="100vh">
@@ -185,7 +188,7 @@ const Inbox = ({
          ))}
          {loadedMsgs.length === 0 && (
             <Box p={5}>
-               <Text mb={4}>You have no messages.</Text>
+               <Text mb={4} fontSize="md">You have no messages.</Text>
                <StartConversationWithAddress web3={web3} />
             </Box>
          )}

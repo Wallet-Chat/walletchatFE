@@ -1,6 +1,9 @@
 import createMetaMaskProvider from 'metamask-extension-provider'
 import WalletAccount from './wallet'
 
+let activeTabId: number,
+   lastUrl: string | undefined,
+   lastTitle: string | undefined
 let _accounts: WalletAccount[] | null = []
 let provider = createMetaMaskProvider()
 provider.on('accountsChanged', handleAccountsChanged)
@@ -41,6 +44,25 @@ chrome.runtime.onInstalled.addListener((details) => {
    })
 })
 
+function getTabInfo(tabId: number) {
+   chrome.tabs.get(tabId, function (tab) {
+      if (lastUrl !== tab.url || lastTitle !== tab.title)
+         window.dispatchEvent(
+            new CustomEvent('urlChangedEvent', { detail: tab.url })
+         )
+   })
+}
+
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+   // console.log('[chrome.tabs.onActivated', activeInfo)
+   getTabInfo((activeTabId = activeInfo.tabId))
+})
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+   // console.log('[chrome.tabs.onUpdated', tabId, changeInfo, tab)
+   getTabInfo(tabId)
+})
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
    if ('notify' === info.menuItemId) {
       if (info.selectionText) {
@@ -72,7 +94,6 @@ chrome.runtime.onSuspend.addListener(() => {
 })
 
 function reloadSettings() {
-
    if (_accounts != null) {
       _accounts.forEach((account) => {
          account.stopScheduler()
@@ -107,8 +128,8 @@ function handleAccountsChanged(accounts: any) {
       let accts = new Array<WalletAccount>()
       accounts.forEach((address: string) => {
          let acc = new WalletAccount(address)
-         acc.onError = walletError;
-         acc.onUpdate = walletUpdate;
+         acc.onError = walletError
+         acc.onUpdate = walletUpdate
          accts.push(acc)
       })
       _accounts = accts
@@ -143,11 +164,11 @@ function walletUpdate() {
             color: [110, 140, 180, 255],
          })
          chrome.action.setTitle({ title: 'No unread messages' })
-         chrome.action.setBadgeText({ text: "" })
+         chrome.action.setBadgeText({ text: '' })
          break
       case 1:
          chrome.action.setBadgeBackgroundColor({
-            color: "#F00",
+            color: '#F00',
          })
          chrome.action.setTitle({
             title: unreadCount + ' unread message',
@@ -156,7 +177,7 @@ function walletUpdate() {
          break
       default:
          chrome.action.setBadgeBackgroundColor({
-            color: "#F00",
+            color: '#F00',
          })
          chrome.action.setTitle({
             title: unreadCount + ' unread messages',

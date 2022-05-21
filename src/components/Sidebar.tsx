@@ -6,18 +6,17 @@ import {
    MenuList,
    MenuItem,
    Menu,
-   Badge,
+   Badge
 } from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import {
-   IconCirclePlus,
-   IconMessageCircle2,
-} from '@tabler/icons'
+import { IconCirclePlus, IconMessageCircle2 } from '@tabler/icons'
 import Blockies from 'react-blockies'
+import styled from 'styled-components'
 
 import logoThumb from '../images/logo-thumb.svg'
-import coolcat2356 from '../images/coolcat2356.png'
-import styled from 'styled-components'
+import { getContractAddressAndNFTId } from '../helpers/contract'
+import NFTMetadataType from '../types/NFTMetadata'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -27,7 +26,7 @@ const LinkElem = styled(NavLink)`
    width: 60px;
    height: 60px;
    padding: 0.8rem;
-   margin-bottom: .2rem;
+   margin-bottom: 0.2rem;
    border-radius: 0.5rem;
    text-align: center;
    box-sizing: border-box;
@@ -60,6 +59,10 @@ const LinkElem = styled(NavLink)`
    }
 `
 
+const LinkElem2 = styled(LinkElem)`
+   background: var(--chakra-colors-lightgray-200);
+`
+
 const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
    border-radius: 0.5rem;
@@ -90,17 +93,88 @@ const Divider = styled.div`
    }
 `
 
+interface URLChangedEvent extends Event {
+   detail?: string
+}
+
 const Sidebar = ({
    unreadCount,
    currAccountAddress,
    disconnectWallet,
 }: {
-   unreadCount: number,
-   currAccountAddress: string,
+   unreadCount: number
+   currAccountAddress: string
    disconnectWallet: () => void
 }) => {
-
    const nftNotificationCount = 0
+   const [url, setUrl] = useState<string | undefined>('')
+   const [nftContractAddr, setNftContractAddr] = useState<string>()
+   const [nftId, setNftId] = useState<number>()
+   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [imageUrl, setImageUrl] = useState<string>()
+
+   const { metadata } = nftData || {}
+
+   useEffect(() => {
+      const queryInfo = { active: true, lastFocusedWindow: true }
+      chrome.tabs &&
+         chrome.tabs.query(queryInfo, (tabs) => {
+            const url = tabs[0].url
+            setUrl(url)
+            // console.log('query tab url:', url)
+         })
+
+      const updateURL = (e: URLChangedEvent) => {
+         // console.log('received', data)
+         if (e.detail && e.detail !== url) {
+            // if incoming and existing url are the same, do nothing
+            setUrl(e.detail)
+         }
+      }
+
+      window.addEventListener('urlChangedEvent', updateURL)
+
+      return () => {
+         window.removeEventListener('urlChangedEvent', updateURL)
+      }
+   }, [])
+
+   useEffect(() => {
+      if (url) {
+         const [contractAddress, nftId] = getContractAddressAndNFTId(url)
+         if (contractAddress && nftId !== null) {
+            console.log(contractAddress, nftId)
+            setNftContractAddr(contractAddress)
+            setNftId(parseInt(nftId))
+            getNftMetadata(contractAddress, parseInt(nftId))
+         }
+      }
+   }, [url])
+
+   const getNftMetadata = (nftContractAddr: string, nftId: number) => {
+      const baseURL = `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getNFTMetadata`
+      const fetchURL = `${baseURL}?contractAddress=${nftContractAddr}&tokenId=${nftId}&tokenType=erc721`
+
+      fetch(fetchURL, {
+         method: 'GET',
+      })
+         .then((response) => response.json())
+         .then((result: NFTMetadataType) => {
+            console.log('✅[GET][NFT data]:', result)
+            // console.log(JSON.stringify(result, null, 2))
+            setNftData(result)
+            console.log('metadata:', result && result.metadata)
+
+            let url = result.metadata && result.metadata.image
+            if (url?.includes('ipfs://')) {
+               let parts = url.split('ipfs://')
+               let cid = parts[parts.length - 1]
+               url = `https://ipfs.io/ipfs/${cid}`
+               setImageUrl(url)
+            }
+         })
+         .catch((error) => console.log('error', error))
+   }
 
    return (
       <Flex
@@ -122,16 +196,42 @@ const Sidebar = ({
             <LinkElem to={'/chat'}>
                <IconMessageCircle2 size="30" stroke={1.5} />
                {unreadCount > 0 && (
-                  <Badge variant="black" position="absolute" bottom="0" right="0" fontSize="lg">{unreadCount}</Badge>
+                  <Badge
+                     variant="black"
+                     position="absolute"
+                     bottom="0"
+                     right="0"
+                     fontSize="lg"
+                  >
+                     {unreadCount}
+                  </Badge>
                )}
-               
             </LinkElem>
-            <LinkElem to={`/nft/`}>
-               <Image src={coolcat2356} alt="" width="40px" />
-               {nftNotificationCount > 0 && (
-                  <Badge variant="black" position="absolute" bottom="0" right="0" fontSize="lg">{nftNotificationCount}</Badge>
-               )}
-            </LinkElem>
+            {console.log(metadata)}
+            {metadata && (
+               <LinkElem2 to={`/nft/${nftContractAddr}/${nftId}`}>
+                  {/* <Image src={coolcat2356} alt="" width="40px" /> */}
+                  {imageUrl && (
+                     <Image
+                        src={imageUrl}
+                        alt=""
+                        height="40px"
+                        borderRadius="var(--chakra-radii-xl)"
+                     />
+                  )}
+                  {nftNotificationCount > 0 && (
+                     <Badge
+                        variant="black"
+                        position="absolute"
+                        bottom="0"
+                        right="0"
+                        fontSize="lg"
+                     >
+                        {nftNotificationCount}
+                     </Badge>
+                  )}
+               </LinkElem2>
+            )}
          </Flex>
          <Flex flexDirection="column" alignItems="center">
             <LinkElem to={`/new`}>

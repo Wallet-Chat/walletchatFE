@@ -28,7 +28,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [publicKey, setPublicKey] = useState()
    const [privateKey, setPrivateKey] = useState()
 
-   console.log({ chainId, account, web3, isAuthenticated, publicKey })
+   // console.log({ chainId, account, web3, isAuthenticated, publicKey })
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -53,7 +53,7 @@ const WalletProvider = React.memo(({ children }) => {
       }
 
       connectEagerly()
-      
+
       return () => {
          const provider = getProvider()
          unsubscribeToEvents(provider)
@@ -94,7 +94,7 @@ const WalletProvider = React.memo(({ children }) => {
 
    const createEncryptionKeyPair = async (accountlocal) => {
       // create identitiy with key-pairs and address
-      const keyPair = EthCrypto.createIdentity();
+      const keyPair = EthCrypto.createIdentity()
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_settings`, {
          method: 'POST',
@@ -102,12 +102,12 @@ const WalletProvider = React.memo(({ children }) => {
             'Content-Type': 'application/json',
          },
          body: JSON.stringify({
-            "walletaddr": accountlocal,
-            "publickey": keyPair.publicKey
-        }),
+            walletaddr: accountlocal,
+            publickey: keyPair.publicKey,
+         }),
       })
 
-      return keyPair;
+      return keyPair
    }
 
    const connectWallet = async () => {
@@ -131,7 +131,7 @@ const WalletProvider = React.memo(({ children }) => {
             let privateKey = await storage.get('private-key')
             if (privateKey?.key) setPrivateKey(privateKey.key)
 
-            if(!publicKey?.key) {
+            if (!publicKey?.key) {
                const keyPair = await createEncryptionKeyPair(account)
                storage.set('public-key', { key: keyPair.publicKey })
                storage.set('private-key', { key: keyPair.privateKey })
@@ -163,7 +163,7 @@ const WalletProvider = React.memo(({ children }) => {
 
    const handleAccountsChanged = (accounts) => {
       setAccount(getNormalizeAddress(accounts))
-      storage.set('current-address', { address: getNormalizeAddress(accounts)})
+      storage.set('current-address', { address: getNormalizeAddress(accounts) })
       console.log('[account changes]: ', getNormalizeAddress(accounts))
    }
 
@@ -192,7 +192,7 @@ const WalletProvider = React.memo(({ children }) => {
             connectWallet,
             isAuthenticated,
             appLoading,
-            web3
+            web3,
          }}
       >
          {children}

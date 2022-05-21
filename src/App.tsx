@@ -8,14 +8,14 @@ import './App.scss'
 import Inbox from './scenes/Inbox'
 import NewConversation from './scenes/NewConversation'
 import Chat from './scenes/Chat'
-import Sidebar from './components/Sidebar'
 import NFT from './scenes/NFT'
+import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import { useUnreadCount } from './context/UnreadCountProvider'
 
 export const App = () => {
-
    const { unreadCount, setUnreadCount } = useUnreadCount()
+   
    // const location = useLocation()
    // console.log("location", location)
 
@@ -33,9 +33,11 @@ export const App = () => {
    useEffect(() => {
       const interval = setInterval(() => {
          getUnreadCount()
-       }, 5000) // every 5s
-     
-       return () => clearInterval(interval)
+      }, 5000) // every 5s
+
+      return () => {
+         clearInterval(interval)
+      }
    }, [])
 
    useEffect(() => {
@@ -50,14 +52,14 @@ export const App = () => {
                'Content-Type': 'application/json',
             },
          })
-         .then((response) => response.json())
-         .then((count: number) => {
-            console.log('✅ [GET] UNREAD COUNT:', count)
-            setUnreadCount(count)
-         })
-         .catch((error) => {
-            console.error('🚨🚨REST API Error [GET]:', error)
-         })
+            .then((response) => response.json())
+            .then((count: number) => {
+               console.log('✅ [GET] UNREAD COUNT:', count)
+               setUnreadCount(count)
+            })
+            .catch((error) => {
+               console.error('🚨🚨REST API Error [GET]:', error)
+            })
       }
    }
 
@@ -162,12 +164,7 @@ export const App = () => {
                            />
                         }
                      />
-                     <Route
-                        path="/nft"
-                        element={
-                           <NFT account={account} />
-                        }
-                     />
+                     <Route path="/nft/:nftContractAddr/:nftId" element={<NFT account={account} />} />
                      <Route
                         path="/"
                         element={<Navigate to="/chat" replace />}

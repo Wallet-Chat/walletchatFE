@@ -13,6 +13,8 @@ const messagesFromReactAppListener = (
 ) => {
    const isValidated = validateSender(message, sender)
    if (isValidated) {
+      console.log('sender.tab: ', sender.tab && sender.tab.url)
+      console.log('request message: ', message)
       response(document.title)
    }
 }
@@ -38,7 +40,7 @@ if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
 
       // Some styles for a fancy sidebar
       iframe.style.cssText =
-         'position:fixed;top:0;right:0;display:block;' +
+         'position:fixed;bottom:10px;right:10px;display:block;' +
          'width:161px;height:56px;z-index:1000000;border:none;background:none;'
       document.body.appendChild(iframe)
    }

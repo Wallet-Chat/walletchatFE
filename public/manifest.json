@@ -20,13 +20,15 @@
          "js": ["./static/js/content.js"]
       }
    ],
-   "web_accessible_resources": [{
-      "resources": ["modal.html"],
-      "matches": [
-         "*://*.looksrare.org/*",
-         "*://*.x2y2.io/*",
-         "*://*.opensea.io/*"
-      ]
-   }],
+   "web_accessible_resources": [
+      {
+         "resources": ["modal.html"],
+         "matches": [
+            "*://*.looksrare.org/*",
+            "*://*.x2y2.io/*",
+            "*://*.opensea.io/*"
+         ]
+      }
+   ],
    "devtools_page": "index.html"
 }
