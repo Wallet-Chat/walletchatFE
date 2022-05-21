@@ -130,12 +130,12 @@ const WalletProvider = React.memo(({ children }) => {
             if (publicKey) setPublicKey(publicKey.key)
             let privateKey = await storage.get('private-key')
             if (privateKey) setPrivateKey(privateKey.key)
-            console.log("pubKey: ", publicKey)
+            //console.log("pubKey: ", publicKey)
             if(!publicKey) {
                const keyPair = await createEncryptionKeyPair(account)
                storage.set('public-key', { key: keyPair.publicKey })
                storage.set('private-key', { key: keyPair.privateKey })
-               console.log("created keypair", publicKey, privateKey)
+               //console.log("created keypair", publicKey, privateKey)
             }
 
             storage.set('metamask-connected', { connected: true })
