@@ -25,21 +25,21 @@ const main = () => {
 }
 main()
 
-// var extensionOrigin = 'chrome-extension://' + chrome.runtime.id
-// if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
-//    if (
-//       window.location.host === 'looksrare.org' ||
-//       window.location.host === 'x2y2.io' ||
-//       window.location.host === 'opensea.io'
-//    ) {
-//       var iframe = document.createElement('iframe')
-//       // Must be declared at web_accessible_resources in manifest.json
-//       iframe.src = chrome.runtime.getURL('modal.html')
+var extensionOrigin = 'chrome-extension://' + chrome.runtime.id
+if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
+   if (
+      window.location.host === 'looksrare.org' ||
+      window.location.host === 'x2y2.io' ||
+      window.location.host === 'opensea.io'
+   ) {
+      var iframe = document.createElement('iframe')
+      // Must be declared at web_accessible_resources in manifest.json
+      iframe.src = chrome.runtime.getURL('modal.html')
 
-//       // Some styles for a fancy sidebar
-//       iframe.style.cssText =
-//          'position:fixed;top:0;right:0;display:block;' +
-//          'width:161px;height:56px;z-index:1000000;border:none;background:none;'
-//       document.body.appendChild(iframe)
-//    }
-// }
+      // Some styles for a fancy sidebar
+      iframe.style.cssText =
+         'position:fixed;top:0;right:0;display:block;' +
+         'width:161px;height:56px;z-index:1000000;border:none;background:none;'
+      document.body.appendChild(iframe)
+   }
+}
