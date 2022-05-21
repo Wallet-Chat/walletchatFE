@@ -69,7 +69,7 @@ const NFT = ({ account }: { account: string }) => {
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
 
    // Chat
-   const [unreadCount, setUnreadCount] = useState<number>()
+   const [unreadCount, setUnreadCount] = useState<number>(0)
    const [msgInput, setMsgInput] = useState<string>('')
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [chatData, setChatData] = useState<MessageType[]>(
@@ -525,11 +525,11 @@ const NFT = ({ account }: { account: string }) => {
             <TabList padding="0 var(--chakra-space-5)">
                <Tab>
                   Chat{' '}
-                  {unreadCount && unreadCount > 0 && (
+                  {(unreadCount && unreadCount !== 0) ? (
                      <Badge variant="black" ml={1}>
-                        {unreadCount}
+                        {unreadCount} xx
                      </Badge>
-                  )}
+                  ): <></>}
                </Tab>
                <Tab>
                   Comments{' '}
