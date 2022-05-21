@@ -84,7 +84,7 @@ const Chat = ({
    useEffect(() => {
       const interval = setInterval(() => {
          getChatData()
-         }, 30000) // every 30s
+         }, 5000) // every 5s
       
          return () => clearInterval(interval)
    }, [])

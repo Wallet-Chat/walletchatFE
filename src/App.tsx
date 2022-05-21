@@ -33,7 +33,7 @@ export const App = () => {
    useEffect(() => {
       const interval = setInterval(() => {
          getUnreadCount()
-       }, 30000) // every 30s
+       }, 5000) // every 5s
      
        return () => clearInterval(interval)
    }, [])
