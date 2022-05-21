@@ -15,3 +15,14 @@ export default interface MessageType {
    read: boolean
    id?: number
 }
+
+export default interface SettingsType {
+   walletaddr: string
+   publickey: string
+}
+
+import { Encrypted } from 'eth-crypto'
+export default interface EncryptedMsgBlock {
+   to: Encrypted
+   from: Encrypted
+}

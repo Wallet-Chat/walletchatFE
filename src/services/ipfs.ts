@@ -24,7 +24,7 @@ export const postIpfsData = async (text: string) => {
    // console.log('IPFS link: ', url)
    console.log("text/cid:", text, cid)
    cidReturn = `${cid.path}`
-   return cidReturn
+   return await cidReturn
 }
 
 export const uploadIpfs = async () => {
