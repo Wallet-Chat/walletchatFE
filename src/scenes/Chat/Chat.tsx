@@ -122,7 +122,7 @@ const Chat = ({
          return
       }
       setIsFetchingChatData(true)
-      console.log(`getall_chatitems/${account}/${toAddr}`)
+      //console.log(`getall_chatitems/${account}/${toAddr}`)
       fetch(` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${toAddr}`, {
          method: 'GET',
          headers: {

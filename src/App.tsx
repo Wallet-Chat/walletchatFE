@@ -165,7 +165,16 @@ export const App = () => {
                            />
                         }
                      />
-                     <Route path="/nft/:nftContractAddr/:nftId" element={<NFT account={account} />} />
+                     <Route
+                        path="/nft/:nftContractAddr/:nftId"
+                        element={
+                           <NFT 
+                              account={account}
+                              publicKey={publicKey}
+                              privateKey={privateKey}
+                            />
+                        }
+                     />
                      <Route
                         path="/"
                         element={<Navigate to="/chat" replace />}

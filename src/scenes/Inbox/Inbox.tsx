@@ -101,7 +101,7 @@ const Inbox = ({
             // Get data from IPFS and replace the message with the fetched text
             for (let i = 0; i < replica.length; i++) {
                const rawmsg = await getIpfsData(replica[i].message)
-               console.log("raw message decoded", rawmsg)
+               //console.log("raw message decoded", rawmsg)
 
                let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
 
