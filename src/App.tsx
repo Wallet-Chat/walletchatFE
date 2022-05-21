@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { IconX } from '@tabler/icons'
-import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 import { Button, Box, Flex, Image, Heading, Spinner } from '@chakra-ui/react'
 
 import logoThumb from './images/logo-thumb.svg'
@@ -16,8 +16,8 @@ import { useUnreadCount } from './context/UnreadCountProvider'
 export const App = () => {
 
    const { unreadCount, setUnreadCount } = useUnreadCount()
-   const location = useLocation()
-   console.log("location", location)
+   // const location = useLocation()
+   // console.log("location", location)
 
    const {
       appLoading,

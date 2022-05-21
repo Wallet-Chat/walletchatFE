@@ -1,9 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import createMetaMaskProvider from 'metamask-extension-provider'
 import Web3 from 'web3'
 import { getNormalizeAddress } from '.'
 import EthCrypto from 'eth-crypto'
-import sigUtil from 'eth-sig-util'
 
 import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
@@ -21,13 +20,13 @@ export function withWallet(Component) {
 }
 
 const WalletProvider = React.memo(({ children }) => {
-   const [chainId, setChainId] = React.useState(null)
-   const [account, setAccount] = React.useState(null)
-   const [publicKey, setPublicKey] = React.useState(null)
-   const [privateKey, setPrivateKey] = React.useState(null)
-   const [web3, setWeb3] = React.useState(null)
-   const [isAuthenticated, setAuthenticated] = React.useState(false)
-   const [appLoading, setAppLoading] = React.useState(false)
+   const [chainId, setChainId] = useState(null)
+   const [account, setAccount] = useState(null)
+   const [web3, setWeb3] = useState(null)
+   const [isAuthenticated, setAuthenticated] = useState(false)
+   const [appLoading, setAppLoading] = useState(false)
+   const [publicKey, setPublicKey] = useState()
+   const [privateKey, setPrivateKey] = useState()
 
    console.log({ chainId, account, web3, isAuthenticated, publicKey })
 
@@ -54,6 +53,7 @@ const WalletProvider = React.memo(({ children }) => {
       }
 
       connectEagerly()
+      
       return () => {
          const provider = getProvider()
          unsubscribeToEvents(provider)
@@ -126,11 +126,15 @@ const WalletProvider = React.memo(({ children }) => {
 
             //only do this once at first login, never again or we can't decrypt previous data
             //until this is moved we likely will have a few latenet issues decrypting older data
-            if(!publicKey) {
+            let publicKey = await storage.get('public-key')
+            if (publicKey?.key) setPublicKey(publicKey.key)
+            let privateKey = await storage.get('private-key')
+            if (privateKey?.key) setPrivateKey(privateKey.key)
+
+            if(!publicKey?.key) {
                const keyPair = await createEncryptionKeyPair(account)
-               console.log('key pair', keyPair)
-               setPublicKey(keyPair.publicKey)
-               setPrivateKey(keyPair.privateKey)
+               storage.set('public-key', { key: keyPair.publicKey })
+               storage.set('private-key', { key: keyPair.privateKey })
             }
 
             storage.set('metamask-connected', { connected: true })
