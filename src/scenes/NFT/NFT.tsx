@@ -672,7 +672,7 @@ const NFT = ({ account }: { account: string }) => {
                   </Flex>
                </TabPanel>
                <TabPanel p={5}>
-                  {isFetchingComments ? (
+                  {(isFetchingComments && loadedComments.length === 0) ? (
                      <Spinner />
                   ) : (
                      <Flex mb={5}>
