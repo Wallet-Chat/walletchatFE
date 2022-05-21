@@ -157,6 +157,7 @@ export const App = () => {
                         element={
                            <Inbox
                               account={account}
+                              privateKey={privateKey}
                               web3={web3}
                               isAuthenticated={isAuthenticated}
                            />
