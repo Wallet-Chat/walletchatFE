@@ -35,6 +35,7 @@ import Message from './components/Message'
 import EncryptedMsgBlock from '../../types/Message'
 import SettingsType from '../../types/Message'
 import EthCrypto, { Encrypted } from 'eth-crypto'
+import { parseIsolatedEntityName } from 'typescript'
 
 // const nftContractAddr = '0x1a92f7381b9f03921564a437210bb9396471050c'
 // const nftId = '878'
@@ -218,11 +219,11 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
       setCommentInput('')
 
       const timestamp = new Date()
-
+      
       let data = {
          fromAddr: account.toLocaleLowerCase(),
          nftAddr: nftContractAddr,
-         nftId: nftId,
+         nftId: typeof nftId === 'string' ? parseInt(nftId) : nftId,
          timestamp: new Date(),
          message: commentInputCopy,
       }
@@ -237,6 +238,7 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
       })
          .then((response) => response.json())
          .then((data) => {
+            console.log("nft id: ", nftId)
             console.log('✅[POST][NFT][Comment]:', data)
             addCommentToUI(
                account,
@@ -376,6 +378,7 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
 
       const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
+      console.log("nft id from sendMessage: ", nftId)
       let data = {
          message: msgInputCopy,
          fromAddr: account.toLocaleLowerCase(),
