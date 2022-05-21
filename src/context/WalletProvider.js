@@ -127,14 +127,15 @@ const WalletProvider = React.memo(({ children }) => {
             //only do this once at first login, never again or we can't decrypt previous data
             //until this is moved we likely will have a few latenet issues decrypting older data
             let publicKey = await storage.get('public-key')
-            if (publicKey?.key) setPublicKey(publicKey.key)
+            if (publicKey) setPublicKey(publicKey.key)
             let privateKey = await storage.get('private-key')
-            if (privateKey?.key) setPrivateKey(privateKey.key)
-
-            if (!publicKey?.key) {
+            if (privateKey) setPrivateKey(privateKey.key)
+            //console.log("pubKey: ", publicKey)
+            if(!publicKey) {
                const keyPair = await createEncryptionKeyPair(account)
                storage.set('public-key', { key: keyPair.publicKey })
                storage.set('private-key', { key: keyPair.privateKey })
+               //console.log("created keypair", publicKey, privateKey)
             }
 
             storage.set('metamask-connected', { connected: true })

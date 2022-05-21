@@ -16,6 +16,8 @@ import { getIpfsData } from '../../services/ipfs'
 import MessageType from '../../types/Message'
 import MessageUIType from '../../types/MessageUI'
 import ConversationItem from './components/ConversationItem'
+import EncryptedMsgBlock from '../../types/Message'
+import EthCrypto, { Encrypted } from 'eth-crypto'
 
 const Divider = styled.div`
    display: block;
@@ -34,10 +36,12 @@ const Divider = styled.div`
 
 const Inbox = ({
    account,
+   privateKey,
    web3,
    isAuthenticated,
 }: {
    account: string
+   privateKey: string
    web3: Web3
    isAuthenticated: boolean
 }) => {
@@ -85,10 +89,39 @@ const Inbox = ({
          },
       })
          .then((response) => response.json())
-         .then((data: MessageType[]) => {
-            console.log('✅ GET [Inbox]:', data)
-            if (data === null) setInboxData([])
-            else setInboxData(data)
+         // .then((data: MessageType[]) => {
+         //    console.log('✅ GET [Inbox]:', data)
+         //    if (data === null) setInboxData([])
+         //    else setInboxData(data)
+         .then(async (data: MessageType[]) => {
+            console.log('✅ GET [Chat items]:', data)
+
+            const replica = JSON.parse(JSON.stringify(data));
+
+            // Get data from IPFS and replace the message with the fetched text
+            for (let i = 0; i < replica.length; i++) {
+               const rawmsg = await getIpfsData(replica[i].message)
+               console.log("raw message decoded", rawmsg)
+
+               let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
+
+               //we only need to decrypt the side we are print to UI (to or from)
+               let decrypted;
+               if(replica[i].toaddr === account) {
+                  decrypted = await EthCrypto.decryptWithPrivateKey(
+                  privateKey,
+                  encdatablock.to)
+               }
+               else {
+                  decrypted = await EthCrypto.decryptWithPrivateKey(
+                  privateKey,
+                  encdatablock.from)
+               }
+
+               replica[i].message = decrypted
+            }
+
+            setInboxData(replica)
             // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
             setIsFetchingInboxData(false)
          })

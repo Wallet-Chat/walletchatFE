@@ -31,7 +31,7 @@ import { truncateAddress } from '../../helpers/truncateString'
 import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
 import EthCrypto, { Encrypted } from 'eth-crypto'
-import sigUtil from 'eth-sig-util'
+//import sigUtil from 'eth-sig-util'
 
 const BlockieWrapper = styled.div`
    border-radius: 0.3rem;
@@ -138,7 +138,7 @@ const Chat = ({
             // Get data from IPFS and replace the message with the fetched text
             for (let i = 0; i < replica.length; i++) {
                const rawmsg = await getIpfsData(replica[i].message)
-               console.log("raw message decoded", rawmsg)
+              // console.log("raw message decoded", rawmsg)
 
                let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
 
