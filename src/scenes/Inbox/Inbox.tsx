@@ -51,7 +51,7 @@ const Inbox = ({
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
-       }, 30000) // every 30s
+       }, 5000) // every 5s
      
        return () => clearInterval(interval)
    }, [])

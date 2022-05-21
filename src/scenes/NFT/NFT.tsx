@@ -96,7 +96,7 @@ const NFT = ({ account }: { account: string }) => {
          getChatData()
          getComments()
          getUnreadCount()
-      }, 30000) // every 30s
+      }, 5000) // every 5s
 
       return () => clearInterval(interval)
    }, [])
