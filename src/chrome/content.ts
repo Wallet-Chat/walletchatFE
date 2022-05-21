@@ -38,7 +38,7 @@ if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
 
       // Some styles for a fancy sidebar
       iframe.style.cssText =
-         'position:fixed;top:0;right:0;display:block;' +
+         'position:fixed;bottom:0;right:0;display:block;' +
          'width:161px;height:56px;z-index:1000000;border:none;background:none;'
       document.body.appendChild(iframe)
    }

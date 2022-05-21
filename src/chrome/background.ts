@@ -4,6 +4,14 @@ import WalletAccount from './wallet'
 let _accounts: WalletAccount[] | null = []
 let provider = createMetaMaskProvider()
 provider.on('accountsChanged', handleAccountsChanged)
+let runCounter = 0
+
+chrome.alarms.create({ periodInMinutes: 0.1 })
+chrome.alarms.onAlarm.addListener(() => {
+    console.log('alarm duuuude wake up')
+    runCounter++
+    console.log(runCounter)
+})
 
 provider
    .request({ method: 'eth_accounts' })
@@ -65,11 +73,22 @@ const notify = (message: string) => {
 
 chrome.runtime.onConnect.addListener((port) => {
    console.log('[background.ts] onConnect', port)
+
+   console.log("onConnect")
+   // chrome.alarms.get('periodic', a => {
+   //    if (!a) chrome.alarms.create('periodic', { periodInMinutes: 0.25 });
+   //  });
 })
 
 chrome.runtime.onSuspend.addListener(() => {
+   console.log("onSuspend")
    console.log('[background.ts] onSuspend')
 })
+
+chrome.runtime.onMessageExternal.addListener( (request, sender, sendResponse) => {
+   console.log("Received message from " + sender + ": ", request);
+   sendResponse({ received: true }); //respond however you like
+});
 
 function reloadSettings() {
 
@@ -106,6 +125,7 @@ function handleAccountsChanged(accounts: any) {
       // Start new account schedulers
       let accts = new Array<WalletAccount>()
       accounts.forEach((address: string) => {
+         console.log('start address: ', address)
          let acc = new WalletAccount(address)
          acc.onError = walletError;
          acc.onUpdate = walletUpdate;

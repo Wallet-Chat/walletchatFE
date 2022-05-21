@@ -25,11 +25,6 @@
 </style>
 <div style="position: absolute; top: 2px; right: 2px">
    <button
-      onclick="evt.preventDefault();
-      chrome.runtime.sendMessage({ open: true }, (response) => {
-        i.src = response;
-        p.appendChild(i);
-      })"
       style="
          border-radius: 0.5rem;
          box-shadow: 0px 0px 0px 6px #2a2a2a20;
@@ -85,7 +80,7 @@
             </defs>
          </svg>
 
-         <span style="color: #fff">WalletChat</span>
+         <span style="color: #fff">Chat With Owner!</span>
       </span>
       <span style="padding: 0.3rem">
          <svg
@@ -108,4 +103,10 @@
          </svg>
       </span>
    </button>
+   <script src="nftchat.js"></script>
+   <!-- onclick="evt.preventDefault();
+   chrome.runtime.sendMessage({ open: true }, (response) => {
+     i.src = response;
+     p.appendChild(i);
+   })" -->
 </div>
