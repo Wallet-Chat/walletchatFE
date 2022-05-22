@@ -1,12 +1,15 @@
-import { Box, Spinner } from '@chakra-ui/react'
-import { IconCheck, IconChecks } from '@tabler/icons'
-import { useEffect } from 'react'
+import { Box, Button, Flex, Image, Spinner, Text } from '@chakra-ui/react'
+import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../helpers/date'
 import MessageUIType from '../../../../types/MessageUI'
+import NFTMetadataType from '../../../../types/NFTMetadata'
 import { useUnreadCount } from '../../../../context/UnreadCountProvider'
+import { truncateAddress } from '../../../../helpers/truncateString'
+import { Link } from 'react-router-dom'
 
 const MessageBox = styled.div`
    position: relative;
@@ -94,8 +97,11 @@ const Message = ({
    msg: MessageUIType
    updateRead: (data: MessageUIType) => void
 }) => {
-
    let { unreadCount, setUnreadCount } = useUnreadCount()
+   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [imageUrl, setImageUrl] = useState<string>()
+
+   const { metadata } = nftData || {}
 
    const { ref, inView } = useInView({
       triggerOnce: true,
@@ -110,6 +116,10 @@ const Message = ({
          setMessageAsRead()
       }
    }, [inView])
+
+   useEffect(() => {
+      getNftMetadata()
+   }, [msg])
 
    const setMessageAsRead = () => {
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
@@ -138,6 +148,33 @@ const Message = ({
       }
    }
 
+   const getNftMetadata = () => {
+      if (msg.nftAddr && msg.nftId) {
+         const baseURL = `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getNFTMetadata`
+         const fetchURL = `${baseURL}?contractAddress=${msg.nftAddr}&tokenId=${msg.nftId}&tokenType=erc721`
+
+         fetch(fetchURL, {
+            method: 'GET',
+         })
+            .then((response) => response.json())
+            .then((result: NFTMetadataType) => {
+               // console.log('✅[GET][NFT data]:', result)
+               setNftData(result)
+
+               let url = result.metadata && result.metadata.image
+               if (url?.includes('ipfs://')) {
+                  let parts = url.split('ipfs://')
+                  let cid = parts[parts.length - 1]
+                  url = `https://ipfs.io/ipfs/${cid}`
+                  setImageUrl(url)
+               } else {
+                  setImageUrl(url)
+               }
+            })
+            .catch((error) => console.log('error', error))
+      }
+   }
+
    return (
       <MessageBox
          className={`msg ${msg.position} ${msg.read && 'read'}`}
@@ -154,19 +191,41 @@ const Message = ({
             </span>
 
             {msg.position === 'right' && (
-            <span className="read-status">
-               {msg.isFetching ? (
-                  <Spinner size="xs" />
-               ) : msg.read ? (
-                  <IconChecks size={15} />
-               ) : (
-                  <IconCheck size={15} />
-               )}
-            </span>
+               <span className="read-status">
+                  {msg.isFetching ? (
+                     <Spinner size="xs" />
+                  ) : msg.read ? (
+                     <IconChecks size={15} />
+                  ) : (
+                     <IconCheck size={15} />
+                  )}
+               </span>
             )}
          </Box>
-         {msg.nftAddr && (
-            <Box>{msg.nftAddr}</Box>
+         {msg.nftAddr && msg.nftId && (
+            <Box mb={1}>
+               {metadata ? (
+                  <Link to={`/nft/${msg.nftAddr}/${msg.nftId}`} style={{ textDecoration: "none" }}>
+                     <Button p={2} height="auto">
+                     <Flex alignItems="center">
+                        {imageUrl && (
+                           <Image
+                              src={imageUrl}
+                              alt=""
+                              height="15px"
+                              borderRadius="var(--chakra-radii-sm)"
+                              mr={1}
+                           />
+                        )}
+                        {metadata.name && <Text mr={1} fontSize="sm">{metadata.name}</Text>}
+                        <IconExternalLink size="13" color="var(--chakra-colors-lightgray-900)" />
+                     </Flex>
+                     </Button>
+                  </Link>
+               ) : (
+                  <Text fontSize="sm">{truncateAddress(msg.nftAddr)}</Text>
+               )}
+            </Box>
          )}
       </MessageBox>
    )
