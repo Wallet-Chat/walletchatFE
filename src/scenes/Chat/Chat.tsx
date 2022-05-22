@@ -82,25 +82,12 @@ const Chat = ({
    let timer: ReturnType<typeof setTimeout>
 
    useEffect(() => {
+      getChatData()
       const interval = setInterval(() => {
          getChatData()
-         }, 5000) // every 5s
-      
-         return () => clearInterval(interval)
-   }, [])
-
-   // useEffect(() => {
-   //    const getENS = async () => {
-   //       const ensValue = await reverseENSLookup(toAddr, web3)
-   //       if (ensValue) {
-   //          setEns(ensValue)
-   //       }
-   //    }
-   //    getENS()
-   // }, [toAddr])
-
-   useEffect(() => {
-      getChatData()
+      }, 5000) // every 5s
+   
+      return () => clearInterval(interval)
    }, [isAuthenticated, account])
 
    function getChatData() {
@@ -118,7 +105,7 @@ const Chat = ({
          return
       }
       if (!toAddr) {
-         console.log('Recipient address is not available');
+         console.log('Recipient address is not available')
          return
       }
       setIsFetchingChatData(true)
