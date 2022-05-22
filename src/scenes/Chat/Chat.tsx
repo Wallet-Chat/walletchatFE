@@ -140,22 +140,23 @@ const Chat = ({
                const rawmsg = await getIpfsData(replica[i].message)
               // console.log("raw message decoded", rawmsg)
 
-               let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
+               // let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
 
-               //we only need to decrypt the side we are print to UI (to or from)
-               let decrypted;
-               if(replica[i].toaddr === account) {
-                  decrypted = await EthCrypto.decryptWithPrivateKey(
-                  privateKey,
-                  encdatablock.to)
-               }
-               else {
-                  decrypted = await EthCrypto.decryptWithPrivateKey(
-                  privateKey,
-                  encdatablock.from)
-               }
+               // //we only need to decrypt the side we are print to UI (to or from)
+               // let decrypted;
+               // if(replica[i].toaddr === account) {
+               //    decrypted = await EthCrypto.decryptWithPrivateKey(
+               //    privateKey,
+               //    encdatablock.to)
+               // }
+               // else {
+               //    decrypted = await EthCrypto.decryptWithPrivateKey(
+               //    privateKey,
+               //    encdatablock.from)
+               // }
 
-               replica[i].message = decrypted
+               //replica[i].message = decrypted
+               replica[i].message = rawmsg
             }
 
             setChatData(replica)
@@ -274,20 +275,21 @@ const Chat = ({
       addMessageToUI(msgInputCopy, account, toAddr, timestamp, false, 'right', true)
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-      let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
+      // let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
  
-      console.log("encrypt with public key: ", toAddrPublicKey)
-      const encryptedTo = await EthCrypto.encryptWithPublicKey(
-         toAddrPublicKey, 
-         msgInputCopy)
+      // console.log("encrypt with public key: ", toAddrPublicKey)
+      // const encryptedTo = await EthCrypto.encryptWithPublicKey(
+      //    toAddrPublicKey, 
+      //    msgInputCopy)
 
-      //we have to encrypt the sender side with its own public key, if we want to refresh data from server 
-      const encryptedFrom = await EthCrypto.encryptWithPublicKey(
-         publicKey, 
-         msgInputCopy) 
+      // //we have to encrypt the sender side with its own public key, if we want to refresh data from server 
+      // const encryptedFrom = await EthCrypto.encryptWithPublicKey(
+      //    publicKey, 
+      //    msgInputCopy) 
 
       //lets try and use IPFS instead of any actual data stored on our server
-      const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
+      //const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
+      const cid = await postIpfsData(msgInputCopy)
       data.message = await cid
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {

@@ -89,39 +89,40 @@ const Inbox = ({
          },
       })
          .then((response) => response.json())
-         // .then((data: MessageType[]) => {
-         //    console.log('✅ GET [Inbox]:', data)
-         //    if (data === null) setInboxData([])
-         //    else setInboxData(data)
-         .then(async (data: MessageType[]) => {
-            console.log('✅[GET][Inbox]:', data)
+         .then((data: MessageType[]) => {
+            console.log('✅ GET [Inbox]:', data)
+            if (data === null) setInboxData([])
+            else setInboxData(data)
+         // .then(async (data: MessageType[]) => {
+         //    console.log('✅[GET][Inbox]:', data)
 
-            const replica = JSON.parse(JSON.stringify(data));
+            //const replica = JSON.parse(JSON.stringify(data));
 
-            // Get data from IPFS and replace the message with the fetched text
-            for (let i = 0; i < replica.length; i++) {
-               const rawmsg = await getIpfsData(replica[i].message)
-               //console.log("raw message decoded", rawmsg)
+            // // Get data from IPFS and replace the message with the fetched text
+            // for (let i = 0; i < replica.length; i++) {
+            //    const rawmsg = await getIpfsData(replica[i].message)
+            //    //console.log("raw message decoded", rawmsg)
 
-               let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
+            //    let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
 
-               //we only need to decrypt the side we are print to UI (to or from)
-               let decrypted;
-               if(replica[i].toaddr === account) {
-                  decrypted = await EthCrypto.decryptWithPrivateKey(
-                  privateKey,
-                  encdatablock.to)
-               }
-               else {
-                  decrypted = await EthCrypto.decryptWithPrivateKey(
-                  privateKey,
-                  encdatablock.from)
-               }
+            //    //we only need to decrypt the side we are print to UI (to or from)
+            //    let decrypted;
+            //    if(replica[i].toaddr === account) {
+            //       decrypted = await EthCrypto.decryptWithPrivateKey(
+            //       privateKey,
+            //       encdatablock.to)
+            //    }
+            //    else {
+            //       decrypted = await EthCrypto.decryptWithPrivateKey(
+            //       privateKey,
+            //       encdatablock.from)
+            //    }
 
-               replica[i].message = decrypted
-            }
+            //    replica[i].message = decrypted
+            // }
 
-            setInboxData(replica)
+            //setInboxData(replica)
+            
             // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
             setIsFetchingInboxData(false)
          })
