@@ -16,5 +16,7 @@ export default interface MessageUIType {
    img?: string,
    position: string,
    isFetching: boolean
-   unread?: number
+   unread?: number,
+   nftAddr: string | null,
+   nftId: number | null
 }

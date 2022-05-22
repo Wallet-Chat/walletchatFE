@@ -413,7 +413,9 @@ const NFT = ({
          timestamp,
          false,
          'right',
-         true
+         true,
+         "",
+         null
       )
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
@@ -467,7 +469,9 @@ const NFT = ({
       timestamp: Date,
       read: boolean,
       position: string,
-      isFetching: boolean
+      isFetching: boolean,
+      nftAddr: string | null,
+      nftId: number | null
    ) => {
       console.log(`Add message to UI: ${message}`)
 
@@ -479,6 +483,8 @@ const NFT = ({
          read,
          position,
          isFetching,
+         nftAddr,
+         nftId
       }
       let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
       newLoadedMsgs.push(newMsg)
@@ -540,6 +546,8 @@ const NFT = ({
                id: chatData[i].id,
                position: 'left',
                isFetching: false,
+               nftAddr: chatData[i].nftaddr,
+               nftId: chatData[i].nftid
             })
          } else if (
             chatData[i] &&
@@ -555,6 +563,8 @@ const NFT = ({
                id: chatData[i].id,
                position: 'right',
                isFetching: false,
+               nftAddr: chatData[i].nftaddr,
+               nftId: chatData[i].nftid
             })
          }
       }

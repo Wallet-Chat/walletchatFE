@@ -165,6 +165,9 @@ const Message = ({
             </span>
             )}
          </Box>
+         {msg.nftAddr && (
+            <Box>{msg.nftAddr}</Box>
+         )}
       </MessageBox>
    )
 }

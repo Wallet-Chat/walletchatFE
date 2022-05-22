@@ -149,6 +149,8 @@ const Inbox = ({
                   toAddr: inboxData[i].toaddr,
                   position: 'left',
                   isFetching: false,
+                  nftAddr: inboxData[i].nftaddr,
+                  nftId: inboxData[i].nftid
                })
             } else if (
                inboxData[i] &&
@@ -162,6 +164,8 @@ const Inbox = ({
                   toAddr: inboxData[i].toaddr,
                   position: 'right',
                   isFetching: false,
+                  nftAddr: inboxData[i].nftaddr,
+                  nftId: inboxData[i].nftid
                })
             }
          }

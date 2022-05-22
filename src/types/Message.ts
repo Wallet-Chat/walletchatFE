@@ -1,3 +1,5 @@
+import { Encrypted } from 'eth-crypto'
+
 // export default interface MessageType {
 //    message: string
 //    fromAddr: string
@@ -23,7 +25,6 @@ export default interface SettingsType {
    publickey: string
 }
 
-import { Encrypted } from 'eth-crypto'
 export default interface EncryptedMsgBlock {
    to: Encrypted
    from: Encrypted
