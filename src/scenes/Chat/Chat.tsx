@@ -31,7 +31,8 @@ import { truncateAddress } from '../../helpers/truncateString'
 import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
 import EthCrypto, { Encrypted } from 'eth-crypto'
-//import sigUtil from 'eth-sig-util'
+import sigUtil from 'eth-sig-util'
+import { TransactionFactory } from '@ethereumjs/tx'
 
 const BlockieWrapper = styled.div`
    border-radius: 0.3rem;
@@ -234,6 +235,83 @@ const Chat = ({
       }
    }
 
+   // async function encrypt (msg: string, toAddrPublicKey: string) {
+   //    const encrypted = await EthCrypto.encryptWithPublicKey(
+   //       toAddrPublicKey, 
+   //       msg
+   //   )
+
+   //   return encrypted;
+   //  }
+
+   //  async function decrypt (msg: Encrypted) {
+   //    const decrypted = await EthCrypto.decryptWithPrivateKey(
+   //       privateKey,
+   //       msg
+   //   );
+
+   //   return decrypted;
+   //  }
+
+   //  async function encrypt (msg: string) {
+   //    //get TO address public key from setting API
+
+   //    const buf = Buffer.from(
+   //      JSON.stringify(
+   //        sigUtil.encrypt(
+   //          publicKey, //this needs to be TO address public key
+   //          { data: msg },
+   //          'x25519-xsalsa20-poly1305'
+   //        )
+   //      ),
+   //      'utf8'
+   //    )
+    
+   //    return '0x' + buf.toString('hex')
+   //  }
+
+   //  async function decrypt (msgbuf: string) {
+   //    //convert msgbuf string to correct data type
+
+   //    const buf = Buffer.from(
+   //      JSON.stringify(
+   //        sigUtil.decrypt(
+   //           { data: msg },
+   //           privateKey,
+   //        )
+   //      ),
+   //      'utf8'
+   //    )
+    
+   //    return '0x' + buf.toString('hex')
+   //  }
+
+   function recoverPublicKey(rawTx: string) {
+      const data = Buffer.from(rawTx.slice(2), "hex");
+      console.log("data from recover: ", data)
+      const tx = TransactionFactory.fromSerializedData(data);
+    
+      return tx.getSenderPublicKey().toString("hex");
+   }
+
+   // const getRawTxHash = async () => {
+   //    await fetch(` https://etherscan.io/getRawTx?tx=0xb9d4ad5408f53eac8627f9ccd840ba8fb3469d55cd9cc2a11c6e049f1eef4edd`, {
+   //       method: 'GET',
+   //       headers: {
+   //          'Content-Type': 'text/html',
+   //       },
+   //    })
+   //    .then((response) => response.text())
+   //    .then(function (html) {
+   //       let raw = "0x" + html.split("Returned Raw Transaction Hex :")[1].split("0x")[1].split(" ")[0]
+   //       console.log("test test 123: ", raw)
+
+   //       const publicKey = recoverPublicKey(raw);
+       
+   //       return publicKey
+   //    })
+   // }
+
    //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
    const getPublicKeyFromSettings = async () => {
       let toAddrPublicKey = ""
@@ -276,6 +354,9 @@ const Chat = ({
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
       let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
  
+      //let test = await getRawTxHash()
+      //console.log("recovered public key: ", test)
+
       console.log("encrypt with public key: ", toAddrPublicKey)
       const encryptedTo = await EthCrypto.encryptWithPublicKey(
          toAddrPublicKey, 
