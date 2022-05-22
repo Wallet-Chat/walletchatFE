@@ -38,6 +38,16 @@ const MessageBox = styled.div`
       float: right;
       background: var(--chakra-colors-darkgray-800);
       color: var(--chakra-colors-lightgray-100);
+
+      .nft-context-btn {
+         background: var(--chakra-colors-darkgray-600);
+         color: var(--chakra-colors-lightgray-500);
+
+         &:hover {
+            background: var(--chakra-colors-darkgray-500);
+            color: var(--chakra-colors-lightgray-500);
+         }
+      }
    }
    .timestamp {
       display: block;
@@ -204,26 +214,36 @@ const Message = ({
          </Box>
          {msg.nftAddr && msg.nftId && (
             <Box mb={1}>
-               {metadata ? (
-                  <Link to={`/nft/${msg.nftAddr}/${msg.nftId}?recipient=${msg.toAddr === account ? msg.fromAddr : msg.toAddr}`} style={{ textDecoration: "none" }}>
-                     <Button p={2} height="auto">
-                     <Flex alignItems="center">
-                        {imageUrl && (
-                           <Image
-                              src={imageUrl}
-                              alt=""
-                              height="15px"
-                              borderRadius="var(--chakra-radii-sm)"
-                              mr={1}
+               {metadata && (
+                  <Link
+                     to={`/nft/${msg.nftAddr}/${msg.nftId}?recipient=${
+                        msg.toAddr === account ? msg.fromAddr : msg.toAddr
+                     }`}
+                     style={{ textDecoration: 'none' }}
+                  >
+                     <Button p={2} height="auto" className="nft-context-btn">
+                        <Flex alignItems="center">
+                           {imageUrl && (
+                              <Image
+                                 src={imageUrl}
+                                 alt=""
+                                 height="15px"
+                                 borderRadius="var(--chakra-radii-sm)"
+                                 mr={1}
+                              />
+                           )}
+                           {metadata.name && (
+                              <Text mr={1} fontSize="sm">
+                                 {metadata.name}
+                              </Text>
+                           )}
+                           <IconExternalLink
+                              size="13"
+                              color="var(--chakra-colors-lightgray-900)"
                            />
-                        )}
-                        {metadata.name && <Text mr={1} fontSize="sm">{metadata.name}</Text>}
-                        <IconExternalLink size="13" color="var(--chakra-colors-lightgray-900)" />
-                     </Flex>
+                        </Flex>
                      </Button>
                   </Link>
-               ) : (
-                  <Text fontSize="sm">{truncateAddress(msg.nftAddr)}</Text>
                )}
             </Box>
          )}

@@ -209,7 +209,6 @@ const Sidebar = ({
                   </Badge>
                )}
             </LinkElem>
-            {console.log(metadata)}
             {metadata && (
                <LinkElem2 to={`/nft/${nftContractAddr}/${nftId}`}>
                   {/* <Image src={coolcat2356} alt="" width="40px" /> */}

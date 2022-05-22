@@ -81,7 +81,7 @@ const NFT = ({
    // Basic data
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [ownerAddr, setOwnerAddr] = useState<string>()
-   const recipientAddr = searchParams.get('recipient') ? searchParams.get('recipient') : ownerAddr
+   const recipientAddr = searchParams.get('recipient') === null ? ownerAddr : searchParams.get('recipient') 
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [imageUrl, setImageUrl] = useState<string>()
 
@@ -108,6 +108,12 @@ const NFT = ({
       getNftMetadata()
       getOwnerAddress()
       getComments()
+   }, [])
+
+   useEffect(() => {
+      getChatData()
+         getComments()
+         getUnreadCount()
       const interval = setInterval(() => {
          getChatData()
          getComments()
@@ -115,12 +121,7 @@ const NFT = ({
       }, 5000) // every 5s
 
       return () => clearInterval(interval)
-   }, [])
-
-   useEffect(() => {
-      getChatData()
-      getUnreadCount()
-   }, [account])
+   }, [account, ownerAddr])
 
    const getUnreadCount = () => {
       if (account) {
@@ -292,13 +293,13 @@ const NFT = ({
       setLoadedComments(newLoadedComments)
    }
 
-   function getChatData() {
+   const getChatData = () => {
       // GET request to get off-chain data for RX user
       if (!process.env.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
          return
       }
-      if (!account) {
+      if (!account || !recipientAddr) {
          console.log('No account connected')
          return
       }
