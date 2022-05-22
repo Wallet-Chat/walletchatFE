@@ -205,7 +205,7 @@ const Message = ({
          {msg.nftAddr && msg.nftId && (
             <Box mb={1}>
                {metadata ? (
-                  <Link to={`/nft/${msg.nftAddr}/${msg.nftId}`} style={{ textDecoration: "none" }}>
+                  <Link to={`/nft/${msg.nftAddr}/${msg.nftId}?recipient=${msg.toAddr === account ? msg.fromAddr : msg.toAddr}`} style={{ textDecoration: "none" }}>
                      <Button p={2} height="auto">
                      <Flex alignItems="center">
                         {imageUrl && (

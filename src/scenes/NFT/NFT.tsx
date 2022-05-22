@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react'
 import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
 import { useState, useEffect, KeyboardEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
@@ -76,10 +76,12 @@ const NFT = ({
    privateKey: string
 }) => {
    let { nftContractAddr = '', nftId = 0 } = useParams()
+   let [searchParams] = useSearchParams()
 
    // Basic data
    const [nftData, setNftData] = useState<NFTMetadataType>()
-   const [ownerAddress, setOwnerAddress] = useState<string>()
+   const [ownerAddr, setOwnerAddr] = useState<string>()
+   const recipientAddr = searchParams.get('recipient') ? searchParams.get('recipient') : ownerAddr
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [imageUrl, setImageUrl] = useState<string>()
 
@@ -180,7 +182,7 @@ const NFT = ({
          .then((result: NFTOwnerAddressType) => {
             console.log('✅[GET][NFT Owner Address]:', result)
             console.log(JSON.stringify(result, null, 2))
-            setOwnerAddress(result.owners[0])
+            setOwnerAddr(result.owners[0])
          })
          .catch((error) => console.log('error', error))
    }
@@ -302,7 +304,7 @@ const NFT = ({
       }
       setIsFetchingMessages(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/getnft_chatitems/${account}/${nftContractAddr}/${nftId}`,
+         ` ${process.env.REACT_APP_REST_API}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
             headers: {
@@ -366,7 +368,7 @@ const NFT = ({
       let toAddrPublicKey = ''
       await fetch(
          ` ${process.env.REACT_APP_REST_API}/get_settings/${
-            ownerAddress ? ownerAddress.toLocaleLowerCase() : ''
+            recipientAddr ? recipientAddr.toLocaleLowerCase() : ''
          }`,
          {
             method: 'GET',
@@ -399,7 +401,7 @@ const NFT = ({
       let data = {
          message: msgInputCopy,
          fromAddr: account.toLocaleLowerCase(),
-         toAddr: ownerAddress ? ownerAddress.toLocaleLowerCase() : '',
+         toAddr: recipientAddr ? recipientAddr.toLocaleLowerCase() : '',
          timestamp,
          nftaddr: nftContractAddr,
          nftid: typeof nftId === 'string' ? parseInt(nftId) : nftId,
@@ -409,7 +411,7 @@ const NFT = ({
       addMessageToUI(
          msgInputCopy,
          account,
-         ownerAddress ? ownerAddress.toLocaleLowerCase() : '',
+         recipientAddr ? recipientAddr.toLocaleLowerCase() : '',
          timestamp,
          false,
          'right',
@@ -510,10 +512,10 @@ const NFT = ({
    }
 
    const copyToClipboard = () => {
-      if (ownerAddress) {
-         console.log('Copy to clipboard', ownerAddress)
+      if (recipientAddr) {
+         console.log('Copy to clipboard', recipientAddr)
          let textField = document.createElement('textarea')
-         textField.innerText = ownerAddress
+         textField.innerText = recipientAddr
          document.body.appendChild(textField)
          textField.select()
          document.execCommand('copy')
@@ -587,12 +589,12 @@ const NFT = ({
                {metadata && metadata.name && (
                   <Heading size="md">{metadata.name}</Heading>
                )}
-               {ownerAddress && (
+               {ownerAddr && (
                   <Box>
                      <Text fontSize="md" color="lightgray.800">
-                        Owned by {truncateAddress(ownerAddress)}{' '}
+                        Owned by {truncateAddress(ownerAddr)}{' '}
                         <Link
-                           to={`https://etherscan.io/address/${ownerAddress}`}
+                           to={`https://etherscan.io/address/${ownerAddr}`}
                            target="_blank"
                            style={{
                               display: 'inline-block',
@@ -642,7 +644,7 @@ const NFT = ({
             >
                <TabPanel px="0" height="100%" padding="0">
                   <Flex flexDirection="column" height="100%">
-                     {ownerAddress && (
+                     {recipientAddr && (
                         <Flex
                            alignItems="center"
                            justifyContent="space-between"
@@ -651,7 +653,7 @@ const NFT = ({
                            <Flex alignItems="center">
                               <BlockieWrapper>
                                  <Blockies
-                                    seed={ownerAddress.toLocaleLowerCase()}
+                                    seed={recipientAddr.toLocaleLowerCase()}
                                     scale={4}
                                  />
                               </BlockieWrapper>
@@ -662,7 +664,7 @@ const NFT = ({
                                     fontWeight="bold"
                                     color="darkgray.800"
                                  >
-                                    {truncateAddress(ownerAddress)}
+                                    {truncateAddress(recipientAddr)}
                                  </Text>
                                  {/* {ens && (
                            <Text fontWeight="bold" color="darkgray.800">
@@ -695,7 +697,7 @@ const NFT = ({
                                  </Button>
                               )}
                               <Button
-                                 href={`https://etherscan.io/address/${ownerAddress}`}
+                                 href={`https://etherscan.io/address/${recipientAddr}`}
                                  target="_blank"
                                  as={CLink}
                                  size="xs"
