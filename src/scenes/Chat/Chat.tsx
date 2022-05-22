@@ -408,7 +408,7 @@ const Chat = ({
                         <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
                      </BlockieWrapper>
                      <Box>
-                        <Text ml={2} fontWeight="bold" color="darkgray.800">
+                        <Text ml={2} fontWeight="bold" color="darkgray.800" fontSize="md">
                            {truncateAddress(toAddr)}
                         </Text>
                         {/* {ens && (

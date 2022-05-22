@@ -54,11 +54,11 @@ export const App = () => {
          })
             .then((response) => response.json())
             .then((count: number) => {
-               console.log('✅ [GET] UNREAD COUNT:', count)
+               console.log('✅[GET][Unread Count]:', count)
                setUnreadCount(count)
             })
             .catch((error) => {
-               console.error('🚨🚨REST API Error [GET]:', error)
+               console.error('🚨[GET][Unread Count]:', error)
             })
       }
    }

@@ -66,7 +66,15 @@ const DottedBackground = styled.div`
    overflow-y: scroll;
 `
 
-const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: string, privateKey: string }) => {
+const NFT = ({
+   account,
+   publicKey,
+   privateKey,
+}: {
+   account: string
+   publicKey: string
+   privateKey: string
+}) => {
    let { nftContractAddr = '', nftId = 0 } = useParams()
 
    // Basic data
@@ -148,10 +156,12 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
             setNftData(result)
 
             let url = result.metadata && result.metadata.image
-            if (url?.includes("ipfs://")) {
-               let parts = url.split("ipfs://")
+            if (url?.includes('ipfs://')) {
+               let parts = url.split('ipfs://')
                let cid = parts[parts.length - 1]
                url = `https://ipfs.io/ipfs/${cid}`
+               setImageUrl(url)
+            } else {
                setImageUrl(url)
             }
          })
@@ -219,7 +229,7 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
       setCommentInput('')
 
       const timestamp = new Date()
-      
+
       let data = {
          fromAddr: account.toLocaleLowerCase(),
          nftAddr: nftContractAddr,
@@ -238,7 +248,7 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log("nft id: ", nftId)
+            console.log('nft id: ', nftId)
             console.log('✅[POST][NFT][Comment]:', data)
             addCommentToUI(
                account,
@@ -311,19 +321,20 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
                const rawmsg = await getIpfsData(replica[i].message)
                //console.log("raw message decoded", rawmsg)
 
-               let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
+               let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg)
 
                //we only need to decrypt the side we are print to UI (to or from)
-               let decrypted;
-               if(replica[i].toaddr === account) {
+               let decrypted
+               if (replica[i].toaddr === account) {
                   decrypted = await EthCrypto.decryptWithPrivateKey(
-                  privateKey,
-                  encdatablock.to)
-               }
-               else {
+                     privateKey,
+                     encdatablock.to
+                  )
+               } else {
                   decrypted = await EthCrypto.decryptWithPrivateKey(
-                  privateKey,
-                  encdatablock.from)
+                     privateKey,
+                     encdatablock.from
+                  )
                }
 
                replica[i].message = decrypted
@@ -349,20 +360,25 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
       }
    }
 
-      //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
+   //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
    const getPublicKeyFromSettings = async () => {
-      let toAddrPublicKey = ""
-      await fetch(` ${process.env.REACT_APP_REST_API}/get_settings/${ownerAddress ? ownerAddress.toLocaleLowerCase() : ''}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-      })
-      .then((response) => response.json())
-      .then(async (settings: SettingsType[]) => {
-         console.log('✅ GET [Public Key]:', settings)
-         toAddrPublicKey = settings[0].publickey
-      })
+      let toAddrPublicKey = ''
+      await fetch(
+         ` ${process.env.REACT_APP_REST_API}/get_settings/${
+            ownerAddress ? ownerAddress.toLocaleLowerCase() : ''
+         }`,
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         }
+      )
+         .then((response) => response.json())
+         .then(async (settings: SettingsType[]) => {
+            console.log('✅ GET [Public Key]:', settings)
+            toAddrPublicKey = settings[0].publickey
+         })
 
       return await toAddrPublicKey
    }
@@ -378,7 +394,7 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
 
       const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
-      console.log("nft id from sendMessage: ", nftId)
+      console.log('nft id from sendMessage: ', nftId)
       let data = {
          message: msgInputCopy,
          fromAddr: account.toLocaleLowerCase(),
@@ -401,20 +417,24 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
 
-      let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
- 
-      console.log("encrypt with public key: ", toAddrPublicKey)
-      const encryptedTo = await EthCrypto.encryptWithPublicKey(
-         toAddrPublicKey, 
-         msgInputCopy)
+      let toAddrPublicKey = await getPublicKeyFromSettings() //TODO: should only need to do this once per convo (@manapixels help move it)
 
-      //we have to encrypt the sender side with its own public key, if we want to refresh data from server 
+      console.log('encrypt with public key: ', toAddrPublicKey)
+      const encryptedTo = await EthCrypto.encryptWithPublicKey(
+         toAddrPublicKey,
+         msgInputCopy
+      )
+
+      //we have to encrypt the sender side with its own public key, if we want to refresh data from server
       const encryptedFrom = await EthCrypto.encryptWithPublicKey(
-         publicKey, 
-         msgInputCopy) 
+         publicKey,
+         msgInputCopy
+      )
 
       //lets try and use IPFS instead of any actual data stored on our server
-      const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
+      const cid = await postIpfsData(
+         JSON.stringify({ to: encryptedTo, from: encryptedFrom })
+      )
       data.message = await cid
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
@@ -543,13 +563,13 @@ const NFT = ({ account, publicKey, privateKey }: { account: string, publicKey: s
       <Flex flexDirection="column" background="white" height="100vh">
          <Flex alignItems="center" mb={2} p={5}>
             {imageUrl && (
-                  <Image
-                     src={imageUrl}
-                     alt=""
-                     height="60px"
-                     borderRadius="var(--chakra-radii-xl)"
-                     mr={3}
-                  />
+               <Image
+                  src={imageUrl}
+                  alt=""
+                  height="60px"
+                  borderRadius="var(--chakra-radii-xl)"
+                  mr={3}
+               />
             )}
             <Box>
                {metadata && metadata.name && (

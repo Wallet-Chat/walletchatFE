@@ -171,6 +171,8 @@ const Sidebar = ({
                let cid = parts[parts.length - 1]
                url = `https://ipfs.io/ipfs/${cid}`
                setImageUrl(url)
+            } else {
+               setImageUrl(url)
             }
          })
          .catch((error) => console.log('error', error))

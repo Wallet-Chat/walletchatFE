@@ -94,7 +94,7 @@ const Inbox = ({
          //    if (data === null) setInboxData([])
          //    else setInboxData(data)
          .then(async (data: MessageType[]) => {
-            console.log('✅ GET [Chat items]:', data)
+            console.log('✅[GET][Inbox]:', data)
 
             const replica = JSON.parse(JSON.stringify(data));
 
@@ -126,7 +126,7 @@ const Inbox = ({
             setIsFetchingInboxData(false)
          })
          .catch((error) => {
-            console.error('🚨🚨REST API Error [GET]:', error)
+            console.error('🚨[GET][Inbox]:', error)
             setIsFetchingInboxData(false)
          })
    }
