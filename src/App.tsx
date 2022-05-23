@@ -24,6 +24,7 @@ export const App = () => {
       isAuthenticated,
       connectWallet,
       disconnectWallet,
+      decrypt,
       account,
       publicKey,
       privateKey,
@@ -149,6 +150,7 @@ export const App = () => {
                               publicKey={publicKey}
                               privateKey={privateKey}
                               account={account}
+                              decrypt={decrypt}
                               web3={web3}
                               isAuthenticated={isAuthenticated}
                            />

@@ -79,6 +79,17 @@ const WalletProvider = React.memo(({ children }) => {
       }
    }
 
+   async function decrypt (encMsg) {
+      const provider = getProvider()
+      const accounts = await provider.enable()
+      const decMsg = await provider.request({
+        method: 'eth_decrypt',
+        params: [encMsg, accounts[0]]
+      })
+    
+      return decMsg
+    }
+
    const getAccounts = async (provider) => {
       if (provider) {
          const [accounts, chainId] = await Promise.all([
@@ -191,6 +202,7 @@ const WalletProvider = React.memo(({ children }) => {
             privateKey,
             disconnectWallet,
             connectWallet,
+            decrypt,
             isAuthenticated,
             appLoading,
             web3,

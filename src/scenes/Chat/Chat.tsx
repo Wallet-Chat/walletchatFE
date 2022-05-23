@@ -31,7 +31,8 @@ import { truncateAddress } from '../../helpers/truncateString'
 import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
 import EthCrypto, { Encrypted } from 'eth-crypto'
-//import sigUtil from 'eth-sig-util'
+import { encrypt } from '@metamask/eth-sig-util'
+import { TransactionFactory } from '@ethereumjs/tx'
 
 const BlockieWrapper = styled.div`
    border-radius: 0.3rem;
@@ -60,6 +61,7 @@ const Chat = ({
    publicKey,
    privateKey,
    account,
+   decrypt,
    web3,
    isAuthenticated,
 }: {
@@ -68,6 +70,7 @@ const Chat = ({
    account: string
    web3: Web3
    isAuthenticated: boolean
+   decrypt: (rawmsg: string) => void
 }) => {
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
@@ -89,6 +92,26 @@ const Chat = ({
    
       return () => clearInterval(interval)
    }, [isAuthenticated, account])
+
+   async function encryptMM (msg: string, encryptionPublicKey: string) {
+   //   const compKeyFromMM = "f5424c9d50cf7d5bc1a92b92b52e0c9e47763a5b5fe5a16db4736d36c1f57806"
+   //   const uncompressed = await EthCrypto.publicKey.decompress(compKeyFromMM)
+   //   console.log("test compression: ", uncompressed)
+      const compressedKey = await EthCrypto.publicKey.compress(encryptionPublicKey)
+      console.log(compressedKey)
+      const buf = Buffer.from(
+        JSON.stringify(
+         encrypt({
+            publicKey: encryptionPublicKey,
+            data: msg,
+            version: 'x25519-xsalsa20-poly1305'
+         })
+        ),
+        'utf8'
+      )
+    
+      return '0x' + buf.toString('hex')
+    }
 
    function getChatData() {
       // GET request to get off-chain data for RX user
@@ -125,25 +148,66 @@ const Chat = ({
             // Get data from IPFS and replace the message with the fetched text
             for (let i = 0; i < replica.length; i++) {
                const rawmsg = await getIpfsData(replica[i].message)
-              // console.log("raw message decoded", rawmsg)
 
-               // let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
+               console.log("raw message decoded", rawmsg)
 
-               // //we only need to decrypt the side we are print to UI (to or from)
-               // let decrypted;
-               // if(replica[i].toaddr === account) {
-               //    decrypted = await EthCrypto.decryptWithPrivateKey(
-               //    privateKey,
-               //    encdatablock.to)
-               // }
-               // else {
-               //    decrypted = await EthCrypto.decryptWithPrivateKey(
-               //    privateKey,
-               //    encdatablock.from)
-               // }
+               let decrypted;
+              
+               let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
 
-               //replica[i].message = decrypted
-               replica[i].message = rawmsg
+               //we only need to decrypt the side we are print to UI (to or from)
+               if(replica[i].toaddr === account) {
+                 //this if statement makes sure we decrypt using secondary keys or actual wallet public key (for first use only)
+                 if(!replica[i].mmkeyused){
+                     decrypted = await EthCrypto.decryptWithPrivateKey(
+                     privateKey,
+                     encdatablock.to)
+                  }
+                  else {
+                     //use MM to decrypt the message - this should only happen once if a user gets messages
+                     //without ever having logged into WalletChat
+                     decrypted = await decrypt(rawmsg)
+                     console.log("decrypted with MM: ", decrypted)
+
+                     //after we have decoded the message here, we need to remove the MM encrypted data, 
+                     //and replace the message using the secondary keys so the UX flows well and the user
+                     //does not have to continuously decode this using MM.
+                     //TODO: re-encrypt the plain text and send the data to IPFS
+
+                     // fetch(
+                     //    ` ${process.env.REACT_APP_REST_API}/update_chatitem/${replica[i].fromaddr}/${replica[i].toaddr}}`,
+                     //    {
+                     //       method: 'PUT',
+                     //       headers: {
+                     //          'Content-Type': 'application/json',
+                     //       },
+                     //       body: JSON.stringify({
+                     //          ...replica[i],
+                     //          read: true,
+                     //          mmkeyused: false,
+                     //          message: <insert CID>
+                     //       }),
+                     //    }
+                     // )
+                     //    .then((response) => response.json())
+                     //    .then((data) => {
+                     //       console.log('✅ PUT Message:', data)
+                     //       setUnreadCount(unreadCount - 1)
+                     //       updateRead(data)
+                     //    })
+                     //    .catch((error) => {
+                     //       console.error('🚨🚨REST API Error [PUT]:', error)
+                     //    })
+                  }
+               }
+               else {
+                  decrypted = await EthCrypto.decryptWithPrivateKey(
+                  privateKey,
+                  encdatablock.from)
+               }
+
+               replica[i].message = decrypted
+               //replica[i].message = rawmsg
             }
 
             setChatData(replica)
@@ -226,8 +290,63 @@ const Chat = ({
       }
    }
 
+   async function recoverPublicKey(rawTx: string) {
+      const data = Buffer.from(rawTx.slice(2), "hex");
+      const tx = TransactionFactory.fromSerializedData(data);
+      return tx.getSenderPublicKey().toString("hex");
+   }
+
+   const getRawTxHash = async (txhash: string) => {
+      console.log("getting tx hash for: ", txhash)
+      let retRaw = ""
+      await fetch(` https://etherscan.io/getRawTx?tx=${txhash}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'text/html',
+         },
+      })
+      .then((response) => response.text())
+      .then(async function (html) {
+         retRaw = "0x" + html.split("Returned Raw Transaction Hex :")[1].split("0x")[1].split(" ")[0]      
+      })
+      return retRaw
+   }
+
+   const getPublicKeyFromBlockchainHistory = async (address: string) => {
+      let toAddrPublicKey = ""
+
+      await fetch(` https://api.etherscan.io/api?module=account&action=txlist&address=${address}&apikey=1P9ACBZNGRVMPW5EA892D4MMGQ37FEM4TV`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+      .then((response) => response.json())
+      .then(async (txlist) => {
+         console.log('✅ GET [Transaction List]:', txlist)
+         
+         //find first outgoing transation hash
+         let txhash = ""
+         for (let i = 0; i < txlist.result.length; i++) {
+            if (txlist.result[i].from === address.toLocaleLowerCase()) {
+               txhash = txlist.result[i].hash
+               console.log("found outgoing tx hash: ", txhash)
+               break
+            }
+         }
+
+         if(txhash != "") {
+            const rawtxhash = await getRawTxHash(txhash)
+            toAddrPublicKey = await recoverPublicKey(rawtxhash)
+         }
+      })
+   
+      return toAddrPublicKey
+   }
+
    //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
    const getPublicKeyFromSettings = async () => {
+      console.log("getting public key from settings for: ", toAddr)
       let toAddrPublicKey = ""
       await fetch(` ${process.env.REACT_APP_REST_API}/get_settings/${toAddr}`, {
          method: 'GET',
@@ -238,13 +357,15 @@ const Chat = ({
       .then((response) => response.json())
       .then(async (settings: SettingsType[]) => {
          console.log('✅ GET [Public Key]:', settings)
-         toAddrPublicKey = settings[0].publickey
+         if(settings.length > 0)
+            toAddrPublicKey = settings[0].publickey
       })
 
-      return await toAddrPublicKey
+      return toAddrPublicKey
    }
    //end get public key that should only need to be done once per conversation
    const sendMessage = async () => {
+
       if (msgInput.length <= 0) return
 
       // Make a copy and clear input field
@@ -261,26 +382,44 @@ const Chat = ({
          toAddr: toAddr.toLocaleLowerCase(),
          timestamp,
          read: false,
+         mmkeyused: false,
       }
 
       addMessageToUI(msgInputCopy, account, toAddr, timestamp, false, 'right', true, null, null)
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-      // let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
- 
-      // console.log("encrypt with public key: ", toAddrPublicKey)
-      // const encryptedTo = await EthCrypto.encryptWithPublicKey(
-      //    toAddrPublicKey, 
-      //    msgInputCopy)
+      let encryptedTo;
+      let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
+      if(toAddrPublicKey === "") {
+         toAddrPublicKey = await getPublicKeyFromBlockchainHistory(toAddr)
+         console.log(`found MM pub key for ${toAddr}: `, toAddrPublicKey)
+         data.mmkeyused = true
 
-      // //we have to encrypt the sender side with its own public key, if we want to refresh data from server 
-      // const encryptedFrom = await EthCrypto.encryptWithPublicKey(
-      //    publicKey, 
-      //    msgInputCopy) 
+         if(toAddrPublicKey === "") {
+            console.log("can't encrypt the data, only option is plan text here.  ETH wallet must either have at least one outgoing TX to calculate a public key, or have joined WalletChat")
+            return
+         }
+
+         console.log("encrypt with public key: ", toAddrPublicKey)
+         encryptedTo = await encryptMM(
+         toAddrPublicKey, 
+         msgInputCopy)    
+      }
+      else {
+         console.log("encrypt with public key: ", toAddrPublicKey)
+         encryptedTo = await EthCrypto.encryptWithPublicKey(
+         toAddrPublicKey, 
+         msgInputCopy)
+      }
+
+      //we have to encrypt the sender side with its own public key, if we want to refresh data from server 
+      const encryptedFrom = await EthCrypto.encryptWithPublicKey(
+         publicKey, 
+         msgInputCopy) 
 
       //lets try and use IPFS instead of any actual data stored on our server
-      //const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
-      const cid = await postIpfsData(msgInputCopy)
+      const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
+      //const cid = await postIpfsData(msgInputCopy)
       data.message = await cid
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {

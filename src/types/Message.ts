@@ -15,6 +15,7 @@ export default interface MessageType {
    toaddr: string
    timestamp: Date,
    read: boolean
+   mmkeyused: boolean
    nftaddr: string
    nftid: number
    id?: number
