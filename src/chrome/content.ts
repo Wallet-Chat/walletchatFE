@@ -41,7 +41,7 @@ if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
       // Some styles for a fancy sidebar
       iframe.style.cssText =
          'position:fixed;top:90px;right:10px;display:block;' +
-         'width:202px;height:70px;z-index:1000000;border:none;background:none;'
+         'width:202px;height:70px;z-index:1000000;border:none;background:none;pointer-events:none;'
       document.body.appendChild(iframe)
    }
 }
