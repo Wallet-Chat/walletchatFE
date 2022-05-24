@@ -40,8 +40,8 @@ if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
 
       // Some styles for a fancy sidebar
       iframe.style.cssText =
-         'position:fixed;bottom:10px;right:10px;display:block;' +
-         'width:161px;height:56px;z-index:1000000;border:none;background:none;'
+         'position:fixed;top:90px;right:10px;display:block;' +
+         'width:202px;height:70px;z-index:1000000;border:none;background:none;'
       document.body.appendChild(iframe)
    }
 }

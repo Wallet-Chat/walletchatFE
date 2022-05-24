@@ -1,6 +1,6 @@
 {
-   "short_name": "walletchat",
-   "name": "A better way to communicate in web3",
+   "name": "WalletChat",
+   "description": "A better way to communicate in web3",
    "version": "1.0",
    "manifest_version": 3,
    "action": {

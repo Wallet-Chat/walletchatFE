@@ -17,6 +17,8 @@ import styled from 'styled-components'
 import logoThumb from '../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../helpers/contract'
 import NFTMetadataType from '../types/NFTMetadata'
+import NFTUnreadType from '../types/NFTUnread'
+import SidebarNFTLink from './SidebarNFTLink'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -112,6 +114,7 @@ const Sidebar = ({
    const [nftId, setNftId] = useState<number>()
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [imageUrl, setImageUrl] = useState<string>()
+   const [unreadNfts, setUnreadNfts] = useState<NFTUnreadType[]>([])
 
    const { metadata } = nftData || {}
 
@@ -134,8 +137,14 @@ const Sidebar = ({
 
       window.addEventListener('urlChangedEvent', updateURL)
 
+      // getUnreadNfts()
+      // const interval = setInterval(() => {
+      //    getUnreadNfts()
+      // }, 5000) // every 5s
+
       return () => {
          window.removeEventListener('urlChangedEvent', updateURL)
+         // clearInterval(interval)
       }
    }, [])
 
@@ -177,6 +186,24 @@ const Sidebar = ({
          })
          .catch((error) => console.log('error', error))
    }
+
+   // const getUnreadNfts = () => {
+
+   //    fetch(`${process.env.REACT_APP_REST_API}/get_unread_cnt_nft/${currAccountAddress}/`, {
+   //       method: 'GET',
+   //       headers: {
+   //          'Content-Type': 'application/json',
+   //       },
+   //    })
+   //       .then((response) => response.json())
+   //       .then((data: NFTUnreadType[]) => {
+   //          console.log('✅[GET][Unread NFTs]:', data)
+   //          setUnreadNfts(data)
+   //       })
+   //       .catch((error) => {
+   //          console.error('🚨[GET][Unread NFTs]:', error)
+   //       })
+   // }
 
    return (
       <Flex
@@ -233,6 +260,9 @@ const Sidebar = ({
                   )}
                </LinkElem2>
             )}
+            {/* {unreadNfts && unreadNfts.map((item, i) => (
+               <SidebarNFTLink nftContractAddr={item.nftaddr} nftId={item.nftid} key={i} />
+            ))} */}
          </Flex>
          <Flex flexDirection="column" alignItems="center">
             <LinkElem to={`/new`}>

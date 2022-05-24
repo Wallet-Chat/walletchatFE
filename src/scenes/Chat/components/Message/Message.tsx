@@ -8,7 +8,6 @@ import { formatMessageDate } from '../../../../helpers/date'
 import MessageUIType from '../../../../types/MessageUI'
 import NFTMetadataType from '../../../../types/NFTMetadata'
 import { useUnreadCount } from '../../../../context/UnreadCountProvider'
-import { truncateAddress } from '../../../../helpers/truncateString'
 import { Link } from 'react-router-dom'
 
 const MessageBox = styled.div`
