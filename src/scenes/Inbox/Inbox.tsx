@@ -144,7 +144,7 @@ const Inbox = ({
             ) {
                toAddToUI.push({
                   ...inboxData[i],
-                  message: await getIpfsData(inboxData[i].message),
+                  message: inboxData[i].message, //await getIpfsData(inboxData[i].message),
                   fromAddr: inboxData[i].fromaddr,
                   toAddr: inboxData[i].toaddr,
                   position: 'left',
@@ -159,7 +159,7 @@ const Inbox = ({
             ) {
                toAddToUI.push({
                   ...inboxData[i],
-                  message: await getIpfsData(inboxData[i].message),
+                  message: inboxData[i].message, //await getIpfsData(inboxData[i].message),
                   fromAddr: inboxData[i].fromaddr,
                   toAddr: inboxData[i].toaddr,
                   position: 'right',

@@ -123,30 +123,31 @@ const Chat = ({
             const replica = JSON.parse(JSON.stringify(data));
 
             // Get data from IPFS and replace the message with the fetched text
-            for (let i = 0; i < replica.length; i++) {
-               const rawmsg = await getIpfsData(replica[i].message)
-              // console.log("raw message decoded", rawmsg)
+            // for (let i = 0; i < replica.length; i++) {
+            //    const rawmsg = await getIpfsData(replica[i].message)
+            //   // console.log("raw message decoded", rawmsg)
 
-               // let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
+            //    // let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
 
-               // //we only need to decrypt the side we are print to UI (to or from)
-               // let decrypted;
-               // if(replica[i].toaddr === account) {
-               //    decrypted = await EthCrypto.decryptWithPrivateKey(
-               //    privateKey,
-               //    encdatablock.to)
-               // }
-               // else {
-               //    decrypted = await EthCrypto.decryptWithPrivateKey(
-               //    privateKey,
-               //    encdatablock.from)
-               // }
+            //    // //we only need to decrypt the side we are print to UI (to or from)
+            //    // let decrypted;
+            //    // if(replica[i].toaddr === account) {
+            //    //    decrypted = await EthCrypto.decryptWithPrivateKey(
+            //    //    privateKey,
+            //    //    encdatablock.to)
+            //    // }
+            //    // else {
+            //    //    decrypted = await EthCrypto.decryptWithPrivateKey(
+            //    //    privateKey,
+            //    //    encdatablock.from)
+            //    // }
 
-               //replica[i].message = decrypted
-               replica[i].message = rawmsg
-            }
+            //    //replica[i].message = decrypted
+            //    replica[i].message = rawmsg
+            // }
 
-            setChatData(replica)
+            setChatData(data)
+            //setChatData(replica)
 
             // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
             setIsFetchingChatData(false)
@@ -280,8 +281,9 @@ const Chat = ({
 
       //lets try and use IPFS instead of any actual data stored on our server
       //const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
-      const cid = await postIpfsData(msgInputCopy)
-      data.message = await cid
+      
+      //const cid = await postIpfsData(msgInputCopy)
+      data.message = msgInputCopy //await cid
 
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
          method: 'POST',

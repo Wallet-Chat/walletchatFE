@@ -24,8 +24,18 @@ const main = () => {
     * Fired when a message is sent from either an extension process or a content script.
     */
    chrome.runtime.onMessage.addListener(messagesFromReactAppListener)
+
+   // SetTerminal to run every 5 seconds (5000 ms), setTimeout to run just on
+   setTimeout(myMainFunction, 5000); 
 }
 main()
+
+async function myMainFunction() {
+   const iframe = document.querySelector('iframe') 
+   if(iframe) {
+      iframe.remove()
+   }
+}
 
 var extensionOrigin = 'chrome-extension://' + chrome.runtime.id
 if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
