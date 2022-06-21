@@ -114,6 +114,8 @@ const Sidebar = ({
    const [nftId, setNftId] = useState<number>()
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [imageUrl, setImageUrl] = useState<string>()
+   const [twitterHandle, setTwitterHandle] = useState<string>()
+   const [twitterID, setTwitterID] = useState<string>()
    const [unreadNfts, setUnreadNfts] = useState<NFTUnreadType[]>([])
 
    const { metadata } = nftData || {}
@@ -156,6 +158,7 @@ const Sidebar = ({
             setNftContractAddr(contractAddress)
             setNftId(parseInt(nftId))
             getNftMetadata(contractAddress, parseInt(nftId))
+            getTwitterInfo(contractAddress)
          }
       }
    }, [url])
@@ -204,6 +207,86 @@ const Sidebar = ({
    //          console.error('🚨[GET][Unread NFTs]:', error)
    //       })
    // }
+
+   const getTwitterHandle = (slug: string) => {
+      fetch(`https://opensea.io/collection/${slug}`, {
+         method: 'GET',
+         // headers: {
+         //    'Content-Type': 'application/json',
+         // },
+      })
+      .then((response) => response.text())
+      .then((data) => {
+         let twitter = data.split("connectedTwitterUsername")[1].split(',')[0].replace(':', '').replace('"', '')
+         console.log('✅[GET][Twitter Handle]:', twitter)
+         setTwitterHandle(twitter)
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Twitter Handle]:', error)
+      })
+   }
+
+   //if we end up implementing this, we should move to server and return the data needed
+   const getTwitterID = () => {
+      fetch(`https://api.twitter.com/2/users/by/username/${twitterHandle}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e',
+         },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+         let id = data['id']
+         setTwitterID(id)
+         console.log('✅[GET][Twitter ID]:', id)
+
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Twitter ID]:', error)
+      })
+   }
+
+   const getTweetsFromAPI = () => {
+      fetch(`https://api.twitter.com/2/users/${twitterID}/tweets`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e',
+         },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+
+         console.log('✅[GET][Twitter Tweets]:', data)
+
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Twitter Tweets]:', error)
+      })
+   }
+
+   const getTwitterInfo = (nftContractAddr: string) => {
+
+      fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+         let collectionSlug = data['collection']
+         let slug = collectionSlug['slug']
+         console.log('✅[GET][Slug Info]:', slug)
+         getTwitterHandle(slug)
+         getTwitterID()
+         getTweetsFromAPI()
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Slug Info]:', error)
+      })
+   }
 
    return (
       <Flex
