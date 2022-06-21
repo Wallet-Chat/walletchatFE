@@ -218,7 +218,7 @@ const Sidebar = ({
          .then((response) => response.text())
          .then((data) => {
             let twitter = data.split("twitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
-            if (!twitter) {
+            if (twitter === "null" || twitter === null) {
                twitter = data.split("connectedTwitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
             }
             console.log('✅[GET][Twitter Handle]:', twitter)
