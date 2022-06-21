@@ -208,27 +208,32 @@ const Sidebar = ({
    //       })
    // }
 
-   const getTwitterHandle = (slug: string) => {
-      fetch(`https://opensea.io/collection/${slug}`, {
+   const getTwitterHandle = async (slug: string): Promise<string|null> => {
+      return fetch(`https://opensea.io/collection/${slug}`, {
          method: 'GET',
          // headers: {
          //    'Content-Type': 'application/json',
          // },
       })
-      .then((response) => response.text())
-      .then((data) => {
-         let twitter = data.split("connectedTwitterUsername")[1].split(',')[0].replace(':', '').replace('"', '')
-         console.log('✅[GET][Twitter Handle]:', twitter)
-         setTwitterHandle(twitter)
-      })
-      .catch((error) => {
-         console.error('🚨[GET][Twitter Handle]:', error)
-      })
+         .then((response) => response.text())
+         .then((data) => {
+            let twitter = data.split("twitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
+            if (!twitter) {
+               twitter = data.split("connectedTwitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
+            }
+            console.log('✅[GET][Twitter Handle]:', twitter)
+            setTwitterHandle(twitter)
+            return Promise.resolve(twitter)
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Twitter Handle]:', error)
+            return Promise.resolve(null)
+         })
    }
 
    //if we end up implementing this, we should move to server and return the data needed
-   const getTwitterID = () => {
-      fetch(`https://api.twitter.com/2/users/by/username/${twitterHandle}`, {
+   const getTwitterID = async (_twitterHandle: string) : Promise<string|null> => {
+      return fetch(`https://api.twitter.com/2/users/by/username/${_twitterHandle}`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',
@@ -237,18 +242,22 @@ const Sidebar = ({
       })
       .then((response) => response.json())
       .then((data) => {
-         let id = data['id']
-         setTwitterID(id)
-         console.log('✅[GET][Twitter ID]:', id)
-
+         let id = null
+         if (data.data) {
+            id = data.data['id']
+            setTwitterID(id)
+            console.log('✅[GET][Twitter ID]:', id)
+         }
+         return Promise.resolve(id)
       })
       .catch((error) => {
          console.error('🚨[GET][Twitter ID]:', error)
+         return Promise.resolve(null)
       })
    }
 
-   const getTweetsFromAPI = () => {
-      fetch(`https://api.twitter.com/2/users/${twitterID}/tweets`, {
+   const getTweetsFromAPI = (_twitterId: string) => {
+      fetch(`https://api.twitter.com/2/users/${_twitterId}/tweets`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',
@@ -257,16 +266,14 @@ const Sidebar = ({
       })
       .then((response) => response.json())
       .then((data) => {
-
          console.log('✅[GET][Twitter Tweets]:', data)
-
       })
       .catch((error) => {
          console.error('🚨[GET][Twitter Tweets]:', error)
       })
    }
 
-   const getTwitterInfo = (nftContractAddr: string) => {
+   const getTwitterInfo = async (nftContractAddr: string) => {
 
       fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
          method: 'GET',
@@ -275,13 +282,15 @@ const Sidebar = ({
          },
       })
       .then((response) => response.json())
-      .then((data) => {
+      .then(async (data) => {
          let collectionSlug = data['collection']
          let slug = collectionSlug['slug']
          console.log('✅[GET][Slug Info]:', slug)
-         getTwitterHandle(slug)
-         getTwitterID()
-         getTweetsFromAPI()
+         const handle = await getTwitterHandle(slug)
+         if (handle) {
+            const id = await getTwitterID(handle)
+            if (id) getTweetsFromAPI(id)
+         }
       })
       .catch((error) => {
          console.error('🚨[GET][Slug Info]:', error)
