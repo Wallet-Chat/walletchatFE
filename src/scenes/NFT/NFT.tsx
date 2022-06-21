@@ -34,8 +34,10 @@ import { getIpfsData, postIpfsData } from '../../services/ipfs'
 import Message from './components/Message'
 import EncryptedMsgBlock from '../../types/Message'
 import SettingsType from '../../types/Message'
+import TweetType from '../../types/Tweet'
 import EthCrypto, { Encrypted } from 'eth-crypto'
 import { parseIsolatedEntityName } from 'typescript'
+import Tweet from './components/Tweet'
 
 // const nftContractAddr = '0x1a92f7381b9f03921564a437210bb9396471050c'
 // const nftId = '878'
@@ -101,6 +103,10 @@ const NFT = ({
    const [isFetchingComments, setIsFetchingComments] = useState<boolean>(false)
    const [isPostingComment, setIsPostingComment] = useState<boolean>(false)
 
+   // Twitter
+   const [twitterID, setTwitterID] = useState<string>()
+   const [tweets, setTweets] = useState<TweetType[]>([])
+
    const { metadata } = nftData || {}
    let timer: ReturnType<typeof setTimeout>
 
@@ -114,10 +120,16 @@ const NFT = ({
       getChatData()
          getComments()
          getUnreadCount()
+         if (nftContractAddr) getTwitterInfo(nftContractAddr)
       const interval = setInterval(() => {
          getChatData()
          getComments()
          getUnreadCount()
+         if (twitterID) {
+            getTweetsFromAPI(twitterID)
+         } else if (nftContractAddr) {
+            getTwitterInfo(nftContractAddr)
+         }
       }, 5000) // every 5s
 
       return () => clearInterval(interval)
@@ -169,6 +181,97 @@ const NFT = ({
             }
          })
          .catch((error) => console.log('error', error))
+   }
+
+   const getTwitterHandle = async (slug: string): Promise<string|null> => {
+      return fetch(`https://opensea.io/collection/${slug}`, {
+         method: 'GET',
+         // headers: {
+         //    'Content-Type': 'application/json',
+         // },
+      })
+         .then((response) => response.text())
+         .then((data) => {
+            let twitter = data.split("twitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
+            if (twitter === "null" || twitter === null) {
+               twitter = data.split("connectedTwitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
+            }
+            console.log('✅[GET][Twitter Handle]:', twitter)
+            return Promise.resolve(twitter)
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Twitter Handle]:', error)
+            return Promise.resolve(null)
+         })
+   }
+
+   //if we end up implementing this, we should move to server and return the data needed
+   const getTwitterID = async (_twitterHandle: string) : Promise<string|null> => {
+      return fetch(`https://api.twitter.com/2/users/by/username/${_twitterHandle}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e',
+         },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+         let id = null
+         if (data.data) {
+            id = data.data['id']
+            setTwitterID(id)
+            console.log('✅[GET][Twitter ID]:', id)
+         }
+         return Promise.resolve(id)
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Twitter ID]:', error)
+         return Promise.resolve(null)
+      })
+   }
+
+   const getTweetsFromAPI = (_twitterId: string) => {
+      fetch(`https://api.twitter.com/2/users/${_twitterId}/tweets`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e',
+         },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+         console.log('✅[GET][Twitter Tweets]:', data)
+         if (data.data && data.data.length > 0) {
+            setTweets(data.data)
+         }
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Twitter Tweets]:', error)
+      })
+   }
+
+   const getTwitterInfo = async (nftContractAddr: string) => {
+
+      fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+      .then((response) => response.json())
+      .then(async (data) => {
+         let collectionSlug = data['collection']
+         let slug = collectionSlug['slug']
+         console.log('✅[GET][Slug Info]:', slug)
+         const handle = await getTwitterHandle(slug)
+         if (handle) {
+            const id = await getTwitterID(handle)
+            if (id) getTweetsFromAPI(id)
+         }
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Slug Info]:', error)
+      })
    }
 
    const getOwnerAddress = () => {
@@ -638,6 +741,14 @@ const NFT = ({
                      {loadedComments.length}
                   </Badge>
                </Tab>
+               {tweets && tweets.length > 0 && (
+                  <Tab>
+                     Update{' '}
+                     <Badge variant="black" ml={1}>
+                        {tweets.length}
+                     </Badge>
+                  </Tab>
+               )}
             </TabList>
 
             <TabPanels
@@ -812,6 +923,14 @@ const NFT = ({
                      <>
                         <Comment data={comment} key={i} />
                         {i + 1 !== loadedComments.length && <Divider mb={4} />}
+                     </>
+                  ))}
+               </TabPanel>
+               <TabPanel p={5}>
+               {tweets && tweets.map((tweet: TweetType, i) => (
+                     <>
+                        <Tweet data={tweet} key={i} />
+                        {i + 1 !== tweets.length && <Divider mb={4} />}
                      </>
                   ))}
                </TabPanel>
