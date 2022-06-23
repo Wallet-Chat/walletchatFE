@@ -1,5 +1,6 @@
 export default interface TweetType {
     id: string,
+    author_id: string,
     user: {
         id: string,
         username: string,
@@ -11,6 +12,7 @@ export default interface TweetType {
     attachments?: {
         media_keys: string[]
     },
+    created_at: string
 }
 
 // https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-tweets

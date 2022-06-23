@@ -1,7 +1,11 @@
 import { Avatar, Box, Flex, Image, Link, Text } from '@chakra-ui/react'
+import { timeSince } from '../../../../helpers/date'
 import TweetType from '../../../../types/Tweet'
 
 const Tweet = ({ data }: { data: TweetType }) => {
+   const date = data.created_at
+   const formattedDate = timeSince(date)
+
    return (
       <Box mb={3}>
          <Flex alignItems="flex-start" mb="1">
@@ -16,7 +20,9 @@ const Tweet = ({ data }: { data: TweetType }) => {
             {data.user && (
                <Box ml={3}>
                   <Flex alignItems="center">
-                     <Text fontWeight="bold">{data.user.name}</Text>
+                     <Text fontWeight="bold" fontSize="lg">
+                        {data.user.name}
+                     </Text>
                      {data.user.username && (
                         <Link
                            href={`https://twitter.com/${data.user.username}`}
@@ -25,6 +31,14 @@ const Tweet = ({ data }: { data: TweetType }) => {
                               @{data.user.username}
                            </Text>
                         </Link>
+                     )}
+                     {formattedDate && (
+                        <>
+                           <Text fontSize="md" ml={1} mr={1} color="darkgray.200">
+                              ·
+                           </Text>
+                           <Text fontSize="md" color="darkgray.200">{formattedDate}</Text>
+                        </>
                      )}
                   </Flex>
                   <Text fontSize="md">{data.text}</Text>

@@ -5,7 +5,8 @@ export default interface RawTweetsType {
             media_keys: string[]
         },
         text: string,
-        id: string
+        id: string,
+        created_at: string
     }>,
     includes?: {
         media?: Array<{
