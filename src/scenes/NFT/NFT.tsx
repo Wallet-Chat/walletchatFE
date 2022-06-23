@@ -778,7 +778,7 @@ const NFT = ({
                </Tab>
                {tweets && tweets.length > 0 && (
                   <Tab>
-                     Update{' '}
+                     Tweets{' '}
                      <Badge variant="black" ml={1}>
                         {tweets.length}
                      </Badge>
