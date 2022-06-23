@@ -38,6 +38,7 @@ import TweetType from '../../types/Tweet'
 import EthCrypto, { Encrypted } from 'eth-crypto'
 import { parseIsolatedEntityName } from 'typescript'
 import Tweet from './components/Tweet'
+import { transformTweets } from '../../helpers/transformTweets'
 
 // const nftContractAddr = '0x1a92f7381b9f03921564a437210bb9396471050c'
 // const nftId = '878'
@@ -83,7 +84,10 @@ const NFT = ({
    // Basic data
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [ownerAddr, setOwnerAddr] = useState<string>()
-   const recipientAddr = searchParams.get('recipient') === null ? ownerAddr : searchParams.get('recipient') 
+   const recipientAddr =
+      searchParams.get('recipient') === null
+         ? ownerAddr
+         : searchParams.get('recipient')
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [imageUrl, setImageUrl] = useState<string>()
 
@@ -104,8 +108,171 @@ const NFT = ({
    const [isPostingComment, setIsPostingComment] = useState<boolean>(false)
 
    // Twitter
-   const [twitterID, setTwitterID] = useState<string>()
-   const [tweets, setTweets] = useState<TweetType[]>([])
+   const [twitterId, setTwitterId] = useState<string>('1395553778187718657')
+   const [tweets, setTweets] = useState<TweetType[]>([
+      {
+          "id": "1539806102346469376",
+          "text": "Thank you for helping us make #CooltopiaNYC such a massive success! \n\nWe hope to see you all tomorrow for the last day and the VIP Purrty! https://t.co/uLu7aDHQNU",
+          "attachments": {
+              "media_keys": [
+                  "3_1539794171522859009"
+              ]
+          },
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5ypAzWQAETVpV.jpg"
+          ]
+      },
+      {
+          "id": "1539806092468813829",
+          "text": "Merch supplies are becoming very limited, and some are exclusives for NYC. \nArrive early to grab the best of what's left!\n\nAn online restock of non-NYC exclusives will happen through our online store in the future. https://t.co/QLZtycyEIt",
+          "attachments": {
+              "media_keys": [
+                  "3_1539793433828679682"
+              ]
+          },
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5x-ErWYAITzAy.jpg"
+          ]
+      },
+      {
+          "id": "1539806088958287873",
+          "text": "Cooltopia CLOSES at 5pm, however, due to high demand doors will close 1-2 hours before. \n\nPlease plan accordingly. https://t.co/MB7N2RnTYK",
+          "attachments": {
+              "media_keys": [
+                  "3_1539792591692206080"
+              ]
+          },
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5xNDeXkAAsdUD.jpg"
+          ]
+      },
+      {
+          "id": "1539806087662256130",
+          "text": "🚨IMPORTANT INFO FOR #CooltopiaNYC\n\nRecommendation for our community planning to attend Day 3, a thread 🧵",
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          }
+      },
+      {
+          "id": "1539778580577673216",
+          "text": "As we wrapped up Day 2 of #CooltopiaNYC, we want to take a moment to thank our partners @OnRallyRd, @Shopify, and @toikido1  for helping us pull together an amazing experience for our Cool Cats family!\n\nSee you all day 3 tomorrow!! #WLTC https://t.co/epsPw0Wjmr",
+          "attachments": {
+              "media_keys": [
+                  "3_1539774687999303682",
+                  "3_1539776704322887680",
+                  "3_1539777261062262789",
+                  "3_1539777654550839298"
+              ]
+          },
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5g67BWIAI7NMh.jpg",
+              "https://pbs.twimg.com/media/FV5iwSaWYAAI_zP.jpg",
+              "https://pbs.twimg.com/media/FV5jQsbXEAUMVYV.jpg",
+              "https://pbs.twimg.com/media/FV5jnmSWQAIFr2I.jpg"
+          ]
+      },
+      {
+          "id": "1539756500083773441",
+          "text": "We heard there are some Apes around the Pier who might be bored. We're sure they won't mind if we join the party over at Front St &amp; John St!\n\nAfter that, we can spend some TIME at 8th Ave &amp; 48th St. \n\nWhat do you think? 😸\nLast night's pics: https://t.co/FoOgZlTWkA",
+          "attachments": {
+              "media_keys": [
+                  "3_1539756166590464000",
+                  "3_1539755833348743168",
+                  "3_1539756038806806529",
+                  "3_1539756137913917446"
+              ]
+          },
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5QE1ZXgAAmVF7.jpg",
+              "https://pbs.twimg.com/media/FV5Pxb-WYAABdY9.jpg",
+              "https://pbs.twimg.com/media/FV5P9ZXXoAECC2d.jpg",
+              "https://pbs.twimg.com/media/FV5QDKkWIAY2uew.jpg"
+          ]
+      },
+      {
+          "id": "1539745606809403395",
+          "text": "@ThGoodKnight Incredible video!!! We Like the Good Knight!!! 😸💙",
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          }
+      },
+      {
+          "id": "1539745446070992899",
+          "text": "RT @ThGoodKnight: I spent the day in Cooltopia.\n\nHere’s a video I put together of the amazing spectacle that the @coolcatsnft team have con…",
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          }
+      },
+      {
+          "id": "1539726110107254784",
+          "text": "💙Blue never looked so good! 💙\n\nOur friends from @Shopify helped us make NYC even COOLER. \n\nDon't miss out on becoming cool and get some merch from our gm @shop:\nLink: https://t.co/R1QlTWlv5d \n\nand no worries, a restock and website version are being worked on! 😸 https://t.co/xql9BzjqQu",
+          "attachments": {
+              "media_keys": [
+                  "3_1539724656617431042",
+                  "3_1539724662934052864"
+              ]
+          },
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV4zatmXoAI68hB.jpg",
+              "https://pbs.twimg.com/media/FV4zbFIXoAAphG5.jpg"
+          ]
+      },
+      {
+          "id": "1539720634728579075",
+          "text": "RT @JoannaPopper: Fun at #CooltopiaNYC with the @coolcatsnft. What a fantastic activation. And amazing Fur is Lava run which is best rocked…",
+          "user": {
+              "id": "1395553778187718657",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg",
+              "username": "coolcatsnft",
+              "name": "Cool Cats"
+          }
+      }
+  ])
 
    const { metadata } = nftData || {}
    let timer: ReturnType<typeof setTimeout>
@@ -118,21 +285,26 @@ const NFT = ({
 
    useEffect(() => {
       getChatData()
-         getComments()
-         getUnreadCount()
-         if (nftContractAddr) getTwitterInfo(nftContractAddr)
+      getComments()
+      getUnreadCount()
+      if (nftContractAddr) getTwitterInfo(nftContractAddr)
+
       const interval = setInterval(() => {
          getChatData()
          getComments()
          getUnreadCount()
-         if (twitterID) {
-            getTweetsFromAPI(twitterID)
-         } else if (nftContractAddr) {
-            getTwitterInfo(nftContractAddr)
-         }
       }, 5000) // every 5s
 
-      return () => clearInterval(interval)
+      const interval2 = setInterval(() => {
+         if (nftContractAddr) {
+            getTwitterInfo(nftContractAddr)
+         }
+      }, 30000) // every 30s
+
+      return () => {
+         clearInterval(interval)
+         clearInterval(interval2)
+      }
    }, [account, ownerAddr])
 
    const getUnreadCount = () => {
@@ -183,7 +355,7 @@ const NFT = ({
          .catch((error) => console.log('error', error))
    }
 
-   const getTwitterHandle = async (slug: string): Promise<string|null> => {
+   const getTwitterHandle = async (slug: string): Promise<string | null> => {
       return fetch(`https://opensea.io/collection/${slug}`, {
          method: 'GET',
          // headers: {
@@ -192,9 +364,17 @@ const NFT = ({
       })
          .then((response) => response.text())
          .then((data) => {
-            let twitter = data.split("twitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
-            if (twitter === "null" || twitter === null) {
-               twitter = data.split("connectedTwitterUsername")[1].split(',')[0].replace(':', '').replace(/"/g, '')
+            let twitter = data
+               .split('twitterUsername')[1]
+               .split(',')[0]
+               .replace(':', '')
+               .replace(/"/g, '')
+            if (twitter === 'null' || twitter === null) {
+               twitter = data
+                  .split('connectedTwitterUsername')[1]
+                  .split(',')[0]
+                  .replace(':', '')
+                  .replace(/"/g, '')
             }
             console.log('✅[GET][Twitter Handle]:', twitter)
             return Promise.resolve(twitter)
@@ -206,72 +386,90 @@ const NFT = ({
    }
 
    //if we end up implementing this, we should move to server and return the data needed
-   const getTwitterID = async (_twitterHandle: string) : Promise<string|null> => {
-      return fetch(`https://api.twitter.com/2/users/by/username/${_twitterHandle}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e',
-         },
-      })
-      .then((response) => response.json())
-      .then((data) => {
-         let id = null
-         if (data.data) {
-            id = data.data['id']
-            setTwitterID(id)
-            console.log('✅[GET][Twitter ID]:', id)
+   const getTwitterID = async (
+      _twitterHandle: string
+   ): Promise<string | null> => {
+      return fetch(
+         `https://api.twitter.com/2/users/by/username/${_twitterHandle}`,
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization:
+                  'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e',
+            },
          }
-         return Promise.resolve(id)
-      })
-      .catch((error) => {
-         console.error('🚨[GET][Twitter ID]:', error)
-         return Promise.resolve(null)
-      })
+      )
+         .then((response) => response.json())
+         .then((data) => {
+            let id = null
+            if (data.data) {
+               id = data.data['id']
+               setTwitterId(id)
+               console.log('✅[GET][Twitter ID]:', id)
+            }
+            return Promise.resolve(id)
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Twitter ID]:', error)
+            return Promise.resolve(null)
+         })
    }
 
    const getTweetsFromAPI = (_twitterId: string) => {
-      fetch(`https://api.twitter.com/2/users/${_twitterId}/tweets`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e',
-         },
-      })
-      .then((response) => response.json())
-      .then((data) => {
-         console.log('✅[GET][Twitter Tweets]:', data)
-         if (data.data && data.data.length > 0) {
-            setTweets(data.data)
+      fetch(
+         `https://api.twitter.com/2/users/1395553778187718657/tweets?media.fields=height,width,url,preview_image_url,type&tweet.fields=attachments&user.fields=profile_image_url,username&expansions=author_id,attachments.media_keys`,
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization:
+                  'Bearer AAAAAAAAAAAAAAAAAAAAAAjRdgEAAAAAK2TFwi%2FmA5pzy1PWRkx8OJQcuko%3DH6G3XZWbJUpYZOW0FUmQvwFAPANhINMFi94UEMdaVwIiw9ne0e'
+            },
          }
-      })
-      .catch((error) => {
-         console.error('🚨[GET][Twitter Tweets]:', error)
-      })
+      )
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Twitter Tweets]:', data)
+            let transformed = transformTweets(data)
+            console.log('Transformed data:', transformed)
+            if (transformed) {
+               setTweets(transformed)
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Twitter Tweets]:', error)
+         })
    }
 
    const getTwitterInfo = async (nftContractAddr: string) => {
-
-      fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-      })
-      .then((response) => response.json())
-      .then(async (data) => {
-         let collectionSlug = data['collection']
-         let slug = collectionSlug['slug']
-         console.log('✅[GET][Slug Info]:', slug)
-         const handle = await getTwitterHandle(slug)
-         if (handle) {
-            const id = await getTwitterID(handle)
-            if (id) getTweetsFromAPI(id)
-         }
-      })
-      .catch((error) => {
-         console.error('🚨[GET][Slug Info]:', error)
-      })
+      if (!twitterId) {
+         fetch(
+            `https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`,
+            {
+               method: 'GET',
+               headers: {
+                  'Content-Type': 'application/json',
+               },
+            }
+         )
+            .then((response) => response.json())
+            .then(async (data) => {
+               let collectionSlug = data['collection']
+               let slug = collectionSlug['slug']
+               console.log('✅[GET][Slug Info]:', slug)
+               const handle = await getTwitterHandle(slug)
+               if (handle) {
+                  const id = await getTwitterID(handle)
+                  if (id) getTweetsFromAPI(id)
+               }
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Slug Info]:', error)
+            })
+      } else {
+         getTweetsFromAPI(twitterId)
+      }
    }
 
    const getOwnerAddress = () => {
@@ -521,7 +719,7 @@ const NFT = ({
          false,
          'right',
          true,
-         "",
+         '',
          null
       )
 
@@ -545,7 +743,7 @@ const NFT = ({
       // const cid = await postIpfsData(
       //    JSON.stringify({ to: encryptedTo, from: encryptedFrom })
       // )
-      
+
       //const cid = await postIpfsData(msgInputCopy)
       data.message = msgInputCopy //await cid
 
@@ -592,7 +790,7 @@ const NFT = ({
          position,
          isFetching,
          nftAddr,
-         nftId
+         nftId,
       }
       let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
       newLoadedMsgs.push(newMsg)
@@ -655,7 +853,7 @@ const NFT = ({
                position: 'left',
                isFetching: false,
                nftAddr: chatData[i].nftaddr,
-               nftId: chatData[i].nftid
+               nftId: chatData[i].nftid,
             })
          } else if (
             chatData[i] &&
@@ -672,7 +870,7 @@ const NFT = ({
                position: 'right',
                isFetching: false,
                nftAddr: chatData[i].nftaddr,
-               nftId: chatData[i].nftid
+               nftId: chatData[i].nftid,
             })
          }
       }
@@ -885,7 +1083,6 @@ const NFT = ({
                   </Flex>
                </TabPanel>
                <TabPanel p={5}>
-
                   <Flex mb={5}>
                      <FormControl style={{ flexGrow: 1 }}>
                         <TextareaAutosize
@@ -899,8 +1096,7 @@ const NFT = ({
                               padding: '.5rem 1rem',
                               width: '100%',
                               fontSize: 'var(--chakra-fontSizes-md)',
-                              background:
-                                 'var(--chakra-colors-lightgray-400)',
+                              background: 'var(--chakra-colors-lightgray-400)',
                               borderRadius: '0.3rem',
                               marginBottom: '-6px',
                            }}
@@ -927,64 +1123,18 @@ const NFT = ({
                   ))}
                </TabPanel>
                <TabPanel p={5}>
-               {tweets && tweets.map((tweet: TweetType, i) => (
-                     <>
-                        <Tweet data={tweet} key={i} />
-                        {i + 1 !== tweets.length && <Divider mb={4} />}
-                     </>
-                  ))}
+                  {tweets &&
+                     tweets.map((tweet: TweetType, i) => (
+                        <>
+                           <Tweet data={tweet} key={i} />
+                           {i + 1 !== tweets.length && <Divider mb={4} />}
+                        </>
+                     ))}
                </TabPanel>
             </TabPanels>
          </Tabs>
       </Flex>
    )
 }
-
-// const dummyComments: CommentType[] = [
-//    {
-//       fromAddr: '0x8999531b12D3577c50D9bEb8E2C1857C7cA62808',
-//       nftAddr: nftContractAddr,
-//       nftId: parseInt(nftId),
-//       timestamp: new Date().toISOString(),
-//       message:
-//          'Sed lacus mi, rutrum sed sem sagittis, imperdiet pellentesque purus. Pellentesque mi libero, varius non fermentum sed, bibendum sed metus. Quisque id turpis ut dui posuere luctus.',
-//    },
-//    {
-//       fromAddr: '0x19871B6F5f64657d6Bf35C88b628F3d1778db81d',
-//       nftAddr: nftContractAddr,
-//       nftId: parseInt(nftId),
-//       timestamp: new Date().toISOString(),
-//       message: 'Proin ac diam ac elit molestie vehicula vitae nec felis.',
-//    },
-//    {
-//       fromAddr: '0x91D7A110E0cE462d428F3ac700b4371990735517',
-//       nftAddr: nftContractAddr,
-//       nftId: parseInt(nftId),
-//       timestamp: new Date(
-//          new Date().setDate(new Date().getDate() - 1)
-//       ).toISOString(),
-//       message:
-//          'Donec tristique, magna sed sodales eleifend, lectus ligula tempor enim, non porttitor ipsum nibh id odio. Sed lorem nisl, venenatis sed lorem et, euismod porttitor orci. ',
-//    },
-//    {
-//       fromAddr: '0xbf9ceF53327Be908CBcFe1D8d217852d44b027de',
-//       nftAddr: nftContractAddr,
-//       nftId: parseInt(nftId),
-//       timestamp: new Date(
-//          new Date().setDate(new Date().getDate() - 1)
-//       ).toISOString(),
-//       message: 'Vivamus vel lectus a neque blandit viverra.',
-//    },
-//    {
-//       fromAddr: '0x785F375F2B819d875Ce07009a15779E9c3679C1D',
-//       nftAddr: nftContractAddr,
-//       nftId: parseInt(nftId),
-//       timestamp: new Date(
-//          new Date().setDate(new Date().getDate() - 2)
-//       ).toISOString(),
-//       message:
-//          'Quisque vitae neque nunc. In hac habitasse platea dictumst. Phasellus gravida fringilla nisl at malesuada. Pellentesque vitae ipsum at elit ultrices facilisis.',
-//    },
-// ]
 
 export default NFT
