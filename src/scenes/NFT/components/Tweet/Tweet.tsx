@@ -19,25 +19,49 @@ const Tweet = ({ data }: { data: TweetType }) => {
             )}
             {data.user && (
                <Box ml={3}>
-                  <Flex alignItems="center">
-                     <Text fontWeight="bold" fontSize="lg">
-                        {data.user.name}
-                     </Text>
-                     {data.user.username && (
+                  <Flex alignItems="center" flexFlow="row wrap">
+                     <Text fontWeight="bold" fontSize="lg" color="darkgray.800">
                         <Link
                            href={`https://twitter.com/${data.user.username}`}
+                           target="_blank"
+                           color="darkgray.800"
                         >
-                           <Text fontSize="md" color="darkgray.200" ml={2}>
-                              @{data.user.username}
-                           </Text>
+                           {data.user.name}
                         </Link>
+                     </Text>
+                     {data.user.username && (
+                        <>
+                           <Text
+                              fontSize="md"
+                              ml={1}
+                              mr={1}
+                              color="darkgray.200"
+                           >
+                              ·
+                           </Text>
+                           <Link
+                              href={`https://twitter.com/${data.user.username}`}
+                              target="_blank"
+                           >
+                              <Text fontSize="md" color="darkgray.200">
+                                 @{data.user.username}
+                              </Text>
+                           </Link>
+                        </>
                      )}
                      {formattedDate && (
                         <>
-                           <Text fontSize="md" ml={1} mr={1} color="darkgray.200">
+                           <Text
+                              fontSize="md"
+                              ml={1}
+                              mr={1}
+                              color="darkgray.200"
+                           >
                               ·
                            </Text>
-                           <Text fontSize="md" color="darkgray.200">{formattedDate}</Text>
+                           <Text fontSize="md" color="darkgray.200">
+                              {formattedDate}
+                           </Text>
                         </>
                      )}
                   </Flex>

@@ -109,7 +109,190 @@ const NFT = ({
 
    // Twitter
    const [twitterId, setTwitterId] = useState<string>()
-   const [tweets, setTweets] = useState<TweetType[]>()
+   const [tweets, setTweets] = useState<TweetType[]>([
+      {
+          "attachments": {
+              "media_keys": [
+                  "3_1539794171522859009"
+              ]
+          },
+          "created_at": "2022-06-23T03:02:37.000Z",
+          "id": "1539806102346469376",
+          "author_id": "1395553778187718657",
+          "text": "Thank you for helping us make #CooltopiaNYC such a massive success! \n\nWe hope to see you all tomorrow for the last day and the VIP Purrty! https://t.co/uLu7aDHQNU",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5ypAzWQAETVpV.jpg"
+          ]
+      },
+      {
+          "attachments": {
+              "media_keys": [
+                  "3_1539793433828679682"
+              ]
+          },
+          "created_at": "2022-06-23T03:02:35.000Z",
+          "id": "1539806092468813829",
+          "author_id": "1395553778187718657",
+          "text": "Merch supplies are becoming very limited, and some are exclusives for NYC. \nArrive early to grab the best of what's left!\n\nAn online restock of non-NYC exclusives will happen through our online store in the future. https://t.co/QLZtycyEIt",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5x-ErWYAITzAy.jpg"
+          ]
+      },
+      {
+          "attachments": {
+              "media_keys": [
+                  "3_1539792591692206080"
+              ]
+          },
+          "created_at": "2022-06-23T03:02:34.000Z",
+          "id": "1539806088958287873",
+          "author_id": "1395553778187718657",
+          "text": "Cooltopia CLOSES at 5pm, however, due to high demand doors will close 1-2 hours before. \n\nPlease plan accordingly. https://t.co/MB7N2RnTYK",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5xNDeXkAAsdUD.jpg"
+          ]
+      },
+      {
+          "created_at": "2022-06-23T03:02:34.000Z",
+          "id": "1539806087662256130",
+          "author_id": "1395553778187718657",
+          "text": "🚨IMPORTANT INFO FOR #CooltopiaNYC\n\nRecommendation for our community planning to attend Day 3, a thread 🧵",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          }
+      },
+      {
+          "attachments": {
+              "media_keys": [
+                  "3_1539774687999303682",
+                  "3_1539776704322887680",
+                  "3_1539777261062262789",
+                  "3_1539777654550839298"
+              ]
+          },
+          "created_at": "2022-06-23T01:13:15.000Z",
+          "id": "1539778580577673216",
+          "author_id": "1395553778187718657",
+          "text": "As we wrapped up Day 2 of #CooltopiaNYC, we want to take a moment to thank our partners @OnRallyRd, @Shopify, and @toikido1  for helping us pull together an amazing experience for our Cool Cats family!\n\nSee you all day 3 tomorrow!! #WLTC https://t.co/epsPw0Wjmr",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5g67BWIAI7NMh.jpg",
+              "https://pbs.twimg.com/media/FV5iwSaWYAAI_zP.jpg",
+              "https://pbs.twimg.com/media/FV5jQsbXEAUMVYV.jpg",
+              "https://pbs.twimg.com/media/FV5jnmSWQAIFr2I.jpg"
+          ]
+      },
+      {
+          "attachments": {
+              "media_keys": [
+                  "3_1539756166590464000",
+                  "3_1539755833348743168",
+                  "3_1539756038806806529",
+                  "3_1539756137913917446"
+              ]
+          },
+          "created_at": "2022-06-22T23:45:31.000Z",
+          "id": "1539756500083773441",
+          "author_id": "1395553778187718657",
+          "text": "We heard there are some Apes around the Pier who might be bored. We're sure they won't mind if we join the party over at Front St &amp; John St!\n\nAfter that, we can spend some TIME at 8th Ave &amp; 48th St. \n\nWhat do you think? 😸\nLast night's pics: https://t.co/FoOgZlTWkA",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV5QE1ZXgAAmVF7.jpg",
+              "https://pbs.twimg.com/media/FV5Pxb-WYAABdY9.jpg",
+              "https://pbs.twimg.com/media/FV5P9ZXXoAECC2d.jpg",
+              "https://pbs.twimg.com/media/FV5QDKkWIAY2uew.jpg"
+          ]
+      },
+      {
+          "created_at": "2022-06-22T23:02:14.000Z",
+          "id": "1539745606809403395",
+          "author_id": "1395553778187718657",
+          "text": "@ThGoodKnight Incredible video!!! We Like the Good Knight!!! 😸💙",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          }
+      },
+      {
+          "created_at": "2022-06-22T23:01:36.000Z",
+          "id": "1539745446070992899",
+          "author_id": "1395553778187718657",
+          "text": "RT @ThGoodKnight: I spent the day in Cooltopia.\n\nHere’s a video I put together of the amazing spectacle that the @coolcatsnft team have con…",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          }
+      },
+      {
+          "attachments": {
+              "media_keys": [
+                  "3_1539724656617431042",
+                  "3_1539724662934052864"
+              ]
+          },
+          "created_at": "2022-06-22T21:44:46.000Z",
+          "id": "1539726110107254784",
+          "author_id": "1395553778187718657",
+          "text": "💙Blue never looked so good! 💙\n\nOur friends from @Shopify helped us make NYC even COOLER. \n\nDon't miss out on becoming cool and get some merch from our gm @shop:\nLink: https://t.co/R1QlTWlv5d \n\nand no worries, a restock and website version are being worked on! 😸 https://t.co/xql9BzjqQu",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          },
+          "media": [
+              "https://pbs.twimg.com/media/FV4zatmXoAI68hB.jpg",
+              "https://pbs.twimg.com/media/FV4zbFIXoAAphG5.jpg"
+          ]
+      },
+      {
+          "created_at": "2022-06-22T21:23:00.000Z",
+          "id": "1539720634728579075",
+          "author_id": "1395553778187718657",
+          "text": "RT @JoannaPopper: Fun at #CooltopiaNYC with the @coolcatsnft. What a fantastic activation. And amazing Fur is Lava run which is best rocked…",
+          "user": {
+              "id": "1395553778187718657",
+              "name": "Cool Cats",
+              "username": "coolcatsnft",
+              "profile_image_url": "https://pbs.twimg.com/profile_images/1537840605035995138/tJViLeoq_normal.jpg"
+          }
+      }
+  ])
 
    const { metadata } = nftData || {}
    let timer: ReturnType<typeof setTimeout>
