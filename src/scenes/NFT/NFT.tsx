@@ -462,7 +462,7 @@ const NFT = ({
          })
    }
 
-   const getTwitterInfo = async (nftContractAddr: string) => {
+   const getTwitterInfoClientSide = async (nftContractAddr: string) => {
       if (!twitterId) {
          fetch(
             `https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`,
@@ -507,6 +507,33 @@ const NFT = ({
             setOwnerAddr(result.owners[0])
          })
          .catch((error) => console.log('error', error))
+   }
+
+   const getTwitterInfo = async (nftContractAddr: string) => {
+      setIsFetchingComments(true)
+      fetch(
+         ` ${process.env.REACT_APP_REST_API}/get_twitter/${nftContractAddr}`,
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         }
+      )
+         .then((response) => response.json())
+         .then((data) => {
+            let jsonData = JSON.parse(data)
+            console.log('✅[GET][Twitter Tweets]:', jsonData)
+            let transformed = transformTweets(jsonData)
+            console.log('Transformed data:', transformed)
+            if (transformed) {
+               setTweets(transformed)
+            }
+         })
+         .catch((error) => {
+            console.error('🚨🚨[GET][NFT][Twitter Info]:', error)
+         })
+         .finally(() => setIsFetchingComments(false))
    }
 
    const getComments = () => {
