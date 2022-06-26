@@ -19,6 +19,8 @@ import { getContractAddressAndNFTId } from '../helpers/contract'
 import NFTMetadataType from '../types/NFTMetadata'
 import NFTUnreadType from '../types/NFTUnread'
 import SidebarNFTLink from './SidebarNFTLink'
+import animatedPlaceholder from '../images/animated-placeholder.gif'
+
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -241,6 +243,7 @@ const Sidebar = ({
                   {imageUrl && (
                      <Image
                         src={imageUrl}
+                        fallbackSrc={animatedPlaceholder}
                         alt=""
                         height="40px"
                         borderRadius="var(--chakra-radii-xl)"
