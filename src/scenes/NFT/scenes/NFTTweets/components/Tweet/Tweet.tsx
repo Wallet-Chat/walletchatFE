@@ -1,6 +1,6 @@
 import { Avatar, Box, Flex, Image, Link, Text } from '@chakra-ui/react'
-import { timeSince } from '../../../../helpers/date'
-import TweetType from '../../../../types/Tweet'
+import { timeSince } from '../../../../../../helpers/date'
+import TweetType from '../../../../../../types/Tweet'
 
 const Tweet = ({ data }: { data: TweetType }) => {
    const date = data.created_at

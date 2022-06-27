@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 import Blockies from 'react-blockies'
 import styled from 'styled-components'
 
-import CommentType from '../../../../types/Comment'
-import { truncateAddress } from '../../../../helpers/truncateString'
-import { timeSince } from '../../../../helpers/date'
+import CommentType from '../../../../../../types/Comment'
+import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { timeSince } from '../../../../../../helpers/date'
 
 const BlockieWrapper = styled.div`
    border-radius: var(--chakra-radii-md);
