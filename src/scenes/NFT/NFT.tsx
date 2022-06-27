@@ -889,15 +889,6 @@ const NFT = ({
                         </Flex>
                      )}
                      <DottedBackground className="custom-scrollbar">
-                        {isFetchingMessages && loadedMsgs.length === 0 && (
-                           <Flex
-                              justifyContent="center"
-                              alignItems="center"
-                              height="100%"
-                           >
-                              <Spinner />
-                           </Flex>
-                        )}
                         {loadedMsgs.map((msg: MessageUIType, i) => {
                            if (msg && msg.message) {
                               return (
