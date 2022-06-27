@@ -32,9 +32,8 @@ const NFTTweets = ({
       )
          .then((response) => response.json())
          .then((data) => {
-            let jsonData = JSON.parse(data)
-            console.log('✅[GET][Twitter Tweets]:', jsonData)
-            let transformed = transformTweets(jsonData)
+            console.log('✅[GET][Twitter Tweets]:', data)
+            let transformed = transformTweets(data)
             console.log('Transformed data:', transformed)
             if (transformed) {
                setTweets(transformed)
