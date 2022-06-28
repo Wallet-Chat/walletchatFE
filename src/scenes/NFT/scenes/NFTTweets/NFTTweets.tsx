@@ -33,11 +33,12 @@ const NFTTweets = ({
          .then((response) => response.json())
          .then((data) => {
             console.log('✅[GET][Twitter Tweets]:', data)
-            let transformed = transformTweets(data)
-            console.log('Transformed data:', transformed)
-            if (transformed) {
-               setTweets(transformed)
-            }
+            setTweets(data)
+            // let transformed = transformTweets(data)
+            // console.log('Transformed data:', transformed)
+            // if (transformed) {
+            //    setTweets(transformed)
+            // }
          })
          .catch((error) => {
             console.error('🚨🚨[GET][NFT][Twitter Info]:', error)
