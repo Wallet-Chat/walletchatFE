@@ -3,24 +3,15 @@ import {
    Button,
    Flex,
    FormControl,
-   Link as CLink,
-   Spinner,
-   Text,
 } from '@chakra-ui/react'
-import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
+import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import styled from 'styled-components'
-import Blockies from 'react-blockies'
 
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import Message from './components/Message'
-import { truncateAddress } from '../../../../helpers/truncateString'
 
-const BlockieWrapper = styled.div`
-   border-radius: 0.3rem;
-   overflow: hidden;
-`
 const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
@@ -49,13 +40,10 @@ const NFTGroupChat = ({
    ownerAddr: string | undefined
    nftContractAddr: string
 }) => {
-   const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [msgInput, setMsgInput] = useState<string>('')
    const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-
-   let timer: ReturnType<typeof setTimeout>
 
    useEffect(() => {
       getChatData()
@@ -169,7 +157,7 @@ const NFTGroupChat = ({
 
       data.message = msgInputCopy
 
-      fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem `, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -213,32 +201,13 @@ const NFTGroupChat = ({
       setLoadedMsgs(newLoadedMsgs)
    }
 
-   const copyToClipboard = () => {
-      if (nftContractAddr) {
-         console.log('Copy to clipboard', nftContractAddr)
-         let textField = document.createElement('textarea')
-         textField.innerText = nftContractAddr
-         document.body.appendChild(textField)
-         textField.select()
-         document.execCommand('copy')
-         textField.focus()
-         textField.remove()
-         setCopiedAddr(true)
-
-         window.clearTimeout(timer)
-         timer = setTimeout(() => {
-            setCopiedAddr(false)
-         }, 3000)
-      }
-   }
-
    return (
     <Flex flexDirection="column" height="100%">
 
          <DottedBackground className="custom-scrollbar">
-            {isFetchingMessages && loadedMsgs.length === 0 && (
-               <Flex justifyContent="center" alignItems="center" height="100%">
-                  <Spinner />
+            {loadedMsgs.length === 0 && (
+               <Flex justifyContent="center" alignItems="center" borderRadius="lg" background="white" p={4}>
+                  <Box fontSize="md">Be the first to post something here 😉</Box>
                </Flex>
             )}
             {loadedMsgs.map((msg: MessageUIType, i) => {
