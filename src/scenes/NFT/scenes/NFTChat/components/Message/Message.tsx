@@ -103,6 +103,7 @@ const Message = ({
 
    useEffect(() => {
       if (
+         msg.toAddr &&
          inView &&
          msg.read === false &&
          msg.toAddr.toLocaleLowerCase() === account.toLocaleLowerCase()

@@ -12,7 +12,13 @@ import {
    Tabs,
    Text,
 } from '@chakra-ui/react'
-import { IconExternalLink, IconLockAccess, IconMessage, IconMessages, IconShieldLock } from '@tabler/icons'
+import {
+   IconExternalLink,
+   IconLockAccess,
+   IconMessage,
+   IconMessages,
+   IconShieldLock,
+} from '@tabler/icons'
 import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 
@@ -23,7 +29,6 @@ import NFTTweets from './scenes/NFTTweets'
 import { truncateAddress } from '../../helpers/truncateString'
 import NFTMetadataType from '../../types/NFTMetadata'
 import NFTOwnerAddressType from '../../types/NFTOwnerAddressType'
-
 
 const tokenType = 'erc721'
 
@@ -228,7 +233,7 @@ const NFT = ({
          >
             <TabList padding="0 var(--chakra-space-5)">
                <Tab>
-                  Group Chat {' '}
+                  Group Chat{' '}
                   {unreadCount && unreadCount !== 0 ? (
                      <Badge variant="black" ml={1}>
                         {unreadCount} xx
@@ -275,7 +280,11 @@ const NFT = ({
                height="100%"
             >
                <TabPanel px="0" height="100%" padding="0">
-                  <NFTGroupChat />
+                  <NFTGroupChat
+                     ownerAddr={ownerAddr}
+                     account={account}
+                     nftContractAddr={nftContractAddr}
+                  />
                </TabPanel>
                <TabPanel px="0" height="100%" padding="0">
                   <NFTChat

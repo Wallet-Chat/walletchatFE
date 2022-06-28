@@ -1,12 +1,9 @@
 import { Box, Spinner } from '@chakra-ui/react'
 import { IconCheck, IconChecks } from '@tabler/icons'
-import { useEffect } from 'react'
 import styled from 'styled-components'
-import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../../../helpers/date'
 import { MessageUIType } from '../../../../../../types/Message'
-import { useUnreadCount } from '../../../../../../context/UnreadCountProvider'
 
 const MessageBox = styled.div`
    position: relative;
@@ -85,64 +82,9 @@ const MessageBox = styled.div`
    }
 `
 
-const Message = ({
-   account,
-   msg,
-   updateRead,
-}: {
-   account: string
-   msg: MessageUIType
-   updateRead: (data: MessageUIType) => void
-}) => {
-
-   let { unreadCount, setUnreadCount } = useUnreadCount()
-
-   const { ref, inView } = useInView({
-      triggerOnce: true,
-   })
-
-   useEffect(() => {
-      if (
-         inView &&
-         msg.read === false &&
-         msg.toAddr.toLocaleLowerCase() === account.toLocaleLowerCase()
-      ) {
-         setMessageAsRead()
-      }
-   }, [inView])
-
-   const setMessageAsRead = () => {
-      if (msg.toAddr && msg.fromAddr && msg.timestamp) {
-         fetch(
-            ` ${process.env.REACT_APP_REST_API}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
-            {
-               method: 'PUT',
-               headers: {
-                  'Content-Type': 'application/json',
-               },
-               body: JSON.stringify({
-                  ...msg,
-                  read: true,
-               }),
-            }
-         )
-            .then((response) => response.json())
-            .then((data) => {
-               console.log('✅ PUT Message:', data)
-               setUnreadCount(unreadCount - 1)
-               updateRead(data)
-            })
-            .catch((error) => {
-               console.error('🚨🚨REST API Error [PUT]:', error)
-            })
-      }
-   }
-
+const Message = ({ msg }: { msg: MessageUIType }) => {
    return (
-      <MessageBox
-         className={`msg ${msg.position} ${msg.read && 'read'}`}
-         ref={ref}
-      >
+      <MessageBox className={`msg ${msg.position} ${msg.read && 'read'}`}>
          <Box
             className="msg-img"
             style={{ backgroundImage: `url(${msg.img})` }}
@@ -154,15 +96,15 @@ const Message = ({
             </span>
 
             {msg.position === 'right' && (
-            <span className="read-status">
-               {msg.isFetching ? (
-                  <Spinner size="xs" />
-               ) : msg.read ? (
-                  <IconChecks size={15} />
-               ) : (
-                  <IconCheck size={15} />
-               )}
-            </span>
+               <span className="read-status">
+                  {msg.isFetching ? (
+                     <Spinner size="xs" />
+                  ) : msg.read ? (
+                     <IconChecks size={15} />
+                  ) : (
+                     <IconCheck size={15} />
+                  )}
+               </span>
             )}
          </Box>
       </MessageBox>

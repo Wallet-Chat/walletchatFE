@@ -31,16 +31,16 @@ export interface GroupMessageType extends MessageSkeletonType {
 export interface MessageUIType {
    message: string
    fromAddr: string
-   toAddr: string
+   toAddr?: string
    timestamp: Date,
-   read: boolean
+   read?: boolean
    id?: number,
    img?: string,
    position: string,
    isFetching: boolean
    unread?: number,
    nftAddr: string | null,
-   nftId: number | null
+   nftId?: number | null
 }
 
 export interface SettingsType {

@@ -61,6 +61,27 @@ const LinkElem = styled(NavLink)`
          stroke: var(--chakra-colors-darkgray-900);
       }
    }
+
+   &:hover {
+      .popup-text {
+         transform: translateY(20%);
+         opacity: 1;
+      }
+   }
+
+   .popup-text {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background: var(--chakra-colors-darkgray-900);
+      color: white;
+      transform: translateY(50%);
+      border-radius: 0.5rem;
+      width: 100%;
+      opacity: 0;
+      transition: transform .3s ease-in-out, opacity .3s ease-in-out;
+      font-size: var(--chakra-fontSizes-md);
+   }
 `
 
 const LinkElem2 = styled(LinkElem)`
@@ -224,6 +245,7 @@ const Sidebar = ({
             <Divider />
             <Box mb={5}></Box>
             <LinkElem to={'/chat'}>
+               <Box className="popup-text">Chat</Box>
                <IconMessageCircle2 size="30" stroke={1.5} />
                {unreadCount > 0 && (
                   <Badge
@@ -239,6 +261,7 @@ const Sidebar = ({
             </LinkElem>
             {metadata && (
                <LinkElem2 to={`/nft/${nftContractAddr}/${nftId}`}>
+                  <Box className="popup-text">NFT</Box>
                   {/* <Image src={coolcat2356} alt="" width="40px" /> */}
                   {imageUrl && (
                      <Image
