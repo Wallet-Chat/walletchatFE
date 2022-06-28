@@ -15,10 +15,8 @@ import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
 // import { parseIsolatedEntityName } from 'typescript'
 
 import Message from './components/Message'
-import MessageUIType from '../../../../types/MessageUI'
-import MessageType from '../../../../types/Message'
+import { MessageType, MessageUIType, SettingsType } from '../../../../types/Message'
 // import EncryptedMsgBlock from '../../../../types/Message'
-import SettingsType from '../../../../types/Message'
 import { truncateAddress } from '../../../../helpers/truncateString'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
@@ -141,10 +139,11 @@ const NFTChat = ({
             setChatData(data)
 
             // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-            setIsFetchingMessages(false)
          })
          .catch((error) => {
             console.error('🚨[GET][NFT][Messages]:', error)
+         })
+         .finally(() => {
             setIsFetchingMessages(false)
          })
    }

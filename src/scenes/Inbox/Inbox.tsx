@@ -11,13 +11,15 @@ import {
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Web3 from 'web3'
+// import EthCrypto, { Encrypted } from 'eth-crypto'
+
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
-import { getIpfsData } from '../../services/ipfs'
-import MessageType from '../../types/Message'
-import MessageUIType from '../../types/MessageUI'
+// import { getIpfsData } from '../../services/ipfs'
+import { MessageType, MessageUIType } from '../../types/Message'
+// import { EncryptedMsgBlock } from '../../types/Message'
 import ConversationItem from './components/ConversationItem'
-import EncryptedMsgBlock from '../../types/Message'
-import EthCrypto, { Encrypted } from 'eth-crypto'
+
+
 
 const Divider = styled.div`
    display: block;

@@ -21,16 +21,13 @@ import {
 import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
-import SettingsType from '../../types/Message'
-import EncryptedMsgBlock from '../../types/Message'
-import MessageType from '../../types/Message'
-import MessageUIType from '../../types/MessageUI'
+import { MessageType, MessageUIType } from'../../types/Message'
 import Message from './components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
-import { getIpfsData, postIpfsData } from '../../services/ipfs'
+// import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
-import EthCrypto, { Encrypted } from 'eth-crypto'
+// import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
 
 const BlockieWrapper = styled.div`
@@ -228,22 +225,23 @@ const Chat = ({
    }
 
    //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
-   const getPublicKeyFromSettings = async () => {
-      let toAddrPublicKey = ""
-      await fetch(` ${process.env.REACT_APP_REST_API}/get_settings/${toAddr}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-      })
-      .then((response) => response.json())
-      .then(async (settings: SettingsType[]) => {
-         console.log('✅ GET [Public Key]:', settings)
-         toAddrPublicKey = settings[0].publickey
-      })
+   // const getPublicKeyFromSettings = async () => {
+   //    let toAddrPublicKey = ""
+   //    await fetch(` ${process.env.REACT_APP_REST_API}/get_settings/${toAddr}`, {
+   //       method: 'GET',
+   //       headers: {
+   //          'Content-Type': 'application/json',
+   //       },
+   //    })
+   //    .then((response) => response.json())
+   //    .then(async (settings: SettingsType[]) => {
+   //       console.log('✅ GET [Public Key]:', settings)
+   //       toAddrPublicKey = settings[0].publickey
+   //    })
 
-      return await toAddrPublicKey
-   }
+   //    return await toAddrPublicKey
+   // }
+   
    //end get public key that should only need to be done once per conversation
    const sendMessage = async () => {
       if (msgInput.length <= 0) return

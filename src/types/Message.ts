@@ -9,23 +9,46 @@ import { Encrypted } from 'eth-crypto'
 //    id?: number
 // }
 
-export default interface MessageType {
+
+interface MessageSkeletonType {
    message: string
    fromaddr: string
-   toaddr: string
-   timestamp: Date,
+   timestamp: Date
    read: boolean
-   nftaddr: string
-   nftid: number
    id?: number
 }
 
-export default interface SettingsType {
+export interface MessageType extends MessageSkeletonType {
+   toaddr: string
+   nftaddr: string
+   nftid: number
+}
+
+export interface GroupMessageType extends MessageSkeletonType {
+   nftaddr: string
+}
+
+export interface MessageUIType {
+   message: string
+   fromAddr: string
+   toAddr: string
+   timestamp: Date,
+   read: boolean
+   id?: number,
+   img?: string,
+   position: string,
+   isFetching: boolean
+   unread?: number,
+   nftAddr: string | null,
+   nftId: number | null
+}
+
+export interface SettingsType {
    walletaddr: string
    publickey: string
 }
 
-export default interface EncryptedMsgBlock {
+export interface EncryptedMsgBlock {
    to: Encrypted
    from: Encrypted
 }

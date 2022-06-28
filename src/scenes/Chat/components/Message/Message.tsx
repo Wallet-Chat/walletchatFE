@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../helpers/date'
-import MessageUIType from '../../../../types/MessageUI'
+import { MessageUIType } from '../../../../types/Message'
 import NFTMetadataType from '../../../../types/NFTMetadata'
 import { useUnreadCount } from '../../../../context/UnreadCountProvider'
 import { Link } from 'react-router-dom'

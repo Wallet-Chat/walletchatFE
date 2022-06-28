@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { Link } from 'react-router-dom'
 
-import MessageUIType from '../../../../types/MessageUI'
+import { MessageUIType } from '../../../../types/Message'
 import { formatMessageDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
 
