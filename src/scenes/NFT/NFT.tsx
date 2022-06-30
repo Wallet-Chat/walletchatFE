@@ -1,7 +1,6 @@
 import {
    Badge,
    Box,
-   Button,
    Flex,
    Heading,
    Image,
@@ -12,13 +11,7 @@ import {
    Tabs,
    Text,
 } from '@chakra-ui/react'
-import {
-   IconExternalLink,
-   IconLockAccess,
-   IconMessage,
-   IconMessages,
-   IconShieldLock,
-} from '@tabler/icons'
+import { IconExternalLink, IconShieldLock } from '@tabler/icons'
 import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 
@@ -28,6 +21,7 @@ import NFTComments from './scenes/NFTComments'
 import NFTTweets from './scenes/NFTTweets'
 import { truncateAddress } from '../../helpers/truncateString'
 import NFTMetadataType from '../../types/NFTMetadata'
+import NFTStatistics from '../../types/NFTFloorPrice'
 import NFTOwnerAddressType from '../../types/NFTOwnerAddressType'
 
 const tokenType = 'erc721'
@@ -45,6 +39,8 @@ const NFT = ({
    let [searchParams] = useSearchParams()
 
    const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [nftFloorPrice, setNftFloorPrice] = useState<number>()
+   const [ethereumPrice, setEthereumPrice] = useState<number>()
    const [ownerAddr, setOwnerAddr] = useState<string>()
    const recipientAddr =
       searchParams.get('recipient') === null
@@ -61,15 +57,26 @@ const NFT = ({
    useEffect(() => {
       getNftMetadata()
       getOwnerAddress()
+      getNftFloorPrice()
+      getEthereumPrice()
+
+      const interval = setInterval(() => {
+         getNftFloorPrice()
+         getEthereumPrice()
+      }, 60000) // every 1 min
+
+      return () => {
+         clearInterval(interval)
+      }
    }, [])
 
    useEffect(() => {
-      getUnreadCount()
+      getUnreadDMCount()
       getUnreadCommentCount()
       getTweetCount()
 
       const interval = setInterval(() => {
-         getUnreadCount()
+         getUnreadDMCount()
          getUnreadCommentCount()
          getTweetCount()
       }, 5000) // every 5s
@@ -121,7 +128,7 @@ const NFT = ({
             })
       }
    }
-   const getUnreadCount = () => {
+   const getUnreadDMCount = () => {
       if (account) {
          fetch(
             ` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
@@ -144,7 +151,7 @@ const NFT = ({
    }
 
    const getNftMetadata = () => {
-      const baseURL = `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getNFTMetadata`
+      const baseURL = `https://eth-mainnet.alchemyapi.io/nft/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getNFTMetadata`
       const fetchURL = `${baseURL}?contractAddress=${nftContractAddr}&tokenId=${nftId}&tokenType=${tokenType}`
 
       fetch(fetchURL, {
@@ -164,6 +171,45 @@ const NFT = ({
                setImageUrl(url)
             } else {
                setImageUrl(url)
+            }
+         })
+         .catch((error) => console.log('error', error))
+   }
+
+   const getNftFloorPrice = () => {
+      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+         console.log('NFTPORT API KEY is missing')
+         return
+      }
+      fetch(
+         `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=ethereum`,
+         {
+            method: 'GET',
+            headers: {
+               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+            },
+         }
+      )
+         .then((response) => response.json())
+         .then((result: NFTStatistics) => {
+            console.log('✅[GET][NFT Statistics]:', result)
+            // console.log(JSON.stringify(result, null, 2))
+            if (result && result.statistics && result.statistics.floor_price) {
+               setNftFloorPrice(result.statistics.floor_price)
+            }
+         })
+         .catch((error) => console.log('error', error))
+   }
+
+   const getEthereumPrice = () => {
+      fetch(`https://api.coinstats.app/public/v1/coins/ethereum?currency=USD`, {
+         method: 'GET',
+      })
+         .then((response) => response.json())
+         .then((result) => {
+            console.log('✅[GET][Ethereum Price]:', result)
+            if (result && result.coin && result.coin.id === 'ethereum') {
+               setEthereumPrice(result.coin.price)
             }
          })
          .catch((error) => console.log('error', error))
@@ -203,7 +249,7 @@ const NFT = ({
                   <Heading size="md">{metadata.name}</Heading>
                )}
                {ownerAddr && (
-                  <Box>
+                  <Box mb="1">
                      <Text fontSize="md" color="lightgray.800">
                         Owned by {truncateAddress(ownerAddr)}{' '}
                         <Link
@@ -223,6 +269,13 @@ const NFT = ({
                      </Text>
                   </Box>
                )}
+               {nftFloorPrice && (
+                  <Text fontSize="sm" color="lightgray.800">
+                     <Badge fontSize="sm">Floor: {nftFloorPrice} Ξ</Badge>{' '}
+                     {ethereumPrice &&
+                        `(~ $${(ethereumPrice * nftFloorPrice).toFixed(2)})`}
+                  </Text>
+               )}
             </Box>
          </Flex>
          <Tabs
@@ -230,7 +283,7 @@ const NFT = ({
             flexDirection="column"
             overflowY="auto"
             flexGrow={1}
-            variant='enclosed'
+            variant="enclosed"
             isLazy
          >
             <TabList padding="0 var(--chakra-space-5)">
@@ -276,8 +329,8 @@ const NFT = ({
                   flexDirection="column"
                   overflowY="auto"
                   flexGrow={1}
-                  variant='soft-rounded'
-                  size='sm'
+                  variant="soft-rounded"
+                  size="sm"
                   isFitted
                   height="100%"
                   isLazy
@@ -285,7 +338,8 @@ const NFT = ({
                   <TabList py={3} px={5}>
                      <Tab>Group Chat</Tab>
                      <Tab>
-                        <IconShieldLock stroke={1.5} size={18} /><Text ml={1}>DM Owner</Text>{' '}
+                        <IconShieldLock stroke={1.5} size={18} />
+                        <Text ml={1}>DM Owner</Text>{' '}
                         {unreadCount && unreadCount !== 0 ? (
                            <Badge variant="black" ml={1}>
                               {unreadCount}
