@@ -18,6 +18,7 @@ import StartConversationWithAddress from '../../components/StartConversationWith
 import { MessageType, MessageUIType } from '../../types/Message'
 // import { EncryptedMsgBlock } from '../../types/Message'
 import ConversationItem from './components/ConversationItem'
+import NFTInboxItem from './components/NFTInboxItem'
 
 
 
@@ -218,6 +219,8 @@ const Inbox = ({
             </Heading>
          </Box>
          <Divider />
+
+         <NFTInboxItem nftAddr="0x1a92f7381b9f03921564a437210bb9396471050c" />
 
          {loadedMsgs.map((conversation, i) => (
             <ConversationItem
