@@ -288,7 +288,7 @@ const NFT = ({
          >
             <TabList padding="0 var(--chakra-space-5)">
                <Tab>
-                  Chitchat{' '}
+                  Social{' '}
                   {unreadCount && unreadCount !== 0 ? (
                      <Badge variant="black" ml={1}>
                         {unreadCount}
