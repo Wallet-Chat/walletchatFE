@@ -318,7 +318,7 @@ const NFT = ({
                      <></>
                   )}
                </Tab> */}
-               {/* {tweetCount && tweetCount !== 0 ? (
+               {tweetCount && tweetCount !== 0 ? (
                   <Tab>
                      Tweets{' '}
                      <Badge variant="black" ml={1}>
@@ -327,7 +327,7 @@ const NFT = ({
                   </Tab>
                ) : (
                   <></>
-               )} */}
+               )}
             </TabList>
 
             <TabPanels
@@ -361,13 +361,13 @@ const NFT = ({
                      nftId={nftId}
                   />
                </TabPanel> */}
-               {/* <TabPanel p={5}>
+               <TabPanel p={5}>
                   <NFTTweets
                      account={account}
                      ownerAddr={ownerAddr}
                      nftContractAddr={nftContractAddr}
                   />
-               </TabPanel> */}
+               </TabPanel>
             </TabPanels>
          </Tabs>
       </Flex>

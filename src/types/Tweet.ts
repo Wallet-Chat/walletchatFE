@@ -8,7 +8,9 @@ export default interface TweetType {
         name: string,
     }
     text: string,
-    media?: string[],
+    media?: {
+        media_keys: string[]
+    },
     attachments?: {
         media_keys: string[]
     },
