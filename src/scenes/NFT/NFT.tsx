@@ -288,7 +288,7 @@ const NFT = ({
          >
             <TabList padding="0 var(--chakra-space-5)">
                <Tab>
-                  Chat{' '}
+                  Chitchat{' '}
                   {unreadCount && unreadCount !== 0 ? (
                      <Badge variant="black" ml={1}>
                         {unreadCount}
@@ -298,6 +298,17 @@ const NFT = ({
                   )}
                </Tab>
                <Tab>
+                  <IconShieldLock stroke={1.5} size={18} />
+                  <Text ml={1}>DM Owner</Text>{' '}
+                  {unreadCount && unreadCount !== 0 ? (
+                     <Badge variant="black" ml={1}>
+                        {unreadCount}
+                     </Badge>
+                  ) : (
+                     <></>
+                  )}
+               </Tab>
+               {/* <Tab>
                   Comments{' '}
                   {unreadCommentsCount && unreadCommentsCount !== 0 ? (
                      <Badge variant="black" ml={1}>
@@ -306,8 +317,8 @@ const NFT = ({
                   ) : (
                      <></>
                   )}
-               </Tab>
-               {tweetCount && tweetCount !== 0 ? (
+               </Tab> */}
+               {/* {tweetCount && tweetCount !== 0 ? (
                   <Tab>
                      Tweets{' '}
                      <Badge variant="black" ml={1}>
@@ -316,7 +327,7 @@ const NFT = ({
                   </Tab>
                ) : (
                   <></>
-               )}
+               )} */}
             </TabList>
 
             <TabPanels
@@ -324,71 +335,39 @@ const NFT = ({
                className="custom-scrollbar"
                height="100%"
             >
-               <Tabs
-                  display="flex"
-                  flexDirection="column"
-                  overflowY="auto"
-                  flexGrow={1}
-                  variant="soft-rounded"
-                  size="sm"
-                  isFitted
-                  height="100%"
-                  isLazy
-               >
-                  <TabList py={3} px={5}>
-                     <Tab>Group Chat</Tab>
-                     <Tab>
-                        <IconShieldLock stroke={1.5} size={18} />
-                        <Text ml={1}>DM Owner</Text>{' '}
-                        {unreadCount && unreadCount !== 0 ? (
-                           <Badge variant="black" ml={1}>
-                              {unreadCount}
-                           </Badge>
-                        ) : (
-                           <></>
-                        )}
-                     </Tab>
-                  </TabList>
-                  <TabPanels
-                     overflowY="auto"
-                     className="custom-scrollbar"
-                     height="100%"
-                  >
-                     <TabPanel px="0" height="100%" padding="0">
-                        <NFTGroupChat
-                           ownerAddr={ownerAddr}
-                           account={account}
-                           nftContractAddr={nftContractAddr}
-                        />
-                     </TabPanel>
-                     <TabPanel px="0" height="100%" padding="0">
-                        <NFTChat
-                           recipientAddr={recipientAddr}
-                           ownerAddr={ownerAddr}
-                           account={account}
-                           nftContractAddr={nftContractAddr}
-                           nftId={nftId}
-                           publicKey={publicKey}
-                           privateKey={privateKey}
-                        />
-                     </TabPanel>
-                  </TabPanels>
-               </Tabs>
-               <TabPanel p={5}>
+               <TabPanel px="0" height="100%" padding="0">
+                  <NFTGroupChat
+                     ownerAddr={ownerAddr}
+                     account={account}
+                     nftContractAddr={nftContractAddr}
+                  />
+               </TabPanel>
+               <TabPanel px="0" height="100%" padding="0">
+                  <NFTChat
+                     recipientAddr={recipientAddr}
+                     ownerAddr={ownerAddr}
+                     account={account}
+                     nftContractAddr={nftContractAddr}
+                     nftId={nftId}
+                     publicKey={publicKey}
+                     privateKey={privateKey}
+                  />
+               </TabPanel>
+               {/* <TabPanel p={5}>
                   <NFTComments
                      account={account}
                      ownerAddr={ownerAddr}
                      nftContractAddr={nftContractAddr}
                      nftId={nftId}
                   />
-               </TabPanel>
-               <TabPanel p={5}>
+               </TabPanel> */}
+               {/* <TabPanel p={5}>
                   <NFTTweets
                      account={account}
                      ownerAddr={ownerAddr}
                      nftContractAddr={nftContractAddr}
                   />
-               </TabPanel>
+               </TabPanel> */}
             </TabPanels>
          </Tabs>
       </Flex>

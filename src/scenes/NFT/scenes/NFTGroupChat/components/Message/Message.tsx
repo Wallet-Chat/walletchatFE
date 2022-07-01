@@ -57,7 +57,8 @@ const MessageBox = styled.div`
    .timestamp {
       display: block;
       position: absolute;
-      right: var(--chakra-space-7);
+      /* right: var(--chakra-space-7); */
+      right: var(--chakra-space-2);
       bottom: var(--chakra-space-2);
       color: #aaa;
       font-size: var(--chakra-fontSizes-sm);
@@ -167,9 +168,9 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
                   {formatMessageDate(new Date(msg.timestamp))}
                </span>
 
-               {msg.position === 'right' && (
+               {msg.position === 'right' && msg.isFetching && (
                   <span className="read-status">
-                     {msg.isFetching && <Spinner size="xs" />}
+                     <Spinner size="xs" />
                   </span>
                )}
             </Box>

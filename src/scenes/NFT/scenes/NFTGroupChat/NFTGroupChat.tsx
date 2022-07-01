@@ -1,15 +1,22 @@
 import {
+   Badge,
    Box,
    Button,
+   Checkbox,
+   Divider,
    Flex,
    FormControl,
+   Stack,
+   Tag,
 } from '@chakra-ui/react'
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import styled from 'styled-components'
+import { getFormattedDate, isValidISODate } from '../../../../helpers/date'
 
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
+import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
 
 const DottedBackground = styled.div`
@@ -114,7 +121,8 @@ const NFTGroupChat = ({
             })
          }
       }
-      setLoadedMsgs(toAddToUI)
+      const items = generateItems(toAddToUI)
+      setLoadedMsgs(items)
    }, [chatData, account])
 
    const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -149,7 +157,7 @@ const NFTGroupChat = ({
       addMessageToUI(
          msgInputCopy,
          account,
-         timestamp,
+         timestamp.toString(),
          'right',
          false,
          nftContractAddr
@@ -181,7 +189,7 @@ const NFTGroupChat = ({
    const addMessageToUI = (
       message: string,
       fromaddr: string,
-      timestamp: Date,
+      timestamp: string,
       position: string,
       isFetching: boolean,
       nftaddr: string | null
@@ -202,16 +210,38 @@ const NFTGroupChat = ({
    }
 
    return (
-    <Flex flexDirection="column" height="100%">
+      <Flex flexDirection="column" height="100%">
+         <Box py={2} px={6}>
+            <Stack spacing={5} direction="row">
+               <Checkbox defaultChecked size="sm">Project</Checkbox>
+               <Checkbox defaultChecked size="sm">Users</Checkbox>
+               <Checkbox defaultChecked size="sm">Holders</Checkbox>
+            </Stack>
+         </Box>
 
          <DottedBackground className="custom-scrollbar">
             {loadedMsgs.length === 0 && (
-               <Flex justifyContent="center" alignItems="center" borderRadius="lg" background="white" p={4}>
-                  <Box fontSize="md">Be the first to post something here 😉</Box>
+               <Flex
+                  justifyContent="center"
+                  alignItems="center"
+                  borderRadius="lg"
+                  background="white"
+                  p={4}
+               >
+                  <Box fontSize="md">
+                     Be the first to post something here 😉
+                  </Box>
                </Flex>
             )}
-            {loadedMsgs.map((msg: MessageUIType, i) => {
-               if (msg && msg.message) {
+            {loadedMsgs.map((msg, i) => {
+               if (msg.type && msg.type === 'day') {
+                  return (
+                     <Box position="relative" my={6}>
+                        <Tag color="darkgray.300" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
+                        <Divider />
+                     </Box>
+                  )
+                } else if (msg.message) {
                   return (
                      <Message
                         key={`${msg.message}${msg.timestamp}`}

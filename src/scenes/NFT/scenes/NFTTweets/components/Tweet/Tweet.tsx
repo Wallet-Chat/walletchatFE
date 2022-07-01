@@ -72,7 +72,7 @@ const Tweet = ({ data }: { data: TweetType }) => {
             <Text fontSize="md">{data.text}</Text>
             )}
 
-            {data.media && (
+            {data.media && data.media.length > 0 && (
                <Box mt={3}>
                   {data.media.map((url, i) => (
                      <Image

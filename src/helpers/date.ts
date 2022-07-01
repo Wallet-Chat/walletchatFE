@@ -87,8 +87,8 @@ export const isDateTimePassed = (inputDate: string) => {
 }
 
 export const getFormattedDate = (inputDate: string) => {
-   console.log(inputDate, isValidISODate(inputDate))
-   if (!isValidISODate(inputDate)) return
+   // console.log(inputDate, isValidISODate(inputDate))
+   // if (!isValidISODate(inputDate)) return
    const monthNames = [
       'Jan',
       'Feb',

@@ -262,7 +262,7 @@ const Chat = ({
          read: false,
       }
 
-      addMessageToUI(msgInputCopy, account, toAddr, timestamp, false, 'right', true, null, null)
+      addMessageToUI(msgInputCopy, account, toAddr, timestamp.toString(), false, 'right', true, null, null)
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
       // let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
@@ -332,7 +332,7 @@ const Chat = ({
       message: string,
       fromAddr: string,
       toAddr: string,
-      timestamp: Date,
+      timestamp: string,
       read: boolean,
       position: string,
       isFetching: boolean,

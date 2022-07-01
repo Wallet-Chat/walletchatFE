@@ -13,7 +13,7 @@ import { Encrypted } from 'eth-crypto'
 interface MessageSkeletonType {
    message: string
    fromaddr: string
-   timestamp: Date
+   timestamp: string
    read: boolean
    id?: number
 }
@@ -29,18 +29,23 @@ export interface GroupMessageType extends MessageSkeletonType {
 }
 
 export interface MessageUIType {
-   message: string
-   fromAddr: string
+   message?: string
+   fromAddr?: string
    toAddr?: string
-   timestamp: Date,
+   timestamp: string,
    read?: boolean
    id?: number,
    img?: string,
-   position: string,
-   isFetching: boolean
+   position?: string,
+   isFetching?: boolean
    unread?: number,
-   nftAddr: string | null,
-   nftId?: number | null
+   nftAddr?: string | null,
+   nftId?: number | null,
+   type?: string,
+}
+
+export interface MessageUIDataType {
+   [key: string]: MessageUIType[]
 }
 
 export interface SettingsType {
