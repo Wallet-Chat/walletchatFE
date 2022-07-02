@@ -147,6 +147,32 @@ const NFT = ({
 
    }
 
+   const deleteBookmark = () => {
+
+      fetch(
+         ` ${process.env.REACT_APP_REST_API}/delete_bookmark`,
+         {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+               walletaddr: account,
+               nftaddr: nftContractAddr
+            }),
+         }
+      )
+         .then((response) => response.json())
+         .then((count: number) => {
+            console.log('✅ [POST][NFT][ Delete Bookmark]')
+            setIsBookmarked(true)
+         })
+         .catch((error) => {
+            console.error('🚨 [POST][NFT][Delete Bookmark]:', error)
+         })
+
+}
+
    const getUnreadCommentCount = () => {
       if (account) {
          fetch(
@@ -396,6 +422,9 @@ const NFT = ({
                               if (isBookmarked === null) return
                               else if (isBookmarked === false) {
                                  createBookmark()
+                              }
+                              else if (isBookmarked === true) {
+                                 deleteBookmark()
                               }}}>
                               <IconStar
                                  fill={isBookmarked === true ? `var(--chakra-colors-warning-500)` : `none`}
