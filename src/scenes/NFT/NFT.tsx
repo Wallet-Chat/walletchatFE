@@ -165,7 +165,7 @@ const NFT = ({
          .then((response) => response.json())
          .then((count: number) => {
             console.log('✅ [POST][NFT][ Delete Bookmark]')
-            setIsBookmarked(true)
+            setIsBookmarked(false)
          })
          .catch((error) => {
             console.error('🚨 [POST][NFT][Delete Bookmark]:', error)
