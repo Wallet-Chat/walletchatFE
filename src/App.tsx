@@ -132,6 +132,7 @@ export const App = () => {
             <Flex>
                {closeBtn}
                <Sidebar
+                  account={account}
                   unreadCount={unreadCount}
                   currAccountAddress={account}
                   disconnectWallet={disconnectWallet}
@@ -159,7 +160,6 @@ export const App = () => {
                         element={
                            <Inbox
                               account={account}
-                              privateKey={privateKey}
                               web3={web3}
                               isAuthenticated={isAuthenticated}
                            />

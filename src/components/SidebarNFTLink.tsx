@@ -57,7 +57,7 @@ const Sidebar = ({
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [imageUrl, setImageUrl] = useState<string>()
 
-   const { metadata } = nftData || {}
+   const { metadata } = nftData?.nft || {}
 
    useEffect(() => {
       if (nftContractAddr && nftId) {
@@ -66,26 +66,32 @@ const Sidebar = ({
    }, [nftContractAddr, nftId])
 
    const getNftMetadata = (nftContractAddr: string, nftId: number) => {
-      const baseURL = `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getNFTMetadata`
-      const fetchURL = `${baseURL}?contractAddress=${nftContractAddr}&tokenId=${nftId}&tokenType=erc721`
-
-      fetch(fetchURL, {
-         method: 'GET',
-      })
+      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+         console.log('Missing NFT Port API Key')
+         return
+      }
+      fetch(
+         `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=ethereum`,
+         {
+            method: 'GET',
+            headers: {
+               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+            },
+         }
+      )
          .then((response) => response.json())
          .then((result: NFTMetadataType) => {
-            console.log('✅[GET][NFT data]:', result)
-            // console.log(JSON.stringify(result, null, 2))
-            setNftData(result)
-            console.log('metadata:', result && result.metadata)
+            console.log('✅[GET][NFT Metadata]:', result)
 
-            let url = result.metadata && result.metadata.image
+            setNftData(result)
+
+            let url = result.nft?.cached_file_url
             if (url?.includes('ipfs://')) {
                let parts = url.split('ipfs://')
                let cid = parts[parts.length - 1]
                url = `https://ipfs.io/ipfs/${cid}`
                setImageUrl(url)
-            } else {
+            } else if (url !== null) {
                setImageUrl(url)
             }
          })

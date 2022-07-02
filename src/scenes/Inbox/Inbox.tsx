@@ -14,13 +14,12 @@ import Web3 from 'web3'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
+import BookmarkType from '../../types/Bookmark'
 // import { getIpfsData } from '../../services/ipfs'
 import { MessageType, MessageUIType } from '../../types/Message'
 // import { EncryptedMsgBlock } from '../../types/Message'
 import ConversationItem from './components/ConversationItem'
 import NFTInboxItem from './components/NFTInboxItem'
-
-
 
 const Divider = styled.div`
    display: block;
@@ -39,12 +38,10 @@ const Divider = styled.div`
 
 const Inbox = ({
    account,
-   privateKey,
    web3,
    isAuthenticated,
 }: {
    account: string
-   privateKey: string
    web3: Web3
    isAuthenticated: boolean
 }) => {
@@ -55,22 +52,25 @@ const Inbox = ({
       useState<boolean>(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [beenHereFor3Secs, setBeenHereFor3Secs] = useState(false)
+   const [bookmarks, setBookmarks] = useState<BookmarkType[]>()
 
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
-       }, 5000) // every 5s
+         getBookmarks()
+      }, 5000) // every 5s
 
-       setTimeout(() => setBeenHereFor3Secs(true), 3000)
-     
-       return () => clearInterval(interval)
+      setTimeout(() => setBeenHereFor3Secs(true), 3000)
+
+      return () => clearInterval(interval)
    }, [])
 
    useEffect(() => {
       getInboxData()
+      getBookmarks()
    }, [isAuthenticated, account])
 
-   function getInboxData() {
+   const getInboxData = () => {
       // GET request to get off-chain data for RX user
       if (!process.env.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
@@ -96,8 +96,8 @@ const Inbox = ({
             console.log('✅ GET [Inbox]:', data)
             if (data === null) setInboxData([])
             else setInboxData(data)
-         // .then(async (data: MessageType[]) => {
-         //    console.log('✅[GET][Inbox]:', data)
+            // .then(async (data: MessageType[]) => {
+            //    console.log('✅[GET][Inbox]:', data)
 
             //const replica = JSON.parse(JSON.stringify(data));
 
@@ -125,7 +125,7 @@ const Inbox = ({
             // }
 
             //setInboxData(replica)
-            
+
             // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
             setIsFetchingInboxData(false)
          })
@@ -135,10 +135,26 @@ const Inbox = ({
          })
    }
 
+   const getBookmarks = () => {
+      fetch(` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+         .then((response) => response.json())
+         .then((result) => {
+            console.log('✅ [GET][NFT][Bookmarks]', result)
+            setBookmarks(result)
+         })
+         .catch((error) => {
+            console.error('🚨 [POST][NFT][Bookmarks]:', error)
+         })
+   }
+
    useEffect(() => {
       const populateUI = async () => {
          const toAddToUI = [] as MessageUIType[]
-
          for (let i = 0; i < inboxData.length; i++) {
             if (
                inboxData[i] &&
@@ -153,7 +169,8 @@ const Inbox = ({
                   position: 'left',
                   isFetching: false,
                   nftAddr: inboxData[i].nftaddr,
-                  nftId: inboxData[i].nftid
+                  nftId: inboxData[i].nftid,
+                  type: 'user',
                })
             } else if (
                inboxData[i] &&
@@ -168,14 +185,26 @@ const Inbox = ({
                   position: 'right',
                   isFetching: false,
                   nftAddr: inboxData[i].nftaddr,
-                  nftId: inboxData[i].nftid
+                  nftId: inboxData[i].nftid,
+                  type: 'user',
+               })
+            }
+         }
+         if (bookmarks && bookmarks.length > 0) {
+            for (let j = 0; j < bookmarks.length; j++) {
+               toAddToUI.push({
+                  type: 'contract',
+                  message: bookmarks[j].lastmsg,
+                  nftAddr: bookmarks[j].nftaddr,
+                  timestamp: bookmarks[j].lasttimestamp,
+                  unread: bookmarks[j].Unreadcnt,
                })
             }
          }
          setLoadedMsgs(toAddToUI)
       }
       populateUI()
-   }, [inboxData, account])
+   }, [inboxData, bookmarks, account])
 
    if (isFetchingInboxData && inboxData.length === 0 && !beenHereFor3Secs) {
       return (
@@ -220,18 +249,25 @@ const Inbox = ({
          </Box>
          <Divider />
 
-         <NFTInboxItem nftAddr="0x1a92f7381b9f03921564a437210bb9396471050c" />
-
-         {loadedMsgs.map((conversation, i) => (
-            <ConversationItem
-               key={conversation.timestamp.toString()}
-               data={conversation}
-               account={account}
-            />
-         ))}
+         {loadedMsgs.map((conversation, i) =>
+            conversation.type === 'user' ? (
+               <ConversationItem
+                  key={conversation.timestamp.toString()}
+                  data={conversation}
+                  account={account}
+               />
+            ) : (
+               <NFTInboxItem
+                  key={conversation.timestamp.toString()}
+                  data={conversation}
+               />
+            )
+         )}
          {loadedMsgs.length === 0 && (
             <Box p={5}>
-               <Text mb={4} fontSize="md">You have no messages.</Text>
+               <Text mb={4} fontSize="md">
+                  You have no messages.
+               </Text>
                <StartConversationWithAddress web3={web3} />
             </Box>
          )}

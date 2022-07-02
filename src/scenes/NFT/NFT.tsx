@@ -1,27 +1,39 @@
 import {
    Badge,
    Box,
+   Button,
+   Divider,
    Flex,
    Heading,
+   HStack,
    Image,
+   Stat,
+   StatHelpText,
+   StatNumber,
    Tab,
    TabList,
    TabPanel,
    TabPanels,
    Tabs,
    Text,
+   Tooltip,
 } from '@chakra-ui/react'
-import { IconExternalLink, IconShieldLock } from '@tabler/icons'
+import {
+   IconCurrencyEthereum,
+   IconExternalLink,
+   IconShieldLock,
+   IconStar,
+} from '@tabler/icons'
 import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 
 import NFTGroupChat from './scenes/NFTGroupChat'
 import NFTChat from './scenes/NFTChat'
-import NFTComments from './scenes/NFTComments'
+// import NFTComments from './scenes/NFTComments'
 import NFTTweets from './scenes/NFTTweets'
 import { truncateAddress } from '../../helpers/truncateString'
 import NFTMetadataType from '../../types/NFTMetadata'
-import NFTStatistics from '../../types/NFTFloorPrice'
+import NFTStatisticsType from '../../types/NFTStatistics'
 import NFTOwnerAddressType from '../../types/NFTOwnerAddressType'
 
 const tokenType = 'erc721'
@@ -39,8 +51,9 @@ const NFT = ({
    let [searchParams] = useSearchParams()
 
    const [nftData, setNftData] = useState<NFTMetadataType>()
-   const [nftFloorPrice, setNftFloorPrice] = useState<number>()
+   const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
    const [ethereumPrice, setEthereumPrice] = useState<number>()
+   const [isBookmarked, setIsBookmarked] = useState<boolean|null>(null)
    const [ownerAddr, setOwnerAddr] = useState<string>()
    const recipientAddr =
       searchParams.get('recipient') === null
@@ -52,16 +65,17 @@ const NFT = ({
    const [unreadCommentsCount, setUnreadCommentsCount] = useState<number>(0)
    const [tweetCount, setTweetCount] = useState<number>(0)
 
-   const { metadata } = nftData || {}
+   const { metadata } = nftData?.nft || {}
 
    useEffect(() => {
       getNftMetadata()
       getOwnerAddress()
-      getNftFloorPrice()
+      getNftStatistics()
       getEthereumPrice()
+      getBookmarkStatus()
 
       const interval = setInterval(() => {
-         getNftFloorPrice()
+         getNftStatistics()
          getEthereumPrice()
       }, 60000) // every 1 min
 
@@ -85,6 +99,53 @@ const NFT = ({
          clearInterval(interval)
       }
    }, [account, ownerAddr])
+
+   const getBookmarkStatus = () => {
+      
+      fetch(
+         ` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}/${nftContractAddr}`,
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         }
+      )
+         .then((response) => response.json())
+         .then((isBookmarked: boolean) => {
+            console.log('✅ [GET][NFT][Bookmarked?]')
+            setIsBookmarked(isBookmarked)
+         })
+         .catch((error) => {
+            console.error('🚨 [POST][NFT][Bookmarked?]:', error)
+         })
+   }
+
+   const createBookmark = () => {
+
+         fetch(
+            ` ${process.env.REACT_APP_REST_API}/create_bookmark`,
+            {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({
+                  walletaddr: account,
+                  nftaddr: nftContractAddr
+               }),
+            }
+         )
+            .then((response) => response.json())
+            .then((count: number) => {
+               console.log('✅ [POST][NFT][Bookmark]')
+               setIsBookmarked(true)
+            })
+            .catch((error) => {
+               console.error('🚨 [POST][NFT][Bookmark]:', error)
+            })
+
+   }
 
    const getUnreadCommentCount = () => {
       if (account) {
@@ -151,34 +212,41 @@ const NFT = ({
    }
 
    const getNftMetadata = () => {
-      const baseURL = `https://eth-mainnet.alchemyapi.io/nft/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getNFTMetadata`
-      const fetchURL = `${baseURL}?contractAddress=${nftContractAddr}&tokenId=${nftId}&tokenType=${tokenType}`
-
-      fetch(fetchURL, {
-         method: 'GET',
-      })
+      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+         console.log('Missing NFT Port API Key')
+         return
+      }
+      fetch(
+         `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=ethereum`,
+         {
+            method: 'GET',
+            headers: {
+               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+            },
+         }
+      )
          .then((response) => response.json())
          .then((result: NFTMetadataType) => {
-            console.log('✅[GET][NFT data]:', result)
-            // console.log(JSON.stringify(result, null, 2))
+            console.log('✅[GET][NFT Metadata]:', result)
+
             setNftData(result)
 
-            let url = result.metadata && result.metadata.image
+            let url = result.nft?.cached_file_url
             if (url?.includes('ipfs://')) {
                let parts = url.split('ipfs://')
                let cid = parts[parts.length - 1]
                url = `https://ipfs.io/ipfs/${cid}`
                setImageUrl(url)
-            } else {
+            } else if (url !== null) {
                setImageUrl(url)
             }
          })
          .catch((error) => console.log('error', error))
    }
 
-   const getNftFloorPrice = () => {
+   const getNftStatistics = () => {
       if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-         console.log('NFTPORT API KEY is missing')
+         console.log('Missing NFT Port API Key')
          return
       }
       fetch(
@@ -191,11 +259,11 @@ const NFT = ({
          }
       )
          .then((response) => response.json())
-         .then((result: NFTStatistics) => {
+         .then((result) => {
             console.log('✅[GET][NFT Statistics]:', result)
             // console.log(JSON.stringify(result, null, 2))
-            if (result && result.statistics && result.statistics.floor_price) {
-               setNftFloorPrice(result.statistics.floor_price)
+            if (result && result.statistics) {
+               setNftStatistics(result.statistics)
             }
          })
          .catch((error) => console.log('error', error))
@@ -234,49 +302,113 @@ const NFT = ({
 
    return (
       <Flex flexDirection="column" background="white" height="100vh">
-         <Flex alignItems="center" mb={2} p={5}>
-            {imageUrl && (
-               <Image
-                  src={imageUrl}
-                  alt=""
-                  height="60px"
-                  borderRadius="var(--chakra-radii-xl)"
-                  mr={3}
-               />
-            )}
-            <Box>
-               {metadata && metadata.name && (
-                  <Heading size="md">{metadata.name}</Heading>
+         <Flex alignItems="center" px={5} pt={4} pb={2}>
+            <Flex alignItems="flex-start" p={2} borderRadius="md">
+               {imageUrl && (
+                  <Image
+                     src={imageUrl}
+                     alt=""
+                     height="70px"
+                     borderRadius="var(--chakra-radii-xl)"
+                     mr={3}
+                  />
                )}
-               {ownerAddr && (
-                  <Box mb="1">
-                     <Text fontSize="md" color="lightgray.800">
-                        Owned by {truncateAddress(ownerAddr)}{' '}
-                        <Link
-                           to={`https://etherscan.io/address/${ownerAddr}`}
-                           target="_blank"
-                           style={{
-                              display: 'inline-block',
-                              verticalAlign: 'middle',
-                           }}
-                        >
-                           <IconExternalLink
-                              size={16}
-                              color="var(--chakra-colors-lightgray-900)"
-                              stroke="1.5"
-                           />
-                        </Link>
-                     </Text>
+               <Box>
+                  {metadata && metadata.name && (
+                     <Heading size="md">{metadata.name}</Heading>
+                  )}
+                  {ownerAddr && (
+                     <Box mb="1">
+                        <Text fontSize="md" color="lightgray.800">
+                           Owned by {truncateAddress(ownerAddr)}{' '}
+                           <Link
+                              to={`https://etherscan.io/address/${ownerAddr}`}
+                              target="_blank"
+                              style={{
+                                 display: 'inline-block',
+                                 verticalAlign: 'middle',
+                              }}
+                           >
+                              <IconExternalLink
+                                 size={16}
+                                 color="var(--chakra-colors-lightgray-900)"
+                                 stroke="1.5"
+                              />
+                           </Link>
+                        </Text>
+                     </Box>
+                  )}
+
+                  <Box
+                     px={4}
+                     py={2}
+                     border="1px solid var(--chakra-colors-lightgray-300)"
+                     borderRadius="md"
+                  >
+                     {/* <Flex alignItems="center">
+               {nftData && (
+                  <Flex mr={2} color="darkgray.300" alignItems="center">
+                     <Text fontSize="sm">Collection:</Text> {nftData?.contract.name}
+                  </Flex>
+               )}
+            </Flex> */}
+
+                     <HStack>
+                        {nftStatistics && (
+                           <>
+                              {/* <Stat flex="0">
+                        <StatNumber fontSize="md" color="darkgray.700">
+                           {nftStatistics.total_supply}
+                        </StatNumber>
+                        <StatHelpText color="darkgray.200">Items</StatHelpText>
+                     </Stat>
+                     <Divider orientation="vertical" height="15px" /> */}
+                              <Stat flex="0">
+                                 <StatNumber fontSize="md" color="darkgray.700">
+                                    {nftStatistics.num_owners}
+                                 </StatNumber>
+                                 <StatHelpText color="darkgray.200">
+                                    Owners
+                                 </StatHelpText>
+                              </Stat>
+                              <Divider orientation="vertical" height="15px" />
+                              <Stat flex="0">
+                                 <StatNumber
+                                    fontSize="md"
+                                    color="darkgray.700"
+                                    d="flex"
+                                    alignItems="center"
+                                 >
+                                    {nftStatistics.floor_price}
+                                    <IconCurrencyEthereum size="18" />
+                                    {/* <Text fontSize="sm">{ethereumPrice &&
+                     `(~ $${(ethereumPrice * nftStatistics.floor_price).toFixed(2)})`}</Text> */}
+                                 </StatNumber>
+                                 <StatHelpText color="darkgray.200">
+                                    Floor
+                                 </StatHelpText>
+                              </Stat>
+                              <Divider orientation="vertical" height="15px" />
+                           </>
+                        )}
+                        <Tooltip label="Bookmark collection">
+                           <Button size="xs" onClick={() => {
+                              if (isBookmarked === null) return
+                              else if (isBookmarked === false) {
+                                 createBookmark()
+                              }}}>
+                              <IconStar
+                                 fill={isBookmarked === true ? `var(--chakra-colors-warning-500)` : `none`}
+                                 color={isBookmarked === true ? `var(--chakra-colors-warning-500)` : `var(--chakra-colors-darkgray-800)`}
+                                 size="15"
+                              />
+                              <Text ml={1}>Bookmark collection</Text>
+                           </Button>
+                        </Tooltip>
+                     </HStack>
                   </Box>
-               )}
-               {nftFloorPrice && (
-                  <Text fontSize="sm" color="lightgray.800">
-                     <Badge fontSize="sm">Floor: {nftFloorPrice} Ξ</Badge>{' '}
-                     {ethereumPrice &&
-                        `(~ $${(ethereumPrice * nftFloorPrice).toFixed(2)})`}
-                  </Text>
-               )}
-            </Box>
+               </Box>
+            </Flex>
          </Flex>
          <Tabs
             display="flex"
@@ -297,16 +429,40 @@ const NFT = ({
                      <></>
                   )}
                </Tab>
-               <Tab>
-                  <IconShieldLock stroke={1.5} size={18} />
-                  <Text ml={1}>DM Owner</Text>{' '}
-                  {unreadCount && unreadCount !== 0 ? (
+               {tweetCount && tweetCount !== 0 ? (
+                  <Tab>
+                     Tweets{' '}
                      <Badge variant="black" ml={1}>
-                        {unreadCount}
+                        {tweetCount}
                      </Badge>
-                  ) : (
-                     <></>
-                  )}
+                  </Tab>
+               ) : (
+                  <></>
+               )}
+               <Tab>
+                  {/* {imageUrl && (
+               <Image
+                  src={imageUrl}
+                  alt=""
+                  height="30px"
+                  borderRadius="var(--chakra-radii-md)"
+                  mr={2}
+               />
+            )} */}
+                  <Box textAlign="left">
+                     <Text>DM Owner</Text>{' '}
+                     {unreadCount && unreadCount !== 0 ? (
+                        <Badge variant="black" ml={1}>
+                           {unreadCount}
+                        </Badge>
+                     ) : (
+                        <></>
+                     )}
+                     <Text fontSize="xs" color="darkgray.100" d="flex">
+                        <IconShieldLock size="15" />
+                        <Box ml={1}>Private Chat</Box>
+                     </Text>
+                  </Box>
                </Tab>
                {/* <Tab>
                   Comments{' '}
@@ -318,16 +474,6 @@ const NFT = ({
                      <></>
                   )}
                </Tab> */}
-               {tweetCount && tweetCount !== 0 ? (
-                  <Tab>
-                     Tweets{' '}
-                     <Badge variant="black" ml={1}>
-                        {tweetCount}
-                     </Badge>
-                  </Tab>
-               ) : (
-                  <></>
-               )}
             </TabList>
 
             <TabPanels
@@ -339,6 +485,13 @@ const NFT = ({
                   <NFTGroupChat
                      ownerAddr={ownerAddr}
                      account={account}
+                     nftContractAddr={nftContractAddr}
+                  />
+               </TabPanel>
+               <TabPanel p={5}>
+                  <NFTTweets
+                     account={account}
+                     ownerAddr={ownerAddr}
                      nftContractAddr={nftContractAddr}
                   />
                </TabPanel>
@@ -361,13 +514,6 @@ const NFT = ({
                      nftId={nftId}
                   />
                </TabPanel> */}
-               <TabPanel p={5}>
-                  <NFTTweets
-                     account={account}
-                     ownerAddr={ownerAddr}
-                     nftContractAddr={nftContractAddr}
-                  />
-               </TabPanel>
             </TabPanels>
          </Tabs>
       </Flex>

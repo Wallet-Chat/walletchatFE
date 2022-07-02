@@ -5,7 +5,7 @@ import TweetType from '../../../../../../types/Tweet'
 const Tweet = ({ data }: { data: TweetType }) => {
    const date = data.created_at
    const formattedDate = timeSince(date)
-   console.log(data)
+
    return (
       <Box mb={3}>
          <Flex alignItems="flex-start" mb="1">
