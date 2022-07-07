@@ -6,21 +6,29 @@ import {
    MenuList,
    MenuItem,
    Menu,
-   Badge
+   Badge,
+   MenuGroup,
+   Link,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { IconCirclePlus, IconMessageCircle2 } from '@tabler/icons'
+import {
+   IconCirclePlus,
+   IconLogout,
+   IconMessageCircle2,
+   IconPencil,
+   IconSwitchHorizontal,
+} from '@tabler/icons'
 import Blockies from 'react-blockies'
 import styled from 'styled-components'
 
 import logoThumb from '../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../helpers/contract'
 import NFTMetadataType from '../types/NFTMetadata'
-import NFTUnreadType from '../types/NFTUnread'
-import SidebarNFTLink from './SidebarNFTLink'
+// import NFTUnreadType from '../types/NFTUnread'
+// import SidebarNFTLink from './SidebarNFTLink'
 import animatedPlaceholder from '../images/animated-placeholder.gif'
-
+import { useWallet } from '../context/WalletProvider'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -79,7 +87,7 @@ const LinkElem = styled(NavLink)`
       border-radius: 0.5rem;
       width: 100%;
       opacity: 0;
-      transition: transform .3s ease-in-out, opacity .3s ease-in-out;
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
       font-size: var(--chakra-fontSizes-md);
    }
 `
@@ -122,17 +130,7 @@ interface URLChangedEvent extends Event {
    detail?: string
 }
 
-const Sidebar = ({
-   account,
-   unreadCount,
-   currAccountAddress,
-   disconnectWallet,
-}: {
-   account: string,
-   unreadCount: number
-   currAccountAddress: string
-   disconnectWallet: () => void
-}) => {
+const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
    const nftNotificationCount = 0
    const [url, setUrl] = useState<string | undefined>('')
    const [nftContractAddr, setNftContractAddr] = useState<string>()
@@ -141,6 +139,8 @@ const Sidebar = ({
    const [imageUrl, setImageUrl] = useState<string>()
 
    const { metadata } = nftData?.nft || {}
+
+   const { disconnectWallet, name, account, walletRequestPermissions } = useWallet()
 
    useEffect(() => {
       const queryInfo = { active: true, lastFocusedWindow: true }
@@ -186,7 +186,7 @@ const Sidebar = ({
 
    const getNftMetadata = (nftContractAddr: string, nftId: number) => {
       if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-         console.log("Missing NFT Port API Key")
+         console.log('Missing NFT Port API Key')
          return
       }
       fetch(
@@ -252,21 +252,24 @@ const Sidebar = ({
             <Box mt={2}></Box>
             <Divider />
             <Box mb={5}></Box>
-            <LinkElem to={'/chat'}>
-               <Box className="popup-text">Chat</Box>
-               <IconMessageCircle2 size="30" stroke={1.5} />
-               {unreadCount > 0 && (
-                  <Badge
-                     variant="black"
-                     position="absolute"
-                     bottom="0"
-                     right="0"
-                     fontSize="lg"
-                  >
-                     {unreadCount}
-                  </Badge>
-               )}
-            </LinkElem>
+
+            {name !== null && (
+               <LinkElem to={'/chat'}>
+                  <Box className="popup-text">Chat</Box>
+                  <IconMessageCircle2 size="30" stroke={1.5} />
+                  {unreadCount > 0 && (
+                     <Badge
+                        variant="black"
+                        position="absolute"
+                        bottom="0"
+                        right="0"
+                        fontSize="lg"
+                     >
+                        {unreadCount}
+                     </Badge>
+                  )}
+               </LinkElem>
+            )}
             {metadata && (
                <LinkElem2 to={`/nft/${nftContractAddr}/${nftId}`}>
                   <Box className="popup-text">NFT</Box>
@@ -298,15 +301,17 @@ const Sidebar = ({
             ))} */}
          </Flex>
          <Flex flexDirection="column" alignItems="center">
-            <LinkElem to={`/new`}>
-               <IconCirclePlus size="30" stroke={1.5} />
-            </LinkElem>
+            {name !== null && (
+               <LinkElem to={`/new`}>
+                  <IconCirclePlus size="30" stroke={1.5} />
+               </LinkElem>
+            )}
             <Menu>
                <MenuButton as={AccountInfo}>
-                  {currAccountAddress && (
+                  {account && (
                      <>
                         <Blockies
-                           seed={currAccountAddress.toLocaleLowerCase()}
+                           seed={account.toLocaleLowerCase()}
                            scale={4}
                         />
                         <span
@@ -315,15 +320,45 @@ const Sidebar = ({
                               color: 'var(--chakra-colors-darkgray-500)',
                            }}
                         >
-                           {currAccountAddress.substring(0, 5)}
+                           {account.substring(0, 5)}
                         </span>
                      </>
                   )}
                </MenuButton>
                <MenuList>
-                  <MenuItem onClick={() => disconnectWallet()}>
-                     Sign out
-                  </MenuItem>
+                  <MenuGroup title={name} fontSize="lg">
+                     <MenuItem
+                        as={Link}
+                        href="/change-name"
+                        icon={
+                           <Box>
+                              <IconPencil stroke="1.5" />
+                           </Box>
+                        }
+                     >
+                        Change name
+                     </MenuItem>
+                     <MenuItem
+                        onClick={() => walletRequestPermissions()}
+                        icon={
+                           <Box>
+                              <IconSwitchHorizontal stroke="1.5" />
+                           </Box>
+                        }
+                     >
+                        Change wallet
+                     </MenuItem>
+                     <MenuItem
+                        onClick={() => disconnectWallet()}
+                        icon={
+                           <Box>
+                              <IconLogout stroke="1.5" />
+                           </Box>
+                        }
+                     >
+                        Sign out
+                     </MenuItem>
+                  </MenuGroup>
                </MenuList>
             </Menu>
          </Flex>

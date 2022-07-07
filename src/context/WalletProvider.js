@@ -21,6 +21,7 @@ export function withWallet(Component) {
 
 const WalletProvider = React.memo(({ children }) => {
    const [chainId, setChainId] = useState(null)
+   const [name, setName] = useState(null)
    const [account, setAccount] = useState(null)
    const [web3, setWeb3] = useState(null)
    const [isAuthenticated, setAuthenticated] = useState(false)
@@ -69,6 +70,33 @@ const WalletProvider = React.memo(({ children }) => {
       }
    }
 
+   const getName = (_account) => {
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!_account) {
+         console.log('No account connected')
+         return
+      }
+      fetch(` ${process.env.REACT_APP_REST_API}/name/${_account}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Name]:', data)
+            if (data[0]?.name) {
+               setName(data[0].name)
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Name]:', error)
+         })
+   }
+
    const getProvider = () => {
       if (window.ethereum) {
          console.log('found window.ethereum>>')
@@ -90,6 +118,15 @@ const WalletProvider = React.memo(({ children }) => {
          return [accounts, chainId]
       }
       return false
+   }
+
+   const walletRequestPermissions = async () => {
+      const provider = getProvider()
+      if (provider) {
+         await provider.request({
+            method: 'wallet_requestPermissions',
+         })
+      }
    }
 
    const createEncryptionKeyPair = async (accountlocal) => {
@@ -123,6 +160,8 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(chainId)
             setWeb3(web3)
             setAuthenticated(true)
+
+            getName(account)
 
             //only do this once at first login, never again or we can't decrypt previous data
             //until this is moved we likely will have a few latenet issues decrypting older data
@@ -186,7 +225,10 @@ const WalletProvider = React.memo(({ children }) => {
    return (
       <WalletContext.Provider
          value={{
+            name,
+            setName,
             account,
+            walletRequestPermissions,
             publicKey,
             privateKey,
             disconnectWallet,
