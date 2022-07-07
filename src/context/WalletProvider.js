@@ -23,6 +23,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
    const [account, setAccount] = useState(null)
+   const [accounts, setAccounts] = useState(null)
    const [web3, setWeb3] = useState(null)
    const [isAuthenticated, setAuthenticated] = useState(false)
    const [appLoading, setAppLoading] = useState(false)
@@ -112,6 +113,11 @@ const WalletProvider = React.memo(({ children }) => {
          const [accounts, chainId] = await Promise.all([
             provider.request({
                method: 'eth_requestAccounts',
+               params: [
+                  {
+                    eth_accounts: {}
+                  }
+                ]
             }),
             provider.request({ method: 'eth_chainId' }),
          ])
@@ -125,6 +131,11 @@ const WalletProvider = React.memo(({ children }) => {
       if (provider) {
          await provider.request({
             method: 'wallet_requestPermissions',
+            params: [
+               {
+                 eth_accounts: {}
+               }
+             ]
          })
       }
    }
@@ -157,6 +168,7 @@ const WalletProvider = React.memo(({ children }) => {
             const account = getNormalizeAddress(accounts)
             const web3 = new Web3(provider)
             setAccount(account)
+            setAccounts(accounts)
             setChainId(chainId)
             setWeb3(web3)
             setAuthenticated(true)
@@ -228,6 +240,7 @@ const WalletProvider = React.memo(({ children }) => {
             name,
             setName,
             account,
+            accounts,
             walletRequestPermissions,
             publicKey,
             privateKey,

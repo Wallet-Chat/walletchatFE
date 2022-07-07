@@ -9,6 +9,8 @@ import {
    Badge,
    MenuGroup,
    Link,
+   Text,
+   MenuDivider
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -29,6 +31,7 @@ import NFTMetadataType from '../types/NFTMetadata'
 // import SidebarNFTLink from './SidebarNFTLink'
 import animatedPlaceholder from '../images/animated-placeholder.gif'
 import { useWallet } from '../context/WalletProvider'
+import { truncateAddress } from '../helpers/truncateString'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -326,7 +329,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                   )}
                </MenuButton>
                <MenuList>
-                  <MenuGroup title={name} fontSize="lg">
+                  <MenuGroup title={name || truncateAddress(account)} fontSize="lg">
                      <MenuItem
                         as={Link}
                         href="/change-name"
@@ -335,18 +338,9 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                               <IconPencil stroke="1.5" />
                            </Box>
                         }
+                        _hover={{ textDecoration: 'none' }}
                      >
                         Change name
-                     </MenuItem>
-                     <MenuItem
-                        onClick={() => walletRequestPermissions()}
-                        icon={
-                           <Box>
-                              <IconSwitchHorizontal stroke="1.5" />
-                           </Box>
-                        }
-                     >
-                        Change wallet
                      </MenuItem>
                      <MenuItem
                         onClick={() => disconnectWallet()}
@@ -359,6 +353,18 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                         Sign out
                      </MenuItem>
                   </MenuGroup>
+                  <MenuDivider />
+                     <MenuItem
+                        onClick={() => walletRequestPermissions()}
+                        icon={
+                           <Box>
+                              <IconSwitchHorizontal stroke="1.5" />
+                           </Box>
+                        }
+                     >
+                        Connect more
+                        <Text fontSize="sm" color="darkgray.400">Switch active account using MetaMask</Text>
+                     </MenuItem>
                </MenuList>
             </Menu>
          </Flex>
