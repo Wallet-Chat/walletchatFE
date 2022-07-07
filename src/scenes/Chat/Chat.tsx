@@ -115,7 +115,7 @@ const Chat = ({
       })
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            console.log('✅ GET [Chat items]:', data)
+            console.log('✅[GET][Chat items]:', data)
 
             const replica = JSON.parse(JSON.stringify(data));
 
@@ -150,7 +150,7 @@ const Chat = ({
             setIsFetchingChatData(false)
          })
          .catch((error) => {
-            console.error('🚨🚨REST API Error [GET]:', error)
+            console.error('🚨[GET][Chat items]:', error)
             setIsFetchingChatData(false)
          })
    }
@@ -292,7 +292,7 @@ const Chat = ({
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅ POST/Send Message:', data, latestLoadedMsgs)
+            console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
             getChatData()
 
             // let indexOfMsg = -1
@@ -321,7 +321,7 @@ const Chat = ({
          })
          .catch((error) => {
             console.error(
-               '🚨🚨REST API Error [POST]:',
+               '🚨[POST][Send message]:',
                error,
                JSON.stringify(data)
             )

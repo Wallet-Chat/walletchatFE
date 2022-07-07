@@ -186,11 +186,11 @@ const NFT = ({
          )
             .then((response) => response.json())
             .then((count: number) => {
-               console.log('✅ [GET][NFT][No. of unread comments]:', count)
+               console.log('✅[GET][NFT][No. of unread comments]:', count)
                setUnreadCommentsCount(count)
             })
             .catch((error) => {
-               console.error('🚨🚨REST API Error [GET]:', error)
+               console.error('🚨[GET][NFT][No. of unread comments]:', error)
             })
       }
    }
@@ -207,11 +207,11 @@ const NFT = ({
          )
             .then((response) => response.json())
             .then((count: number) => {
-               console.log('✅ [GET][NFT][No. of tweets]:', count)
+               console.log('✅[GET][NFT][No. of tweets]:', count)
                setTweetCount(count)
             })
             .catch((error) => {
-               console.error('🚨🚨REST API Error [GET]:', error)
+               console.error('🚨[GET][NFT][No. of tweets]:', error)
             })
       }
    }
@@ -228,11 +228,11 @@ const NFT = ({
          )
             .then((response) => response.json())
             .then((count: number) => {
-               console.log('✅ [GET][NFT][No. of unread msgs]:', count)
+               console.log('✅[GET][NFT][No. of unread msgs]:', count)
                setUnreadCount(count)
             })
             .catch((error) => {
-               console.error('🚨🚨REST API Error [GET]:', error)
+               console.error('🚨[GET][NFT][No. of unread msgs]:', error)
             })
       }
    }

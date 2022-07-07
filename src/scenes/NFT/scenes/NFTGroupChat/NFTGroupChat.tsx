@@ -174,12 +174,12 @@ const NFTGroupChat = ({
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅ POST/Send Message:', data, latestLoadedMsgs)
+            console.log('✅[POST][Message]:', data, latestLoadedMsgs)
             getChatData()
          })
          .catch((error) => {
             console.error(
-               '🚨🚨REST API Error [POST]:',
+               '🚨[POST][Message]:',
                error,
                JSON.stringify(data)
             )

@@ -129,12 +129,12 @@ const Message = ({
          )
             .then((response) => response.json())
             .then((data) => {
-               console.log('✅ PUT Message:', data)
+               console.log('✅[PUT][Message]:', data)
                setUnreadCount(unreadCount - 1)
                updateRead(data)
             })
             .catch((error) => {
-               console.error('🚨🚨REST API Error [PUT]:', error)
+               console.error('🚨[PUT][Message]:', error)
             })
       }
    }
