@@ -9,10 +9,11 @@ import {
    Input,
    Text,
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../context/WalletProvider'
+import { NFTMetadataOpenSeaType } from '../../types/NFTMetadata'
 
 const EnterName = ({ account }: { account: string }) => {
    const {
@@ -21,32 +22,62 @@ const EnterName = ({ account }: { account: string }) => {
       formState: { errors },
    } = useForm()
 
-   const {
-      setName: globalSetName
-   } = useWallet()
+   const { setName: globalSetName } = useWallet()
 
    const [name, setName] = useState('')
+   const [ownedENS, setOwnedENS] = useState<NFTMetadataOpenSeaType[]>([])
+
+   useEffect(() => {
+      const getOwnedENS = () => {
+         if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+            console.log('Missing OpenSea API Key')
+            return
+         }
+         fetch(
+            `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
+            {
+               method: 'GET',
+               headers: {
+                  Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+               },
+            }
+         )
+            .then((response) => response.json())
+            .then((result) => {
+               console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
+               if (result?.assets?.length > 0) {
+                  setOwnedENS(result.assets)
+               }
+            })
+            .catch((error) =>
+               console.log(`🚨[GET][ENS Owned by ${account}`, error)
+            )
+      }
+      if (account) {
+         getOwnedENS()
+      }
+   }, [account])
 
    const onSubmit = (values: any) => {
       if (values?.name) {
-      fetch(` ${process.env.REACT_APP_REST_API}/name`, {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({
-            name: values.name,
-            address: account
-         }),
-      })
-         .then((response) => response.json())
-         .then((response) => {
-            console.log('✅[POST][Name]:', response)
-            globalSetName(name)
+         fetch(` ${process.env.REACT_APP_REST_API}/name`, {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+               name: values.name,
+               address: account,
+            }),
          })
-         .catch((error) => {
-            console.error('🚨[POST][Name]:', error)
-         })
+            .then((response) => response.json())
+            .then((response) => {
+               console.log('✅[POST][Name]:', response)
+               globalSetName(name)
+            })
+            .catch((error) => {
+               console.error('🚨[POST][Name]:', error)
+            })
       }
    }
 
@@ -65,6 +96,7 @@ const EnterName = ({ account }: { account: string }) => {
                      size="lg"
                      value={name}
                      placeholder="Real or anon name"
+                     borderColor="black"
                      {...register('name', {
                         required: true,
                      })}
@@ -73,18 +105,36 @@ const EnterName = ({ account }: { account: string }) => {
                      }
                   />
                   <Button variant="black" height="auto" type="submit">
-               
-               <IconSend size="20" />
-            </Button>
-            </Flex>
+                     <IconSend size="20" />
+                  </Button>
+               </Flex>
+               {ownedENS.length > 0 && (
+               <Box mt={2}>
+                  {ownedENS.map((item, i) =>
+                     (item?.name && item.name !== "Unknown ENS name") ? (
+                        <Button
+                           variant="outline"
+                           key={i}
+                           onClick={() => setName(item.name)}
+                           mr="2"
+                           mb="2"
+                           size="sm"
+                        >
+                           {item.name}
+                        </Button>
+                     ) : (
+                        ''
+                     )
+                  )}
+               </Box>
+            )}
                <FormHelperText>
                   You can change it anytime in your settings
                </FormHelperText>
                {errors.name && errors.name.type === 'required' && (
-                <FormErrorMessage>No blank name please</FormErrorMessage>
-                )}
+                  <FormErrorMessage>No blank name please</FormErrorMessage>
+               )}
             </FormControl>
-            
          </form>
       </Box>
    )

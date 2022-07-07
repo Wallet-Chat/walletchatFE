@@ -214,7 +214,9 @@ const WalletProvider = React.memo(({ children }) => {
    }
 
    const handleAccountsChanged = (accounts) => {
+      console.log('handleAccountsChanged', accounts)
       setAccount(getNormalizeAddress(accounts))
+      getName(accounts[0])
       storage.set('current-address', { address: getNormalizeAddress(accounts) })
       console.log('[account changes]: ', getNormalizeAddress(accounts))
    }
