@@ -212,8 +212,6 @@ export const App = () => {
                         element={
                            <NFT
                               account={account}
-                              publicKey={publicKey}
-                              privateKey={privateKey}
                            />
                         }
                      />

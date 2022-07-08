@@ -40,11 +40,9 @@ const DottedBackground = styled.div`
 
 const NFTGroupChat = ({
    account,
-   ownerAddr,
    nftContractAddr,
 }: {
    account: string | undefined
-   ownerAddr: string | undefined
    nftContractAddr: string
 }) => {
    const [msgInput, setMsgInput] = useState<string>('')
@@ -62,7 +60,7 @@ const NFTGroupChat = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account, ownerAddr])
+   }, [account])
 
    const getChatData = () => {
       if (!account) {
@@ -211,13 +209,13 @@ const NFTGroupChat = ({
 
    return (
       <Flex flexDirection="column" height="100%">
-         <Box py={2} px={6}>
+         {/* <Box py={2} px={6}>
             <Stack spacing={5} direction="row">
                <Checkbox defaultChecked size="sm">Project</Checkbox>
                <Checkbox defaultChecked size="sm">Users</Checkbox>
                <Checkbox defaultChecked size="sm">Holders</Checkbox>
             </Stack>
-         </Box>
+         </Box> */}
 
          <DottedBackground className="custom-scrollbar">
             {loadedMsgs.length === 0 && (

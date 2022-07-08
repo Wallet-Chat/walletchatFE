@@ -7,11 +7,9 @@ import { Divider } from '@chakra-ui/react'
 
 const NFTTweets = ({
    account,
-   ownerAddr = '',
    nftContractAddr,
 }: {
    account: string
-   ownerAddr: string | undefined
    nftContractAddr: string
 }) => {
    // Twitter
@@ -174,7 +172,7 @@ const NFTTweets = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account, ownerAddr])
+   }, [account])
 
    return (
       <>

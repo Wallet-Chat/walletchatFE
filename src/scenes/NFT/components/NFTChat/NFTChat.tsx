@@ -45,7 +45,6 @@ const DottedBackground = styled.div`
 
 const NFTChat = ({
    recipientAddr,
-   ownerAddr,
    account,
    nftContractAddr,
    nftId,
@@ -53,7 +52,6 @@ const NFTChat = ({
    privateKey,
 }: {
    recipientAddr: string | undefined | null
-   ownerAddr: string | undefined | null
    account: string
    nftContractAddr: string
    nftId: number | string
@@ -82,7 +80,7 @@ const NFTChat = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account, ownerAddr])
+   }, [account])
 
    const getChatData = () => {
       // GET request to get off-chain data for RX user

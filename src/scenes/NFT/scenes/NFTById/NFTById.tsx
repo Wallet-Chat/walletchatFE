@@ -417,7 +417,7 @@ const NFT = ({
                               <Divider orientation="vertical" height="15px" />
                            </>
                         )}
-                        <Tooltip label="Bookmark collection">
+                        <Tooltip label="Join">
                            <Button size="xs" onClick={() => {
                               if (isBookmarked === null) return
                               else if (isBookmarked === false) {
@@ -426,12 +426,7 @@ const NFT = ({
                               else if (isBookmarked === true) {
                                  deleteBookmark()
                               }}}>
-                              <IconStar
-                                 fill={isBookmarked === true ? `var(--chakra-colors-warning-500)` : `none`}
-                                 color={isBookmarked === true ? `var(--chakra-colors-warning-500)` : `var(--chakra-colors-darkgray-800)`}
-                                 size="15"
-                              />
-                              <Text ml={1}>Bookmark collection</Text>
+                              <Text ml={1}>+ Join</Text>
                            </Button>
                         </Tooltip>
                      </HStack>
@@ -512,7 +507,6 @@ const NFT = ({
             >
                <TabPanel px="0" height="100%" padding="0">
                   <NFTGroupChat
-                     ownerAddr={ownerAddr}
                      account={account}
                      nftContractAddr={nftContractAddr}
                   />
@@ -520,14 +514,12 @@ const NFT = ({
                <TabPanel p={5}>
                   <NFTTweets
                      account={account}
-                     ownerAddr={ownerAddr}
                      nftContractAddr={nftContractAddr}
                   />
                </TabPanel>
                <TabPanel px="0" height="100%" padding="0">
                   <NFTChat
                      recipientAddr={recipientAddr}
-                     ownerAddr={ownerAddr}
                      account={account}
                      nftContractAddr={nftContractAddr}
                      nftId={nftId}
@@ -538,7 +530,6 @@ const NFT = ({
                {/* <TabPanel p={5}>
                   <NFTComments
                      account={account}
-                     ownerAddr={ownerAddr}
                      nftContractAddr={nftContractAddr}
                      nftId={nftId}
                   />
