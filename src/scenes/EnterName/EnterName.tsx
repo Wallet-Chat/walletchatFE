@@ -10,6 +10,7 @@ import {
    Text,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../context/WalletProvider'
@@ -23,6 +24,7 @@ const EnterName = ({ account }: { account: string }) => {
    } = useForm()
 
    const { setName: globalSetName } = useWallet()
+   let navigate = useNavigate()
 
    const [name, setName] = useState('')
    const [isFetching, setIsFetching] = useState(false)
@@ -78,6 +80,7 @@ const EnterName = ({ account }: { account: string }) => {
             .then((response) => {
                console.log('✅[POST][Name]:', response)
                globalSetName(name)
+               navigate('/nft/walletchat')
             })
             .catch((error) => {
                console.error('🚨[POST][Name]:', error)

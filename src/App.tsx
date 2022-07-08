@@ -23,6 +23,7 @@ import { useWallet } from './context/WalletProvider'
 import { useUnreadCount } from './context/UnreadCountProvider'
 import EnterName from './scenes/EnterName'
 import ChangeName from './scenes/ChangeName'
+import NFTById from './scenes/NFT/scenes/NFTById'
 
 export const App = () => {
    const { unreadCount, setUnreadCount } = useUnreadCount()
@@ -198,6 +199,16 @@ export const App = () => {
                      />
                      <Route
                         path="/nft/:nftContractAddr/:nftId"
+                        element={
+                           <NFTById
+                              account={account}
+                              publicKey={publicKey}
+                              privateKey={privateKey}
+                           />
+                        }
+                     />
+                     <Route
+                        path="/nft/:nftContractAddr"
                         element={
                            <NFT
                               account={account}
