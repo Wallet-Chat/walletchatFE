@@ -434,7 +434,7 @@ const NFT = ({ account }: { account: string }) => {
                <Tab>
                   Social{' '}
                   {unreadCount && unreadCount !== 0 ? (
-                     <Badge variant="black" ml={1}>
+                     <Badge variant="black" background="information.400" ml={1}>
                         {unreadCount}
                      </Badge>
                   ) : (
@@ -444,9 +444,9 @@ const NFT = ({ account }: { account: string }) => {
                {tweetCount && tweetCount !== 0 ? (
                   <Tab>
                      Tweets{' '}
-                     <Badge variant="black" ml={1}>
+                     {/* <Badge variant="black" background="information.400" ml={1}>
                         {tweetCount}
-                     </Badge>
+                     </Badge> */}
                   </Tab>
                ) : (
                   <></>

@@ -93,11 +93,9 @@ const LinkElem = styled(NavLink)`
       font-size: var(--chakra-fontSizes-md);
    }
 `
-
 const LinkElem2 = styled(LinkElem)`
    background: var(--chakra-colors-lightgray-200);
 `
-
 const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
    border-radius: 0.5rem;
@@ -126,6 +124,42 @@ const Divider = styled.div`
       height: 1px;
       border-bottom: 1px solid #cbcbcb;
    }
+`
+const UnreadCountContainer = styled.div`
+   position: absolute;
+   bottom: 0;
+   right: 0;
+   width: 25px;
+   height: 25px;
+    overflow: hidden;
+    background: var(--chakra-colors-information-400);
+    border-radius: var(--chakra-radii-md);
+    border: 2px solid #FFF;
+
+    &::before {
+      content: "";
+    display: block;
+    padding-top: 100%;
+    }
+
+    .square-content{
+    position:  absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    color: white;
+}
+.square-content div {
+   display: table;
+   width: 100%;
+   height: 100%;
+}
+.square-content span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 `
 
 interface URLChangedEvent extends Event {
@@ -257,24 +291,30 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
 
             {name !== null && (
                <LinkElem to={'/chat'}>
-                  <Box className="popup-text">Chat</Box>
+                  {/* <Box className="popup-text">Chat</Box> */}
                   <IconMessageCircle2 size="30" stroke={1.5} />
                   {unreadCount > 0 && (
-                     <Badge
-                        variant="black"
-                        position="absolute"
-                        bottom="0"
-                        right="0"
-                        fontSize="lg"
-                     >
-                        {unreadCount}
-                     </Badge>
+                     <UnreadCountContainer>
+                        <Box className="square-content">
+                           <Box>
+                              <span>
+                        <Badge
+                           variant="black"
+                           background="information.400"
+                           fontSize="lg"
+                        >
+                           {unreadCount}
+                        </Badge>
+                        </span>
+                        </Box>
+                        </Box>
+                     </UnreadCountContainer>
                   )}
                </LinkElem>
             )}
             {metadata && (
                <LinkElem2 to={`/nft/${nftContractAddr}/${nftId}`}>
-                  <Box className="popup-text">NFT</Box>
+                  {/* <Box className="popup-text">NFT</Box> */}
                   {/* <Image src={coolcat2356} alt="" width="40px" /> */}
                   {imageUrl && (
                      <Image
