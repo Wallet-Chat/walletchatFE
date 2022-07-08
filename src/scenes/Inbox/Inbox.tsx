@@ -52,12 +52,12 @@ const Inbox = ({
       useState<boolean>(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [beenHereFor3Secs, setBeenHereFor3Secs] = useState(false)
-   const [bookmarks, setBookmarks] = useState<BookmarkType[]>()
+   const [joinedGroups, setJoinedGroups] = useState<BookmarkType[]>()
 
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
-         getBookmarks()
+         getJoinedGroups()
       }, 5000) // every 5s
 
       setTimeout(() => setBeenHereFor3Secs(true), 3000)
@@ -67,7 +67,7 @@ const Inbox = ({
 
    useEffect(() => {
       getInboxData()
-      getBookmarks()
+      getJoinedGroups()
    }, [isAuthenticated, account])
 
    const getInboxData = () => {
@@ -135,7 +135,7 @@ const Inbox = ({
          })
    }
 
-   const getBookmarks = () => {
+   const getJoinedGroups = () => {
       fetch(` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}`, {
          method: 'GET',
          headers: {
@@ -144,11 +144,11 @@ const Inbox = ({
       })
          .then((response) => response.json())
          .then((result) => {
-            console.log('✅ [GET][NFT][Bookmarks]', result)
-            setBookmarks(result)
+            console.log('✅[GET][Joined Groups]', result)
+            setJoinedGroups(result)
          })
          .catch((error) => {
-            console.error('🚨 [POST][NFT][Bookmarks]:', error)
+            console.error('🚨[POST][Joined Groups]:', error)
          })
    }
 
@@ -190,21 +190,21 @@ const Inbox = ({
                })
             }
          }
-         if (bookmarks && bookmarks.length > 0) {
-            for (let j = 0; j < bookmarks.length; j++) {
+         if (joinedGroups && joinedGroups.length > 0) {
+            for (let j = 0; j < joinedGroups.length; j++) {
                toAddToUI.push({
                   type: 'contract',
-                  message: bookmarks[j].lastmsg,
-                  nftAddr: bookmarks[j].nftaddr,
-                  timestamp: bookmarks[j].lasttimestamp,
-                  unread: bookmarks[j].Unreadcnt,
+                  message: joinedGroups[j].lastmsg,
+                  nftAddr: joinedGroups[j].nftaddr,
+                  timestamp: joinedGroups[j].lasttimestamp,
+                  unread: joinedGroups[j].Unreadcnt,
                })
             }
          }
          setLoadedMsgs(toAddToUI)
       }
       populateUI()
-   }, [inboxData, bookmarks, account])
+   }, [inboxData, joinedGroups, account])
 
    if (isFetchingInboxData && inboxData.length === 0 && !beenHereFor3Secs) {
       return (

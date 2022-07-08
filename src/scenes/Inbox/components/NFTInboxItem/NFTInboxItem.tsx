@@ -7,6 +7,7 @@ import NFTMetadataType from '../../../../types/NFTMetadata'
 import { MessageUIType } from '../../../../types/Message'
 import { formatMessageDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
+import NFTContractType from '../../../../types/NFTContract'
 
 const Wrapper = styled.button`
    display: block;
@@ -53,42 +54,28 @@ const NotificationCount = styled.div`
 `
 
 const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
-   const [nft, setNft] = useState<NFTMetadataType>()
-   const [imageUrl, setImageUrl] = useState<string|null|undefined>()
-   const [serverData, setServerData] = useState()
+   const [nft, setNft] = useState<NFTContractType>()
 
    useEffect(() => {
       if (data.nftAddr) {
-         if (!process.env.REACT_APP_NFTPORT_API_KEY) {
-            console.log('Missing NFTPort API Key')
+         if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+            console.log('Missing OpenSea API Key')
             return
          }
-         fetch(
-            `https://api.nftport.xyz/v0/nfts/${data.nftAddr}/1?chain=ethereum`,
-            {
-               method: 'GET',
-               headers: {
-                  Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
-               },
-            }
-         )
+         fetch(`https://api.opensea.io/api/v1/asset_contract/${data.nftAddr}`, {
+            method: 'GET',
+            headers: {
+               Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+            },
+         })
             .then((response) => response.json())
-            .then((result: NFTMetadataType) => {
-               console.log('✅[GET][NFT Metadata]:', result)
-
-               setNft(result)
-
-               let url = result.nft?.cached_file_url
-               if (url?.includes('ipfs://')) {
-                  let parts = url.split('ipfs://')
-                  let cid = parts[parts.length - 1]
-                  url = `https://ipfs.io/ipfs/${cid}`
-                  setImageUrl(url)
-               } else if (url !== null) {
-                  setImageUrl(url)
+            .then((result: NFTContractType) => {
+               console.log(`✅[GET][NFT Contract]:`, result)
+               if (result?.collection.name) {
+                  setNft(result)
                }
             })
-            .catch((error) => console.log('error', error))
+            .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
       }
    }, [data.nftAddr])
 
@@ -100,8 +87,8 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                   <Box mr={2}>
                      <BlockieWrapper>
                         {data.nftAddr && (
-                           imageUrl ?
-                           <Image src={imageUrl} alt="" width="41px" />
+                           nft?.collection.image_url ?
+                           <Image src={nft.collection.image_url} alt="" width="41px" />
                            :
                            <Blockies seed={data.nftAddr} scale={5} />
                         )}
@@ -110,7 +97,7 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                   <Box>
                      {data.nftAddr && (
                         <RecipientAddress>
-                           {nft?.contract.name ? nft?.contract.name : truncateAddress(data.nftAddr)}
+                           {nft?.collection.name ? nft.collection.name : truncateAddress(data.nftAddr)}
                         </RecipientAddress>
                      )}
                      {data.message && (
