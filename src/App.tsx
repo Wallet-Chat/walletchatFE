@@ -22,6 +22,7 @@ import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import { useUnreadCount } from './context/UnreadCountProvider'
 import EnterName from './scenes/EnterName'
+import ChangeName from './scenes/ChangeName'
 
 export const App = () => {
    const { unreadCount, setUnreadCount } = useUnreadCount()
@@ -34,7 +35,6 @@ export const App = () => {
       appLoading,
       isAuthenticated,
       connectWallet,
-      disconnectWallet,
       name,
       account,
       publicKey,
@@ -188,6 +188,12 @@ export const App = () => {
                               web3={web3}
                               isAuthenticated={isAuthenticated}
                            />
+                        }
+                     />
+                     <Route
+                        path="/change-name"
+                        element={
+                           <ChangeName />
                         }
                      />
                      <Route
