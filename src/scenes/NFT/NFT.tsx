@@ -71,14 +71,6 @@ const NFT = ({ account }: { account: string }) => {
 
    useEffect(() => {
       getTweetCount()
-
-      const interval = setInterval(() => {
-         getTweetCount()
-      }, 5000) // every 5s
-
-      return () => {
-         clearInterval(interval)
-      }
    }, [account])
 
    const getJoinStatus = () => {
@@ -432,7 +424,7 @@ const NFT = ({ account }: { account: string }) => {
          >
             <TabList padding="0 var(--chakra-space-5)">
                <Tab>
-                  Social{' '}
+                  Chat{' '}
                   {unreadCount && unreadCount !== 0 ? (
                      <Badge variant="black" background="information.400" ml={1}>
                         {unreadCount}

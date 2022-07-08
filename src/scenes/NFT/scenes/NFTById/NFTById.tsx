@@ -6,6 +6,7 @@ import {
    Flex,
    Heading,
    HStack,
+   Link as CLink,
    Image,
    Stat,
    StatHelpText,
@@ -22,7 +23,6 @@ import {
    IconCurrencyEthereum,
    IconExternalLink,
    IconShieldLock,
-   IconStar,
 } from '@tabler/icons'
 import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
@@ -32,9 +32,9 @@ import NFTChat from '../../components/NFTChat'
 // import NFTComments from './scenes/NFTComments'
 import NFTTweets from '../../components/NFTTweets'
 import { truncateAddress } from '../../../../helpers/truncateString'
-import NFTMetadataType from '../../../../types/NFTMetadata'
 import NFTStatisticsType from '../../../../types/NFTStatistics'
 import NFTOwnerAddressType from '../../../../types/NFTOwnerAddressType'
+import NFTAssetType from '../../../../types/NFTAsset'
 
 const tokenType = 'erc721'
 
@@ -50,29 +50,26 @@ const NFT = ({
    let { nftContractAddr = '', nftId = 0 } = useParams()
    let [searchParams] = useSearchParams()
 
-   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [nftData, setNftData] = useState<NFTAssetType>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
    const [ethereumPrice, setEthereumPrice] = useState<number>()
-   const [isBookmarked, setIsBookmarked] = useState<boolean|null>(null)
+   const [isBookmarked, setIsBookmarked] = useState<boolean | null>(null)
    const [ownerAddr, setOwnerAddr] = useState<string>()
    const recipientAddr =
       searchParams.get('recipient') === null
          ? ownerAddr
          : searchParams.get('recipient')
-   const [imageUrl, setImageUrl] = useState<string>()
 
    const [unreadCount, setUnreadCount] = useState<number>(0)
    const [unreadCommentsCount, setUnreadCommentsCount] = useState<number>(0)
    const [tweetCount, setTweetCount] = useState<number>(0)
-
-   const { metadata } = nftData?.nft || {}
 
    useEffect(() => {
       getNftMetadata()
       getOwnerAddress()
       getNftStatistics()
       getEthereumPrice()
-      getBookmarkStatus()
+      getJoinStatus()
 
       const interval = setInterval(() => {
          getNftStatistics()
@@ -92,7 +89,7 @@ const NFT = ({
       const interval = setInterval(() => {
          getUnreadDMCount()
          getUnreadCommentCount()
-         getTweetCount()
+         // getTweetCount()
       }, 5000) // every 5s
 
       return () => {
@@ -100,8 +97,7 @@ const NFT = ({
       }
    }, [account, ownerAddr])
 
-   const getBookmarkStatus = () => {
-      
+   const getJoinStatus = () => {
       fetch(
          ` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}/${nftContractAddr}`,
          {
@@ -121,47 +117,38 @@ const NFT = ({
          })
    }
 
-   const createBookmark = () => {
-
-         fetch(
-            ` ${process.env.REACT_APP_REST_API}/create_bookmark`,
-            {
-               method: 'POST',
-               headers: {
-                  'Content-Type': 'application/json',
-               },
-               body: JSON.stringify({
-                  walletaddr: account,
-                  nftaddr: nftContractAddr
-               }),
-            }
-         )
-            .then((response) => response.json())
-            .then((count: number) => {
-               console.log('✅ [POST][NFT][Bookmark]')
-               setIsBookmarked(true)
-            })
-            .catch((error) => {
-               console.error('🚨 [POST][NFT][Bookmark]:', error)
-            })
-
+   const joinGroup = () => {
+      fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+            walletaddr: account,
+            nftaddr: nftContractAddr,
+         }),
+      })
+         .then((response) => response.json())
+         .then((count: number) => {
+            console.log('✅ [POST][NFT][Bookmark]')
+            setIsBookmarked(true)
+         })
+         .catch((error) => {
+            console.error('🚨 [POST][NFT][Bookmark]:', error)
+         })
    }
 
-   const deleteBookmark = () => {
-
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/delete_bookmark`,
-         {
-            method: 'POST',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-               walletaddr: account,
-               nftaddr: nftContractAddr
-            }),
-         }
-      )
+   const leaveGroup = () => {
+      fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+            walletaddr: account,
+            nftaddr: nftContractAddr,
+         }),
+      })
          .then((response) => response.json())
          .then((count: number) => {
             console.log('✅ [POST][NFT][ Delete Bookmark]')
@@ -170,8 +157,7 @@ const NFT = ({
          .catch((error) => {
             console.error('🚨 [POST][NFT][Delete Bookmark]:', error)
          })
-
-}
+   }
 
    const getUnreadCommentCount = () => {
       if (account) {
@@ -194,6 +180,7 @@ const NFT = ({
             })
       }
    }
+
    const getTweetCount = () => {
       if (account) {
          fetch(
@@ -215,6 +202,7 @@ const NFT = ({
             })
       }
    }
+
    const getUnreadDMCount = () => {
       if (account) {
          fetch(
@@ -238,36 +226,24 @@ const NFT = ({
    }
 
    const getNftMetadata = () => {
-      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-         console.log('Missing NFT Port API Key')
+      if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+         console.log('Missing OpenSea API Key')
          return
       }
-      fetch(
-         `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=ethereum`,
-         {
-            method: 'GET',
-            headers: {
-               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
-            },
-         }
-      )
+      fetch(`https://api.opensea.io/api/v1/asset/${nftContractAddr}/${nftId}`, {
+         method: 'GET',
+         headers: {
+            Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+         },
+      })
          .then((response) => response.json())
-         .then((result: NFTMetadataType) => {
-            console.log('✅[GET][NFT Metadata]:', result)
-
-            setNftData(result)
-
-            let url = result.nft?.cached_file_url
-            if (url?.includes('ipfs://')) {
-               let parts = url.split('ipfs://')
-               let cid = parts[parts.length - 1]
-               url = `https://ipfs.io/ipfs/${cid}`
-               setImageUrl(url)
-            } else if (url !== null) {
-               setImageUrl(url)
+         .then((result: NFTAssetType) => {
+            console.log(`✅[GET][NFT][Asset]:`, result)
+            if (result?.name) {
+               setNftData(result)
             }
          })
-         .catch((error) => console.log('error', error))
+         .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
    }
 
    const getNftStatistics = () => {
@@ -330,9 +306,9 @@ const NFT = ({
       <Flex flexDirection="column" background="white" height="100vh">
          <Flex alignItems="center" px={5} pt={4} pb={2}>
             <Flex alignItems="flex-start" p={2} borderRadius="md">
-               {imageUrl && (
+               {nftData?.image_thumbnail_url && (
                   <Image
-                     src={imageUrl}
+                     src={nftData.image_thumbnail_url}
                      alt=""
                      height="70px"
                      borderRadius="var(--chakra-radii-xl)"
@@ -340,9 +316,54 @@ const NFT = ({
                   />
                )}
                <Box>
-                  {metadata && metadata.name && (
-                     <Heading size="md">{metadata.name}</Heading>
-                  )}
+                  {nftData?.name && <Heading size="md">{nftData.name}</Heading>}
+                  <Flex alignItems="center">
+                     {nftData?.collection?.name && (
+                        <CLink href={`/nft/${nftContractAddr}`} mr={2}>
+                           <Badge
+                              d="flex"
+                              alignItems="center"
+                              textTransform="unset"
+                              pl={0}
+                           >
+                              {nftData?.collection.image_url && (
+                                 <Image
+                                    src={nftData.collection.image_url}
+                                    height="20px"
+                                    alt=""
+                                    mr={2}
+                                 />
+                              )}
+                              <Text fontSize="sm">
+                                 {nftData.collection.name}
+                              </Text>
+                           </Badge>
+                        </CLink>
+                     )}
+                     {nftStatistics && (
+                        <Tooltip label="Floor price">
+                           <Badge d="flex" alignItems="center" mr={2} fontSize="sm">
+                              {nftStatistics.floor_price}
+                              <IconCurrencyEthereum size="15" />
+                           </Badge>
+                        </Tooltip>
+                     )}
+                     <Tooltip label="Join">
+                        <Button
+                           size="xs"
+                           onClick={() => {
+                              if (isBookmarked === null) return
+                              else if (isBookmarked === false) {
+                                 joinGroup()
+                              } else if (isBookmarked === true) {
+                                 leaveGroup()
+                              }
+                           }}
+                        >
+                           <Text ml={1}>+ Join</Text>
+                        </Button>
+                     </Tooltip>
+                  </Flex>
                   {ownerAddr && (
                      <Box mb="1">
                         <Text fontSize="md" color="lightgray.800">
@@ -364,73 +385,6 @@ const NFT = ({
                         </Text>
                      </Box>
                   )}
-
-                  <Box
-                     px={4}
-                     py={2}
-                     border="1px solid var(--chakra-colors-lightgray-300)"
-                     borderRadius="md"
-                  >
-                     {/* <Flex alignItems="center">
-               {nftData && (
-                  <Flex mr={2} color="darkgray.300" alignItems="center">
-                     <Text fontSize="sm">Collection:</Text> {nftData?.contract.name}
-                  </Flex>
-               )}
-            </Flex> */}
-
-                     <HStack>
-                        {nftStatistics && (
-                           <>
-                              {/* <Stat flex="0">
-                        <StatNumber fontSize="md" color="darkgray.700">
-                           {nftStatistics.total_supply}
-                        </StatNumber>
-                        <StatHelpText color="darkgray.200">Items</StatHelpText>
-                     </Stat>
-                     <Divider orientation="vertical" height="15px" /> */}
-                              <Stat flex="0">
-                                 <StatNumber fontSize="md" color="darkgray.700">
-                                    {nftStatistics.num_owners}
-                                 </StatNumber>
-                                 <StatHelpText color="darkgray.200">
-                                    Owners
-                                 </StatHelpText>
-                              </Stat>
-                              <Divider orientation="vertical" height="15px" />
-                              <Stat flex="0">
-                                 <StatNumber
-                                    fontSize="md"
-                                    color="darkgray.700"
-                                    d="flex"
-                                    alignItems="center"
-                                 >
-                                    {nftStatistics.floor_price}
-                                    <IconCurrencyEthereum size="18" />
-                                    {/* <Text fontSize="sm">{ethereumPrice &&
-                     `(~ $${(ethereumPrice * nftStatistics.floor_price).toFixed(2)})`}</Text> */}
-                                 </StatNumber>
-                                 <StatHelpText color="darkgray.200">
-                                    Floor
-                                 </StatHelpText>
-                              </Stat>
-                              <Divider orientation="vertical" height="15px" />
-                           </>
-                        )}
-                        <Tooltip label="Join">
-                           <Button size="xs" onClick={() => {
-                              if (isBookmarked === null) return
-                              else if (isBookmarked === false) {
-                                 createBookmark()
-                              }
-                              else if (isBookmarked === true) {
-                                 deleteBookmark()
-                              }}}>
-                              <Text ml={1}>+ Join</Text>
-                           </Button>
-                        </Tooltip>
-                     </HStack>
-                  </Box>
                </Box>
             </Flex>
          </Flex>
@@ -444,7 +398,7 @@ const NFT = ({
          >
             <TabList padding="0 var(--chakra-space-5)">
                <Tab>
-                  Social{' '}
+                  Chat{' '}
                   {unreadCount && unreadCount !== 0 ? (
                      <Badge variant="black" background="information.400" ml={1}>
                         {unreadCount}
@@ -464,15 +418,6 @@ const NFT = ({
                   <></>
                )}
                <Tab>
-                  {/* {imageUrl && (
-               <Image
-                  src={imageUrl}
-                  alt=""
-                  height="30px"
-                  borderRadius="var(--chakra-radii-md)"
-                  mr={2}
-               />
-            )} */}
                   <Box textAlign="left">
                      <Text>DM Owner</Text>{' '}
                      {unreadCount && unreadCount !== 0 ? (
@@ -484,7 +429,7 @@ const NFT = ({
                      )}
                      <Text fontSize="xs" color="darkgray.100" d="flex">
                         <IconShieldLock size="15" />
-                        <Box ml={1}>Private Chat</Box>
+                        <Box ml={1}>Private</Box>
                      </Text>
                   </Box>
                </Tab>

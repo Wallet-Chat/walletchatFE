@@ -80,7 +80,7 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
    }, [data.nftAddr])
 
    return (
-      <Link to={`/nft/${data.nftAddr}/1`} style={{ textDecoration: 'none' }}>
+      <Link to={`/nft/${data.nftAddr}`} style={{ textDecoration: 'none' }}>
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>
