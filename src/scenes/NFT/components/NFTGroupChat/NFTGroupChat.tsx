@@ -1,19 +1,17 @@
 import {
-   Badge,
    Box,
    Button,
-   Checkbox,
    Divider,
    Flex,
    FormControl,
-   Stack,
+   Spinner,
    Tag,
 } from '@chakra-ui/react'
 import { IconSend } from '@tabler/icons'
-import { useEffect, useState, KeyboardEvent } from 'react'
+import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import styled from 'styled-components'
-import { getFormattedDate, isValidISODate } from '../../../../helpers/date'
+import { getFormattedDate } from '../../../../helpers/date'
 
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
@@ -49,6 +47,8 @@ const NFTGroupChat = ({
    const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+
+   const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
    useEffect(() => {
       getChatData()
@@ -122,6 +122,13 @@ const NFTGroupChat = ({
       const items = generateItems(toAddToUI)
       setLoadedMsgs(items)
    }, [chatData, account])
+
+   useEffect(() => {
+      // Scroll to bottom of chat once all messages are loaded
+      if (scrollToBottomRef?.current) {
+         scrollToBottomRef.current.scrollIntoView()
+      }
+   }, [loadedMsgs])
 
    const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter') {
@@ -226,9 +233,9 @@ const NFTGroupChat = ({
                   background="white"
                   p={4}
                >
-                  <Box fontSize="md">
+                  {isFetchingMessages ? <Spinner /> : <Box fontSize="md">
                      Be the first to post something here 😉
-                  </Box>
+                  </Box>}
                </Flex>
             )}
             {loadedMsgs.map((msg, i) => {
@@ -249,6 +256,7 @@ const NFTGroupChat = ({
                }
                return null
             })}
+            <Box float="left" style={{ clear: 'both' }} ref={scrollToBottomRef}></Box>
          </DottedBackground>
 
          <Flex>
