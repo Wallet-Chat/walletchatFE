@@ -43,6 +43,8 @@ const NFTGroupChat = ({
    account: string | undefined
    nftContractAddr: string
 }) => {
+
+   const [firstLoad, setFirstLoad] = useState(true)
    const [msgInput, setMsgInput] = useState<string>('')
    const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
@@ -125,8 +127,13 @@ const NFTGroupChat = ({
 
    useEffect(() => {
       // Scroll to bottom of chat once all messages are loaded
-      if (scrollToBottomRef?.current) {
+      if (scrollToBottomRef?.current && firstLoad) {
+         console.log(firstLoad, 'going innnn')
          scrollToBottomRef.current.scrollIntoView()
+         
+         setTimeout(() => {
+            setFirstLoad(false)
+         }, 5000)
       }
    }, [loadedMsgs])
 
@@ -241,7 +248,7 @@ const NFTGroupChat = ({
             {loadedMsgs.map((msg, i) => {
                if (msg.type && msg.type === 'day') {
                   return (
-                     <Box position="relative" my={6}>
+                     <Box position="relative" my={6} key={msg.timestamp}>
                         <Tag color="darkgray.300" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
                         <Divider />
                      </Box>
