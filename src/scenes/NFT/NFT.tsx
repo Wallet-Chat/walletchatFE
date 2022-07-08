@@ -57,7 +57,7 @@ const NFT = ({ account }: { account: string }) => {
       getNftMetadata()
       getNftStatistics()
       getEthereumPrice()
-      getBookmarkStatus()
+      getJoinStatus()
 
       const interval = setInterval(() => {
          getNftStatistics()
@@ -81,7 +81,7 @@ const NFT = ({ account }: { account: string }) => {
       }
    }, [account])
 
-   const getBookmarkStatus = () => {
+   const getJoinStatus = () => {
       fetch(
          ` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}/${nftContractAddr}`,
          {
