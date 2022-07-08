@@ -25,6 +25,7 @@ const EnterName = ({ account }: { account: string }) => {
    const { setName: globalSetName } = useWallet()
 
    const [name, setName] = useState('')
+   const [isFetching, setIsFetching] = useState(false)
    const [ownedENS, setOwnedENS] = useState<NFTMetadataOpenSeaType[]>([])
 
    useEffect(() => {
@@ -60,6 +61,9 @@ const EnterName = ({ account }: { account: string }) => {
 
    const onSubmit = (values: any) => {
       if (values?.name) {
+
+         setIsFetching(true)
+
          fetch(` ${process.env.REACT_APP_REST_API}/name`, {
             method: 'POST',
             headers: {
@@ -77,6 +81,9 @@ const EnterName = ({ account }: { account: string }) => {
             })
             .catch((error) => {
                console.error('🚨[POST][Name]:', error)
+            })
+            .then(() => {
+               setIsFetching(false)
             })
       }
    }
@@ -104,7 +111,7 @@ const EnterName = ({ account }: { account: string }) => {
                         setName(e.target.value)
                      }
                   />
-                  <Button variant="black" height="auto" type="submit">
+                  <Button variant="black" height="auto" type="submit" isLoading={isFetching}>
                      <IconSend size="20" />
                   </Button>
                </Flex>

@@ -8,7 +8,6 @@ import {
    Menu,
    Badge,
    MenuGroup,
-   Link,
    Text,
    MenuDivider
 } from '@chakra-ui/react'
@@ -331,8 +330,8 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                <MenuList>
                   <MenuGroup title={name || truncateAddress(account)} fontSize="lg">
                      <MenuItem
-                        as={Link}
-                        href="/change-name"
+                        as={NavLink}
+                        to="/change-name"
                         icon={
                            <Box>
                               <IconPencil stroke="1.5" />
