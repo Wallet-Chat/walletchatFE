@@ -11,6 +11,7 @@ import { Encrypted } from 'eth-crypto'
 
 
 interface MessageSkeletonType {
+   type?: string
    message: string
    fromaddr: string
    timestamp: string

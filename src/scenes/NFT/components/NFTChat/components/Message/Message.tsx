@@ -22,6 +22,7 @@ const MessageBox = styled.div`
    margin-bottom: 0px;
    font-size: var(--chakra-fontSizes-md);
    clear: both;
+   word-break: break-word;
 
    &:nth-last-child(1) {
       margin-bottom: 20px;
