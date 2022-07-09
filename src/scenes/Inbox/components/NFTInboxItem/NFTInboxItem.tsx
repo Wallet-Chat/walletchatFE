@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
-import NFTMetadataType from '../../../../types/NFTMetadata'
 import { MessageUIType } from '../../../../types/Message'
 import { formatMessageDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
@@ -42,7 +41,7 @@ const BlockieWrapper = styled.div`
    overflow: hidden;
 `
 const NotificationCount = styled.div`
-   background: var(--chakra-colors-error-600);
+   background: var(--chakra-colors-information-400);
    border-radius: 50%;
    width: 18px;
    height: 18px;

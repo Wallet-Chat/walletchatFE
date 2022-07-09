@@ -176,7 +176,7 @@ const NFTGroupChat = ({
 
       data.message = msgInputCopy
 
-      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem `, {
+      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ const NFTGroupChat = ({
                 } else if (msg.message) {
                   return (
                      <Message
-                        key={`${msg.message}${msg.timestamp}`}
+                        key={`${msg.message}${msg.timestamp}${i}`}
                         msg={msg}
                      />
                   )

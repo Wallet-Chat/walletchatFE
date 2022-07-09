@@ -40,7 +40,7 @@ const BlockieWrapper = styled.div`
    overflow: hidden;
 `
 const NotificationCount = styled.div`
-   background: var(--chakra-colors-error-600);
+   background: var(--chakra-colors-information-400);
    border-radius: 50%;
    width: 18px;
    height: 18px;

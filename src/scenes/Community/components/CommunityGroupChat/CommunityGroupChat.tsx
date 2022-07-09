@@ -73,7 +73,6 @@ const NFTGroupChat = ({
                timestamp: chatData[i].timestamp,
                position: 'right',
                isFetching: false,
-               nftAddr: chatData[i].nftaddr,
             })
          } else {
             toAddToUI.push({
@@ -83,7 +82,6 @@ const NFTGroupChat = ({
                timestamp: chatData[i].timestamp,
                position: 'left',
                isFetching: false,
-               nftAddr: chatData[i].nftaddr,
             })
          }
       }
@@ -125,9 +123,9 @@ const NFTGroupChat = ({
       const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
       let data = {
+         type: 'message',
          message: msgInputCopy,
          fromaddr: account.toLocaleLowerCase(),
-         nftaddr: community.toLocaleLowerCase(),
          timestamp,
       }
 
@@ -137,13 +135,14 @@ const NFTGroupChat = ({
          account,
          timestamp.toString(),
          'right',
-         false,
-         community
+         false
       )
 
       data.message = msgInputCopy
 
-      fetch(` ${process.env.REACT_APP_REST_API}/community/${community} `, {
+      console.log(data, `${process.env.REACT_APP_REST_API}/community/${community}`)
+
+      fetch(`${process.env.REACT_APP_REST_API}/community/${community}`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -170,7 +169,6 @@ const NFTGroupChat = ({
       timestamp: string,
       position: string,
       isFetching: boolean,
-      nftaddr: string | null
    ) => {
       console.log(`Add message to UI: ${message}`)
 
@@ -181,7 +179,6 @@ const NFTGroupChat = ({
          timestamp,
          position,
          isFetching,
-         nftAddr: nftaddr,
       }
       let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
       newLoadedMsgs.push(newMsg)
