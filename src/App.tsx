@@ -24,6 +24,7 @@ import { useUnreadCount } from './context/UnreadCountProvider'
 import EnterName from './scenes/EnterName'
 import ChangeName from './scenes/ChangeName'
 import NFTById from './scenes/NFT/scenes/NFTById'
+import Community from './scenes/Community'
 
 export const App = () => {
    const { unreadCount, setUnreadCount } = useUnreadCount()
@@ -147,7 +148,7 @@ export const App = () => {
             )}
          </Flex>
       )
-   } else if (name === null) {
+   } else if (isAuthenticated && name === null) {
       return (
          <Box>
             <Flex>
@@ -211,6 +212,14 @@ export const App = () => {
                         path="/nft/:nftContractAddr"
                         element={
                            <NFT
+                              account={account}
+                           />
+                        }
+                     />
+                     <Route
+                        path="/community/:community"
+                        element={
+                           <Community
                               account={account}
                            />
                         }

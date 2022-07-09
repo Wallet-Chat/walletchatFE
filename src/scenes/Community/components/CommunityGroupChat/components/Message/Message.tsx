@@ -10,7 +10,7 @@ import {
    Image,
    Text,
    Divider,
-   Link
+   Link,
 } from '@chakra-ui/react'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
@@ -131,29 +131,92 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
                      </BlockieWrapper>
                   </MenuButton>
                   <MenuList>
-                     
-                     <Link href={`https://etherscan.io/address/${msg.fromAddr}`} target="_blank" _hover={{ textDecoration: 'none', background: 'var(--chakra-colors-lightgray-400)'}}>
-                        <MenuItem icon={<Image src={IconEtherscan} width="20px" height="20px" alt="" />}>
+                     <Link
+                        href={`https://etherscan.io/address/${msg.fromAddr}`}
+                        target="_blank"
+                        _hover={{
+                           textDecoration: 'none',
+                           background: 'var(--chakra-colors-lightgray-400)',
+                        }}
+                     >
+                        <MenuItem
+                           icon={
+                              <Image
+                                 src={IconEtherscan}
+                                 width="20px"
+                                 height="20px"
+                                 alt=""
+                              />
+                           }
+                        >
                            <Flex alignItems="center">
                               <Text>{truncateAddress(msg.fromAddr)}</Text>
                               <IconExternalLink stroke="1.5" size="20" />
                            </Flex>
                         </MenuItem>
                      </Link>
-                     
+
                      <Divider />
-                     <Link href={`https://opensea.io/accounts/${msg.fromAddr}`} target="_blank" _hover={{ textDecoration: 'none', background: 'var(--chakra-colors-lightgray-400)'}}>
-                        <MenuItem icon={<Image src={IconOpenSea} width="20px" height="20px" alt="" />}>
+                     <Link
+                        href={`https://opensea.io/accounts/${msg.fromAddr}`}
+                        target="_blank"
+                        _hover={{
+                           textDecoration: 'none',
+                           background: 'var(--chakra-colors-lightgray-400)',
+                        }}
+                     >
+                        <MenuItem
+                           icon={
+                              <Image
+                                 src={IconOpenSea}
+                                 width="20px"
+                                 height="20px"
+                                 alt=""
+                              />
+                           }
+                        >
                            View in OpenSea
                         </MenuItem>
                      </Link>
-                     <Link href={`https://looksrare.org/accounts/${msg.fromAddr}`} target="_blank" _hover={{ textDecoration: 'none', background: 'var(--chakra-colors-lightgray-400)'}}>
-                        <MenuItem icon={<Image src={IconLooksRare} width="20px" height="20px" alt="" />}>
+                     <Link
+                        href={`https://looksrare.org/accounts/${msg.fromAddr}`}
+                        target="_blank"
+                        _hover={{
+                           textDecoration: 'none',
+                           background: 'var(--chakra-colors-lightgray-400)',
+                        }}
+                     >
+                        <MenuItem
+                           icon={
+                              <Image
+                                 src={IconLooksRare}
+                                 width="20px"
+                                 height="20px"
+                                 alt=""
+                              />
+                           }
+                        >
                            View in LooksRare
                         </MenuItem>
                      </Link>
-                     <Link href={`https://x2y2.io/user/${msg.fromAddr}`} target="_blank" _hover={{ textDecoration: 'none', background: 'var(--chakra-colors-lightgray-400)'}}>
-                        <MenuItem icon={<Image src={IconX2Y2} width="20px" height="20px" alt="" />}>
+                     <Link
+                        href={`https://x2y2.io/user/${msg.fromAddr}`}
+                        target="_blank"
+                        _hover={{
+                           textDecoration: 'none',
+                           background: 'var(--chakra-colors-lightgray-400)',
+                        }}
+                     >
+                        <MenuItem
+                           icon={
+                              <Image
+                                 src={IconX2Y2}
+                                 width="20px"
+                                 height="20px"
+                                 alt=""
+                              />
+                           }
+                        >
                            View in X2Y2
                         </MenuItem>
                      </Link>
@@ -164,6 +227,11 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
 
          <MessageBox className={`msg ${msg.position} ${msg.read && 'read'}`}>
             <Box className="msg-bubble">
+               {msg?.name && (
+                  <Text fontSize="md" color="information.600">
+                     {msg.name}
+                  </Text>
+               )}
                {msg.message}
                <span className="timestamp">
                   {formatMessageDate(new Date(msg.timestamp))}

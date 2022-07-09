@@ -80,7 +80,7 @@ const EnterName = ({ account }: { account: string }) => {
             .then((response) => {
                console.log('✅[POST][Name]:', response)
                globalSetName(name)
-               navigate('/nft/walletchat')
+               navigate('/community/walletchat')
             })
             .catch((error) => {
                console.error('🚨[POST][Name]:', error)

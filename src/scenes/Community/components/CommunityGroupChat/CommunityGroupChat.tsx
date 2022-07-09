@@ -4,14 +4,17 @@ import {
    Divider,
    Flex,
    FormControl,
+   Link,
    Spinner,
    Tag,
+   Text,
 } from '@chakra-ui/react'
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import styled from 'styled-components'
 import { getFormattedDate } from '../../../../helpers/date'
+import { truncateAddress } from '../../../../helpers/truncateString'
 
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
@@ -38,59 +41,20 @@ const DottedBackground = styled.div`
 
 const NFTGroupChat = ({
    account,
-   nftContractAddr,
+   community,
+   chatData
 }: {
    account: string | undefined
-   nftContractAddr: string
+   community: string
+   chatData: GroupMessageType[]
 }) => {
 
    const [firstLoad, setFirstLoad] = useState(true)
    const [msgInput, setMsgInput] = useState<string>('')
    const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
-   const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
-
-   useEffect(() => {
-      getChatData()
-
-      const interval = setInterval(() => {
-         getChatData()
-      }, 5000) // every 5s
-
-      return () => {
-         clearInterval(interval)
-      }
-   }, [account])
-
-   const getChatData = () => {
-      if (!account) {
-         console.log('No account connected')
-         return
-      }
-
-      setIsFetchingMessages(true)
-
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_groupchatitems/${nftContractAddr}`,
-         {
-            method: 'GET',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-         }
-      )
-         .then((response) => response.json())
-         .then(async (data: GroupMessageType[]) => {
-            console.log('✅[GET][NFT][Group Chat Messages]:', data)
-            setChatData(data)
-         })
-         .catch((error) => {
-            console.error('🚨[GET][NFT][Messages]:', error)
-         })
-         .finally(() => setIsFetchingMessages(false))
-   }
 
    useEffect(() => {
       const toAddToUI = [] as MessageUIType[]
@@ -103,6 +67,7 @@ const NFTGroupChat = ({
             chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
+               type: chatData[i].type,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
                timestamp: chatData[i].timestamp,
@@ -112,6 +77,7 @@ const NFTGroupChat = ({
             })
          } else {
             toAddToUI.push({
+               type: chatData[i].type,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
                timestamp: chatData[i].timestamp,
@@ -161,22 +127,23 @@ const NFTGroupChat = ({
       let data = {
          message: msgInputCopy,
          fromaddr: account.toLocaleLowerCase(),
-         nftaddr: nftContractAddr.toLocaleLowerCase(),
+         nftaddr: community.toLocaleLowerCase(),
          timestamp,
       }
 
       addMessageToUI(
+         "message",
          msgInputCopy,
          account,
          timestamp.toString(),
          'right',
          false,
-         nftContractAddr
+         community
       )
 
       data.message = msgInputCopy
 
-      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem `, {
+      fetch(` ${process.env.REACT_APP_REST_API}/community/${community} `, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -185,12 +152,11 @@ const NFTGroupChat = ({
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅[POST][Message]:', data, latestLoadedMsgs)
-            getChatData()
+            console.log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
          })
          .catch((error) => {
             console.error(
-               '🚨[POST][Message]:',
+               '🚨[POST][Community][Message]:',
                error,
                JSON.stringify(data)
             )
@@ -198,6 +164,7 @@ const NFTGroupChat = ({
    }
 
    const addMessageToUI = (
+      type: string,
       message: string,
       fromaddr: string,
       timestamp: string,
@@ -208,6 +175,7 @@ const NFTGroupChat = ({
       console.log(`Add message to UI: ${message}`)
 
       const newMsg: MessageUIType = {
+         type,
          message,
          fromAddr: fromaddr,
          timestamp,
@@ -222,13 +190,6 @@ const NFTGroupChat = ({
 
    return (
       <Flex flexDirection="column" height="100%">
-         {/* <Box py={2} px={6}>
-            <Stack spacing={5} direction="row">
-               <Checkbox defaultChecked size="sm">Project</Checkbox>
-               <Checkbox defaultChecked size="sm">Users</Checkbox>
-               <Checkbox defaultChecked size="sm">Holders</Checkbox>
-            </Stack>
-         </Box> */}
 
          <DottedBackground className="custom-scrollbar">
             {loadedMsgs.length === 0 && (
@@ -252,10 +213,16 @@ const NFTGroupChat = ({
                         <Divider />
                      </Box>
                   )
+                } else if (msg.type && msg.type === 'welcome') {
+                  return (
+                     <Box textAlign="center">
+                        <Text fontSize="sm" color="darkgray.200">A warm welcome to <Link href={`https://etherscan.io/address/${msg.fromAddr}`} target="_blank">{truncateAddress(msg.fromAddr)}</Link></Text>
+                     </Box>
+                  )
                 } else if (msg.message) {
                   return (
                      <Message
-                        key={`${msg.message}${msg.timestamp}`}
+                        key={`${msg.message}${msg.timestamp}${i}`}
                         msg={msg}
                      />
                   )
