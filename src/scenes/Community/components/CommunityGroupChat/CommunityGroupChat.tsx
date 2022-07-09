@@ -127,6 +127,7 @@ const NFTGroupChat = ({
          message: msgInputCopy,
          fromaddr: account.toLocaleLowerCase(),
          timestamp,
+         nftaddr: community
       }
 
       addMessageToUI(
@@ -140,9 +141,9 @@ const NFTGroupChat = ({
 
       data.message = msgInputCopy
 
-      console.log(data, `${process.env.REACT_APP_REST_API}/community/${community}`)
+      console.log(data, `${process.env.REACT_APP_REST_API}/community`)
 
-      fetch(`${process.env.REACT_APP_REST_API}/community/${community}`, {
+      fetch(`${process.env.REACT_APP_REST_API}/community`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
