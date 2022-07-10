@@ -127,7 +127,7 @@ const NFTGroupChat = ({
          message: msgInputCopy,
          nftaddr: community,
          fromaddr: account.toLocaleLowerCase(),
-         timestamp,
+         timestamp
       }
 
       addMessageToUI(
