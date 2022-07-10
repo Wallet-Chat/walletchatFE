@@ -215,7 +215,9 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
             console.log(contractAddress, nftId)
             setNftContractAddr(contractAddress)
             setNftId(parseInt(nftId))
-            getNftMetadata(contractAddress, parseInt(nftId))
+            if (contractAddress.startsWith('0x')) {
+               getNftMetadata(contractAddress, parseInt(nftId))
+            }
          }
       }
    }, [url])

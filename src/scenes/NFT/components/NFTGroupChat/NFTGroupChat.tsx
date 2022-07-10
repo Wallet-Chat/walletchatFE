@@ -84,7 +84,7 @@ const NFTGroupChat = ({
       )
          .then((response) => response.json())
          .then(async (data: GroupMessageType[]) => {
-            console.log('✅[GET][NFT][Group Chat Messages]:', data)
+            console.log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
             setChatData(data)
          })
          .catch((error) => {
