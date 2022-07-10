@@ -59,7 +59,7 @@ const ConversationItem = ({
    account: string
 }) => {
    let recipientAddress = ''
-   if (data && data.toAddr && data.fromAddr) {
+   if (data?.toAddr && data?.fromAddr) {
       recipientAddress =
          data.toAddr.toLocaleLowerCase() === account
             ? data.fromAddr.toLocaleLowerCase()
@@ -77,7 +77,9 @@ const ConversationItem = ({
                      </BlockieWrapper>
                   </Box>
                   <Box>
-                     {recipientAddress && (
+                     {data?.sender_name !== "" ? (
+                        <RecipientAddress>{data.sender_name}</RecipientAddress>
+                        ) : (
                         <RecipientAddress>
                            {truncateAddress(recipientAddress)}
                         </RecipientAddress>
