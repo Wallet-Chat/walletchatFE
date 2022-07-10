@@ -60,13 +60,13 @@ const NFTChat = ({
 }) => {
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [msgInput, setMsgInput] = useState<string>('')
+   const [isSendingMessage, setIsSendingMessage] = useState(false)
    const [chatData, setChatData] = useState<MessageType[]>(
       new Array<MessageType>()
    )
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
-   const [isPostingMessage, setIsPostingMessage] = useState<boolean>(false)
 
    let timer: ReturnType<typeof setTimeout>
 
@@ -213,6 +213,7 @@ const NFTChat = ({
       //const cid = await postIpfsData(msgInputCopy)
       data.message = msgInputCopy //await cid
 
+      setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
          method: 'POST',
          headers: {
@@ -231,6 +232,9 @@ const NFTChat = ({
                error,
                JSON.stringify(data)
             )
+         })
+         .finally(() => {
+            setIsSendingMessage(false)
          })
    }
 
@@ -477,6 +481,7 @@ const NFTChat = ({
                   variant="black"
                   height="100%"
                   onClick={() => sendMessage()}
+                  isLoading={isSendingMessage}
                >
                   <IconSend size="20" />
                </Button>

@@ -46,6 +46,7 @@ const NFTGroupChat = ({
 
    const [firstLoad, setFirstLoad] = useState(true)
    const [msgInput, setMsgInput] = useState<string>('')
+   const [isSendingMessage, setIsSendingMessage] = useState(false)
    const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
@@ -176,6 +177,7 @@ const NFTGroupChat = ({
 
       data.message = msgInputCopy
 
+      setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem`, {
          method: 'POST',
          headers: {
@@ -194,6 +196,9 @@ const NFTGroupChat = ({
                error,
                JSON.stringify(data)
             )
+         })
+         .finally(() => {
+            setIsSendingMessage(false)
          })
    }
 
@@ -290,6 +295,7 @@ const NFTGroupChat = ({
                   variant="black"
                   height="100%"
                   onClick={() => sendMessage()}
+                  isLoading={isSendingMessage}
                >
                   <IconSend size="20" />
                </Button>
