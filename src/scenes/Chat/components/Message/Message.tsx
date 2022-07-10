@@ -204,6 +204,11 @@ const Message = ({
             style={{ backgroundImage: `url(${msg.img})` }}
          ></Box>
          <Box className="msg-bubble">
+            {msg?.sender_name && (
+               <Text fontSize="md" color="information.600">
+                  {msg.sender_name}
+               </Text>
+            )}
             {msg.message}
             <span className="timestamp">
                {formatMessageDate(new Date(msg.timestamp))}

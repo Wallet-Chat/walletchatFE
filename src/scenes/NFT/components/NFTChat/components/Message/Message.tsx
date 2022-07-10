@@ -1,4 +1,4 @@
-import { Box, Spinner } from '@chakra-ui/react'
+import { Box, Spinner, Text } from '@chakra-ui/react'
 import { IconCheck, IconChecks } from '@tabler/icons'
 import { useEffect } from 'react'
 import styled from 'styled-components'
@@ -95,7 +95,6 @@ const Message = ({
    msg: MessageUIType
    updateRead: (data: MessageUIType) => void
 }) => {
-
    let { unreadCount, setUnreadCount } = useUnreadCount()
 
    const { ref, inView } = useInView({
@@ -150,21 +149,26 @@ const Message = ({
             style={{ backgroundImage: `url(${msg.img})` }}
          ></Box>
          <Box className="msg-bubble">
+            {msg?.sender_name && (
+               <Text fontSize="md" color="information.600">
+                  {msg.sender_name}
+               </Text>
+            )}
             {msg.message}
             <span className="timestamp">
                {formatMessageDate(new Date(msg.timestamp))}
             </span>
 
             {msg.position === 'right' && (
-            <span className="read-status">
-               {msg.isFetching ? (
-                  <Spinner size="xs" />
-               ) : msg.read ? (
-                  <IconChecks size={15} />
-               ) : (
-                  <IconCheck size={15} />
-               )}
-            </span>
+               <span className="read-status">
+                  {msg.isFetching ? (
+                     <Spinner size="xs" />
+                  ) : msg.read ? (
+                     <IconChecks size={15} />
+                  ) : (
+                     <IconCheck size={15} />
+                  )}
+               </span>
             )}
          </Box>
       </MessageBox>
