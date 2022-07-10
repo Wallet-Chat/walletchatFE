@@ -235,7 +235,7 @@ const NFT = ({ account }: { account: string }) => {
                   <Image
                      src={nftData.collection.image_url}
                      alt=""
-                     height="70px"
+                     height="60px"
                      borderRadius="var(--chakra-radii-xl)"
                      mr={3}
                   />

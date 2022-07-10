@@ -310,7 +310,7 @@ const NFT = ({
                   <Image
                      src={nftData.image_thumbnail_url}
                      alt=""
-                     height="70px"
+                     height="60px"
                      borderRadius="var(--chakra-radii-xl)"
                      mr={3}
                   />

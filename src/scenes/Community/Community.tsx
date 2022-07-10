@@ -153,7 +153,7 @@ const Community = ({ account }: { account: string }) => {
                   <Image
                      src={communityData.logo}
                      alt=""
-                     height="70px"
+                     height="60px"
                      borderRadius="var(--chakra-radii-xl)"
                      mr={3}
                   />
