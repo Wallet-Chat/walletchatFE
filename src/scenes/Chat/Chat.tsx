@@ -21,7 +21,7 @@ import {
 import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
-import { MessageType, MessageUIType } from'../../types/Message'
+import { MessageType, MessageUIType } from '../../types/Message'
 import Message from './components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
@@ -61,15 +61,17 @@ const Chat = ({
    isAuthenticated,
 }: {
    publicKey: string
-   privateKey: string 
+   privateKey: string
    account: string
    web3: Web3
    isAuthenticated: boolean
 }) => {
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
+   const [name, setName] = useState()
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
+   const [isSendingMessage, setIsSendingMessage] = useState(false)
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [chatData, setChatData] = useState<MessageType[]>(
       new Array<MessageType>()
@@ -83,9 +85,28 @@ const Chat = ({
       const interval = setInterval(() => {
          getChatData()
       }, 5000) // every 5s
-   
+
       return () => clearInterval(interval)
    }, [isAuthenticated, account])
+
+   useEffect(() => {
+      if (toAddr) {
+         fetch(` ${process.env.REACT_APP_REST_API}/name/${toAddr}`, {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         })
+            .then((response) => response.json())
+            .then((response) => {
+               console.log('✅[GET][Name]:', response)
+               if (response[0]?.name) setName(response[0].name)
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Name]:', error)
+            })
+      }
+   }, [toAddr])
 
    function getChatData() {
       // GET request to get off-chain data for RX user
@@ -107,17 +128,20 @@ const Chat = ({
       }
       setIsFetchingChatData(true)
       //console.log(`getall_chatitems/${account}/${toAddr}`)
-      fetch(` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${toAddr}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-      })
+      fetch(
+         ` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${toAddr}`,
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         }
+      )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            console.log('✅ GET [Chat items]:', data)
+            console.log('✅[GET][Chat items]:', data)
 
-            const replica = JSON.parse(JSON.stringify(data));
+            const replica = JSON.parse(JSON.stringify(data))
 
             // Get data from IPFS and replace the message with the fetched text
             // for (let i = 0; i < replica.length; i++) {
@@ -150,7 +174,7 @@ const Chat = ({
             setIsFetchingChatData(false)
          })
          .catch((error) => {
-            console.error('🚨🚨REST API Error [GET]:', error)
+            console.error('🚨[GET][Chat items]:', error)
             setIsFetchingChatData(false)
          })
    }
@@ -174,7 +198,7 @@ const Chat = ({
                position: 'left',
                isFetching: false,
                nftAddr: chatData[i].nftaddr,
-               nftId: chatData[i].nftid
+               nftId: chatData[i].nftid,
             })
          } else if (
             chatData[i] &&
@@ -191,7 +215,7 @@ const Chat = ({
                position: 'right',
                isFetching: false,
                nftAddr: chatData[i].nftaddr,
-               nftId: chatData[i].nftid
+               nftId: chatData[i].nftid,
             })
          }
       }
@@ -241,7 +265,7 @@ const Chat = ({
 
    //    return await toAddrPublicKey
    // }
-   
+
    //end get public key that should only need to be done once per conversation
    const sendMessage = async () => {
       if (msgInput.length <= 0) return
@@ -252,7 +276,7 @@ const Chat = ({
 
       const timestamp = new Date()
 
-      const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs));
+      const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
       let data = {
          message: msgInputCopy,
@@ -262,27 +286,38 @@ const Chat = ({
          read: false,
       }
 
-      addMessageToUI(msgInputCopy, account, toAddr, timestamp.toString(), false, 'right', true, null, null)
+      addMessageToUI(
+         msgInputCopy,
+         account,
+         toAddr,
+         timestamp.toString(),
+         false,
+         'right',
+         true,
+         null,
+         null
+      )
 
       // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
       // let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
- 
+
       // console.log("encrypt with public key: ", toAddrPublicKey)
       // const encryptedTo = await EthCrypto.encryptWithPublicKey(
-      //    toAddrPublicKey, 
+      //    toAddrPublicKey,
       //    msgInputCopy)
 
-      // //we have to encrypt the sender side with its own public key, if we want to refresh data from server 
+      // //we have to encrypt the sender side with its own public key, if we want to refresh data from server
       // const encryptedFrom = await EthCrypto.encryptWithPublicKey(
-      //    publicKey, 
-      //    msgInputCopy) 
+      //    publicKey,
+      //    msgInputCopy)
 
       //lets try and use IPFS instead of any actual data stored on our server
       //const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
-      
+
       //const cid = await postIpfsData(msgInputCopy)
       data.message = msgInputCopy //await cid
 
+      setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
          method: 'POST',
          headers: {
@@ -292,7 +327,7 @@ const Chat = ({
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅ POST/Send Message:', data, latestLoadedMsgs)
+            console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
             getChatData()
 
             // let indexOfMsg = -1
@@ -321,10 +356,13 @@ const Chat = ({
          })
          .catch((error) => {
             console.error(
-               '🚨🚨REST API Error [POST]:',
+               '🚨[POST][Send message]:',
                error,
                JSON.stringify(data)
             )
+         })
+         .finally(() => {
+            setIsSendingMessage(false)
          })
    }
 
@@ -350,7 +388,7 @@ const Chat = ({
          position,
          isFetching,
          nftAddr,
-         nftId
+         nftId,
       }
       let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
       newLoadedMsgs.push(newMsg)
@@ -369,11 +407,10 @@ const Chat = ({
       if (indexOfMsg !== -1) {
          newLoadedMsgs[indexOfMsg] = {
             ...newLoadedMsgs[indexOfMsg],
-            read: true
+            read: true,
          }
          setLoadedMsgs(newLoadedMsgs)
       }
-      
    }
 
    return (
@@ -404,10 +441,27 @@ const Chat = ({
                      <BlockieWrapper>
                         <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
                      </BlockieWrapper>
-                     <Box>
-                        <Text ml={2} fontWeight="bold" color="darkgray.800" fontSize="md">
-                           {truncateAddress(toAddr)}
-                        </Text>
+                     <Box ml={2}>
+                        {name ? (
+                           <Box>
+                              <Text
+                                 fontWeight="bold"
+                                 color="darkgray.800"
+                                 fontSize="md"
+                              >
+                                 {name}
+                              </Text>
+                              <Text fontSize="sm" color="darkgray.500">{truncateAddress(toAddr)}</Text>
+                           </Box>
+                        ) : (
+                           <Text
+                              fontWeight="bold"
+                              color="darkgray.800"
+                              fontSize="md"
+                           >
+                              {truncateAddress(toAddr)}
+                           </Text>
+                        )}
                         {/* {ens && (
                            <Text fontWeight="bold" color="darkgray.800">
                               {ens}
@@ -464,7 +518,14 @@ const Chat = ({
             )}
             {loadedMsgs.map((msg: MessageUIType, i) => {
                if (msg && msg.message) {
-                  return <Message key={`${msg.message}${msg.timestamp}`} account={account} msg={msg} updateRead={updateRead} />
+                  return (
+                     <Message
+                        key={`${msg.message}${msg.timestamp}`}
+                        account={account}
+                        msg={msg}
+                        updateRead={updateRead}
+                     />
+                  )
                }
                return null
             })}
@@ -495,6 +556,7 @@ const Chat = ({
                   variant="black"
                   height="100%"
                   onClick={() => sendMessage()}
+                  isLoading={isSendingMessage}
                >
                   <IconSend size="20" />
                </Button>

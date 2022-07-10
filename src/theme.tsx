@@ -308,6 +308,9 @@ export const theme = extendTheme(
                   color: 'darkgray.800',
                   _hover: { bg: 'lightgray.200' },
                },
+               outline: {
+                  borderColor: 'darkgray.400'
+               },
                morePadding: {
                   paddingLeft: 8,
                   paddingRight: 8,

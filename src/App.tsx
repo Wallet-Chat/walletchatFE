@@ -1,7 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { IconX } from '@tabler/icons'
 import { Route, Routes, Navigate } from 'react-router-dom'
-import { Button, Box, Flex, Image, Heading, Spinner } from '@chakra-ui/react'
+import {
+   Button,
+   Box,
+   Flex,
+   Image,
+   Heading,
+   Spinner,
+   Text,
+   Alert,
+} from '@chakra-ui/react'
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
@@ -12,10 +21,15 @@ import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import { useUnreadCount } from './context/UnreadCountProvider'
+import EnterName from './scenes/EnterName'
+import ChangeName from './scenes/ChangeName'
+import NFTById from './scenes/NFT/scenes/NFTById'
+import Community from './scenes/Community'
 
 export const App = () => {
    const { unreadCount, setUnreadCount } = useUnreadCount()
-   
+   const [btnClicks, setBtnClicks] = useState(0)
+
    // const location = useLocation()
    // console.log("location", location)
 
@@ -23,7 +37,7 @@ export const App = () => {
       appLoading,
       isAuthenticated,
       connectWallet,
-      disconnectWallet,
+      name,
       account,
       publicKey,
       privateKey,
@@ -117,26 +131,39 @@ export const App = () => {
                   </Heading>
                   <Button
                      variant="black"
-                     onClick={() => connectWallet()}
+                     onClick={() => {
+                        setBtnClicks(btnClicks + 1)
+                        connectWallet()
+                     }}
                      size="lg"
                   >
                      Sign in using wallet
                   </Button>
+                  {btnClicks > 0 && (
+                     <Alert status="success" variant="solid" mt={4}>
+                        Check the MetaMask extension to continue
+                     </Alert>
+                  )}
                </Box>
             )}
          </Flex>
+      )
+   } else if (isAuthenticated && name === null) {
+      return (
+         <Box>
+            <Flex>
+               {closeBtn}
+               <Sidebar unreadCount={unreadCount} />
+               <EnterName account={account} />
+            </Flex>
+         </Box>
       )
    } else {
       return (
          <Box>
             <Flex>
                {closeBtn}
-               <Sidebar
-                  account={account}
-                  unreadCount={unreadCount}
-                  currAccountAddress={account}
-                  disconnectWallet={disconnectWallet}
-               />
+               <Sidebar unreadCount={unreadCount} />
                <Box flex="1">
                   <Routes>
                      <Route
@@ -166,13 +193,35 @@ export const App = () => {
                         }
                      />
                      <Route
+                        path="/change-name"
+                        element={
+                           <ChangeName />
+                        }
+                     />
+                     <Route
                         path="/nft/:nftContractAddr/:nftId"
                         element={
-                           <NFT 
+                           <NFTById
                               account={account}
                               publicKey={publicKey}
                               privateKey={privateKey}
-                            />
+                           />
+                        }
+                     />
+                     <Route
+                        path="/nft/:nftContractAddr"
+                        element={
+                           <NFT
+                              account={account}
+                           />
+                        }
+                     />
+                     <Route
+                        path="/community/:community"
+                        element={
+                           <Community
+                              account={account}
+                           />
                         }
                      />
                      <Route

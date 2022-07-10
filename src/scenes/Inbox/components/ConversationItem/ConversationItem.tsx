@@ -40,7 +40,7 @@ const BlockieWrapper = styled.div`
    overflow: hidden;
 `
 const NotificationCount = styled.div`
-   background: var(--chakra-colors-error-600);
+   background: var(--chakra-colors-information-400);
    border-radius: 50%;
    width: 18px;
    height: 18px;
@@ -59,7 +59,7 @@ const ConversationItem = ({
    account: string
 }) => {
    let recipientAddress = ''
-   if (data && data.toAddr && data.fromAddr) {
+   if (data?.toAddr && data?.fromAddr) {
       recipientAddress =
          data.toAddr.toLocaleLowerCase() === account
             ? data.fromAddr.toLocaleLowerCase()
@@ -77,7 +77,9 @@ const ConversationItem = ({
                      </BlockieWrapper>
                   </Box>
                   <Box>
-                     {recipientAddress && (
+                     {data?.sender_name !== "" ? (
+                        <RecipientAddress>{data.sender_name}</RecipientAddress>
+                        ) : (
                         <RecipientAddress>
                            {truncateAddress(recipientAddress)}
                         </RecipientAddress>

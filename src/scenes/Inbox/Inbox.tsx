@@ -52,12 +52,10 @@ const Inbox = ({
       useState<boolean>(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [beenHereFor3Secs, setBeenHereFor3Secs] = useState(false)
-   const [bookmarks, setBookmarks] = useState<BookmarkType[]>()
 
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
-         getBookmarks()
       }, 5000) // every 5s
 
       setTimeout(() => setBeenHereFor3Secs(true), 3000)
@@ -67,7 +65,6 @@ const Inbox = ({
 
    useEffect(() => {
       getInboxData()
-      getBookmarks()
    }, [isAuthenticated, account])
 
    const getInboxData = () => {
@@ -135,31 +132,16 @@ const Inbox = ({
          })
    }
 
-   const getBookmarks = () => {
-      fetch(` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}`, {
-         method: 'GET',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-      })
-         .then((response) => response.json())
-         .then((result) => {
-            console.log('✅ [GET][NFT][Bookmarks]', result)
-            setBookmarks(result)
-         })
-         .catch((error) => {
-            console.error('🚨 [POST][NFT][Bookmarks]:', error)
-         })
-   }
-
    useEffect(() => {
       const populateUI = async () => {
          const toAddToUI = [] as MessageUIType[]
          for (let i = 0; i < inboxData.length; i++) {
             if (
+               inboxData[i]?.type === 'nft' || (
                inboxData[i] &&
                inboxData[i].toaddr &&
                inboxData[i].toaddr.toLowerCase() === account.toLowerCase()
+               )
             ) {
                toAddToUI.push({
                   ...inboxData[i],
@@ -170,7 +152,6 @@ const Inbox = ({
                   isFetching: false,
                   nftAddr: inboxData[i].nftaddr,
                   nftId: inboxData[i].nftid,
-                  type: 'user',
                })
             } else if (
                inboxData[i] &&
@@ -186,25 +167,13 @@ const Inbox = ({
                   isFetching: false,
                   nftAddr: inboxData[i].nftaddr,
                   nftId: inboxData[i].nftid,
-                  type: 'user',
-               })
-            }
-         }
-         if (bookmarks && bookmarks.length > 0) {
-            for (let j = 0; j < bookmarks.length; j++) {
-               toAddToUI.push({
-                  type: 'contract',
-                  message: bookmarks[j].lastmsg,
-                  nftAddr: bookmarks[j].nftaddr,
-                  timestamp: bookmarks[j].lasttimestamp,
-                  unread: bookmarks[j].Unreadcnt,
                })
             }
          }
          setLoadedMsgs(toAddToUI)
       }
       populateUI()
-   }, [inboxData, bookmarks, account])
+   }, [inboxData, account])
 
    if (isFetchingInboxData && inboxData.length === 0 && !beenHereFor3Secs) {
       return (
@@ -249,20 +218,24 @@ const Inbox = ({
          </Box>
          <Divider />
 
-         {loadedMsgs.map((conversation, i) =>
-            conversation.type === 'user' ? (
+         {loadedMsgs.map((conversation, i) => {
+            if (conversation.type === 'dm' || conversation.type === 'community') {
+               return (
                <ConversationItem
                   key={conversation.timestamp.toString()}
                   data={conversation}
                   account={account}
                />
-            ) : (
+               )
+            } else if (conversation.type === 'nft') {
+               return (
                <NFTInboxItem
                   key={conversation.timestamp.toString()}
                   data={conversation}
                />
-            )
-         )}
+               )
+            }
+         })}
          {loadedMsgs.length === 0 && (
             <Box p={5}>
                <Text mb={4} fontSize="md">

@@ -1,5 +1,11 @@
 // NFT Port API
 
+export interface NFTMetadataOpenSeaType {
+   name: string
+   token_id: string
+   description: string
+}
+
 export default interface NFTMetadataType {
    contract: {
       metadata: {
@@ -14,30 +20,32 @@ export default interface NFTMetadataType {
       type: string
    }
    nft?: {
-      animation_url: string | null
-      cached_animation_url: string | null
-      cached_file_url: string | null
-      chain: string
-      contract_address: string
-      file_url: string | null
-      metadata: {
-         attributes: Array<{
-            trait_type: string
-            value: string
-         }>
-         description: string
-         google_image: string
-         image: string
-         ipfs_image: string
-         name: string
-      }
-      metadata_url: string
-      mint_date: string
-      token_id: string
-      updated_date: string
+      name: string
+   animation_url: string | null
+   cached_animation_url: string | null
+   cached_file_url: string | null
+   chain: string
+   contract_address: string
+   file_url: string | null
+   metadata: {
+      attributes: Array<{
+         trait_type: string
+         value: string
+      }>
+      description: string
+      google_image: string
+      image: string
+      ipfs_image: string
+      name: string
    }
+   metadata_url: string
+   mint_date: string
+   token_id: string
+   updated_date: string
+   },
    owner: string
 }
+
 
 // Alchemy API
 

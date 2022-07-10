@@ -24,6 +24,7 @@ const MessageBox = styled.div`
    margin-bottom: 0px;
    font-size: var(--chakra-fontSizes-md);
    clear: both;
+   word-break: break-word;
 
    &:nth-last-child(1) {
       margin-bottom: 20px;
@@ -148,12 +149,12 @@ const Message = ({
          )
             .then((response) => response.json())
             .then((data) => {
-               console.log('✅ PUT Message:', data)
+               console.log('✅[PUT][Message]:', data)
                setUnreadCount(unreadCount - 1)
                updateRead(data)
             })
             .catch((error) => {
-               console.error('🚨🚨REST API Error [PUT]:', error)
+               console.error('🚨[PUT][Message]:', error)
             })
       }
    }
@@ -203,6 +204,11 @@ const Message = ({
             style={{ backgroundImage: `url(${msg.img})` }}
          ></Box>
          <Box className="msg-bubble">
+            {msg?.sender_name && (
+               <Text fontSize="md" color="information.600">
+                  {msg.sender_name}
+               </Text>
+            )}
             {msg.message}
             <span className="timestamp">
                {formatMessageDate(new Date(msg.timestamp))}
