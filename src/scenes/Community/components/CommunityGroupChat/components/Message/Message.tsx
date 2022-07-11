@@ -46,7 +46,7 @@ const MessageBox = styled.div`
       display: inline-block;
    }
    .name {
-      color: var(--chakra-colors-information-600);
+      color: var(--chakra-colors-darkgray-700);
    }
 
    &.left {
@@ -117,6 +117,7 @@ const BlockieWrapper = styled.div`
 `
 
 const Message = ({ msg }: { msg: MessageUIType }) => {
+
    return (
       <Flex
          alignItems="flex-start"

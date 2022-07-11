@@ -26,6 +26,10 @@ const MessageBox = styled.div`
    clear: both;
    word-break: break-word;
 
+   .name {
+      color: var(--chakra-colors-darkgray-700);
+   }
+
    &:nth-last-child(1) {
       margin-bottom: 20px;
    }
@@ -47,6 +51,10 @@ const MessageBox = styled.div`
             background: var(--chakra-colors-darkgray-500);
             color: var(--chakra-colors-lightgray-500);
          }
+      }
+
+      .name {
+         color: var(--chakra-colors-white);
       }
    }
    .timestamp {
@@ -205,7 +213,7 @@ const Message = ({
          ></Box>
          <Box className="msg-bubble">
             {msg?.sender_name && (
-               <Text fontSize="md" color="information.600">
+               <Text fontSize="md" className="name">
                   {msg.sender_name}
                </Text>
             )}

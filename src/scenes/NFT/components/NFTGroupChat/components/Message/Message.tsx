@@ -46,6 +46,10 @@ const MessageBox = styled.div`
       display: inline-block;
    }
 
+   .name {
+      color: var(--chakra-colors-darkgray-700);
+   }
+
    &.left {
       float: left;
       background: #fff;
@@ -54,6 +58,10 @@ const MessageBox = styled.div`
       float: left;
       background: var(--chakra-colors-darkgray-800);
       color: var(--chakra-colors-lightgray-100);
+
+      .name {
+         color: var(--chakra-colors-white);
+      }
    }
    .timestamp {
       display: block;
@@ -110,6 +118,7 @@ const BlockieWrapper = styled.div`
 `
 
 const Message = ({ msg }: { msg: MessageUIType }) => {
+   console.log(msg, 'yo')
    return (
       <Flex
          alignItems="flex-start"
@@ -228,7 +237,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
          <MessageBox className={`msg ${msg.position} ${msg.read && 'read'}`}>
             <Box className="msg-bubble">
                {msg?.sender_name && (
-                  <Text fontSize="md" color="information.600">
+                  <Text fontSize="md" className="name">
                      {msg.sender_name}
                   </Text>
                )}

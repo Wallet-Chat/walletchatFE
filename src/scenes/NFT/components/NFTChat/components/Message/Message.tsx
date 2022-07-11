@@ -28,6 +28,10 @@ const MessageBox = styled.div`
       margin-bottom: 20px;
    }
 
+   .name {
+      color: var(--chakra-colors-darkgray-700);
+   }
+
    &.left {
       float: left;
       background: #fff;
@@ -36,6 +40,10 @@ const MessageBox = styled.div`
       float: right;
       background: var(--chakra-colors-darkgray-800);
       color: var(--chakra-colors-lightgray-100);
+
+      .name {
+         color: var(--chakra-colors-white);
+      }
    }
    .timestamp {
       display: block;
@@ -138,7 +146,7 @@ const Message = ({
             })
       }
    }
-
+console.log(msg, 'hi')
    return (
       <MessageBox
          className={`msg ${msg.position} ${msg.read && 'read'}`}
@@ -150,7 +158,7 @@ const Message = ({
          ></Box>
          <Box className="msg-bubble">
             {msg?.sender_name && (
-               <Text fontSize="md" color="information.600">
+               <Text fontSize="md" className="name">
                   {msg.sender_name}
                </Text>
             )}
