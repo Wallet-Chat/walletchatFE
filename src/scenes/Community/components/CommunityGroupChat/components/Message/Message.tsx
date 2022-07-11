@@ -45,6 +45,9 @@ const MessageBox = styled.div`
    .msg-bubble {
       display: inline-block;
    }
+   .name {
+      color: var(--chakra-colors-information-600);
+   }
 
    &.left {
       float: left;
@@ -53,7 +56,11 @@ const MessageBox = styled.div`
    &.right {
       float: left;
       background: var(--chakra-colors-darkgray-800);
-      color: var(--chakra-colors-lightgray-100);
+      color: var(--chakra-colors-lightgray-400);
+
+      .name {
+         color: var(--chakra-colors-white);
+      }
    }
    .timestamp {
       display: block;
@@ -227,9 +234,9 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
 
          <MessageBox className={`msg ${msg.position} ${msg.read && 'read'}`}>
             <Box className="msg-bubble">
-               {msg?.sender_name && (
-                  <Text fontSize="md" color="information.600">
-                     {msg.sender_name}
+               {msg?.name && (
+                  <Text fontSize="md" className="name">
+                     {msg.name}
                   </Text>
                )}
                {msg.message}

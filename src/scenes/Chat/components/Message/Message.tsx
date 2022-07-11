@@ -204,9 +204,9 @@ const Message = ({
             style={{ backgroundImage: `url(${msg.img})` }}
          ></Box>
          <Box className="msg-bubble">
-            {msg?.sender_name && (
+            {msg?.name && (
                <Text fontSize="md" color="information.600">
-                  {msg.sender_name}
+                  {msg.name}
                </Text>
             )}
             {msg.message}

@@ -77,8 +77,8 @@ const ConversationItem = ({
                      </BlockieWrapper>
                   </Box>
                   <Box>
-                     {data?.sender_name !== "" ? (
-                        <RecipientAddress>{data.sender_name}</RecipientAddress>
+                     {data?.name !== "" ? (
+                        <RecipientAddress>{data.name}</RecipientAddress>
                         ) : (
                         <RecipientAddress>
                            {truncateAddress(recipientAddress)}

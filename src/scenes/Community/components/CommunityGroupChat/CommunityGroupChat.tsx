@@ -5,7 +5,6 @@ import {
    Flex,
    FormControl,
    Link,
-   Spinner,
    Tag,
    Text,
 } from '@chakra-ui/react'
@@ -67,6 +66,7 @@ const NFTGroupChat = ({
             chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
+               name: chatData[i].name,
                type: chatData[i].type,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
@@ -76,6 +76,7 @@ const NFTGroupChat = ({
             })
          } else {
             toAddToUI.push({
+               name: chatData[i].name,
                type: chatData[i].type,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
