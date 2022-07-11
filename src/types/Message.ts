@@ -11,7 +11,7 @@ import { Encrypted } from 'eth-crypto'
 
 
 interface MessageSkeletonType {
-   name?: string // name of sender
+   sender_name?: string // name of sender
    type?: string
    message: string
    fromaddr: string
@@ -31,7 +31,7 @@ export interface GroupMessageType extends MessageSkeletonType {
 }
 
 export interface MessageUIType {
-   name?: string // name of sender
+   sender_name?: string // name of sender
    message?: string
    fromAddr?: string
    toAddr?: string

@@ -234,9 +234,9 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
 
          <MessageBox className={`msg ${msg.position} ${msg.read && 'read'}`}>
             <Box className="msg-bubble">
-               {msg?.name && (
+               {msg?.sender_name && (
                   <Text fontSize="md" className="name">
-                     {msg.name}
+                     {msg.sender_name}
                   </Text>
                )}
                {msg.message}

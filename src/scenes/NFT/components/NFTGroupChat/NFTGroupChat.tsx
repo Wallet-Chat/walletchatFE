@@ -74,7 +74,7 @@ const NFTGroupChat = ({
       setIsFetchingMessages(true)
 
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_groupchatitems/${nftContractAddr}`,
+         ` ${process.env.REACT_APP_REST_API}/get_groupchatitems/${nftContractAddr}/${account}`,
          {
             method: 'GET',
             headers: {
@@ -88,7 +88,7 @@ const NFTGroupChat = ({
             setChatData(data)
          })
          .catch((error) => {
-            console.error('🚨[GET][NFT][Messages]:', error)
+            console.error('🚨[GET][NFT][Group Chat Messages By Addr]:', error)
          })
          .finally(() => setIsFetchingMessages(false))
    }
@@ -104,6 +104,7 @@ const NFTGroupChat = ({
             chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
+               sender_name: chatData[i].sender_name,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
                timestamp: chatData[i].timestamp,
@@ -113,6 +114,7 @@ const NFTGroupChat = ({
             })
          } else {
             toAddToUI.push({
+               sender_name: chatData[i].sender_name,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
                timestamp: chatData[i].timestamp,

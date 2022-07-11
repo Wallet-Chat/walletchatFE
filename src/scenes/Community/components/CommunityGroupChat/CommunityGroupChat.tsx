@@ -66,7 +66,7 @@ const NFTGroupChat = ({
             chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
-               name: chatData[i].name,
+               sender_name: chatData[i].sender_name,
                type: chatData[i].type,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
@@ -76,7 +76,7 @@ const NFTGroupChat = ({
             })
          } else {
             toAddToUI.push({
-               name: chatData[i].name,
+               sender_name: chatData[i].sender_name,
                type: chatData[i].type,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,

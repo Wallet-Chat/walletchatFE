@@ -337,6 +337,7 @@ const NFTChat = ({
             chatData[i].toaddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
+               sender_name: chatData[i].sender_name,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
                toAddr: chatData[i].toaddr,
@@ -354,6 +355,7 @@ const NFTChat = ({
             chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
          ) {
             toAddToUI.push({
+               sender_name: chatData[i].sender_name,
                message: chatData[i].message,
                fromAddr: chatData[i].fromaddr,
                toAddr: chatData[i].toaddr,
