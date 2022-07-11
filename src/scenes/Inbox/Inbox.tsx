@@ -36,6 +36,8 @@ const Divider = styled.div`
    }
 `
 
+const localStorageInbox = localStorage.getItem("inbox")
+
 const Inbox = ({
    account,
    web3,
@@ -46,7 +48,7 @@ const Inbox = ({
    isAuthenticated: boolean
 }) => {
    const [inboxData, setInboxData] = useState<MessageType[]>(
-      new Array<MessageType>()
+      localStorageInbox ? JSON.parse(localStorageInbox) : new Array<MessageType>()
    )
    const [isFetchingInboxData, setIsFetchingInboxData] =
       useState<boolean>(false)
@@ -91,8 +93,14 @@ const Inbox = ({
          .then((response) => response.json())
          .then((data: MessageType[]) => {
             console.log('✅ GET [Inbox]:', data)
-            if (data === null) setInboxData([])
-            else setInboxData(data)
+            if (data === null) {
+               setInboxData([])
+               localStorage.setItem("inbox", JSON.stringify([]))
+            }
+            else {
+               setInboxData(data)
+               localStorage.setItem("inbox", JSON.stringify(data))
+            }
             // .then(async (data: MessageType[]) => {
             //    console.log('✅[GET][Inbox]:', data)
 
@@ -175,7 +183,7 @@ const Inbox = ({
       populateUI()
    }, [inboxData, account])
 
-   if (isFetchingInboxData && inboxData.length === 0 && !beenHereFor3Secs) {
+   if (isFetchingInboxData && inboxData.length === 0) {
       return (
          <Box background="white" height="100vh">
             <Box py={8} px={3} height="100vh">

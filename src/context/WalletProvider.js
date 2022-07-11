@@ -219,6 +219,7 @@ const WalletProvider = React.memo(({ children }) => {
       setName(null)
       getName(accounts[0])
       storage.set('current-address', { address: getNormalizeAddress(accounts) })
+      storage.set('inbox', [])
       console.log('[account changes]: ', getNormalizeAddress(accounts))
    }
 
@@ -234,6 +235,7 @@ const WalletProvider = React.memo(({ children }) => {
 
    const handleDisconnect = () => {
       console.log('[disconnected]')
+      storage.set('inbox', [])
       disconnectWallet()
    }
 
