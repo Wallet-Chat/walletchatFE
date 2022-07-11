@@ -13,6 +13,7 @@ import { Encrypted } from 'eth-crypto'
 interface MessageSkeletonType {
    sender_name?: string // name of sender
    type?: string
+   context_type?: string
    message: string
    fromaddr: string
    timestamp: string
@@ -45,6 +46,7 @@ export interface MessageUIType {
    nftAddr?: string | null,
    nftId?: number | null,
    type?: string,
+   context_type?: string
 }
 
 export interface MessageUIDataType {
