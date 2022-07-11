@@ -146,7 +146,7 @@ const Message = ({
             })
       }
    }
-console.log(msg, 'hi')
+
    return (
       <MessageBox
          className={`msg ${msg.position} ${msg.read && 'read'}`}

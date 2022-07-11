@@ -118,7 +118,7 @@ const BlockieWrapper = styled.div`
 `
 
 const Message = ({ msg }: { msg: MessageUIType }) => {
-   console.log(msg, 'yo')
+
    return (
       <Flex
          alignItems="flex-start"
