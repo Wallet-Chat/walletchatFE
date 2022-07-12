@@ -9,6 +9,7 @@ import {
    Heading,
    Spinner,
    Alert,
+   Tag,
 } from '@chakra-ui/react'
 
 import logoThumb from './images/logo-thumb.svg'
@@ -154,7 +155,7 @@ export const App = () => {
       return (
          <Box>
             <Flex>
-               {closeBtn}
+               {isMobileView && closeBtn}
                <Sidebar unreadCount={unreadCount} />
                <EnterName account={account} />
             </Flex>
@@ -164,7 +165,7 @@ export const App = () => {
       return (
          <Box>
             <Flex>
-               {closeBtn}
+               {isMobileView && closeBtn}
                <Sidebar unreadCount={unreadCount} />
                <Box flex="1">
                   <Routes>
@@ -187,11 +188,18 @@ export const App = () => {
                      <Route
                         path="/chat"
                         element={
-                           <Inbox
-                              account={account}
-                              web3={web3}
-                              isAuthenticated={isAuthenticated}
-                           />
+                           <Flex>
+                              <Inbox
+                                 account={account}
+                                 web3={web3}
+                                 isAuthenticated={isAuthenticated}
+                              />
+                              {!isMobileView && (
+                                 <Flex background="lightgray.200" flex="1" alignItems="center" justifyContent="center">
+                                    <Tag background="white">Select a chat to start messaging</Tag>
+                                 </Flex>
+                              )}
+                           </Flex>
                         }
                      />
                      <Route path="/change-name" element={<ChangeName />} />
