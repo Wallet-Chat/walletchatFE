@@ -66,28 +66,42 @@ const ConversationItem = ({
             : data.toAddr.toLocaleLowerCase()
    }
 
-   let displayName = ""
+   let displayName = ''
 
-   if (data?.sender_name && data?.sender_name !== "") {
+   if (data?.sender_name && data?.sender_name !== '') {
       displayName = data.sender_name
-   } else if (data?.name && data?.name !== "") {
+   } else if (data?.name && data?.name !== '') {
       displayName = data.name
    } else {
-      displayName = truncateAddress(recipientAddress) || ""
+      displayName = truncateAddress(recipientAddress) || ''
    }
 
    return (
-      <Link to={data.context_type === 'community' ? `/community/${data.nftAddr}` : `/chat/${recipientAddress}`} style={{ textDecoration: 'none' }}>
+      <Link
+         to={
+            data.context_type === 'community'
+               ? `/community/${data.nftAddr}`
+               : `/chat/${recipientAddress}`
+         }
+         style={{ textDecoration: 'none' }}
+      >
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>
                   <Box mr={2}>
-                     {data?.logo ?
-                        <Image src={data.logo} alt="" />
-                        : <BlockieWrapper>
-                        <Blockies seed={recipientAddress} scale={5} />
-                     </BlockieWrapper>
-}
+                     {data?.logo ? (
+                        <Image
+                           src={data.logo}
+                           alt=""
+                           maxWidth="50px"
+                           maxHeight="50px"
+                           borderRadius="md"
+                        />
+                     ) : (
+                        <BlockieWrapper>
+                           <Blockies seed={recipientAddress} scale={5} />
+                        </BlockieWrapper>
+                     )}
                   </Box>
                   <Box>
                      <RecipientAddress>{displayName}</RecipientAddress>
@@ -103,9 +117,11 @@ const ConversationItem = ({
                   <Box className="timestamp">
                      {formatMessageDate(new Date(data.timestamp))}
                   </Box>
-                  {(data.unread && data.unread !== 0) ? (
+                  {data.unread && data.unread !== 0 ? (
                      <NotificationCount>{data.unread}</NotificationCount>
-                  ): ""}
+                  ) : (
+                     ''
+                  )}
                </Box>
             </Flex>
          </Wrapper>

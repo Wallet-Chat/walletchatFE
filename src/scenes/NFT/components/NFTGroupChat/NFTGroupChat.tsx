@@ -43,7 +43,6 @@ const NFTGroupChat = ({
    account: string | undefined
    nftContractAddr: string
 }) => {
-
    const [firstLoad, setFirstLoad] = useState(true)
    const [msgInput, setMsgInput] = useState<string>('')
    const [isSendingMessage, setIsSendingMessage] = useState(false)
@@ -132,7 +131,7 @@ const NFTGroupChat = ({
       // Scroll to bottom of chat once all messages are loaded
       if (scrollToBottomRef?.current && firstLoad) {
          scrollToBottomRef.current.scrollIntoView()
-         
+
          setTimeout(() => {
             setFirstLoad(false)
          }, 5000)
@@ -193,11 +192,7 @@ const NFTGroupChat = ({
             getChatData()
          })
          .catch((error) => {
-            console.error(
-               '🚨[POST][Message]:',
-               error,
-               JSON.stringify(data)
-            )
+            console.error('🚨[POST][Message]:', error, JSON.stringify(data))
          })
          .finally(() => {
             setIsSendingMessage(false)
@@ -246,20 +241,40 @@ const NFTGroupChat = ({
                   background="white"
                   p={4}
                >
-                  {isFetchingMessages ? <Spinner /> : <Box fontSize="md">
-                     Be the first to post something here 😉
-                  </Box>}
+                  {isFetchingMessages ? (
+                     <Spinner />
+                  ) : (
+                     <Box fontSize="md">
+                        Be the first to post something here 😉
+                     </Box>
+                  )}
                </Flex>
             )}
             {loadedMsgs.map((msg, i) => {
                if (msg.type && msg.type === 'day') {
                   return (
-                     <Box position="relative" my={6} key={`${msg.timestamp}${i}`}>
-                        <Tag color="darkgray.300" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
+                     <Box
+                        position="relative"
+                        my={6}
+                        key={`${msg.timestamp}${i}`}
+                     >
+                        <Tag
+                           color="lightgray.800"
+                           background="lightgray.200"
+                           fontSize="xs"
+                           fontWeight="bold"
+                           mb={1}
+                           position="absolute"
+                           right="var(--chakra-space-4)"
+                           top="50%"
+                           transform="translateY(-50%)"
+                        >
+                           {getFormattedDate(msg.timestamp.toString())}
+                        </Tag>
                         <Divider />
                      </Box>
                   )
-                } else if (msg.message) {
+               } else if (msg.message) {
                   return (
                      <Message
                         key={`${msg.message}${msg.timestamp}${i}`}
@@ -269,7 +284,11 @@ const NFTGroupChat = ({
                }
                return null
             })}
-            <Box float="left" style={{ clear: 'both' }} ref={scrollToBottomRef}></Box>
+            <Box
+               float="left"
+               style={{ clear: 'both' }}
+               ref={scrollToBottomRef}
+            ></Box>
          </DottedBackground>
 
          <Flex>

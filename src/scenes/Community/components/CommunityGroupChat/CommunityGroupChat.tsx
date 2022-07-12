@@ -211,7 +211,7 @@ const NFTGroupChat = ({
                if (msg.type && msg.type === 'day') {
                   return (
                      <Box position="relative" my={6} key={msg.timestamp}>
-                        <Tag color="darkgray.300" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
+                        <Tag color="lightgray.800" background="lightgray.200" fontSize="xs" fontWeight="bold" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
                         <Divider />
                      </Box>
                   )

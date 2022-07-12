@@ -12,9 +12,10 @@ import {
    Divider,
    Link,
 } from '@chakra-ui/react'
+import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
-import { IconExternalLink } from '@tabler/icons'
+import { IconExternalLink, IconMessage } from '@tabler/icons'
 
 import { formatMessageDate } from '../../../../../../helpers/date'
 import { MessageUIType } from '../../../../../../types/Message'
@@ -117,6 +118,99 @@ const BlockieWrapper = styled.div`
 `
 
 const Message = ({ msg }: { msg: MessageUIType }) => {
+   const menuItems = (
+      <MenuList>
+         <Link
+            as={RLink}
+            to={`/chat/${msg.fromAddr}`}
+            _hover={{
+               textDecoration: 'none',
+               background: 'var(--chakra-colors-lightgray-400)',
+            }}
+         >
+            <MenuItem icon={<IconMessage width="20px" height="20px" />}>
+               <Text>Chat</Text>
+            </MenuItem>
+         </Link>
+         <Link
+            href={`https://etherscan.io/address/${msg.fromAddr}`}
+            target="_blank"
+            _hover={{
+               textDecoration: 'none',
+               background: 'var(--chakra-colors-lightgray-400)',
+            }}
+         >
+            <MenuItem
+               icon={
+                  <Image
+                     src={IconEtherscan}
+                     width="20px"
+                     height="20px"
+                     alt=""
+                  />
+               }
+            >
+               <Flex alignItems="center">
+                  <Text>{truncateAddress(msg.fromAddr)}</Text>
+                  <IconExternalLink stroke="1.5" size="20" />
+               </Flex>
+            </MenuItem>
+         </Link>
+
+         <Divider />
+         <Link
+            href={`https://opensea.io/accounts/${msg.fromAddr}`}
+            target="_blank"
+            _hover={{
+               textDecoration: 'none',
+               background: 'var(--chakra-colors-lightgray-400)',
+            }}
+         >
+            <MenuItem
+               icon={
+                  <Image src={IconOpenSea} width="20px" height="20px" alt="" />
+               }
+            >
+               View in OpenSea
+            </MenuItem>
+         </Link>
+         <Link
+            href={`https://looksrare.org/accounts/${msg.fromAddr}`}
+            target="_blank"
+            _hover={{
+               textDecoration: 'none',
+               background: 'var(--chakra-colors-lightgray-400)',
+            }}
+         >
+            <MenuItem
+               icon={
+                  <Image
+                     src={IconLooksRare}
+                     width="20px"
+                     height="20px"
+                     alt=""
+                  />
+               }
+            >
+               View in LooksRare
+            </MenuItem>
+         </Link>
+         <Link
+            href={`https://x2y2.io/user/${msg.fromAddr}`}
+            target="_blank"
+            _hover={{
+               textDecoration: 'none',
+               background: 'var(--chakra-colors-lightgray-400)',
+            }}
+         >
+            <MenuItem
+               icon={<Image src={IconX2Y2} width="20px" height="20px" alt="" />}
+            >
+               View in X2Y2
+            </MenuItem>
+         </Link>
+      </MenuList>
+   )
 
    return (
       <Flex
@@ -138,97 +232,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
                         />
                      </BlockieWrapper>
                   </MenuButton>
-                  <MenuList>
-                     <Link
-                        href={`https://etherscan.io/address/${msg.fromAddr}`}
-                        target="_blank"
-                        _hover={{
-                           textDecoration: 'none',
-                           background: 'var(--chakra-colors-lightgray-400)',
-                        }}
-                     >
-                        <MenuItem
-                           icon={
-                              <Image
-                                 src={IconEtherscan}
-                                 width="20px"
-                                 height="20px"
-                                 alt=""
-                              />
-                           }
-                        >
-                           <Flex alignItems="center">
-                              <Text>{truncateAddress(msg.fromAddr)}</Text>
-                              <IconExternalLink stroke="1.5" size="20" />
-                           </Flex>
-                        </MenuItem>
-                     </Link>
-
-                     <Divider />
-                     <Link
-                        href={`https://opensea.io/accounts/${msg.fromAddr}`}
-                        target="_blank"
-                        _hover={{
-                           textDecoration: 'none',
-                           background: 'var(--chakra-colors-lightgray-400)',
-                        }}
-                     >
-                        <MenuItem
-                           icon={
-                              <Image
-                                 src={IconOpenSea}
-                                 width="20px"
-                                 height="20px"
-                                 alt=""
-                              />
-                           }
-                        >
-                           View in OpenSea
-                        </MenuItem>
-                     </Link>
-                     <Link
-                        href={`https://looksrare.org/accounts/${msg.fromAddr}`}
-                        target="_blank"
-                        _hover={{
-                           textDecoration: 'none',
-                           background: 'var(--chakra-colors-lightgray-400)',
-                        }}
-                     >
-                        <MenuItem
-                           icon={
-                              <Image
-                                 src={IconLooksRare}
-                                 width="20px"
-                                 height="20px"
-                                 alt=""
-                              />
-                           }
-                        >
-                           View in LooksRare
-                        </MenuItem>
-                     </Link>
-                     <Link
-                        href={`https://x2y2.io/user/${msg.fromAddr}`}
-                        target="_blank"
-                        _hover={{
-                           textDecoration: 'none',
-                           background: 'var(--chakra-colors-lightgray-400)',
-                        }}
-                     >
-                        <MenuItem
-                           icon={
-                              <Image
-                                 src={IconX2Y2}
-                                 width="20px"
-                                 height="20px"
-                                 alt=""
-                              />
-                           }
-                        >
-                           View in X2Y2
-                        </MenuItem>
-                     </Link>
-                  </MenuList>
+                  {menuItems}
                </Menu>
             )}
          </Box>
@@ -236,9 +240,23 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
          <MessageBox className={`msg ${msg.position} ${msg.read && 'read'}`}>
             <Box className="msg-bubble">
                {msg?.sender_name && (
-                  <Text fontSize="md" className="name">
-                     {msg.sender_name}
-                  </Text>
+                  <Menu>
+                     <MenuButton
+                        as={Box}
+                        p={0}
+                        height="auto"
+                        minWidth="unset"
+                        _hover={{
+                           textDecoration: 'underline',
+                           cursor: 'pointer',
+                        }}
+                     >
+                        <Text fontSize="md" className="name">
+                           {msg.sender_name}
+                        </Text>
+                     </MenuButton>
+                     {menuItems}
+                  </Menu>
                )}
                {msg.message}
                <span className="timestamp">
