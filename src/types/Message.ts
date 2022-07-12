@@ -46,7 +46,9 @@ export interface MessageUIType {
    nftAddr?: string | null,
    nftId?: number | null,
    type?: string,
-   context_type?: string
+   context_type?: string,
+   name?: string
+   logo?: string
 }
 
 export interface MessageUIDataType {

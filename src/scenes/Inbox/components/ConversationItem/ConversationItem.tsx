@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react'
+import { Box, Flex, Image } from '@chakra-ui/react'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { Link } from 'react-router-dom'
@@ -66,24 +66,31 @@ const ConversationItem = ({
             : data.toAddr.toLocaleLowerCase()
    }
 
+   let displayName = ""
+
+   if (data?.sender_name && data?.sender_name !== "") {
+      displayName = data.sender_name
+   } else if (data?.name && data?.name !== "") {
+      displayName = data.name
+   } else {
+      displayName = truncateAddress(recipientAddress) || ""
+   }
+
    return (
-      <Link to={`/chat/${recipientAddress}`} style={{ textDecoration: 'none' }}>
+      <Link to={data.context_type === 'community' ? `/community/${data.nftAddr}` : `/chat/${recipientAddress}`} style={{ textDecoration: 'none' }}>
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>
                   <Box mr={2}>
-                     <BlockieWrapper>
+                     {data?.logo ?
+                        <Image src={data.logo} alt="" />
+                        : <BlockieWrapper>
                         <Blockies seed={recipientAddress} scale={5} />
                      </BlockieWrapper>
+}
                   </Box>
                   <Box>
-                     {data?.sender_name !== "" ? (
-                        <RecipientAddress>{data.sender_name}</RecipientAddress>
-                        ) : (
-                        <RecipientAddress>
-                           {truncateAddress(recipientAddress)}
-                        </RecipientAddress>
-                     )}
+                     <RecipientAddress>{displayName}</RecipientAddress>
                      {data.message && (
                         <Box fontSize="md" color="darkgray.100">
                            {data.message.substring(0, 25)}

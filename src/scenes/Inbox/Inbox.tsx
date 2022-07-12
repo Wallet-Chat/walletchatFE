@@ -145,7 +145,8 @@ const Inbox = ({
          const toAddToUI = [] as MessageUIType[]
          for (let i = 0; i < inboxData.length; i++) {
             if (
-               inboxData[i]?.context_type === 'nft' || (
+               inboxData[i]?.context_type === 'nft' || 
+               inboxData[i]?.context_type === 'community' || (
                inboxData[i] &&
                inboxData[i].toaddr &&
                inboxData[i].toaddr.toLowerCase() === account.toLowerCase()
@@ -230,7 +231,7 @@ const Inbox = ({
             if (conversation.context_type === 'dm' || conversation.context_type === 'community') {
                return (
                <ConversationItem
-                  key={conversation.timestamp.toString()}
+                  key={`${conversation.timestamp.toString()}${i}`}
                   data={conversation}
                   account={account}
                />
@@ -238,7 +239,7 @@ const Inbox = ({
             } else if (conversation.context_type === 'nft') {
                return (
                <NFTInboxItem
-                  key={conversation.timestamp.toString()}
+                  key={`${conversation.timestamp.toString()}${i}`}
                   data={conversation}
                />
                )

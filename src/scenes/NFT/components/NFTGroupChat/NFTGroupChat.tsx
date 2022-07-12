@@ -254,7 +254,7 @@ const NFTGroupChat = ({
             {loadedMsgs.map((msg, i) => {
                if (msg.type && msg.type === 'day') {
                   return (
-                     <Box position="relative" my={6} key={msg.timestamp}>
+                     <Box position="relative" my={6} key={`${msg.timestamp}${i}`}>
                         <Tag color="darkgray.300" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
                         <Divider />
                      </Box>
