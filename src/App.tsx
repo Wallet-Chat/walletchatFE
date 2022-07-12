@@ -110,7 +110,7 @@ export const App = () => {
             right="10px"
          >
             {/* <Header /> */}
-            {closeBtn}
+            {isMobileView && closeBtn}
             {appLoading ? (
                <Flex
                   w="100vw"
