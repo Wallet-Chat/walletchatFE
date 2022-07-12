@@ -7,14 +7,15 @@ import {
    SkeletonText,
    Text,
    Spinner,
+   Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Web3 from 'web3'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
-import BookmarkType from '../../types/Bookmark'
 // import { getIpfsData } from '../../services/ipfs'
 import { MessageType, MessageUIType } from '../../types/Message'
 // import { EncryptedMsgBlock } from '../../types/Message'
@@ -219,12 +220,13 @@ const Inbox = ({
    }
 
    return (
-      <Box background="white" minHeight="100vh">
-         <Box p={5}>
+      <Box background="white" minHeight="100vh" borderRight="1px solid var(--chakra-colors-lightgray-400)" minWidth="330px">
+         <Flex p={5} justifyContent="space-between">
             <Heading size="xl">
                Inbox {isFetchingInboxData && <Spinner />}
             </Heading>
-         </Box>
+            <Button as={Link} to="/new" size="sm" variant="outline" _hover={{ textDecoration: 'none', backgroundColor: 'var(--chakra-colors-lightgray-300)' }}>+ New</Button>
+         </Flex>
          <Divider />
 
          {loadedMsgs.map((conversation, i) => {

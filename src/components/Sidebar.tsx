@@ -9,7 +9,8 @@ import {
    Badge,
    MenuGroup,
    Text,
-   MenuDivider
+   MenuDivider,
+   Tooltip
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -346,9 +347,11 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          </Flex>
          <Flex flexDirection="column" alignItems="center">
             {name !== null && (
-               <LinkElem to={`/new`}>
-                  <IconCirclePlus size="30" stroke={1.5} />
-               </LinkElem>
+               <Tooltip label="New" placement="top">
+                  <LinkElem to={`/new`}>
+                     <IconCirclePlus size="30" stroke={1.5} />
+                  </LinkElem>
+               </Tooltip>
             )}
             <Menu>
                <MenuButton as={AccountInfo}>

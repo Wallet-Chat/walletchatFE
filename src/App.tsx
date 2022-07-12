@@ -8,7 +8,6 @@ import {
    Image,
    Heading,
    Spinner,
-   Text,
    Alert,
 } from '@chakra-ui/react'
 
@@ -20,6 +19,7 @@ import Chat from './scenes/Chat'
 import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
+import { useIsMobileView } from './context/IsMobileViewProvider'
 import { useUnreadCount } from './context/UnreadCountProvider'
 import EnterName from './scenes/EnterName'
 import ChangeName from './scenes/ChangeName'
@@ -43,6 +43,8 @@ export const App = () => {
       privateKey,
       web3,
    } = useWallet()
+
+   const { isMobileView } = useIsMobileView()
 
    useEffect(() => {
       const interval = setInterval(() => {
@@ -192,36 +194,55 @@ export const App = () => {
                            />
                         }
                      />
-                     <Route
-                        path="/change-name"
-                        element={
-                           <ChangeName />
-                        }
-                     />
+                     <Route path="/change-name" element={<ChangeName />} />
+
                      <Route
                         path="/nft/:nftContractAddr/:nftId"
                         element={
-                           <NFTById
-                              account={account}
-                              publicKey={publicKey}
-                              privateKey={privateKey}
-                           />
+                           <Flex>
+                              {!isMobileView && (
+                                 <Inbox
+                                    account={account}
+                                    web3={web3}
+                                    isAuthenticated={isAuthenticated}
+                                 />
+                              )}
+                              <NFTById
+                                 account={account}
+                                 publicKey={publicKey}
+                                 privateKey={privateKey}
+                              />
+                           </Flex>
                         }
                      />
                      <Route
                         path="/nft/:nftContractAddr"
                         element={
-                           <NFT
-                              account={account}
-                           />
+                           <Flex>
+                              {!isMobileView && (
+                                 <Inbox
+                                    account={account}
+                                    web3={web3}
+                                    isAuthenticated={isAuthenticated}
+                                 />
+                              )}
+                              <NFT account={account} />
+                           </Flex>
                         }
                      />
                      <Route
                         path="/community/:community"
                         element={
-                           <Community
-                              account={account}
-                           />
+                           <Flex>
+                              {!isMobileView && (
+                                 <Inbox
+                                    account={account}
+                                    web3={web3}
+                                    isAuthenticated={isAuthenticated}
+                                 />
+                              )}
+                              <Community account={account} />
+                           </Flex>
                         }
                      />
                      <Route
