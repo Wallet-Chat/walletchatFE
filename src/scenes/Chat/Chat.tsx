@@ -54,14 +54,10 @@ const DottedBackground = styled.div`
 `
 
 const Chat = ({
-   publicKey,
-   privateKey,
    account,
    web3,
    isAuthenticated,
 }: {
-   publicKey: string
-   privateKey: string
    account: string
    web3: Web3
    isAuthenticated: boolean
@@ -140,33 +136,6 @@ const Chat = ({
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
             console.log('✅[GET][Chat items]:', data)
-
-            const replica = JSON.parse(JSON.stringify(data))
-
-            // Get data from IPFS and replace the message with the fetched text
-            // for (let i = 0; i < replica.length; i++) {
-            //    const rawmsg = await getIpfsData(replica[i].message)
-            //   // console.log("raw message decoded", rawmsg)
-
-            //    // let encdatablock: EncryptedMsgBlock = JSON.parse(rawmsg);
-
-            //    // //we only need to decrypt the side we are print to UI (to or from)
-            //    // let decrypted;
-            //    // if(replica[i].toaddr === account) {
-            //    //    decrypted = await EthCrypto.decryptWithPrivateKey(
-            //    //    privateKey,
-            //    //    encdatablock.to)
-            //    // }
-            //    // else {
-            //    //    decrypted = await EthCrypto.decryptWithPrivateKey(
-            //    //    privateKey,
-            //    //    encdatablock.from)
-            //    // }
-
-            //    //replica[i].message = decrypted
-            //    replica[i].message = rawmsg
-            // }
-
             setChatData(data)
             //setChatData(replica)
 

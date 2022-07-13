@@ -12,20 +12,19 @@ import UnreadCountProvider from './context/UnreadCountProvider'
 import IsMobileViewProvider from './context/IsMobileViewProvider'
 import { theme } from './theme'
 
-
 ReactDOM.render(
    <React.StrictMode>
       <ColorModeScript />
       <BrowserRouter>
-         <WalletProvider>
-            <IsMobileViewProvider>
+         <IsMobileViewProvider>
+            <WalletProvider>
                <UnreadCountProvider>
                   <ChakraProvider theme={theme}>
                      <App />
                   </ChakraProvider>
                </UnreadCountProvider>
-            </IsMobileViewProvider>
-         </WalletProvider>
+            </WalletProvider>
+         </IsMobileViewProvider>
       </BrowserRouter>
    </React.StrictMode>,
    document.getElementById('root')

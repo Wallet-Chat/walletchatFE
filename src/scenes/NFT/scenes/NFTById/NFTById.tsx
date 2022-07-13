@@ -40,12 +40,8 @@ const tokenType = 'erc721'
 
 const NFT = ({
    account,
-   publicKey,
-   privateKey,
 }: {
    account: string
-   publicKey: string
-   privateKey: string
 }) => {
    let { nftContractAddr = '', nftId = 0 } = useParams()
    let [searchParams] = useSearchParams()
@@ -468,8 +464,6 @@ const NFT = ({
                      account={account}
                      nftContractAddr={nftContractAddr}
                      nftId={nftId}
-                     publicKey={publicKey}
-                     privateKey={privateKey}
                   />
                </TabPanel>
                {/* <TabPanel p={5}>

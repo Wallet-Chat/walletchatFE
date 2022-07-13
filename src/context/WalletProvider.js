@@ -1,11 +1,33 @@
 import React, { useState } from 'react'
 import createMetaMaskProvider from 'metamask-extension-provider'
 import Web3 from 'web3'
+import Web3Modal from 'web3modal'
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import { getNormalizeAddress } from '.'
 import EthCrypto from 'eth-crypto'
 
 import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
+import { ethers } from 'ethers'
+
+const providerOptions = {
+   walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+         infuraId: process.env.REACT_APP_INFURA_ID, // required
+      },
+   },
+}
+
+if (!process.env.REACT_APP_INFURA_ID) {
+   console.log('Missing REACT_APP_INFURA_ID')
+}
+
+const web3Modal = new Web3Modal({
+   network: 'mainnet', // optional
+   cacheProvider: true, // optional
+   providerOptions, // required
+})
 
 export const WalletContext = React.createContext()
 export const useWallet = () => React.useContext(WalletContext)
@@ -20,6 +42,8 @@ export function withWallet(Component) {
 }
 
 const WalletProvider = React.memo(({ children }) => {
+   const [provider, setProvider] = useState()
+   const [library, setLibrary] = useState()
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
    const [account, setAccount] = useState(null)
@@ -27,8 +51,6 @@ const WalletProvider = React.memo(({ children }) => {
    const [web3, setWeb3] = useState(null)
    const [isAuthenticated, setAuthenticated] = useState(false)
    const [appLoading, setAppLoading] = useState(false)
-   const [publicKey, setPublicKey] = useState()
-   const [privateKey, setPrivateKey] = useState()
 
    // console.log({ chainId, account, web3, isAuthenticated, publicKey })
 
@@ -54,10 +76,9 @@ const WalletProvider = React.memo(({ children }) => {
          }
       }
 
-      connectEagerly()
+      // connectEagerly()
 
       return () => {
-         const provider = getProvider()
          unsubscribeToEvents(provider)
       }
    }, [])
@@ -98,116 +119,105 @@ const WalletProvider = React.memo(({ children }) => {
          })
    }
 
-   const getProvider = () => {
-      if (window.ethereum) {
-         console.log('found window.ethereum>>')
-         return window.ethereum
-      } else {
-         const provider = createMetaMaskProvider()
-         return provider
-      }
-   }
-
-   const getAccounts = async (provider) => {
+   const getAccountsExtension = async (provider) => {
       if (provider) {
-         const [accounts, chainId] = await Promise.all([
-            provider.request({
+         // const [accounts, chainId] = await Promise.all([
+         //    provider.request({
+         //       method: 'eth_requestAccounts',
+         //       params: [
+         //          {
+         //             eth_accounts: {},
+         //          },
+         //       ],
+         //    }),
+         //    provider.request({ method: 'eth_chainId' }),
+         // ])
+         // return [accounts, chainId]
+            const accounts = await provider.request({
                method: 'eth_requestAccounts',
                params: [
                   {
-                    eth_accounts: {}
-                  }
-                ]
-            }),
-            provider.request({ method: 'eth_chainId' }),
-         ])
-         return [accounts, chainId]
+                     eth_accounts: {},
+                  },
+               ],
+            })
+            return accounts
       }
       return false
    }
 
    const walletRequestPermissions = async () => {
-      const provider = getProvider()
       if (provider) {
          await provider.request({
             method: 'wallet_requestPermissions',
             params: [
                {
-                 eth_accounts: {}
-               }
-             ]
+                  eth_accounts: {},
+               },
+            ],
          })
       }
-   }
-
-   const createEncryptionKeyPair = async (accountlocal) => {
-      // create identitiy with key-pairs and address
-      const keyPair = EthCrypto.createIdentity()
-
-      fetch(` ${process.env.REACT_APP_REST_API}/create_settings`, {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({
-            walletaddr: accountlocal,
-            publickey: keyPair.publicKey,
-         }),
-      })
-
-      return keyPair
    }
 
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
-         const provider = getProvider()
-         const [accounts, chainId] = await getAccounts(provider)
-         if (accounts && chainId) {
+         
+         let _provider, _accounts
+
+         if (window.ethereum) {
+            console.log('found window.ethereum>>')
+            _provider = await web3Modal.connect()
+            const library = new ethers.providers.Web3Provider(_provider)
+            _accounts = await library.listAccounts()
+            const network = await library.getNetwork()
+            setLibrary(library)
+            setChainId(network)
+         } else {
+            _provider = createMetaMaskProvider()
+            _accounts = await getAccountsExtension(provider)
+         }
+         
+         setProvider(_provider)  
+         
+
+         if (_accounts) {
             setAppLoading(true)
-            const account = getNormalizeAddress(accounts)
-            const web3 = new Web3(provider)
-            setAccount(account)
-            setAccounts(accounts)
-            setChainId(chainId)
-            setWeb3(web3)
+            const _account = getNormalizeAddress(_accounts)
+            setAccount(_account)
+            setAccounts(_accounts)
+            // setChainId(chainId)
             setAuthenticated(true)
+            getName(_account)
+            const _web3 = new Web3(provider)
+            setWeb3(_web3)
 
-            getName(account)
-
-            //only do this once at first login, never again or we can't decrypt previous data
-            //until this is moved we likely will have a few latenet issues decrypting older data
-            let publicKey = await storage.get('public-key')
-            if (publicKey) setPublicKey(publicKey.key)
-            let privateKey = await storage.get('private-key')
-            if (privateKey) setPrivateKey(privateKey.key)
-            //console.log("pubKey: ", publicKey)
-            if(!publicKey) {
-               const keyPair = await createEncryptionKeyPair(account)
-               storage.set('public-key', { key: keyPair.publicKey })
-               storage.set('private-key', { key: keyPair.privateKey })
-               //console.log("created keypair", publicKey, privateKey)
+            if (!window.ethereum) {
+               storage.set('metamask-connected', { connected: true })
             }
-
-            storage.set('metamask-connected', { connected: true })
             subscribeToEvents(provider)
          }
       } catch (e) {
-         console.log('error while connect', e)
+         console.log('🚨connectWallet', e)
       } finally {
          setAppLoading(false)
       }
    }
 
-   const disconnectWallet = () => {
+   const disconnectWallet = async () => {
       console.log('disconnectWallet')
       try {
-         storage.set('metamask-connected', { connected: false })
+         if (window.ethereum) {
+            await web3Modal.clearCachedProvider()
+         } else {
+            storage.set('metamask-connected', { connected: false })
+         }
          storage.set('current-address', { address: null })
          setAccount(null)
          setChainId(null)
          setAuthenticated(false)
          setWeb3(null)
+         web3Modal.clearCachedProvider()
       } catch (e) {
          console.log(e)
       }
@@ -247,8 +257,6 @@ const WalletProvider = React.memo(({ children }) => {
             account,
             accounts,
             walletRequestPermissions,
-            publicKey,
-            privateKey,
             disconnectWallet,
             connectWallet,
             isAuthenticated,

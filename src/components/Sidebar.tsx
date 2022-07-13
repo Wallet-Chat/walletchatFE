@@ -32,6 +32,7 @@ import NFTMetadataType from '../types/NFTMetadata'
 import animatedPlaceholder from '../images/animated-placeholder.gif'
 import { useWallet } from '../context/WalletProvider'
 import { truncateAddress } from '../helpers/truncateString'
+import { useIsMobileView } from '../context/IsMobileViewProvider'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -174,6 +175,8 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
    const [nftId, setNftId] = useState<number>()
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [imageUrl, setImageUrl] = useState<string>()
+
+   const { isMobileView } = useIsMobileView()
 
    const { metadata } = nftData?.nft || {}
 
@@ -397,6 +400,8 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                         Sign out
                      </MenuItem>
                   </MenuGroup>
+                  {isMobileView && (
+                  <>
                   <MenuDivider />
                      <MenuItem
                         onClick={() => walletRequestPermissions()}
@@ -409,6 +414,8 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                         Connect more
                         <Text fontSize="sm" color="darkgray.400">Switch active account using MetaMask</Text>
                      </MenuItem>
+                     </>
+                  )}
                </MenuList>
             </Menu>
          </Flex>

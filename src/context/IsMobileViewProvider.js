@@ -30,8 +30,6 @@ const IsMobileViewProvider = React.memo(({ children }) => {
 
    const isMobileView = size.width <= 600
 
-   console.log(size, isMobileView)
-
    return (
       <IsMobileViewContext.Provider value={{isMobileView}}>
          {children}

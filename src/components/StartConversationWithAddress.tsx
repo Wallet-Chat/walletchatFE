@@ -64,7 +64,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                </Flex>
                </Link>
             )}
-            {errors.toAddr && errors.toAddr.type === 'validate' && (
+            {errors?.toAddr && errors?.toAddr.type === 'validate' && (
                <FormErrorMessage>Address is not valid</FormErrorMessage>
             )}
          </FormControl>

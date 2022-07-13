@@ -40,8 +40,6 @@ export const App = () => {
       connectWallet,
       name,
       account,
-      publicKey,
-      privateKey,
       web3,
    } = useWallet()
 
@@ -177,8 +175,6 @@ export const App = () => {
                         path="/chat/:address"
                         element={
                            <Chat
-                              publicKey={publicKey}
-                              privateKey={privateKey}
                               account={account}
                               web3={web3}
                               isAuthenticated={isAuthenticated}
@@ -217,8 +213,6 @@ export const App = () => {
                               )}
                               <NFTById
                                  account={account}
-                                 publicKey={publicKey}
-                                 privateKey={privateKey}
                               />
                            </Flex>
                         }
