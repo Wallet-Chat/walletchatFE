@@ -117,9 +117,9 @@ const Inbox = ({
             if (
                inboxData[i]?.context_type === 'nft' || 
                inboxData[i]?.context_type === 'community' || (
-               inboxData[i] &&
-               inboxData[i].toaddr &&
-               inboxData[i].toaddr.toLowerCase() === account.toLowerCase()
+                  account &&
+                  inboxData[i]?.toaddr &&
+                  inboxData[i]?.toaddr.toLowerCase() === account.toLowerCase()
                )
             ) {
                toAddToUI.push({
@@ -133,9 +133,9 @@ const Inbox = ({
                   nftId: inboxData[i].nftid,
                })
             } else if (
-               inboxData[i] &&
-               inboxData[i].toaddr &&
-               inboxData[i].fromaddr.toLowerCase() === account.toLowerCase()
+               account &&
+               inboxData[i]?.toaddr &&
+               inboxData[i]?.fromaddr.toLowerCase() === account.toLowerCase()
             ) {
                toAddToUI.push({
                   ...inboxData[i],

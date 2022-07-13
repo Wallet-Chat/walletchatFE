@@ -43,7 +43,7 @@ export function withWallet(Component) {
 
 const WalletProvider = React.memo(({ children }) => {
    const [provider, setProvider] = useState()
-   const [library, setLibrary] = useState()
+   const [web3ModalProvider, setWeb3ModalProvider] = useState()
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
    const [account, setAccount] = useState(null)
@@ -56,9 +56,13 @@ const WalletProvider = React.memo(({ children }) => {
 
    React.useEffect(() => {
       const connectEagerly = async () => {
-         const metamask = await storage.get('metamask-connected')
-         if (metamask?.connected) {
-            await connectWallet()
+         if (window.ethereum) {
+            if (web3Modal?.cachedProvider) connectWallet()
+         } else {
+            const metamask = await storage.get('metamask-connected')
+            if (metamask?.connected) {
+               await connectWallet()
+            }
          }
       }
       const unsubscribeToEvents = (provider) => {
@@ -76,12 +80,12 @@ const WalletProvider = React.memo(({ children }) => {
          }
       }
 
-      // connectEagerly()
+      connectEagerly()
 
       return () => {
          unsubscribeToEvents(provider)
       }
-   }, [])
+   }, [web3Modal])
 
    const subscribeToEvents = (provider) => {
       if (provider && provider.on) {
@@ -162,37 +166,37 @@ const WalletProvider = React.memo(({ children }) => {
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
-         
-         let _provider, _accounts
+         let _provider, _account
 
          if (window.ethereum) {
             console.log('found window.ethereum>>')
-            _provider = await web3Modal.connect()
-            const library = new ethers.providers.Web3Provider(_provider)
-            _accounts = await library.listAccounts()
-            const network = await library.getNetwork()
-            setLibrary(library)
+            const instance = await web3Modal.connect()
+            setWeb3ModalProvider(instance)
+            _provider = new ethers.providers.Web3Provider(instance)
+            await _provider.getSigner().getAddress()
+            _account = await _provider.getSigner().getAddress()
+            const network = await _provider.getNetwork()
             setChainId(network)
          } else {
             _provider = createMetaMaskProvider()
-            _accounts = await getAccountsExtension(provider)
+            const _accounts = await getAccountsExtension(provider)
+            _account = getNormalizeAddress(_accounts)
          }
          
          setProvider(_provider)  
-         
 
-         if (_accounts) {
+         if (_account) {
             setAppLoading(true)
-            const _account = getNormalizeAddress(_accounts)
             setAccount(_account)
-            setAccounts(_accounts)
             // setChainId(chainId)
             setAuthenticated(true)
             getName(_account)
             const _web3 = new Web3(provider)
             setWeb3(_web3)
 
-            if (!window.ethereum) {
+            if (window.ethereum) {
+               storage.set('metamask-connected', { connected: true })
+            } else {
                storage.set('metamask-connected', { connected: true })
             }
             subscribeToEvents(provider)
@@ -208,7 +212,12 @@ const WalletProvider = React.memo(({ children }) => {
       console.log('disconnectWallet')
       try {
          if (window.ethereum) {
-            await web3Modal.clearCachedProvider()
+            console.log(web3ModalProvider.close)
+            if (web3ModalProvider.close) {
+               await web3ModalProvider.close()
+               await web3Modal.clearCachedProvider()
+               setProvider(null)
+            }
          } else {
             storage.set('metamask-connected', { connected: false })
          }
@@ -217,7 +226,6 @@ const WalletProvider = React.memo(({ children }) => {
          setChainId(null)
          setAuthenticated(false)
          setWeb3(null)
-         web3Modal.clearCachedProvider()
       } catch (e) {
          console.log(e)
       }
