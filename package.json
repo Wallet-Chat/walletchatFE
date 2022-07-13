@@ -65,8 +65,8 @@
       "react-error-overlay": "6.0.9"
    },
    "scripts": {
-      "start": "react-scripts --openssl-legacy-provider start",
-      "build": "export SET NODE_OPTIONS=--openssl-legacy-provider && craco build",
+      "start": "react-scripts start",
+      "build": "craco build",
       "test": "react-scripts test",
       "eject": "react-scripts eject"
    },
