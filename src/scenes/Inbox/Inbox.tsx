@@ -180,6 +180,7 @@ const Inbox = ({
                })
             }
          }
+         toAddToUI.sort((a, b) => (a.timestamp as any) - (b.timestamp as any))
          setLoadedMsgs(toAddToUI)
       }
       populateUI()

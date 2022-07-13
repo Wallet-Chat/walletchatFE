@@ -111,6 +111,16 @@ export const getFormattedDate = (inputDate: string) => {
    return `${month} ${day}, ${year}`
 }
 
+export const getFormattedDateDMYYYY = (inputDate: string) => { 
+   const dateObj = new Date(inputDate)
+
+   const month = dateObj.getMonth() + 1
+   const day = dateObj.getDate()
+   const year = dateObj.getFullYear()
+
+   return `${day}/${month}/${year}`
+}
+
 export const timeSince = (dateStr: string) => {
 
    let date = new Date(dateStr)
@@ -173,5 +183,15 @@ export const formatMessageDate = (date: Date) => {
       const h = '0' + date.getHours()
       const m = '0' + date.getMinutes()
       return `${h.slice(-2)}:${m.slice(-2)}`
+   }
+}
+
+export const formatInboxDate = (date: string) => {
+   console.log(date, isToday(date), isValidISODate(date))
+   if (isToday(date)){
+      let _date = new Date(date)
+      return formatMessageDate(_date)
+   } else {
+      return getFormattedDateDMYYYY(date)
    }
 }
