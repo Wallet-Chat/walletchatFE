@@ -64,7 +64,7 @@ const ConversationItem = ({
    let recipientAddress = ''
    if (data?.toAddr && data?.fromAddr) {
       recipientAddress =
-         data.toAddr.toLocaleLowerCase() === account
+         data.toAddr.toLocaleLowerCase() === account.toLocaleLowerCase()
             ? data.fromAddr.toLocaleLowerCase()
             : data.toAddr.toLocaleLowerCase()
    }
