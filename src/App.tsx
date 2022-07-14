@@ -26,6 +26,7 @@ import EnterName from './scenes/EnterName'
 import ChangeName from './scenes/ChangeName'
 import NFTById from './scenes/NFT/scenes/NFTById'
 import Community from './scenes/Community'
+import { isChromeExtension } from './helpers/chrome'
 
 export const App = () => {
    const { unreadCount, setUnreadCount } = useUnreadCount()
@@ -109,7 +110,7 @@ export const App = () => {
             right="10px"
          >
             {/* <Header /> */}
-            {isMobileView && closeBtn}
+            {isChromeExtension() && closeBtn}
             {appLoading ? (
                <Flex
                   w="100vw"
@@ -153,7 +154,7 @@ export const App = () => {
       return (
          <Box>
             <Flex>
-               {isMobileView && closeBtn}
+               {isChromeExtension() && closeBtn}
                <Sidebar unreadCount={unreadCount} />
                <EnterName account={account} />
             </Flex>
@@ -163,7 +164,7 @@ export const App = () => {
       return (
          <Box>
             <Flex>
-               {isMobileView && closeBtn}
+               {isChromeExtension() && closeBtn}
                <Sidebar unreadCount={unreadCount} />
                <Box flex="1">
                   <Routes>
