@@ -4,11 +4,11 @@ import Web3 from 'web3'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { getNormalizeAddress } from '.'
-import EthCrypto from 'eth-crypto'
 
 import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
 import { ethers } from 'ethers'
+import { isChromeExtension } from '../helpers/chrome'
 
 const providerOptions = {
    walletconnect: {
@@ -52,17 +52,15 @@ const WalletProvider = React.memo(({ children }) => {
    const [isAuthenticated, setAuthenticated] = useState(false)
    const [appLoading, setAppLoading] = useState(false)
 
-   // console.log({ chainId, account, web3, isAuthenticated, publicKey })
-
    React.useEffect(() => {
       const connectEagerly = async () => {
-         if (window.ethereum) {
-            if (web3Modal?.cachedProvider) connectWallet()
-         } else {
+         if (isChromeExtension) {
             const metamask = await storage.get('metamask-connected')
             if (metamask?.connected) {
                await connectWallet()
             }
+         } else {
+            if (web3Modal?.cachedProvider) connectWallet()
          }
       }
       const unsubscribeToEvents = (provider) => {
@@ -168,8 +166,11 @@ const WalletProvider = React.memo(({ children }) => {
       try {
          let _provider, _account
 
-         if (window.ethereum) {
-            console.log('found window.ethereum>>')
+         if (isChromeExtension) {
+            _provider = createMetaMaskProvider()
+            const _accounts = await getAccountsExtension(provider)
+            _account = getNormalizeAddress(_accounts)
+         } else {
             const instance = await web3Modal.connect()
             setWeb3ModalProvider(instance)
             _provider = new ethers.providers.Web3Provider(instance)
@@ -177,10 +178,6 @@ const WalletProvider = React.memo(({ children }) => {
             _account = await _provider.getSigner().getAddress()
             const network = await _provider.getNetwork()
             setChainId(network)
-         } else {
-            _provider = createMetaMaskProvider()
-            const _accounts = await getAccountsExtension(provider)
-            _account = getNormalizeAddress(_accounts)
          }
          
          setProvider(_provider)  
@@ -194,9 +191,7 @@ const WalletProvider = React.memo(({ children }) => {
             const _web3 = new Web3(provider)
             setWeb3(_web3)
 
-            if (window.ethereum) {
-               storage.set('metamask-connected', { connected: true })
-            } else {
+            if (isChromeExtension) {
                storage.set('metamask-connected', { connected: true })
             }
             subscribeToEvents(provider)
