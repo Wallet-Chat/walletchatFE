@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { MessageUIType } from '../../../../types/Message'
-import { formatMessageDate } from '../../../../helpers/date'
+import { formatInboxDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import NFTContractType from '../../../../types/NFTContract'
 
@@ -109,7 +109,7 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                </Flex>
                <Box>
                   <Box className="timestamp">
-                     {formatMessageDate(new Date(data.timestamp))}
+                  {formatInboxDate(data.timestamp)}
                   </Box>
                   {data.unread && data.unread !== 0 ? (
                      <NotificationCount>{data.unread}</NotificationCount>
