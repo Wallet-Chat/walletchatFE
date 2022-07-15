@@ -62,7 +62,7 @@ const NFTGroupChat = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account])
+   }, [account, nftContractAddr])
 
    const getChatData = () => {
       if (!account) {
