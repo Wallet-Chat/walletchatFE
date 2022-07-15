@@ -202,7 +202,7 @@ const WalletProvider = React.memo(({ children }) => {
             if (isChromeExtension()) {
                storage.set('metamask-connected', { connected: true })
             }
-            subscribeToEvents(provider)
+            subscribeToEvents(_provider)
          }
       } catch (e) {
          console.log('🚨connectWallet', e)
@@ -214,15 +214,15 @@ const WalletProvider = React.memo(({ children }) => {
    const disconnectWallet = async () => {
       console.log('disconnectWallet')
       try {
-         if (window.ethereum) {
+         if (isChromeExtension) {
+            storage.set('metamask-connected', { connected: false })
+         } else {
             console.log(web3ModalProvider.close)
             if (web3ModalProvider.close) {
                await web3ModalProvider.close()
                await web3Modal.clearCachedProvider()
                setProvider(null)
             }
-         } else {
-            storage.set('metamask-connected', { connected: false })
          }
          storage.set('current-address', { address: null })
          setAccount(null)
