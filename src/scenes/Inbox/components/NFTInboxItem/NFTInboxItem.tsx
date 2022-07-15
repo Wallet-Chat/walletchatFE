@@ -41,15 +41,16 @@ const BlockieWrapper = styled.div`
    overflow: hidden;
 `
 const NotificationCount = styled.div`
+   display: inline-block;
    background: var(--chakra-colors-information-400);
-   border-radius: 50%;
-   width: 18px;
+   border-radius: var(--chakra-radii-md);
    height: 18px;
    color: #fff;
    font-weight: 700;
    font-size: 90%;
    text-align: center;
    margin-left: auto;
+   padding: 0 var(--chakra-space-2);
 `
 
 const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
@@ -107,9 +108,9 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                      )}
                   </Box>
                </Flex>
-               <Box>
+               <Box textAlign="right">
                   <Box className="timestamp">
-                  {formatInboxDate(data.timestamp)}
+                     {formatInboxDate(data.timestamp)}
                   </Box>
                   {data.unread && data.unread !== 0 ? (
                      <NotificationCount>{data.unread}</NotificationCount>

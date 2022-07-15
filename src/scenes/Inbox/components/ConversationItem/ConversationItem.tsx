@@ -42,7 +42,7 @@ const BlockieWrapper = styled.div`
    height: 40px;
 `
 const NotificationCount = styled.div`
-display: inline-block;
+   display: inline-block;
    background: var(--chakra-colors-information-400);
    border-radius: var(--chakra-radii-md);
    height: 18px;
