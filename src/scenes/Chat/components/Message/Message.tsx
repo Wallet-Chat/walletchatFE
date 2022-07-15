@@ -27,7 +27,7 @@ const MessageBox = styled.div`
    word-break: break-word;
 
    .name {
-      color: var(--chakra-colors-darkgray-700);
+      color: var(--chakra-colors-information-600);
    }
 
    &:nth-last-child(1) {

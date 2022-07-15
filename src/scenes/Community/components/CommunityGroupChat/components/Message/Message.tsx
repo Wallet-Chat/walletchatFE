@@ -47,7 +47,7 @@ const MessageBox = styled.div`
       display: inline-block;
    }
    .name {
-      color: var(--chakra-colors-darkgray-700);
+      color: var(--chakra-colors-information-600);
    }
 
    &.left {
