@@ -75,7 +75,7 @@ const NFT = ({
       return () => {
          clearInterval(interval)
       }
-   }, [])
+   }, [nftContractAddr, nftId])
 
    useEffect(() => {
       getUnreadDMCount()

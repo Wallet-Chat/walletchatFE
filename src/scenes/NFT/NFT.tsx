@@ -65,7 +65,7 @@ const NFT = ({ account }: { account: string }) => {
       return () => {
          clearInterval(interval)
       }
-   }, [])
+   }, [nftContractAddr])
 
    useEffect(() => {
       getTweetCount()
