@@ -17,6 +17,23 @@ export const isTomorrow = (inputDate: string) => {
    return tomorrow.toDateString() === new Date(inputDate).toDateString()
 }
 
+export const isCurrentWeek = (_inputDate: string) => {
+   if (!isValidISODate(_inputDate)) return false
+   // const currDate = new Date()
+   // const startDate = new Date(currDate.getFullYear(), 0, 1)
+   // const inputDate = new Date(_inputDate)
+   // const inputDateWeekNumber = Math.ceil(Math.floor((inputDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)) / 7)
+   // const currWeekNumber = Math.ceil(Math.floor((currDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)) / 7)
+
+   const curr = new Date() // Current date
+   const first = curr.getDate() - curr.getDay() + 1 // 1st day of week = day of month - day of week.
+   // +1 for Mon as first day of week
+   const last = first + 6 // last day is the first day + 6
+   const input = new Date(_inputDate).getDate()
+   
+   return input >= first && input < last
+}
+
 export const isCurrentYear = (inputDate: string) => {
    if (!isValidISODate(inputDate)) return false
    return today.getFullYear() === new Date(inputDate).getFullYear()
@@ -187,10 +204,11 @@ export const formatMessageDate = (date: Date) => {
 }
 
 export const formatInboxDate = (date: string) => {
-   console.log(date, isToday(date), isValidISODate(date))
    if (isToday(date)){
       let _date = new Date(date)
       return formatMessageDate(_date)
+   } else if (isCurrentWeek(date)) {
+      return new Date(date).toLocaleString('en-us', {  weekday: 'short' })
    } else {
       return getFormattedDateDMYYYY(date)
    }
