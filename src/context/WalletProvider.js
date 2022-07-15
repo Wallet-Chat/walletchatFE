@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import createMetaMaskProvider from 'metamask-extension-provider'
 import Web3 from 'web3'
 import Web3Modal from 'web3modal'
@@ -71,36 +71,57 @@ const WalletProvider = React.memo(({ children }) => {
             if (web3Modal?.cachedProvider) connectWallet()
          }
       }
-      const unsubscribeToEvents = (provider) => {
-         if (provider && provider.removeListener) {
-            provider.removeListener(
-               EthereumEvents.CHAIN_CHANGED,
-               handleChainChanged
-            )
-            provider.removeListener(
-               EthereumEvents.ACCOUNTS_CHANGED,
-               handleAccountsChanged
-            )
-            provider.removeListener(EthereumEvents.CONNECT, handleConnect)
-            provider.removeListener(EthereumEvents.DISCONNECT, handleDisconnect)
-         }
-      }
 
       connectEagerly()
-
-      return () => {
-         unsubscribeToEvents(provider)
-      }
    }, [web3Modal])
 
-   const subscribeToEvents = (provider) => {
-      if (provider && provider.on) {
-         provider.on(EthereumEvents.CHAIN_CHANGED, handleChainChanged)
-         provider.on(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged)
-         provider.on(EthereumEvents.CONNECT, handleConnect)
-         provider.on(EthereumEvents.DISCONNECT, handleDisconnect)
+   useEffect(() => {
+      if (web3ModalProvider?.on) {
+         const handleAccountsChanged = (accounts) => {
+            console.log('handleAccountsChanged', accounts)
+            setAccount(getNormalizeAddress(accounts))
+            setName(null)
+            getName(accounts[0])
+            storage.set('current-address', {
+               address: getNormalizeAddress(accounts),
+            })
+            storage.set('inbox', [])
+            console.log('[account changes]: ', getNormalizeAddress(accounts))
+         }
+
+         const handleChainChanged = (chainId) => {
+            setChainId(chainId)
+            console.log('[chainId changes]: ', chainId)
+         }
+
+         const handleConnect = () => {
+            setAuthenticated(true)
+            console.log('[connected]')
+         }
+
+         const handleDisconnect = () => {
+            console.log('[disconnected]')
+            storage.set('inbox', [])
+            disconnectWallet()
+         }
+
+         console.log('subscribeToEvents', web3ModalProvider)
+         web3ModalProvider.on(EthereumEvents.CHAIN_CHANGED, handleChainChanged)
+         web3ModalProvider.on(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged)
+         web3ModalProvider.on(EthereumEvents.CONNECT, handleConnect)
+         web3ModalProvider.on(EthereumEvents.DISCONNECT, handleDisconnect)
+
+         return () => {
+            console.log('unsubscribeToEvents', web3ModalProvider)
+            if (web3ModalProvider?.removeListener) {
+               web3ModalProvider.removeListener(EthereumEvents.CHAIN_CHANGED, handleChainChanged)
+               web3ModalProvider.removeListener(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged)
+               web3ModalProvider.removeListener(EthereumEvents.CONNECT, handleConnect)
+               web3ModalProvider.removeListener(EthereumEvents.DISCONNECT, handleDisconnect)
+            }
+         }
       }
-   }
+   }, [web3ModalProvider])
 
    const getName = (_account) => {
       if (!process.env.REACT_APP_REST_API) {
@@ -202,7 +223,6 @@ const WalletProvider = React.memo(({ children }) => {
             if (isChromeExtension()) {
                storage.set('metamask-connected', { connected: true })
             }
-            subscribeToEvents(_provider)
          }
       } catch (e) {
          console.log('🚨connectWallet', e)
@@ -232,32 +252,6 @@ const WalletProvider = React.memo(({ children }) => {
       } catch (e) {
          console.log(e)
       }
-   }
-
-   const handleAccountsChanged = (accounts) => {
-      console.log('handleAccountsChanged', accounts)
-      setAccount(getNormalizeAddress(accounts))
-      setName(null)
-      getName(accounts[0])
-      storage.set('current-address', { address: getNormalizeAddress(accounts) })
-      storage.set('inbox', [])
-      console.log('[account changes]: ', getNormalizeAddress(accounts))
-   }
-
-   const handleChainChanged = (chainId) => {
-      setChainId(chainId)
-      console.log('[chainId changes]: ', chainId)
-   }
-
-   const handleConnect = () => {
-      setAuthenticated(true)
-      console.log('[connected]')
-   }
-
-   const handleDisconnect = () => {
-      console.log('[disconnected]')
-      storage.set('inbox', [])
-      disconnectWallet()
    }
 
    return (

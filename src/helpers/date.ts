@@ -207,7 +207,7 @@ export const formatInboxDate = (date: string) => {
    if (isToday(date)){
       let _date = new Date(date)
       return formatMessageDate(_date)
-   } else if (isCurrentWeek(date)) {
+   } else if (isCurrentWeek(date) && isCurrentYear(date)) {
       return new Date(date).toLocaleString('en-us', {  weekday: 'short' })
    } else {
       return getFormattedDateDMYYYY(date)
