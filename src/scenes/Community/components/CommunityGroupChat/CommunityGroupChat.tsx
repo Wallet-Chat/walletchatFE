@@ -4,12 +4,12 @@ import {
    Divider,
    Flex,
    FormControl,
-   Link,
    Tag,
    Text,
 } from '@chakra-ui/react'
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
+import { Link as RLink } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
 import styled from 'styled-components'
 import { getFormattedDate } from '../../../../helpers/date'
@@ -218,7 +218,7 @@ const NFTGroupChat = ({
                 } else if (msg.type && msg.type === 'welcome') {
                   return (
                      <Box textAlign="center">
-                        <Text fontSize="sm" color="darkgray.200">A warm welcome to  <Link href={`https://etherscan.io/address/${msg.fromAddr}`} target="_blank">{msg.sender_name ? msg.sender_name : truncateAddress(msg.fromAddr)}</Link></Text>
+                        <Text fontSize="sm" color="darkgray.200">A warm welcome to  <RLink to={`/chat/${msg.fromAddr}`}>{msg.sender_name ? msg.sender_name : truncateAddress(msg.fromAddr)}</RLink></Text>
                      </Box>
                   )
                 } else if (msg.message) {
