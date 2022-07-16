@@ -385,7 +385,7 @@ const Chat = ({
    }
 
    return (
-      <Flex background="white" height="100vh" flexDirection="column">
+      <Flex background="white" height="100vh" flexDirection="column" flex="1">
          <Box
             p={5}
             pb={3}

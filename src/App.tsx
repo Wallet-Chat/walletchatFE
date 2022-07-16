@@ -98,6 +98,14 @@ export const App = () => {
       </Flex>
    )
 
+   const inbox = (
+      <Inbox
+         account={account}
+         web3={web3}
+         isAuthenticated={isAuthenticated}
+      />
+   )
+
    if (appLoading || !isAuthenticated) {
       return (
          <Flex
@@ -175,22 +183,21 @@ export const App = () => {
                      <Route
                         path="/chat/:address"
                         element={
-                           <Chat
-                              account={account}
-                              web3={web3}
-                              isAuthenticated={isAuthenticated}
-                           />
+                           <Flex>
+                              {!isMobileView && inbox}
+                              <Chat
+                                 account={account}
+                                 web3={web3}
+                                 isAuthenticated={isAuthenticated}
+                              />
+                           </Flex>
                         }
                      />
                      <Route
                         path="/chat"
                         element={
                            <Flex>
-                              <Inbox
-                                 account={account}
-                                 web3={web3}
-                                 isAuthenticated={isAuthenticated}
-                              />
+                              {inbox}
                               {!isMobileView && (
                                  <Flex background="lightgray.200" flex="1" alignItems="center" justifyContent="center">
                                     <Tag background="white">Select a chat to start messaging</Tag>
@@ -205,13 +212,7 @@ export const App = () => {
                         path="/nft/:nftContractAddr/:nftId"
                         element={
                            <Flex>
-                              {!isMobileView && (
-                                 <Inbox
-                                    account={account}
-                                    web3={web3}
-                                    isAuthenticated={isAuthenticated}
-                                 />
-                              )}
+                              {!isMobileView && inbox}
                               <NFTById
                                  account={account}
                               />
@@ -222,13 +223,7 @@ export const App = () => {
                         path="/nft/:nftContractAddr"
                         element={
                            <Flex>
-                              {!isMobileView && (
-                                 <Inbox
-                                    account={account}
-                                    web3={web3}
-                                    isAuthenticated={isAuthenticated}
-                                 />
-                              )}
+                              {!isMobileView && inbox}
                               <NFT account={account} />
                            </Flex>
                         }
@@ -237,13 +232,7 @@ export const App = () => {
                         path="/community/:community"
                         element={
                            <Flex>
-                              {!isMobileView && (
-                                 <Inbox
-                                    account={account}
-                                    web3={web3}
-                                    isAuthenticated={isAuthenticated}
-                                 />
-                              )}
+                              {!isMobileView && inbox}
                               <Community account={account} />
                            </Flex>
                         }
