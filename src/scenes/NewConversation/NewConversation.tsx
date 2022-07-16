@@ -1,4 +1,5 @@
 import { Flex } from '@chakra-ui/react'
+import { isMobile } from 'react-device-detect'
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
 
 const NewConversation = ({ web3 }: { web3: any }) => {
@@ -7,9 +8,10 @@ const NewConversation = ({ web3 }: { web3: any }) => {
          px={5}
          py={10}
          background="white"
-         minHeight="100vh"
+         minHeight={isMobile ? 'unset' : '100vh'}
          justifyContent="center"
          alignItems="center"
+         flex="1"
       >
          <StartConversationWithAddress web3={web3} />
       </Flex>

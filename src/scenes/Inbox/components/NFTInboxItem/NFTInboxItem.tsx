@@ -35,6 +35,9 @@ const Wrapper = styled.button`
 const RecipientAddress = styled.div`
    font-size: var(--chakra-fontSizes-lg);
    font-weight: bold;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
 `
 const BlockieWrapper = styled.div`
    border-radius: 0.3rem;
@@ -84,31 +87,36 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>
-                  <Box mr={2}>
+                  <Box mr={2} flexShrink={0}>
                      <BlockieWrapper>
-                        {data.nftAddr && (
-                           nft?.collection.image_url ?
-                           <Image src={nft.collection.image_url} alt="" width="41px" />
-                           :
-                           <Blockies seed={data.nftAddr} scale={5} />
-                        )}
+                        {data.nftAddr &&
+                           (nft?.collection.image_url ? (
+                              <Image
+                                 src={nft.collection.image_url}
+                                 alt=""
+                                 width="41px"
+                              />
+                           ) : (
+                              <Blockies seed={data.nftAddr} scale={5} />
+                           ))}
                      </BlockieWrapper>
                   </Box>
-                  <Box>
+                  <Box minWidth="0">
                      {data.nftAddr && (
                         <RecipientAddress>
-                           {nft?.collection.name ? nft.collection.name : truncateAddress(data.nftAddr)}
+                           {nft?.collection.name
+                              ? nft.collection.name
+                              : truncateAddress(data.nftAddr)}
                         </RecipientAddress>
                      )}
                      {data.message && (
-                        <Box fontSize="md" color="darkgray.100">
-                           {data.message.substring(0, 25)}
-                           {data.message.length > 25 && '...'}
+                        <Box fontSize="md" color="darkgray.100" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                           {data.message.substring(0, 25)}{data.message.length > 25 && '...'}
                         </Box>
                      )}
                   </Box>
                </Flex>
-               <Box textAlign="right">
+               <Box textAlign="right" flexShrink={0}>
                   <Box className="timestamp">
                      {formatInboxDate(data.timestamp)}
                   </Box>

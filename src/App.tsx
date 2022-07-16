@@ -11,6 +11,8 @@ import {
    Alert,
    Tag,
 } from '@chakra-ui/react'
+import { isMobile } from 'react-device-detect'
+
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
@@ -171,10 +173,10 @@ export const App = () => {
    } else {
       return (
          <Box>
-            <Flex>
+            <Flex flexDirection={(isMobile && !isChromeExtension()) ? 'column' : 'row'} minHeight={isMobile ? '100vh' : 'unset'}>
                {isChromeExtension() && closeBtn}
                <Sidebar unreadCount={unreadCount} />
-               <Box flex="1">
+               <Box flex="1" overflow="hidden" minWidth="1px">
                   <Routes>
                      <Route
                         path="/new"

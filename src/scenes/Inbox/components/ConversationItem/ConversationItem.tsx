@@ -34,6 +34,9 @@ const Wrapper = styled.button`
 const RecipientAddress = styled.div`
    font-size: var(--chakra-fontSizes-lg);
    font-weight: bold;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
 `
 const BlockieWrapper = styled.div`
    border-radius: 0.3rem;
@@ -91,7 +94,7 @@ const ConversationItem = ({
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>
-                  <Box mr={2}>
+                  <Box mr={2} flexShrink={0}>
                      {data?.logo ? (
                         <Image
                            src={data.logo}
@@ -106,17 +109,16 @@ const ConversationItem = ({
                         </BlockieWrapper>
                      )}
                   </Box>
-                  <Box>
+                  <Box minWidth="0">
                      <RecipientAddress>{displayName}</RecipientAddress>
                      {data.message && (
-                        <Box fontSize="md" color="darkgray.100">
-                           {data.message.substring(0, 25)}
-                           {data.message.length > 25 && '...'}
+                        <Box fontSize="md" color="darkgray.100" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                           {data.message.substring(0, 25)}{data.message.length > 25 && '...'}
                         </Box>
                      )}
                   </Box>
                </Flex>
-               <Box textAlign="right">
+               <Box textAlign="right" flexShrink={0}>
                   <Box className="timestamp">
                      {formatInboxDate(data.timestamp)}
                   </Box>

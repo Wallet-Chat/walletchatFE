@@ -10,6 +10,7 @@ import {
    Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Web3 from 'web3'
@@ -190,7 +191,7 @@ const Inbox = ({
    }
 
    return (
-      <Box background="white" minHeight="100vh" borderRight="1px solid var(--chakra-colors-lightgray-400)" minWidth="330px">
+      <Box background="white" minHeight={isMobile ? 'unset' : '100vh'} borderRight="1px solid var(--chakra-colors-lightgray-400)" minWidth="300px" width={isMobile ? '100%' : 'auto'}>
          <Flex p={5} justifyContent="space-between">
             <Heading size="xl">
                Inbox {isFetchingInboxData && <Spinner />}

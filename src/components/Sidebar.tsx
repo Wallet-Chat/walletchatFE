@@ -33,6 +33,7 @@ import animatedPlaceholder from '../images/animated-placeholder.gif'
 import { useWallet } from '../context/WalletProvider'
 import { truncateAddress } from '../helpers/truncateString'
 import { useIsMobileView } from '../context/IsMobileViewProvider'
+import { isMobile } from 'react-device-detect'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -116,15 +117,16 @@ const AccountInfo = styled.button`
 `
 const Divider = styled.div`
    display: block;
-   width: 100%;
-   height: 1px;
+   width: ${isMobile ? '1px' : '100%'};
+   height: ${isMobile ? '100%' : '1px'};
    &::before {
       content: '';
       display: block;
       margin: 0 auto;
-      width: 40px;
-      height: 1px;
+      width: ${isMobile ? '1px' : '40px'};
+      height: ${isMobile ? '40px' : '1px'};
       border-bottom: 1px solid #cbcbcb;
+      border-right: 1px solid #cbcbcb;
    }
 `
 const UnreadCountContainer = styled.div`
@@ -281,19 +283,21 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
       <Flex
          justifyContent="space-between"
          alignItems="center"
-         flexFlow="column nowrap"
+         flexDirection={isMobile ? 'row' : 'column'}
          borderRight="1px solid var(--chakra-colors-lightgray-400)"
          background="white"
-         height="100vh"
-         padding="0.2rem"
+         height={isMobile ? 'auto' : '100vh'}
+         py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
+         px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
+         order={isMobile ? 2 : 0}
       >
-         <Flex flexDirection="column" alignItems="center">
+         <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
             <Box padding="0.8rem">
                <Image src={logoThumb} alt="" width="30px" />
             </Box>
-            <Box mt={2}></Box>
+            <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0}></Box>
             <Divider />
-            <Box mb={5}></Box>
+            <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0}></Box>
 
             {name !== null && (
                <LinkElem to={'/chat'}>
@@ -348,7 +352,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                <SidebarNFTLink nftContractAddr={item.nftaddr} nftId={item.nftid} key={i} />
             ))} */}
          </Flex>
-         <Flex flexDirection="column" alignItems="center">
+         <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
             {name !== null && (
                <Tooltip label="New" placement="top">
                   <LinkElem to={`/new`}>
@@ -364,6 +368,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                            seed={account.toLocaleLowerCase()}
                            scale={4}
                         />
+                        {!isMobile && (
                         <span
                            style={{
                               fontSize: 'var(--chakra-fontSizes-md)',
@@ -372,6 +377,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                         >
                            {account.substring(0, 5)}
                         </span>
+                        )}
                      </>
                   )}
                </MenuButton>
