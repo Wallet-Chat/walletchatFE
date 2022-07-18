@@ -25,6 +25,7 @@ import { MessageType, MessageUIType } from '../../types/Message'
 import Message from './components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
+import { isMobile } from 'react-device-detect'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
 // import EthCrypto, { Encrypted } from 'eth-crypto'
@@ -391,20 +392,22 @@ const Chat = ({
             pb={3}
             borderBottom="1px solid var(--chakra-colors-lightgray-400)"
          >
-            <Box mb={4}>
-               <Link to="/chat" style={{ textDecoration: 'none' }}>
-                  <Button
-                     colorScheme="gray"
-                     background="lightgray.300"
-                     size="sm"
-                  >
-                     <Flex alignItems="center">
-                        <IconArrowLeft size={18} />
-                        <Text ml="1">Back to Inbox</Text>
-                     </Flex>
-                  </Button>
-               </Link>
-            </Box>
+            {isMobile && (
+               <Box mb={4}>
+                  <Link to="/chat" style={{ textDecoration: 'none' }}>
+                     <Button
+                        colorScheme="gray"
+                        background="lightgray.300"
+                        size="sm"
+                     >
+                        <Flex alignItems="center">
+                           <IconArrowLeft size={18} />
+                           <Text ml="1">Back to Inbox</Text>
+                        </Flex>
+                     </Button>
+                  </Link>
+               </Box>
+            )}
 
             {toAddr && (
                <Flex alignItems="center" justifyContent="space-between">
