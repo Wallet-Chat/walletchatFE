@@ -83,7 +83,7 @@ const Chat = ({
       }, 5000) // every 5s
 
       return () => clearInterval(interval)
-   }, [isAuthenticated, account])
+   }, [isAuthenticated, account, toAddr])
 
    useEffect(() => {
       if (toAddr) {
