@@ -198,6 +198,7 @@ const Inbox = ({
          minWidth="300px"
          width={isMobile ? '100%' : 'auto'}
          overflowY="auto"
+         className="custom-scrollbar"
       >
          <Flex p={5} justifyContent="space-between">
             <Heading size="xl">
