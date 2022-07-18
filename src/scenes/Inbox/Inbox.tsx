@@ -38,7 +38,7 @@ const Divider = styled.div`
    }
 `
 
-const localStorageInbox = localStorage.getItem("inbox")
+const localStorageInbox = localStorage.getItem('inbox')
 
 const Inbox = ({
    account,
@@ -50,7 +50,9 @@ const Inbox = ({
    isAuthenticated: boolean
 }) => {
    const [inboxData, setInboxData] = useState<MessageType[]>(
-      localStorageInbox ? JSON.parse(localStorageInbox) : new Array<MessageType>()
+      localStorageInbox
+         ? JSON.parse(localStorageInbox)
+         : new Array<MessageType>()
    )
    const [isFetchingInboxData, setIsFetchingInboxData] =
       useState<boolean>(false)
@@ -97,11 +99,10 @@ const Inbox = ({
             console.log('✅ GET [Inbox]:', data)
             if (data === null) {
                setInboxData([])
-               localStorage.setItem("inbox", JSON.stringify([]))
-            }
-            else {
+               localStorage.setItem('inbox', JSON.stringify([]))
+            } else {
                setInboxData(data)
-               localStorage.setItem("inbox", JSON.stringify(data))
+               localStorage.setItem('inbox', JSON.stringify(data))
             }
             setIsFetchingInboxData(false)
          })
@@ -116,12 +117,11 @@ const Inbox = ({
          const toAddToUI = [] as MessageUIType[]
          for (let i = 0; i < inboxData.length; i++) {
             if (
-               inboxData[i]?.context_type === 'nft' || 
-               inboxData[i]?.context_type === 'community' || (
-                  account &&
+               inboxData[i]?.context_type === 'nft' ||
+               inboxData[i]?.context_type === 'community' ||
+               (account &&
                   inboxData[i]?.toaddr &&
-                  inboxData[i]?.toaddr.toLowerCase() === account.toLowerCase()
-               )
+                  inboxData[i]?.toaddr.toLowerCase() === account.toLowerCase())
             ) {
                toAddToUI.push({
                   ...inboxData[i],
@@ -191,41 +191,64 @@ const Inbox = ({
    }
 
    return (
-      <Box background="white" minHeight={isMobile ? 'unset' : '100vh'} borderRight="1px solid var(--chakra-colors-lightgray-400)" minWidth="300px" width={isMobile ? '100%' : 'auto'}>
+      <Box
+         background="white"
+         height={isMobile ? 'unset' : '100vh'}
+         borderRight="1px solid var(--chakra-colors-lightgray-400)"
+         minWidth="300px"
+         width={isMobile ? '100%' : 'auto'}
+         overflowY="auto"
+      >
          <Flex p={5} justifyContent="space-between">
             <Heading size="xl">
                Inbox {isFetchingInboxData && <Spinner />}
             </Heading>
-            <Button as={Link} to="/new" size="sm" variant="outline" _hover={{ textDecoration: 'none', backgroundColor: 'var(--chakra-colors-lightgray-300)' }}>+ New</Button>
+            <Button
+               as={Link}
+               to="/new"
+               size="sm"
+               variant="outline"
+               _hover={{
+                  textDecoration: 'none',
+                  backgroundColor: 'var(--chakra-colors-lightgray-300)',
+               }}
+            >
+               + New
+            </Button>
          </Flex>
          <Divider />
 
-         {loadedMsgs.map((conversation, i) => {
-            if (conversation.context_type === 'dm' || conversation.context_type === 'community') {
-               return (
-               <ConversationItem
-                  key={`${conversation.timestamp.toString()}${i}`}
-                  data={conversation}
-                  account={account}
-               />
-               )
-            } else if (conversation.context_type === 'nft') {
-               return (
-               <NFTInboxItem
-                  key={`${conversation.timestamp.toString()}${i}`}
-                  data={conversation}
-               />
-               )
-            }
-         })}
-         {loadedMsgs.length === 0 && (
-            <Box p={5}>
-               <Text mb={4} fontSize="md">
-                  You have no messages.
-               </Text>
-               <StartConversationWithAddress web3={web3} />
-            </Box>
-         )}
+         <Box overflowY="scroll">
+            {loadedMsgs.map((conversation, i) => {
+               if (
+                  conversation.context_type === 'dm' ||
+                  conversation.context_type === 'community'
+               ) {
+                  return (
+                     <ConversationItem
+                        key={`${conversation.timestamp.toString()}${i}`}
+                        data={conversation}
+                        account={account}
+                     />
+                  )
+               } else if (conversation.context_type === 'nft') {
+                  return (
+                     <NFTInboxItem
+                        key={`${conversation.timestamp.toString()}${i}`}
+                        data={conversation}
+                     />
+                  )
+               }
+            })}
+            {loadedMsgs.length === 0 && (
+               <Box p={5}>
+                  <Text mb={4} fontSize="md">
+                     You have no messages.
+                  </Text>
+                  <StartConversationWithAddress web3={web3} />
+               </Box>
+            )}
+         </Box>
       </Box>
    )
 }
