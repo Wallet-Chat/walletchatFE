@@ -1,29 +1,8 @@
-import createMetaMaskProvider from 'metamask-extension-provider'
-import WalletAccount from './wallet'
+// import createMetaMaskProvider from 'metamask-extension-provider'
 
 let activeTabId: number,
    lastUrl: string | undefined,
    lastTitle: string | undefined
-let _accounts: WalletAccount[] | null = []
-let provider = createMetaMaskProvider()
-provider.on('accountsChanged', handleAccountsChanged)
-
-provider
-   .request({ method: 'eth_accounts' })
-   .then(handleAccountsChanged)
-   .catch((err) => {
-      // Some unexpected error.
-      // For backwards compatibility reasons, if no accounts are available,
-      // eth_accounts will return an empty array.
-      console.error(err)
-   })
-
-chrome.runtime.onMessage.addListener((data) => {
-   console.log('chrome.runtime.onMessage', data)
-   if (data.type === 'notification') {
-      notify(data.message)
-   }
-})
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
@@ -33,7 +12,14 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
       )
    }
 })
-
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+   // console.log('[chrome.tabs.onUpdated', tabId, changeInfo, tab)
+   getTabInfo(tabId)
+})
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+   // console.log('[chrome.tabs.onActivated', activeInfo)
+   getTabInfo((activeTabId = activeInfo.tabId))
+})
 chrome.runtime.onInstalled.addListener((details) => {
    console.log('[background.ts] onInstalled', details)
 
@@ -42,7 +28,111 @@ chrome.runtime.onInstalled.addListener((details) => {
       title: 'WalletChat: %s',
       contexts: ['selection'],
    })
+
+   // try {
+   //    let provider = createMetaMaskProvider()
+
+   //    provider.on('accountsChanged', handleAccountsChanged)
+
+   //    provider
+   //       .request({ method: 'eth_accounts' })
+   //       .then(handleAccountsChanged)
+   //       .catch((err) => {
+   //          // Some unexpected error.
+   //          // For backwards compatibility reasons, if no accounts are available,
+   //          // eth_accounts will return an empty array.
+   //          console.error(err)
+   //       })
+
+   //    function handleAccountsChanged(accounts: any) {
+   //       console.log('[background.ts] handleAccountsChanged')
+   //       if (accounts && accounts[0]) {
+   //          chrome.storage.local.set({
+   //             account: accounts[0],
+   //          })
+   //          getInboxCount(accounts[0])
+   //       }
+   //    }
+   // } catch (e) {
+   //    console.log(e)
+   // }
 })
+chrome.runtime.onStartup.addListener(() => {
+   console.log('[background.ts] onStartup')
+   startAlarm()
+})
+chrome.runtime.onConnect.addListener((port) => {
+   console.log('[background.ts] onConnect', port)
+})
+chrome.runtime.onSuspend.addListener(() => {
+   console.log('[background.ts] onSuspend')
+})
+chrome.runtime.onMessage.addListener((data) => {
+   console.log('[background.ts] onMessage', data)
+   if (data.type === 'notification') {
+      notify(data.message)
+   }
+})
+chrome.alarms.onAlarm.addListener((alarm) => {
+   console.log('[background.ts] onAlarm')
+   if (alarm.name === 'badgeUpdate') {
+      chrome.storage.local.get(['account'], (data) => {
+         if (data.account) {
+            getInboxCount(data.account)
+         }
+      })
+   }
+})
+chrome.runtime.onInstalled.addListener((details) => {
+   //When extension is installed or updated, set or reset the count variable in storage
+   if (details.reason === 'update' || details.reason === 'install') {
+      chrome.storage.local.set({
+         count: 0,
+      })
+      // Start alarm when the extension is first installed.
+      startAlarm()
+   }
+})
+
+function startAlarm() {
+   console.log('[background.ts] startAlarm')
+   // Call fn immediately
+   chrome.storage.local.get(['account'], (data) => {
+      if (data.account) {
+         getInboxCount(data.account)
+      }
+   })
+
+   // Create intervals to call alarm
+   chrome.alarms.create('badgeUpdate', {
+      periodInMinutes: 1 / 30,
+      delayInMinutes: 0,
+   })
+}
+
+async function getInboxCount(account: string) {
+   console.log('[background.ts] getInboxCount', account)
+   if (account) {
+      fetch(` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+         .then((response) => response.json())
+         .then((count: number) => {
+            console.log('✅[GET][Unread Count]:', count)
+            chrome.storage.local.get(['count'], (data) => {
+               //Get the count variable from storage, then, in this callback I can call setBadgeText.
+               updateUnreadCountBadge(count)
+               chrome.storage.local.set({ count: count })
+            })
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Unread Count]:', error)
+         })
+   }
+}
 
 function getTabInfo(tabId: number) {
    chrome.tabs.get(tabId, function (tab) {
@@ -53,111 +143,7 @@ function getTabInfo(tabId: number) {
    })
 }
 
-chrome.tabs.onActivated.addListener(function (activeInfo) {
-   // console.log('[chrome.tabs.onActivated', activeInfo)
-   getTabInfo((activeTabId = activeInfo.tabId))
-})
-
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-   // console.log('[chrome.tabs.onUpdated', tabId, changeInfo, tab)
-   getTabInfo(tabId)
-})
-
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-   if ('notify' === info.menuItemId) {
-      if (info.selectionText) {
-         notify(info.selectionText)
-      }
-   }
-})
-
-const notify = (message: string) => {
-   chrome.storage.local.get(['notifyCount'], (data) => {
-      let value = data.notifyCount || 0
-      chrome.storage.local.set({ notifyCount: Number(value) + 1 })
-   })
-
-   return chrome.notifications.create('', {
-      type: 'basic',
-      title: 'WalletChat',
-      message: message || 'Enter your message here',
-      iconUrl: './assets/icons/128.png',
-   })
-}
-
-chrome.runtime.onConnect.addListener((port) => {
-   console.log('[background.ts] onConnect', port)
-})
-
-chrome.runtime.onSuspend.addListener(() => {
-   console.log('[background.ts] onSuspend')
-})
-
-function reloadSettings() {
-   if (_accounts != null) {
-      _accounts.forEach((account) => {
-         account.stopScheduler()
-      })
-      _accounts = null
-   }
-   _accounts = new Array<WalletAccount>()
-   chrome.browserAction.setBadgeText({ text: '...' })
-   chrome.browserAction.setTitle({ title: 'Polling accounts...' })
-
-   window.setTimeout(startRequest, 0)
-}
-
-function handleAccountsChanged(accounts: any) {
-   console.log('handleAccountsChanged()', accounts)
-
-   if (accounts.length === 0) {
-      // MetaMask is locked or the user has not connected any accounts
-      console.log('Please connect to MetaMask.')
-   } else {
-      // Stop all old account schedulers
-      if (_accounts != null) {
-         _accounts.forEach((acc: WalletAccount) => {
-            console.log('stop address: ', acc)
-            if (acc) {
-               acc.stopScheduler()
-            }
-         })
-      }
-
-      // Start new account schedulers
-      let accts = new Array<WalletAccount>()
-      accounts.forEach((address: string) => {
-         let acc = new WalletAccount(address)
-         acc.onError = walletError
-         acc.onUpdate = walletUpdate
-         accts.push(acc)
-      })
-      _accounts = accts
-      startRequest()
-   }
-}
-
-function startRequest() {
-   if (_accounts !== null) {
-      _accounts.forEach((account, i) => {
-         if (account != null) {
-            window.setTimeout(account.startScheduler, 500 * i)
-         }
-      })
-   }
-}
-
-function walletUpdate() {
-   let unreadCount = 0
-
-   if (_accounts !== null) {
-      _accounts.forEach((account) => {
-         if (account != null && account.getUnreadCount() > 0) {
-            unreadCount += account.getUnreadCount()
-         }
-      })
-   }
-
+function updateUnreadCountBadge(unreadCount: number) {
    switch (unreadCount) {
       case 0:
          chrome.action.setBadgeBackgroundColor({
@@ -168,7 +154,7 @@ function walletUpdate() {
          break
       case 1:
          chrome.action.setBadgeBackgroundColor({
-            color: '#F00',
+            color: '#1236AA',
          })
          chrome.action.setTitle({
             title: unreadCount + ' unread message',
@@ -177,7 +163,7 @@ function walletUpdate() {
          break
       default:
          chrome.action.setBadgeBackgroundColor({
-            color: '#F00',
+            color: '#1236AA',
          })
          chrome.action.setTitle({
             title: unreadCount + ' unread messages',
@@ -187,11 +173,13 @@ function walletUpdate() {
    }
 }
 
-// Called when an account has experienced an error
-function walletError() {
-   chrome.browserAction.setBadgeBackgroundColor({ color: [190, 190, 190, 255] })
-   chrome.browserAction.setBadgeText({ text: 'X' })
-   chrome.browserAction.setTitle({ title: 'Wallet not connected' })
+const notify = (message: string) => {
+   return chrome.notifications.create('', {
+      type: 'basic',
+      title: 'WalletChat',
+      message: message || 'Enter your message here',
+      iconUrl: './assets/icons/128.png',
+   })
 }
 
 export {}

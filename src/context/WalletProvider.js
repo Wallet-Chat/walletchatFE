@@ -1,3 +1,4 @@
+/*global chrome*/
 import React, { useEffect, useState } from 'react'
 import createMetaMaskProvider from 'metamask-extension-provider'
 import Web3 from 'web3'
@@ -222,6 +223,9 @@ const WalletProvider = React.memo(({ children }) => {
 
             if (isChromeExtension()) {
                storage.set('metamask-connected', { connected: true })
+               chrome.storage.local.set({
+                  account: _account
+               });
             }
          }
       } catch (e) {

@@ -1,13 +1,13 @@
 {
    "name": "WalletChat",
    "description": "A better way to communicate in web3",
-   "version": "1.4.5",
+   "version": "1.4.6",
    "manifest_version": 3,
    "action": {
       "default_popup": "index.html",
-      "default_title": "Open the popup"
+      "default_title": "Open WalletChat popup"
    },
-   "permissions": ["contextMenus", "notifications", "storage", "tabs"],
+   "permissions": ["contextMenus", "notifications", "storage", "tabs", "alarms"],
    "icons": {
       "512": "logo512.png"
    },

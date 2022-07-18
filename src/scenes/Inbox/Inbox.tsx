@@ -218,7 +218,7 @@ const Inbox = ({
          </Flex>
          <Divider />
 
-         <Box overflowY="scroll">
+         <Box overflowY="auto">
             {loadedMsgs.map((conversation, i) => {
                if (
                   conversation.context_type === 'dm' ||
