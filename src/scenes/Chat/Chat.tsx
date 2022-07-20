@@ -138,9 +138,6 @@ const Chat = ({
          .then(async (data: MessageType[]) => {
             console.log('✅[GET][Chat items]:', data)
             setChatData(data)
-            //setChatData(replica)
-
-            // TODO: DECRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
             setIsFetchingChatData(false)
          })
          .catch((error) => {
@@ -220,25 +217,6 @@ const Chat = ({
       }
    }
 
-   //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
-   // const getPublicKeyFromSettings = async () => {
-   //    let toAddrPublicKey = ""
-   //    await fetch(` ${process.env.REACT_APP_REST_API}/get_settings/${toAddr}`, {
-   //       method: 'GET',
-   //       headers: {
-   //          'Content-Type': 'application/json',
-   //       },
-   //    })
-   //    .then((response) => response.json())
-   //    .then(async (settings: SettingsType[]) => {
-   //       console.log('✅ GET [Public Key]:', settings)
-   //       toAddrPublicKey = settings[0].publickey
-   //    })
-
-   //    return await toAddrPublicKey
-   // }
-
-   //end get public key that should only need to be done once per conversation
    const sendMessage = async () => {
       if (msgInput.length <= 0) return
 
@@ -270,24 +248,7 @@ const Chat = ({
          null
       )
 
-      // TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
-      // let toAddrPublicKey = await getPublicKeyFromSettings()  //TODO: should only need to do this once per convo (@manapixels help move it)
-
-      // console.log("encrypt with public key: ", toAddrPublicKey)
-      // const encryptedTo = await EthCrypto.encryptWithPublicKey(
-      //    toAddrPublicKey,
-      //    msgInputCopy)
-
-      // //we have to encrypt the sender side with its own public key, if we want to refresh data from server
-      // const encryptedFrom = await EthCrypto.encryptWithPublicKey(
-      //    publicKey,
-      //    msgInputCopy)
-
-      //lets try and use IPFS instead of any actual data stored on our server
-      //const cid = await postIpfsData(JSON.stringify({to: encryptedTo, from: encryptedFrom}))
-
-      //const cid = await postIpfsData(msgInputCopy)
-      data.message = msgInputCopy //await cid
+      data.message = msgInputCopy
 
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
@@ -301,30 +262,6 @@ const Chat = ({
          .then((data) => {
             console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
             getChatData()
-
-            // let indexOfMsg = -1
-
-            // for (let i = latestLoadedMsgs.length - 1; i > 0; i--) {
-            //    console.log(latestLoadedMsgs[i], data)
-            //    if (
-            //       latestLoadedMsgs[i].message === data.message &&
-            //       latestLoadedMsgs[i].timestamp.getTime() === data.timestamp.getTime()
-            //    ) {
-            //       indexOfMsg = i
-            //       break
-            //    }
-            // }
-            // if (indexOfMsg !== -1) {
-            //    let newLoadedMsgs: MessageUIType[] = [...latestLoadedMsgs] // copy the old array
-            //    newLoadedMsgs[indexOfMsg]['isFetching'] = false
-            //    setLoadedMsgs(newLoadedMsgs)
-            // } else {
-            //    let newLoadedMsgs: MessageUIType[] = [...latestLoadedMsgs] // copy the old array
-            //    newLoadedMsgs.push({
-            //       ...data,
-            //       isFetching: false
-            //    })
-            // }
          })
          .catch((error) => {
             console.error(
@@ -336,6 +273,40 @@ const Chat = ({
          .finally(() => {
             setIsSendingMessage(false)
          })
+
+      if (toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19') {
+         if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
+            console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
+         } else {
+            fetch(
+               `https://api.sleekplan.com/v1/post`,
+               {
+                  method: 'POST',
+                  headers: {
+                     'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
+                  },
+                  body: JSON.stringify({
+                     title: account,
+                     type: 'feedback',
+                     description: msgInputCopy,
+                     user: 347112,
+                  }),
+               }
+            )
+               .then((response) => response.json())
+               .then((data) => {
+                  console.log('✅[POST][Feedback]:', data)
+               })
+               .catch((error) => {
+                  console.error(
+                     '🚨[POST][Feedback]:',
+                     error,
+                     JSON.stringify(data)
+                  )
+               })
+         }
+      }
    }
 
    const addMessageToUI = (
@@ -425,7 +396,9 @@ const Chat = ({
                               >
                                  {name}
                               </Text>
-                              <Text fontSize="sm" color="darkgray.500">{truncateAddress(toAddr)}</Text>
+                              <Text fontSize="sm" color="darkgray.500">
+                                 {truncateAddress(toAddr)}
+                              </Text>
                            </Box>
                         ) : (
                            <Text
@@ -485,9 +458,22 @@ const Chat = ({
          </Box>
 
          <DottedBackground className="custom-scrollbar">
-            {isFetchingChatData && loadedMsgs.length === 0 && (
+            {/* {isFetchingChatData && loadedMsgs.length === 0 && (
                <Flex justifyContent="center" alignItems="center" height="100%">
                   <Spinner />
+               </Flex>
+            )} */}
+            {toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19' && (
+               <Flex
+                  justifyContent="center"
+                  alignItems="center"
+                  borderRadius="lg"
+                  background="green.200"
+                  p={4}
+               >
+                  <Box fontSize="md">
+                     We welcome all feedback and bug reports. Thank you! 😊
+                  </Box>
                </Flex>
             )}
             {loadedMsgs.map((msg: MessageUIType, i) => {

@@ -23,7 +23,9 @@ import {
 } from '@tabler/icons'
 import Blockies from 'react-blockies'
 import styled from 'styled-components'
+import { isMobile } from 'react-device-detect'
 
+import IconFeedback from '../images/icon-feedback.svg'
 import logoThumb from '../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../helpers/contract'
 import NFTMetadataType from '../types/NFTMetadata'
@@ -33,7 +35,7 @@ import animatedPlaceholder from '../images/animated-placeholder.gif'
 import { useWallet } from '../context/WalletProvider'
 import { truncateAddress } from '../helpers/truncateString'
 import { useIsMobileView } from '../context/IsMobileViewProvider'
-import { isMobile } from 'react-device-detect'
+
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -98,6 +100,12 @@ const LinkElem = styled(NavLink)`
 `
 const LinkElem2 = styled(LinkElem)`
    background: var(--chakra-colors-lightgray-200);
+`
+const FeedbackLinkElem = styled(LinkElem)`
+   background: var(--chakra-colors-warning-200);
+   &.active {
+      background: var(--chakra-colors-warning-200);
+   }
 `
 const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
@@ -360,6 +368,13 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                   </LinkElem>
                </Tooltip>
             )}
+
+            <Tooltip label="Feedback" placement="top">
+               <FeedbackLinkElem to={`/chat/0x17FA0A61bf1719D12C08c61F211A063a58267A19`}>
+                  <Image src={IconFeedback} width="50px" height="50px" alt="" />
+               </FeedbackLinkElem>
+            </Tooltip>
+
             <Menu>
                <MenuButton as={AccountInfo}>
                   {account && (
