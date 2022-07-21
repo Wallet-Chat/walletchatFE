@@ -12,6 +12,7 @@ import {
    Text,
    MenuDivider,
    Tooltip,
+   Link as CLink,
    Popover,
    PopoverTrigger,
    PopoverContent,
@@ -32,7 +33,6 @@ import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
 import {
    IconBrandTwitter,
-   IconBrandDiscord
 } from '@tabler/icons'
 
 import IconFeedback from '../images/icon-feedback.svg'
@@ -323,8 +323,8 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                      <Text fontSize="md" fontWeight="bold">WalletChat</Text>
                      <CDivider my="1" />
                      <Flex alignItems="center">
-                        <Link to="https://twitter.com/wallet_chat" target="_blank"><IconBrandTwitter stroke={1.5} color="white"fill="var(--chakra-colors-lightgray-800)" /></Link>
-                        <Link to="https://discord.gg/walletchat" target="_blank"><Image src={IconDiscord} alt="" height="24px" width="24px" /></Link>
+                        <CLink href="https://twitter.com/wallet_chat" target="_blank"><IconBrandTwitter stroke={1.5} color="white"fill="var(--chakra-colors-lightgray-800)" /></CLink>
+                        <CLink href="https://discord.gg/walletchat" target="_blank"><Image src={IconDiscord} alt="" height="24px" width="24px" /></CLink>
                      </Flex>
                      <Text fontSize="sm" mt={2} color="lightgray.900">Ver. {process.env.REACT_APP_VERSION}</Text>
                   </PopoverBody>
