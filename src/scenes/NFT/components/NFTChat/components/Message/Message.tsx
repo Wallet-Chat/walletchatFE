@@ -44,6 +44,9 @@ const MessageBox = styled.div`
       .name {
          color: var(--chakra-colors-white);
       }
+      .chakra-menu__menu-list {
+         color: #000;
+      }
    }
    .timestamp {
       display: block;

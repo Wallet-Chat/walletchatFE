@@ -52,6 +52,9 @@ const MessageBox = styled.div`
             color: var(--chakra-colors-lightgray-500);
          }
       }
+      .chakra-menu__menu-list {
+         color: #000;
+      }
 
       .name {
          color: var(--chakra-colors-white);
