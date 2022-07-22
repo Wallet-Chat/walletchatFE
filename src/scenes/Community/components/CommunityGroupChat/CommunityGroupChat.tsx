@@ -1,23 +1,15 @@
-import {
-   Box,
-   Button,
-   Divider,
-   Flex,
-   FormControl,
-   Tag,
-   Text,
-} from '@chakra-ui/react'
-import { IconSend } from '@tabler/icons'
-import { useEffect, useState, KeyboardEvent, useRef } from 'react'
+import { Box, Divider, Flex, Tag, Text } from '@chakra-ui/react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { Link as RLink } from 'react-router-dom'
-import TextareaAutosize from 'react-textarea-autosize'
+import { FixedSizeList as List } from 'react-window'
 import styled from 'styled-components'
+
 import { getFormattedDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
-
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
+import MessageInput from './components/MessageInput'
 
 const DottedBackground = styled.div`
    flex-grow: 1;
@@ -41,19 +33,25 @@ const DottedBackground = styled.div`
 const NFTGroupChat = ({
    account,
    community,
-   chatData
+   chatData,
 }: {
    account: string | undefined
    community: string
    chatData: GroupMessageType[]
 }) => {
-
    const [firstLoad, setFirstLoad] = useState(true)
-   const [msgInput, setMsgInput] = useState<string>('')
-   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
+
+   const listRef = useRef()
+   const sizeMap = useRef({})
+   const setSize = useCallback((index, size) => {
+      sizeMap.current = { ...sizeMap.current, [index]: size };
+      listRef.current.resetAfterIndex(index);
+   }, []);
+   const getSize = index => sizeMap.current[index] || 50;
+  
 
    useEffect(() => {
       const toAddToUI = [] as MessageUIType[]
@@ -94,95 +92,34 @@ const NFTGroupChat = ({
       // Scroll to bottom of chat once all messages are loaded
       if (scrollToBottomRef?.current && firstLoad) {
          scrollToBottomRef.current.scrollIntoView()
-         
+
          setTimeout(() => {
             setFirstLoad(false)
          }, 5000)
       }
    }, [loadedMsgs])
 
-   const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (event.key === 'Enter') {
-         event.preventDefault()
-         sendMessage()
-      }
-   }
-
-   const sendMessage = async () => {
-      if (msgInput.length <= 0) return
-      if (!account) {
-         console.log('No account connected')
-         return
-      }
-
-      // Make a copy and clear input field
-      const msgInputCopy = (' ' + msgInput).slice(1)
-      setMsgInput('')
-
-      const timestamp = new Date()
-
-      const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
-
-      let data = {
-         type: 'message',
-         message: msgInputCopy,
-         nftaddr: community,
-         fromaddr: account.toLocaleLowerCase(),
-         timestamp
-      }
-
-      addMessageToUI(
-         "message",
-         msgInputCopy,
-         account,
-         timestamp.toString(),
-         'right',
-         false
-      )
-
-      data.message = msgInputCopy
-
-      setIsSendingMessage(true)
-
-      fetch(`${process.env.REACT_APP_REST_API}/community`, {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
-         .then((data) => {
-            console.log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
-         })
-         .catch((error) => {
-            console.error(
-               '🚨[POST][Community][Message]:',
-               error,
-               JSON.stringify(data)
-            )
-         })
-         .finally(() => {
-            setIsSendingMessage(false)
-         })
-   }
-
-   const addMessageToUI = (
-      type: string,
-      message: string,
-      fromaddr: string,
-      timestamp: string,
-      position: string,
-      isFetching: boolean,
-   ) => {
-      console.log(`Add message to UI: ${message}`)
-
+   const addMessageToUI = ({
+      type,
+      message,
+      fromaddr,
+      position,
+      timestamp,
+      isFetching,
+   }: {
+      type: string
+      message: string
+      fromaddr: string
+      position: string
+      timestamp: string
+      isFetching: boolean
+   }) => {
       const newMsg: MessageUIType = {
          type,
          message,
          fromAddr: fromaddr,
-         timestamp,
          position,
+         timestamp,
          isFetching,
       }
       let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
@@ -192,7 +129,6 @@ const NFTGroupChat = ({
 
    return (
       <Flex flexDirection="column" height="100%">
-
          <DottedBackground className="custom-scrollbar">
             {loadedMsgs.length === 0 && (
                <Flex
@@ -207,21 +143,41 @@ const NFTGroupChat = ({
                   </Box>
                </Flex>
             )}
+            <List ref={listRef} height="500px" width="100%" itemCount={loadedMsgs.length} itemSize={getSize} itemData={loadedMsgs}>
             {loadedMsgs.map((msg, i) => {
                if (msg.type && msg.type === 'day') {
                   return (
                      <Box position="relative" my={6} key={msg.timestamp}>
-                        <Tag color="lightgray.800" background="lightgray.200" fontSize="xs" fontWeight="bold" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
+                        <Tag
+                           color="lightgray.800"
+                           background="lightgray.200"
+                           fontSize="xs"
+                           fontWeight="bold"
+                           mb={1}
+                           position="absolute"
+                           right="var(--chakra-space-4)"
+                           top="50%"
+                           transform="translateY(-50%)"
+                        >
+                           {getFormattedDate(msg.timestamp.toString())}
+                        </Tag>
                         <Divider />
                      </Box>
                   )
-                } else if (msg.type && msg.type === 'welcome') {
+               } else if (msg.type && msg.type === 'welcome') {
                   return (
                      <Box textAlign="center">
-                        <Text fontSize="sm" color="darkgray.200">A warm welcome to  <RLink to={`/chat/${msg.fromAddr}`}>{msg.sender_name ? msg.sender_name : truncateAddress(msg.fromAddr)}</RLink></Text>
+                        <Text fontSize="sm" color="darkgray.200">
+                           A warm welcome to{' '}
+                           <RLink to={`/chat/${msg.fromAddr}`}>
+                              {msg.sender_name
+                                 ? msg.sender_name
+                                 : truncateAddress(msg.fromAddr)}
+                           </RLink>
+                        </Text>
                      </Box>
                   )
-                } else if (msg.message) {
+               } else if (msg.message) {
                   return (
                      <Message
                         key={`${msg.message}${msg.timestamp}${i}`}
@@ -231,40 +187,19 @@ const NFTGroupChat = ({
                }
                return null
             })}
-            <Box float="left" style={{ clear: 'both' }} ref={scrollToBottomRef}></Box>
+            </List>
+            <Box
+               float="left"
+               style={{ clear: 'both' }}
+               ref={scrollToBottomRef}
+            ></Box>
          </DottedBackground>
 
-         <Flex>
-            <FormControl style={{ flexGrow: 1 }}>
-               <TextareaAutosize
-                  placeholder="Write a message..."
-                  value={msgInput}
-                  onChange={(e) => setMsgInput(e.target.value)}
-                  onKeyPress={(e) => handleKeyPress(e)}
-                  className="custom-scrollbar"
-                  style={{
-                     resize: 'none',
-                     padding: '.5rem 1rem',
-                     width: '100%',
-                     fontSize: 'var(--chakra-fontSizes-md)',
-                     background: 'var(--chakra-colors-lightgray-400)',
-                     borderRadius: '0.3rem',
-                     marginBottom: '-6px',
-                  }}
-                  maxRows={8}
-               />
-            </FormControl>
-            <Flex alignItems="flex-end">
-               <Button
-                  variant="black"
-                  height="100%"
-                  onClick={() => sendMessage()}
-                  isLoading={isSendingMessage}
-               >
-                  <IconSend size="20" />
-               </Button>
-            </Flex>
-         </Flex>
+         <MessageInput
+            account={account}
+            community={community}
+            addMessageToUI={addMessageToUI}
+         />
       </Flex>
    )
 }

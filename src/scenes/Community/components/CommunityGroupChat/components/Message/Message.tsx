@@ -24,6 +24,7 @@ import IconLooksRare from '../../../../../../images/icon-looksrare.svg'
 import IconX2Y2 from '../../../../../../images/icon-x2y2.svg'
 import IconEtherscan from '../../../../../../images/icon-etherscan.svg'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { useEffect, useRef } from 'react'
 
 const MessageBox = styled.div`
    position: relative;
@@ -120,7 +121,14 @@ const BlockieWrapper = styled.div`
    overflow: hidden;
 `
 
-const Message = ({ msg }: { msg: MessageUIType }) => {
+const Message = ({ msg, setSize }: { msg: MessageUIType, setSize: () => void }) => {
+
+   const rowRef = useRef()
+
+   useEffect(() => {
+      setSize(index, rowRef.current.getBoundingClientRect().height);
+    }, [setSize, index])
+   
    const menuItems = (
       <MenuList>
          <Link
@@ -216,6 +224,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
    )
 
    return (
+      <div ref={rowRef}>
       <Flex
          alignItems="flex-start"
          margin="var(--chakra-space-3) var(--chakra-space-4)"
@@ -274,6 +283,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             </Box>
          </MessageBox>
       </Flex>
+      <
    )
 }
 
