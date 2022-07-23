@@ -1,11 +1,9 @@
-import { Box, Divider, Flex, Tag, Text } from '@chakra-ui/react'
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { Link as RLink } from 'react-router-dom'
-import { FixedSizeList as List } from 'react-window'
+import { Box, Flex } from '@chakra-ui/react'
+import { useEffect, useState, useRef } from 'react'
+import { VariableSizeList } from 'react-window'
+import AutoSizer from 'react-virtualized-auto-sizer'
 import styled from 'styled-components'
 
-import { getFormattedDate } from '../../../../helpers/date'
-import { truncateAddress } from '../../../../helpers/truncateString'
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
@@ -27,7 +25,7 @@ const DottedBackground = styled.div`
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);
-   overflow-y: scroll;
+   overflow-y: auto;
 `
 
 const NFTGroupChat = ({
@@ -42,16 +40,38 @@ const NFTGroupChat = ({
    const [firstLoad, setFirstLoad] = useState(true)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
-   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+   const listRef = useRef<any>({})
+   const rowHeights = useRef<any>({})
+   function getRowHeight(index: number) {
+      return rowHeights.current[index] + 8 || 82
+   }
+   function setRowHeight(index: number, size: number) {
+      listRef.current.resetAfterIndex(0)
+      rowHeights.current = { ...rowHeights.current, [index]: size }
+   }
 
-   const listRef = useRef()
-   const sizeMap = useRef({})
-   const setSize = useCallback((index, size) => {
-      sizeMap.current = { ...sizeMap.current, [index]: size };
-      listRef.current.resetAfterIndex(index);
-   }, []);
-   const getSize = index => sizeMap.current[index] || 50;
-  
+   function RowRenderer({
+      data: msg,
+      index,
+      style,
+   }: {
+      data: MessageUIType[]
+      index: number
+      style: any
+   }) {
+
+      if (msg[index].message) {
+         return (
+            <Message
+               style={style}
+               msg={msg[index]}
+               index={index}
+               setRowHeight={setRowHeight}
+            />
+         )
+      }
+      return null
+   }
 
    useEffect(() => {
       const toAddToUI = [] as MessageUIType[]
@@ -90,8 +110,8 @@ const NFTGroupChat = ({
 
    useEffect(() => {
       // Scroll to bottom of chat once all messages are loaded
-      if (scrollToBottomRef?.current && firstLoad) {
-         scrollToBottomRef.current.scrollIntoView()
+      if (listRef?.current && firstLoad) {
+         // listRef?.current?.scrollToItem(loadedMsgs.length)
 
          setTimeout(() => {
             setFirstLoad(false)
@@ -129,7 +149,7 @@ const NFTGroupChat = ({
 
    return (
       <Flex flexDirection="column" height="100%">
-         <DottedBackground className="custom-scrollbar">
+         <DottedBackground>
             {loadedMsgs.length === 0 && (
                <Flex
                   justifyContent="center"
@@ -143,56 +163,25 @@ const NFTGroupChat = ({
                   </Box>
                </Flex>
             )}
-            <List ref={listRef} height="500px" width="100%" itemCount={loadedMsgs.length} itemSize={getSize} itemData={loadedMsgs}>
-            {loadedMsgs.map((msg, i) => {
-               if (msg.type && msg.type === 'day') {
-                  return (
-                     <Box position="relative" my={6} key={msg.timestamp}>
-                        <Tag
-                           color="lightgray.800"
-                           background="lightgray.200"
-                           fontSize="xs"
-                           fontWeight="bold"
-                           mb={1}
-                           position="absolute"
-                           right="var(--chakra-space-4)"
-                           top="50%"
-                           transform="translateY(-50%)"
-                        >
-                           {getFormattedDate(msg.timestamp.toString())}
-                        </Tag>
-                        <Divider />
-                     </Box>
-                  )
-               } else if (msg.type && msg.type === 'welcome') {
-                  return (
-                     <Box textAlign="center">
-                        <Text fontSize="sm" color="darkgray.200">
-                           A warm welcome to{' '}
-                           <RLink to={`/chat/${msg.fromAddr}`}>
-                              {msg.sender_name
-                                 ? msg.sender_name
-                                 : truncateAddress(msg.fromAddr)}
-                           </RLink>
-                        </Text>
-                     </Box>
-                  )
-               } else if (msg.message) {
-                  return (
-                     <Message
-                        key={`${msg.message}${msg.timestamp}${i}`}
-                        msg={msg}
-                     />
-                  )
-               }
-               return null
-            })}
-            </List>
-            <Box
-               float="left"
-               style={{ clear: 'both' }}
-               ref={scrollToBottomRef}
-            ></Box>
+            <AutoSizer>
+               {({ height, width }) => (
+                  <>
+                  {console.log(width)}
+                  <VariableSizeList
+                     ref={listRef}
+                     height={height}
+                     width={width}
+                     itemCount={loadedMsgs.length}
+                     itemSize={getRowHeight}
+                     itemData={loadedMsgs}
+                     className="custom-scrollbar"
+                  >
+                     {RowRenderer}
+                  </VariableSizeList>
+                  </>
+               )}
+               
+            </AutoSizer>
          </DottedBackground>
 
          <MessageInput

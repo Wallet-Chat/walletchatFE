@@ -1,5 +1,4 @@
 import {
-   Badge,
    Box,
    Button,
    Divider,
@@ -7,7 +6,6 @@ import {
    Heading,
    Image,
    Link,
-   Stack,
    Tab,
    TabList,
    TabPanel,
@@ -17,10 +15,8 @@ import {
    Tooltip,
 } from '@chakra-ui/react'
 import {
-   IconBrandMedium,
    IconBrandTwitter,
    IconCircleCheck,
-   IconLink,
 } from '@tabler/icons'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -30,11 +26,14 @@ import CommunityTweets from './components/CommunityTweets'
 import { useHover } from '../../helpers/useHover'
 import IconDiscord from '../../images/icon-discord.svg'
 import CommunityType from '../../types/Community'
+import { GroupMessageType } from '../../types/Message'
+import isEqual from 'react-fast-compare'
 
 const Community = ({ account }: { account: string }) => {
    let { community = '' } = useParams()
 
    const [communityData, setCommunityData] = useState<CommunityType>()
+   const [communityChatData, setCommunityChatData] = useState<GroupMessageType[]>([])
    const [isFetchingCommunityData, setIsFetchingCommunityData] = useState(false)
    const [joined, setJoined] = useState<boolean | null>(null)
    const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
@@ -45,7 +44,7 @@ const Community = ({ account }: { account: string }) => {
 
       const interval = setInterval(() => {
          getCommunityData()
-      }, 5000) // every 5s
+      }, 60000) // every 5s
 
       return () => {
          clearInterval(interval)
@@ -82,6 +81,9 @@ const Community = ({ account }: { account: string }) => {
                   setJoined(true)
                } else if (data?.joined === false && joined !== false) {
                   setJoined(false)
+               }
+               if (!isEqual(communityChatData, data.messages) && data.messages !== undefined) {
+                  setCommunityChatData(data.messages)
                }
             })
             .catch((error) => {
@@ -334,7 +336,7 @@ const Community = ({ account }: { account: string }) => {
                   <CommunityGroupChat
                      account={account}
                      community={community}
-                     chatData={communityData?.messages || []}
+                     chatData={communityChatData}
                   />
                </TabPanel>
                <TabPanel p={5}>

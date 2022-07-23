@@ -24,7 +24,7 @@ import IconLooksRare from '../../../../../../images/icon-looksrare.svg'
 import IconX2Y2 from '../../../../../../images/icon-x2y2.svg'
 import IconEtherscan from '../../../../../../images/icon-etherscan.svg'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 
 const MessageBox = styled.div`
    position: relative;
@@ -121,14 +121,26 @@ const BlockieWrapper = styled.div`
    overflow: hidden;
 `
 
-const Message = ({ msg, setSize }: { msg: MessageUIType, setSize: () => void }) => {
+const Message = ({
+   style,
+   msg,
+   index,
+   setRowHeight
+}: {
+   style: any
+   msg: MessageUIType
+   index: number
+   setRowHeight: any
+}) => {
 
-   const rowRef = useRef()
-
-   useEffect(() => {
-      setSize(index, rowRef.current.getBoundingClientRect().height);
-    }, [setSize, index])
+   const rowRef = useRef<HTMLDivElement>(null)
    
+   useLayoutEffect(() => {
+      if (rowRef.current)
+         setRowHeight(index, rowRef.current.clientHeight)
+         console.log(rowRef?.current?.clientHeight)
+      }, [])
+
    const menuItems = (
       <MenuList>
          <Link
@@ -224,10 +236,11 @@ const Message = ({ msg, setSize }: { msg: MessageUIType, setSize: () => void }) 
    )
 
    return (
-      <div ref={rowRef}>
       <Flex
          alignItems="flex-start"
          margin="var(--chakra-space-3) var(--chakra-space-4)"
+         style={style}
+         ref={rowRef}
       >
          <Box
             className="msg-img"
@@ -283,7 +296,6 @@ const Message = ({ msg, setSize }: { msg: MessageUIType, setSize: () => void }) 
             </Box>
          </MessageBox>
       </Flex>
-      <
    )
 }
 
