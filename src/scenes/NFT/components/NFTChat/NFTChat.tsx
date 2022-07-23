@@ -52,7 +52,7 @@ const NFTChat = ({
    recipientAddr: string | undefined | null
    account: string
    nftContractAddr: string
-   nftId: number | string
+   nftId: string
 }) => {
    const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
    const [msgInput, setMsgInput] = useState<string>('')
@@ -138,7 +138,7 @@ const NFTChat = ({
          toAddr: recipientAddr ? recipientAddr.toLocaleLowerCase() : '',
          timestamp,
          nftaddr: nftContractAddr,
-         nftid: typeof nftId === 'string' ? parseInt(nftId) : nftId,
+         nftid: nftId,
          read: false,
       }
 
@@ -235,7 +235,7 @@ const NFTChat = ({
       position: string,
       isFetching: boolean,
       nftAddr: string | null,
-      nftId: number | null
+      nftId: string | null
    ) => {
       console.log(`Add message to UI: ${message}`)
 

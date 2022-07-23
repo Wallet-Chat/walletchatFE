@@ -192,7 +192,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
    const nftNotificationCount = 0
    const [url, setUrl] = useState<string | undefined>('')
    const [nftContractAddr, setNftContractAddr] = useState<string>()
-   const [nftId, setNftId] = useState<number>()
+   const [nftId, setNftId] = useState<string>()
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [imageUrl, setImageUrl] = useState<string>()
 
@@ -239,15 +239,15 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          if (contractAddress && nftId !== null) {
             console.log(contractAddress, nftId)
             setNftContractAddr(contractAddress)
-            setNftId(parseInt(nftId))
+            setNftId(nftId)
             if (contractAddress.startsWith('0x')) {
-               getNftMetadata(contractAddress, parseInt(nftId))
+               getNftMetadata(contractAddress, nftId)
             }
          }
       }
    }, [url])
 
-   const getNftMetadata = (nftContractAddr: string, nftId: number) => {
+   const getNftMetadata = (nftContractAddr: string, nftId: string) => {
       if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
          console.log('Missing NFT Port API Key')
          return

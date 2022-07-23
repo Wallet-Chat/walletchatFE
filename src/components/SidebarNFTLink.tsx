@@ -51,7 +51,7 @@ const Sidebar = ({
    nftId,
 }: {
    nftContractAddr: string
-   nftId: number
+   nftId: string
 }) => {
    const nftNotificationCount = 0
    const [nftData, setNftData] = useState<NFTMetadataType>()
@@ -65,7 +65,7 @@ const Sidebar = ({
       }
    }, [nftContractAddr, nftId])
 
-   const getNftMetadata = (nftContractAddr: string, nftId: number) => {
+   const getNftMetadata = (nftContractAddr: string, nftId: string) => {
       if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
          console.log('Missing NFT Port API Key')
          return

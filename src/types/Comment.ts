@@ -1,7 +1,7 @@
 export default interface CommentType {
     fromAddr: string,
     nftAddr: string,
-    nftId: number,
+    nftId: string,
     timestamp: string,
     message: string
 }

@@ -43,7 +43,7 @@ const NFT = ({
 }: {
    account: string
 }) => {
-   let { nftContractAddr = '', nftId = 0 } = useParams()
+   let { nftContractAddr = '', nftId = '' } = useParams()
    let [searchParams] = useSearchParams()
 
    const [nftData, setNftData] = useState<NFTAssetType>()

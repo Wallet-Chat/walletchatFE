@@ -15,7 +15,7 @@ const NFTComments = ({
    account: string
    ownerAddr: string | undefined | null
    nftContractAddr: string
-   nftId: string | number
+   nftId: string
 }) => {
    // Comment
    const [commentInput, setCommentInput] = useState<string>('')
@@ -83,7 +83,7 @@ const NFTComments = ({
       let data = {
          fromAddr: account.toLocaleLowerCase(),
          nftAddr: nftContractAddr,
-         nftId: typeof nftId === 'string' ? parseInt(nftId) : nftId,
+         nftId: nftId,
          timestamp: new Date(),
          message: commentInputCopy,
       }
@@ -103,7 +103,7 @@ const NFTComments = ({
             addCommentToUI(
                account,
                nftContractAddr,
-               nftId.toString(),
+               nftId,
                timestamp,
                commentInputCopy
             )
@@ -130,7 +130,7 @@ const NFTComments = ({
       const newComment: CommentType = {
          fromAddr,
          nftAddr,
-         nftId: parseInt(nftId),
+         nftId: nftId,
          timestamp: timestamp.toISOString(),
          message,
       }

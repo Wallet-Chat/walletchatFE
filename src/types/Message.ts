@@ -24,7 +24,7 @@ interface MessageSkeletonType {
 export interface MessageType extends MessageSkeletonType {
    toaddr: string
    nftaddr: string
-   nftid: number
+   nftid: string
 }
 
 export interface GroupMessageType extends MessageSkeletonType {
@@ -44,7 +44,7 @@ export interface MessageUIType {
    isFetching?: boolean
    unread?: number,
    nftAddr?: string | null,
-   nftId?: number | null,
+   nftId?: string | null,
    type?: string,
    context_type?: string,
    name?: string

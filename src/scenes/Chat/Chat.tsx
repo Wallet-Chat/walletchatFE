@@ -318,7 +318,7 @@ const Chat = ({
       position: string,
       isFetching: boolean,
       nftAddr: string | null,
-      nftId: number | null
+      nftId: string | null
    ) => {
       console.log(`Add message to UI: ${message}`)
 
