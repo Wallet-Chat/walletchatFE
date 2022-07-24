@@ -235,9 +235,7 @@ const NFT = ({
          .then((response) => response.json())
          .then((result: NFTAssetType) => {
             console.log(`✅[GET][NFT][Asset]:`, result)
-            if (result?.name) {
-               setNftData(result)
-            }
+            setNftData(result)
          })
          .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
    }
@@ -452,12 +450,14 @@ const NFT = ({
                      nftContractAddr={nftContractAddr}
                   />
                </TabPanel>
+               {tweetCount && tweetCount !== 0 && (
                <TabPanel p={5}>
                   <NFTTweets
                      account={account}
                      nftContractAddr={nftContractAddr}
                   />
                </TabPanel>
+)}
                <TabPanel px="0" height="100%" padding="0">
                   <NFTChat
                      recipientAddr={recipientAddr}
