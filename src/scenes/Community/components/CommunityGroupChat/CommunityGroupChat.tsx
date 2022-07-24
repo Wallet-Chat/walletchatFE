@@ -1,7 +1,6 @@
 import { Box, Flex } from '@chakra-ui/react'
-import { useEffect, useState, useRef } from 'react'
-import { VariableSizeList } from 'react-window'
-import AutoSizer from 'react-virtualized-auto-sizer'
+import { useEffect, useRef, useState } from 'react'
+import { Virtuoso } from 'react-virtuoso'
 import styled from 'styled-components'
 
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
@@ -39,39 +38,7 @@ const NFTGroupChat = ({
 }) => {
    const [firstLoad, setFirstLoad] = useState(true)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-
-   const listRef = useRef<any>({})
-   const rowHeights = useRef<any>({})
-   function getRowHeight(index: number) {
-      return rowHeights.current[index] + 8 || 82
-   }
-   function setRowHeight(index: number, size: number) {
-      listRef.current.resetAfterIndex(0)
-      rowHeights.current = { ...rowHeights.current, [index]: size }
-   }
-
-   function RowRenderer({
-      data: msg,
-      index,
-      style,
-   }: {
-      data: MessageUIType[]
-      index: number
-      style: any
-   }) {
-
-      if (msg[index].message) {
-         return (
-            <Message
-               style={style}
-               msg={msg[index]}
-               index={index}
-               setRowHeight={setRowHeight}
-            />
-         )
-      }
-      return null
-   }
+   const virtuosoRef = useRef(null)
 
    useEffect(() => {
       const toAddToUI = [] as MessageUIType[]
@@ -110,14 +77,20 @@ const NFTGroupChat = ({
 
    useEffect(() => {
       // Scroll to bottom of chat once all messages are loaded
-      if (listRef?.current && firstLoad) {
-         // listRef?.current?.scrollToItem(loadedMsgs.length)
+      if (virtuosoRef?.current && firstLoad) {
+         //@ts-ignore
+         virtuosoRef.current.scrollToIndex({
+            index: 0,
+            align: "end",
+            behavior: "auto"
+          });
 
          setTimeout(() => {
             setFirstLoad(false)
          }, 5000)
       }
    }, [loadedMsgs])
+   
 
    const addMessageToUI = ({
       type,
@@ -163,25 +136,15 @@ const NFTGroupChat = ({
                   </Box>
                </Flex>
             )}
-            <AutoSizer>
-               {({ height, width }) => (
-                  <>
-                  {console.log(width)}
-                  <VariableSizeList
-                     ref={listRef}
-                     height={height}
-                     width={width}
-                     itemCount={loadedMsgs.length}
-                     itemSize={getRowHeight}
-                     itemData={loadedMsgs}
-                     className="custom-scrollbar"
-                  >
-                     {RowRenderer}
-                  </VariableSizeList>
-                  </>
+            <Virtuoso
+            ref={virtuosoRef}
+               style={{ height: '100%' }}
+               data={loadedMsgs}
+               totalCount={loadedMsgs.length}
+               itemContent={(index: number, msg: MessageUIType) => (
+                  <Message msg={msg} />
                )}
-               
-            </AutoSizer>
+               />
          </DottedBackground>
 
          <MessageInput

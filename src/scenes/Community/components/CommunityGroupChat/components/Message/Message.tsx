@@ -122,24 +122,10 @@ const BlockieWrapper = styled.div`
 `
 
 const Message = ({
-   style,
    msg,
-   index,
-   setRowHeight
 }: {
-   style: any
    msg: MessageUIType
-   index: number
-   setRowHeight: any
 }) => {
-
-   const rowRef = useRef<HTMLDivElement>(null)
-   
-   useLayoutEffect(() => {
-      if (rowRef.current)
-         setRowHeight(index, rowRef.current.clientHeight)
-         console.log(rowRef?.current?.clientHeight)
-      }, [])
 
    const menuItems = (
       <MenuList>
@@ -239,8 +225,6 @@ const Message = ({
       <Flex
          alignItems="flex-start"
          margin="var(--chakra-space-3) var(--chakra-space-4)"
-         style={style}
-         ref={rowRef}
       >
          <Box
             className="msg-img"
