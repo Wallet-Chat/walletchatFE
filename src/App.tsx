@@ -133,7 +133,7 @@ export const App = () => {
             ) : (
                <Box
                   borderRadius="lg"
-                  className="bg-pattern"
+                  className="space-pattern"
                   padding="70px 40px"
                   flexGrow={1}
                >
