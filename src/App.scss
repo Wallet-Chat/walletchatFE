@@ -2,13 +2,13 @@ html {
     min-height: 30rem;
     height: 100%;
     min-width: 400px;
-    border: var(--chakra-colors-red-300);
+    border: var(--chakra-colors-lightgray-300);
     border-radius: var(--chakra-borderRadius-sm);
     box-shadow: 0px 4px 4px 2px #00000026;
 }
 
 body {
-    background: var(--chakra-colors-red-300);
+    background: var(--chakra-colors-lightgray-300);
 }
 
 a {
@@ -21,7 +21,7 @@ a {
     &.disabled {
         pointer-events: none;
         text-decoration: none;
-        color: var(--chakra-colors-red-600) !important;
+        color: var(--chakra-colors-lightgray-600) !important;
     }
 }
 
@@ -34,19 +34,19 @@ a {
 }
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: var(--chakra-colors-red-600) rgb(194, 53, 53);
+    scrollbar-color: var(--chakra-colors-lightgray-600) rgb(194, 53, 53);
   
     &::-webkit-scrollbar {
       width: 6px;
     }
   
     &::-webkit-scrollbar-track {
-      background: var(--chakra-colors-red-300);
+      background: var(--chakra-colors-lightgray-300);
       border-radius: 10px;
     }
   
     &::-webkit-scrollbar-thumb {
-      background-color: var(--chakra-colors-red-600);
+      background-color: var(--chakra-colors-lightgray-600);
       border-radius: 6px;
       // border: 3px solid #FFF;
     }
