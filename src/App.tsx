@@ -138,7 +138,7 @@ export const App = () => {
                   flexGrow={1}
                >
                   <Image src={logoThumb} mb={5} width="40px" />
-                  <Heading size="2xl" mb={8} colorScheme='yellow'>
+                  <Heading size="2xl" mb={8} color='yellow'>
                      Login to start chatting
                   </Heading>
                   <Button
