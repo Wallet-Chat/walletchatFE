@@ -13,7 +13,7 @@ const Wrapper = styled.button`
    padding: var(--chakra-space-3) var(--chakra-space-5);
    background: #fff;
    text-align: left;
-   color: var(--chakra-colors-yellow-900);
+   color: var(--chakra-colors-darkgray-900);
 
    &:not(:last-child) {
       border-bottom: 1px solid var(--chakra-colors-red-300);
@@ -25,7 +25,7 @@ const Wrapper = styled.button`
 
    .timestamp {
       display: block;
-      color: var(--chakra-colors-yellow-300);
+      color: var(--chakra-colors-darkgray-300);
       font-size: var(--chakra-fontSizes-md);
       user-select: none;
       line-height: 1.7;

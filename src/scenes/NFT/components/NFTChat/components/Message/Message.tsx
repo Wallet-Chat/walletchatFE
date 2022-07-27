@@ -38,11 +38,11 @@ const MessageBox = styled.div`
    }
    &.right {
       float: right;
-      background: var(--chakra-colors-yellow-800);
+      background: var(--chakra-colors-darkgray-800);
       color: var(--chakra-colors-red-100);
 
       .name {
-         color: var(--chakra-colors-yellow);
+         color: var(--chakra-colors-white);
       }
       .chakra-menu__menu-list {
          color: #000;

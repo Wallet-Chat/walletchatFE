@@ -34,7 +34,7 @@ const Divider = styled.div`
       margin-left: var(--chakra-space-5);
       width: 40px;
       height: 1px;
-      border-bottom: 1px solid #FFD700;
+      border-bottom: 1px solid #cbcbcb;
    }
 `
 

@@ -37,11 +37,11 @@ const LinkElem = styled(NavLink)`
       background: var(--chakra-colors-red-400);
 
       &::before {
-         background: var(--chakra-colors-yellow-900);
+         background: var(--chakra-colors-darkgray-900);
       }
 
       svg {
-         stroke: var(--chakra-colors-yellow-900);
+         stroke: var(--chakra-colors-darkgray-900);
       }
    }
 `
