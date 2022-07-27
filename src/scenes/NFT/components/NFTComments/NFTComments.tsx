@@ -155,7 +155,7 @@ const NFTComments = ({
                      padding: '.5rem 1rem',
                      width: '100%',
                      fontSize: 'var(--chakra-fontSizes-md)',
-                     background: 'var(--chakra-colors-lightgray-400)',
+                     background: 'var(--chakra-colors-gold-400)',
                      borderRadius: '0.3rem',
                      marginBottom: '-6px',
                   }}

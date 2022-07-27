@@ -37,7 +37,7 @@ const Comment = ({ data }: { data: CommentType }) => {
                   >
                      <IconExternalLink
                         size={16}
-                        color="var(--chakra-colors-darkgray-200)"
+                        color="var(--chakra-colors-navy-200)"
                         stroke="1.5"
                      />
                   </Link>

@@ -372,7 +372,7 @@ const NFT = ({
                            >
                               <IconExternalLink
                                  size={16}
-                                 color="var(--chakra-colors-lightgray-900)"
+                                 color="var(--chakra-colors-gold-900)"
                                  stroke="1.5"
                               />
                            </Link>

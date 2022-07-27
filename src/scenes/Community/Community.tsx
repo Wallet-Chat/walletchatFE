@@ -217,7 +217,7 @@ const Community = ({ account }: { account: string }) => {
                            verticalAlign="middle"
                         >
                            <IconBrandTwitter stroke={1.5} color="white"
-                              fill="var(--chakra-colors-lightgray-800)" />
+                              fill="var(--chakra-colors-gold-800)" />
                         </Link>
                      </Tooltip>
                      )}
@@ -240,7 +240,7 @@ const Community = ({ account }: { account: string }) => {
                               verticalAlign="middle"
                               mr={1}
                            >
-                              <IconLink stroke={1.5} color="var(--chakra-colors-lightgray-800)" />
+                              <IconLink stroke={1.5} color="var(--chakra-colors-gold-800)" />
                            </Link>
                         </Tooltip>
                      )}
@@ -267,7 +267,7 @@ const Community = ({ account }: { account: string }) => {
                               mr={1}
                            >
                               <IconBrandTwitter stroke={1.5} color="white"
-                                 fill="var(--chakra-colors-lightgray-800)" />
+                                 fill="var(--chakra-colors-gold-800)" />
                            </Link>
                         </Tooltip>
                      )}
@@ -295,7 +295,7 @@ const Community = ({ account }: { account: string }) => {
                               <IconBrandMedium
                                  stroke={1.5}
                                  color="white"
-                                 fill="var(--chakra-colors-lightgray-800)"
+                                 fill="var(--chakra-colors-gold-800)"
                               />
                            </Link>
                         </Tooltip>
