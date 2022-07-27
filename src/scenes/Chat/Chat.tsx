@@ -40,9 +40,7 @@ const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
    height: auto;
-   background: ${spaceBackground};
-   background-size: 15px 15px !important;
-   background-position: top left !important;
+   background: url(${spaceBackground});
    padding: var(--chakra-space-1);
    overflow-y: scroll;
 `

@@ -24,7 +24,7 @@ const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
    height: auto;
-   background: ${spaceBackground};
+   background: url(${spaceBackground});
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);
