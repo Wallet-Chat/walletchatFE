@@ -9,7 +9,7 @@ const Header = () => {
       <Flex
          justifyContent="space-between"
          alignItems="stretch"
-         borderBottom="1px solid var(--chakra-colors-gold-400)"
+         borderBottom="1px solid var(--chakra-colors-lightgray-400)"
          px={8}
          py={1}
          background="white"

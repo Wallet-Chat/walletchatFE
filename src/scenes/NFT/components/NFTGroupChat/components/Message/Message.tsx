@@ -32,7 +32,7 @@ const MessageBox = styled.div`
    max-width: 80%;
    height: auto;
    background: #fff;
-   background: var(--chakra-colors-gold-300);
+   background: var(--chakra-colors-lightgray-300);
    border-radius: var(--chakra-radii-md);
    padding: var(--chakra-space-2) var(--chakra-space-3) var(--chakra-space-5);
    font-size: var(--chakra-fontSizes-md);
@@ -57,8 +57,8 @@ const MessageBox = styled.div`
    }
    &.right {
       float: left;
-      background: var(--chakra-colors-navy-800);
-      color: var(--chakra-colors-gold-100);
+      background: var(--chakra-colors-darkgray-800);
+      color: var(--chakra-colors-lightgray-100);
 
       .name {
          color: var(--chakra-colors-white);
@@ -88,7 +88,7 @@ const MessageBox = styled.div`
       right: var(--chakra-space-2);
       bottom: var(--chakra-space-2);
       svg {
-         stroke: var(--chakra-colors-gold-800);
+         stroke: var(--chakra-colors-lightgray-800);
       }
    }
    &.read:not(.left) {
@@ -129,7 +129,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             to={`/chat/${msg.fromAddr}`}
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-gold-400)',
+               background: 'var(--chakra-colors-lightgray-400)',
             }}
          >
             <MenuItem icon={<IconMessage width="20px" height="20px" />}>
@@ -142,7 +142,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-gold-400)',
+               background: 'var(--chakra-colors-lightgray-400)',
             }}
          >
             <MenuItem
@@ -168,7 +168,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-gold-400)',
+               background: 'var(--chakra-colors-lightgray-400)',
             }}
          >
             <MenuItem
@@ -184,7 +184,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-gold-400)',
+               background: 'var(--chakra-colors-lightgray-400)',
             }}
          >
             <MenuItem
@@ -205,7 +205,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-gold-400)',
+               background: 'var(--chakra-colors-lightgray-400)',
             }}
          >
             <MenuItem

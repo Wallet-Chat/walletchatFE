@@ -281,7 +281,7 @@ const NFT = ({ account }: { account: string }) => {
                      px={4}
                      pt={2}
                      my={1}
-                     border="1px solid var(--chakra-colors-gold-300)"
+                     border="1px solid var(--chakra-colors-lightgray-300)"
                      borderRadius="md"
                   >
                      <HStack>
@@ -348,7 +348,7 @@ const NFT = ({ account }: { account: string }) => {
                               verticalAlign="middle"
                               mr={1}
                            >
-                              <IconLink stroke={1.5} color="var(--chakra-colors-gold-800)" />
+                              <IconLink stroke={1.5} color="var(--chakra-colors-lightgray-800)" />
                            </Link>
                         </Tooltip>
                      )}
@@ -375,7 +375,7 @@ const NFT = ({ account }: { account: string }) => {
                               mr={1}
                            >
                               <IconBrandTwitter stroke={1.5} color="white"
-                                 fill="var(--chakra-colors-gold-800)" />
+                                 fill="var(--chakra-colors-lightgray-800)" />
                            </Link>
                         </Tooltip>
                      )}
@@ -403,7 +403,7 @@ const NFT = ({ account }: { account: string }) => {
                               <IconBrandMedium
                                  stroke={1.5}
                                  color="white"
-                                 fill="var(--chakra-colors-gold-800)"
+                                 fill="var(--chakra-colors-lightgray-800)"
                               />
                            </Link>
                         </Tooltip>
