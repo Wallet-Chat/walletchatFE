@@ -15,7 +15,7 @@ const MessageBox = styled.div`
    max-width: 80%;
    height: auto;
    background: #fff;
-   background: var(--chakra-colors-lightgray-300);
+   background: var(--chakra-colors-red-300);
    border-radius: var(--chakra-radii-md);
    padding: var(--chakra-space-2) var(--chakra-space-3) var(--chakra-space-5);
    margin: var(--chakra-space-3) var(--chakra-space-4);
@@ -39,7 +39,7 @@ const MessageBox = styled.div`
    &.right {
       float: right;
       background: var(--chakra-colors-darkgray-800);
-      color: var(--chakra-colors-lightgray-100);
+      color: var(--chakra-colors-red-100);
 
       .name {
          color: var(--chakra-colors-white);
@@ -68,7 +68,7 @@ const MessageBox = styled.div`
       right: var(--chakra-space-2);
       bottom: var(--chakra-space-2);
       svg {
-         stroke: var(--chakra-colors-lightgray-800);
+         stroke: var(--chakra-colors-red-800);
       }
    }
    &.read:not(.left) {

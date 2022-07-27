@@ -16,11 +16,11 @@ const Wrapper = styled.button`
    color: var(--chakra-colors-darkgray-900);
 
    &:not(:last-child) {
-      border-bottom: 1px solid var(--chakra-colors-lightgray-300);
+      border-bottom: 1px solid var(--chakra-colors-red-300);
    }
 
    &:hover {
-      background: var(--chakra-colors-lightgray-300);
+      background: var(--chakra-colors-red-300);
    }
 
    .timestamp {

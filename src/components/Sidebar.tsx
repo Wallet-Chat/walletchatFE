@@ -76,7 +76,7 @@ const LinkElem = styled(NavLink)`
 
    &:hover,
    &.active {
-      background: var(--chakra-colors-lightgray-400);
+      background: var(--chakra-colors-red-400);
 
       &::before {
          background: var(--chakra-colors-darkgray-900);
@@ -109,7 +109,7 @@ const LinkElem = styled(NavLink)`
    }
 `
 const LinkElem2 = styled(LinkElem)`
-   background: var(--chakra-colors-lightgray-200);
+   background: var(--chakra-colors-red-200);
 `
 const FeedbackLinkElem = styled(LinkElem)`
    background: var(--chakra-colors-warning-200);
@@ -121,7 +121,7 @@ const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
    border-radius: 0.5rem;
    text-align: center;
-   background: var(--chakra-colors-lightgray-400);
+   background: var(--chakra-colors-red-400);
 
    & > span {
       display: flex;
@@ -130,7 +130,7 @@ const AccountInfo = styled.button`
    }
 
    &:hover {
-      background: var(--chakra-colors-lightgray-300);
+      background: var(--chakra-colors-red-300);
    }
 `
 const Divider = styled.div`
@@ -303,7 +303,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          justifyContent="space-between"
          alignItems="center"
          flexDirection={isMobile ? 'row' : 'column'}
-         borderRight="1px solid var(--chakra-colors-lightgray-400)"
+         borderRight="1px solid var(--chakra-colors-red-400)"
          background="white"
          height={isMobile ? 'auto' : '100vh'}
          py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
@@ -323,7 +323,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                      <Text fontSize="md" fontWeight="bold">WalletChat</Text>
                      <CDivider my="1" />
                      <Flex alignItems="center">
-                        <CLink href="https://twitter.com/wallet_chat" target="_blank"><IconBrandTwitter stroke={1.5} color="white"fill="var(--chakra-colors-lightgray-800)" /></CLink>
+                        <CLink href="https://twitter.com/wallet_chat" target="_blank"><IconBrandTwitter stroke={1.5} color="white"fill="var(--chakra-colors-red-800)" /></CLink>
                         <CLink href="https://discord.gg/walletchat" target="_blank"><Image src={IconDiscord} alt="" height="24px" width="24px" /></CLink>
                      </Flex>
                      <Text fontSize="sm" mt={2} color="lightgray.900">Ver. {process.env.REACT_APP_VERSION}</Text>

@@ -166,7 +166,7 @@ const Inbox = ({
                         py={6}
                         px={3}
                         bg="white"
-                        borderBottom="1px solid var(--chakra-colors-lightgray-300)"
+                        borderBottom="1px solid var(--chakra-colors-red-300)"
                      >
                         <SkeletonCircle
                            size="10"
@@ -194,7 +194,7 @@ const Inbox = ({
       <Box
          background="white"
          height={isMobile ? 'unset' : '100vh'}
-         borderRight="1px solid var(--chakra-colors-lightgray-400)"
+         borderRight="1px solid var(--chakra-colors-red-400)"
          minWidth="300px"
          width={isMobile ? '100%' : 'auto'}
          overflowY="auto"
@@ -211,7 +211,7 @@ const Inbox = ({
                variant="outline"
                _hover={{
                   textDecoration: 'none',
-                  backgroundColor: 'var(--chakra-colors-lightgray-300)',
+                  backgroundColor: 'var(--chakra-colors-red-300)',
                }}
             >
                + New

@@ -352,7 +352,7 @@ const Chat = ({
          <Box
             p={5}
             pb={3}
-            borderBottom="1px solid var(--chakra-colors-lightgray-400)"
+            borderBottom="1px solid var(--chakra-colors-red-400)"
          >
             {isMobile && (
                <Box mb={4}>
@@ -424,7 +424,7 @@ const Chat = ({
                            ) : (
                               <IconCopy
                                  size={20}
-                                 color="var(--chakra-colors-lightgray-900)"
+                                 color="var(--chakra-colors-red-900)"
                                  stroke="1.5"
                               />
                            )}
@@ -439,7 +439,7 @@ const Chat = ({
                      >
                         <IconExternalLink
                            size={20}
-                           color="var(--chakra-colors-lightgray-900)"
+                           color="var(--chakra-colors-red-900)"
                            stroke="1.5"
                         />
                      </Button>
@@ -495,7 +495,7 @@ const Chat = ({
                      padding: '.5rem 1rem',
                      width: '100%',
                      fontSize: 'var(--chakra-fontSizes-md)',
-                     background: 'var(--chakra-colors-lightgray-400)',
+                     background: 'var(--chakra-colors-red-400)',
                      borderRadius: '0.3rem',
                      marginBottom: '-6px',
                   }}
