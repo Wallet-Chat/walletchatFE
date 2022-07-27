@@ -29,7 +29,7 @@ const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
    height: auto;
-   background: ${spaceBackground};
+   background: '../../../../images/space-pattern.svg';
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);
