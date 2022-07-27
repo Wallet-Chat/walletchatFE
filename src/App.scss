@@ -2,17 +2,17 @@ html {
     min-height: 30rem;
     height: 100%;
     min-width: 400px;
-    border: var(--chakra-colors-lightgray-300);
+    border: var(colors);
     border-radius: var(--chakra-borderRadius-sm);
     box-shadow: 0px 4px 4px 2px #00000026;
 }
 
 body {
-    background: var(--chakra-colors-lightgray-300);
+    background: var(--chakra-colors-gold-600);
 }
 
 a {
-    color: var(--chakra-colors-gray-600);
+    color: var(--chakra-colors-gold-600);
 
     &:hover {
         text-decoration: underline;
@@ -21,7 +21,7 @@ a {
     &.disabled {
         pointer-events: none;
         text-decoration: none;
-        color: var(--chakra-colors-lightgray-600) !important;
+        color: var(--chakra-colors-gold-600) !important;
     }
 }
 
@@ -34,19 +34,19 @@ a {
 }
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: var(--chakra-colors-lightgray-600) #FFF;
+    scrollbar-color: var(--chakra-colors-gold-600) rgb(206, 187, 22);
   
     &::-webkit-scrollbar {
       width: 6px;
     }
   
     &::-webkit-scrollbar-track {
-      background: var(--chakra-colors-lightgray-300);
+      background: var(--chakra-colors-gold-300);
       border-radius: 10px;
     }
   
     &::-webkit-scrollbar-thumb {
-      background-color: var(--chakra-colors-lightgray-600);
+      background-color: var(--chakra-colors-gold-600);
       border-radius: 6px;
       // border: 3px solid #FFF;
     }
