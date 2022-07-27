@@ -170,16 +170,16 @@ const Inbox = ({
                      >
                         <SkeletonCircle
                            size="10"
-                           startColor="lightgray.200"
-                           endColor="lightgray.400"
+                           startColor="yellow.200"
+                           endColor="yellow.400"
                            flexShrink={0}
                            mr={4}
                         />
                         <SkeletonText
                            noOfLines={2}
                            spacing="4"
-                           startColor="lightgray.200"
-                           endColor="lightgray.400"
+                           startColor="yellow.200"
+                           endColor="yellow.400"
                            width="100%"
                         />
                      </Flex>
