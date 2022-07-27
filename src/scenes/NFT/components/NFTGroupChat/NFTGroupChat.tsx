@@ -16,20 +16,13 @@ import { getFormattedDate } from '../../../../helpers/date'
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
+import spaceBackground from '../../../../images/space-pattern.svg'
 
 const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
    height: auto;
-   background: linear-gradient(
-            90deg,
-            var(--chakra-colors-lightgray-200) 14px,
-            transparent 1%
-         )
-         center,
-      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
-         center,
-      #9dadc3 !important;
+   background: ${spaceBackground};
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);

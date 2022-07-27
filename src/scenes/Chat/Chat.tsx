@@ -26,6 +26,7 @@ import Message from './components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
 import { isMobile } from 'react-device-detect'
+import spaceBackground from '../../images/space-pattern.svg'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
 // import EthCrypto, { Encrypted } from 'eth-crypto'
@@ -39,15 +40,7 @@ const DottedBackground = styled.div`
    flex-grow: 1;
    width: 100%;
    height: auto;
-   background: linear-gradient(
-            90deg,
-            var(--chakra-colors-lightgray-200) 14px,
-            transparent 1%
-         )
-         center,
-      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
-         center,
-      #9dadc3 !important;
+   background: ${spaceBackground};
    background-size: 15px 15px !important;
    background-position: top left !important;
    padding: var(--chakra-space-1);
