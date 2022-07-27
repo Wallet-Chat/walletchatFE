@@ -40,15 +40,15 @@ const MessageBox = styled.div`
    }
    &.right {
       float: right;
-      background: var(--chakra-colors-darkgray-800);
+      background: var(--chakra-colors-yellow-800);
       color: var(--chakra-colors-red-100);
 
       .nft-context-btn {
-         background: var(--chakra-colors-darkgray-600);
+         background: var(--chakra-colors-yellow-600);
          color: var(--chakra-colors-red-500);
 
          &:hover {
-            background: var(--chakra-colors-darkgray-500);
+            background: var(--chakra-colors-yellow-500);
             color: var(--chakra-colors-red-500);
          }
       }
@@ -57,7 +57,7 @@ const MessageBox = styled.div`
       }
 
       .name {
-         color: var(--chakra-colors-white);
+         color: var(--chakra-colors-yellow);
       }
    }
    .timestamp {

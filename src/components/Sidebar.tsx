@@ -79,11 +79,11 @@ const LinkElem = styled(NavLink)`
       background: var(--chakra-colors-red-400);
 
       &::before {
-         background: var(--chakra-colors-darkgray-900);
+         background: var(--chakra-colors-yellow-900);
       }
 
       svg {
-         stroke: var(--chakra-colors-darkgray-900);
+         stroke: var(--chakra-colors-yellow-900);
       }
    }
 
@@ -98,7 +98,7 @@ const LinkElem = styled(NavLink)`
       position: absolute;
       left: 0;
       bottom: 0;
-      background: var(--chakra-colors-darkgray-900);
+      background: var(--chakra-colors-yellow-900);
       color: white;
       transform: translateY(50%);
       border-radius: 0.5rem;
@@ -143,8 +143,8 @@ const Divider = styled.div`
       margin: 0 auto;
       width: ${isMobile ? '1px' : '40px'};
       height: ${isMobile ? '40px' : '1px'};
-      border-bottom: 1px solid #cbcbcb;
-      border-right: 1px solid #cbcbcb;
+      border-bottom: 1px solid #FFD700;
+      border-right: 1px solid #FFD700;
    }
 `
 const UnreadCountContainer = styled.div`
@@ -416,7 +416,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                            <span
                               style={{
                                  fontSize: 'var(--chakra-fontSizes-md)',
-                                 color: 'var(--chakra-colors-darkgray-500)',
+                                 color: 'var(--chakra-colors-yellow-500)',
                               }}
                            >
                               {account.substring(0, 5)}

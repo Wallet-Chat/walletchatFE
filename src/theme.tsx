@@ -266,7 +266,7 @@ export const theme = extendTheme(
             baseStyle: {
                fontWeight: 'normal',
                _hover: {
-                  boxShadow: '0px 0px 0px 1px var(--chakra-colors-darkgray-100)',
+                  boxShadow: '0px 0px 0px 1px var(--chakra-colors-yellow-100)',
                   _disabled: {
                      boxShadow: 'none'
                   }

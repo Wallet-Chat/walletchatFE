@@ -418,7 +418,7 @@ const Chat = ({
                            {copiedAddr ? (
                               <IconCheck
                                  size={20}
-                                 color="var(--chakra-colors-darkgray-500)"
+                                 color="var(--chakra-colors-yellow-500)"
                                  stroke="1.5"
                               />
                            ) : (
