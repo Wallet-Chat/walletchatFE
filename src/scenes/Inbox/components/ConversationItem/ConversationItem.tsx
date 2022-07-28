@@ -11,7 +11,7 @@ const Wrapper = styled.button`
    display: block;
    width: 100%;
    padding: var(--chakra-space-3) var(--chakra-space-5);
-   background: #ff0;
+   background: #FFFF99;
    text-align: left;
    color: var(--chakra-colors-yellow);
 
