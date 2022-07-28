@@ -11,9 +11,9 @@ const Wrapper = styled.button`
    display: block;
    width: 100%;
    padding: var(--chakra-space-3) var(--chakra-space-5);
-   background: #fff;
+   background: #ff0;
    text-align: left;
-   color: var(--chakra-colors-yellow-900);
+   color: var(--chakra-colors-yellow);
 
    &:not(:last-child) {
       border-bottom: 1px solid var(--chakra-colors-red-300);
