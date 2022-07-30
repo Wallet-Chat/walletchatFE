@@ -158,15 +158,15 @@ const Inbox = ({
 
    if (isFetchingInboxData && inboxData.length === 0) {
       return (
-         <Box background="white" height="100vh">
+         <Box background="#FEE72E" height="100vh">
             <Box py={8} px={3} height="100vh">
                {[...Array(5)].map((e, i) => (
                   <Stack key={i}>
                      <Flex
                         py={6}
                         px={3}
-                        bg="white"
-                        borderBottom="1px solid var(--chakra-colors-red-300)"
+                        bg="#FEE72E"
+                        borderBottom="1px solid #DD4237"
                      >
                         <SkeletonCircle
                            size="10"
@@ -192,9 +192,9 @@ const Inbox = ({
 
    return (
       <Box
-         background="white"
+         background="#FEE72E"
          height={isMobile ? 'unset' : '100vh'}
-         borderRight="1px solid var(--chakra-colors-red-400)"
+         borderRight="1px solid #FEE72E"
          minWidth="300px"
          width={isMobile ? '100%' : 'auto'}
          overflowY="auto"
@@ -211,7 +211,7 @@ const Inbox = ({
                variant="outline"
                _hover={{
                   textDecoration: 'none',
-                  backgroundColor: 'var(--chakra-colors-red-300)',
+                  backgroundColor: '#DD4237',
                }}
             >
                + New

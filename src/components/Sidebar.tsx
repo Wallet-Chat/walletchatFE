@@ -59,7 +59,7 @@ const LinkElem = styled(NavLink)`
    border-radius: 0.5rem;
    text-align: center;
    box-sizing: border-box;
-   background: #fff;
+   background: #DD4237;
 
    &::before {
       content: '';
@@ -69,14 +69,17 @@ const LinkElem = styled(NavLink)`
       top: 50%;
       left: 0;
       transform: translateY(-50%);
-      background: transparent;
+      background: #DD4237;
       border-top-right-radius: 0.2rem;
       border-bottom-right-radius: 0.2rem;
    }
 
-   &:hover,
+   &:hover{
+      background: #FEE72E;
+   }
+
    &.active {
-      background: var(--chakra-colors-red-400);
+      background: #DD4237;
 
       &::before {
          background: var(--chakra-colors-darkgray-900);
@@ -109,19 +112,19 @@ const LinkElem = styled(NavLink)`
    }
 `
 const LinkElem2 = styled(LinkElem)`
-   background: var(--chakra-colors-red-200);
+   background: #DD4237;
 `
 const FeedbackLinkElem = styled(LinkElem)`
-   background: var(--chakra-colors-warning-200);
+   background: #DD4237;
    &.active {
-      background: var(--chakra-colors-warning-200);
+      background: #FEE72E;
    }
 `
 const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
    border-radius: 0.5rem;
    text-align: center;
-   background: var(--chakra-colors-red-400);
+   background: #DD4237;
 
    & > span {
       display: flex;
@@ -130,7 +133,7 @@ const AccountInfo = styled.button`
    }
 
    &:hover {
-      background: var(--chakra-colors-red-300);
+      background: #FEE72E;
    }
 `
 const Divider = styled.div`
@@ -303,8 +306,8 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          justifyContent="space-between"
          alignItems="center"
          flexDirection={isMobile ? 'row' : 'column'}
-         borderRight="1px solid var(--chakra-colors-red-400)"
-         background="white"
+         borderRight="1px solid #DD4237"
+         background="#242137"
          height={isMobile ? 'auto' : '100vh'}
          py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
          px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
@@ -313,7 +316,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
             <Popover>
                <PopoverTrigger>
-                  <Box padding="0.8rem" cursor="pointer" borderRadius="md" _hover={{ background: "lightgray.400" }}>
+                  <Box padding="0.8rem" cursor="pointer" borderRadius="md" _hover={{ background: "#FEE72E" }}>
                      <Image src={logoThumb} alt="" width="30px" />
                   </Box>
                </PopoverTrigger>
@@ -345,7 +348,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                               <span>
                                  <Badge
                                     variant="black"
-                                    background="information.400"
+                                    background="#DD4237"
                                     fontSize="lg"
                                  >
                                     {unreadCount}

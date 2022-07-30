@@ -429,7 +429,7 @@ const NFTChat = ({
                      padding: '.5rem 1rem',
                      width: '100%',
                      fontSize: 'var(--chakra-fontSizes-md)',
-                     background: 'var(--chakra-colors-red-400)',
+                     background: '#DD4237',
                      borderRadius: '0.3rem',
                      marginBottom: '-6px',
                   }}

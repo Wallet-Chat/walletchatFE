@@ -228,7 +228,7 @@ const NFT = ({ account }: { account: string }) => {
 //    }
 
    return (
-      <Flex flexDirection="column" background="white" height="100vh" flex="1">
+      <Flex flexDirection="column" background="#FEE72E" height="100vh" flex="1">
          <Flex alignItems="center" px={5} pt={4} pb={2}>
             <Flex alignItems="flex-start" p={2} borderRadius="md">
                {nftData?.collection.image_url && (
@@ -281,7 +281,7 @@ const NFT = ({ account }: { account: string }) => {
                      px={4}
                      pt={2}
                      my={1}
-                     border="1px solid var(--chakra-colors-red-300)"
+                     border="1px solid #DD4237"
                      borderRadius="md"
                   >
                      <HStack>

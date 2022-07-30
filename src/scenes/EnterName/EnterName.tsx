@@ -92,7 +92,7 @@ const EnterName = ({ account }: { account: string }) => {
    }
 
    return (
-      <Box p={6} pt={16} background="white" width="100%">
+      <Box p={6} pt={16} background="#FEE72E" width="100%">
          <form onSubmit={handleSubmit(onSubmit)}>
             <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
                Hey there!

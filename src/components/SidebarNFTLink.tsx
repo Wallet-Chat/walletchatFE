@@ -17,7 +17,7 @@ const LinkElem = styled(NavLink)`
    border-radius: 0.5rem;
    text-align: center;
    box-sizing: border-box;
-   background: var(--chakra-colors-red-200);
+   background: #DD4237;
 
    &::before {
       content: '';
@@ -34,7 +34,7 @@ const LinkElem = styled(NavLink)`
 
    &:hover,
    &.active {
-      background: var(--chakra-colors-red-400);
+      background: #DD4237;
 
       &::before {
          background: var(--chakra-colors-darkgray-900);

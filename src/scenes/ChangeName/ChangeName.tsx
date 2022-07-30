@@ -98,7 +98,7 @@ import {
     }
  
     return (
-       <Box p={6} pt={16} background="white" width="100%" height="100vh">
+       <Box p={6} pt={16} background="#FEE72E" width="100%" height="100vh">
           <form onSubmit={handleSubmit(onSubmit)}>
              <FormControl>
                 <FormLabel fontSize="xl">Change your name</FormLabel>

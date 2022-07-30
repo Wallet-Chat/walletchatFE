@@ -88,7 +88,7 @@ export const App = () => {
             borderBottomRightRadius="lg"
             borderTopLeftRadius={0}
             borderTopRightRadius={0}
-            background="lightgray.500"
+            background="#FEE72E"
             py={0}
             px={1}
             size="lg"
@@ -138,7 +138,7 @@ export const App = () => {
                   flexGrow={1}
                >
                   <Image src={logoThumb} mb={5} width="40px" />
-                  <Heading size="2xl" mb={8} color='yellow'>
+                  <Heading size="2xl" mb={8} color='black'>
                      Login to start chatting
                   </Heading>
                   <Button
@@ -201,8 +201,8 @@ export const App = () => {
                            <Flex>
                               {inbox}
                               {!isMobileView && (
-                                 <Flex background="lightgray.200" flex="1" alignItems="center" justifyContent="center">
-                                    <Tag background="white">Select a chat to start messaging</Tag>
+                                 <Flex background="#FEE72E" flex="1" alignItems="center" justifyContent="center">
+                                    <Tag background="#FEE72E">Select a chat to start messaging</Tag>
                                  </Flex>
                               )}
                            </Flex>

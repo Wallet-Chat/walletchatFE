@@ -8,11 +8,11 @@ html {
 }
 
 body {
-    background: var(--chakra-colors-lightgray-300);
+    background: #FEE72E;
 }
 
 a {
-    color: var(--chakra-colors-gray-600);
+    color: #FEE72E;
 
     &:hover {
         text-decoration: underline;
@@ -30,11 +30,11 @@ a {
 }
 
 .bg-pattern {
-    background: #FFF url('./images/bg-pattern.svg') repeat;
+    background: #FF0 url('./images/bg-pattern.svg') repeat;
 }
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: var(--chakra-colors-lightgray-600) rgb(194, 53, 53);
+    scrollbar-color: var(--chakra-colors-lightgray-600);
   
     &::-webkit-scrollbar {
       width: 6px;

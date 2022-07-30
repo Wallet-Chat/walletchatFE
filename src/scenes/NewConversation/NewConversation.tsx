@@ -7,7 +7,7 @@ const NewConversation = ({ web3 }: { web3: any }) => {
       <Flex
          px={5}
          py={10}
-         background="white"
+         background="#FEE72E"
          minHeight={isMobile ? 'unset' : '100vh'}
          justifyContent="center"
          alignItems="center"

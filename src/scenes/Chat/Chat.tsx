@@ -348,11 +348,11 @@ const Chat = ({
    }
 
    return (
-      <Flex background="white" height="100vh" flexDirection="column" flex="1">
+      <Flex background="#FEE72E" height="100vh" flexDirection="column" flex="1">
          <Box
             p={5}
             pb={3}
-            borderBottom="1px solid var(--chakra-colors-red-400)"
+            borderBottom="1px solid #DD4237"
          >
             {isMobile && (
                <Box mb={4}>
@@ -495,7 +495,7 @@ const Chat = ({
                      padding: '.5rem 1rem',
                      width: '100%',
                      fontSize: 'var(--chakra-fontSizes-md)',
-                     background: 'var(--chakra-colors-red-400)',
+                     background: '#DD4237',
                      borderRadius: '0.3rem',
                      marginBottom: '-6px',
                   }}

@@ -11,7 +11,7 @@ const Wrapper = styled.button`
    display: block;
    width: 100%;
    padding: var(--chakra-space-3) var(--chakra-space-5);
-   background: #FFFF99;
+   background: #FEE72E;
    text-align: left;
    color: var(--chakra-colors-yellow);
 
@@ -20,7 +20,7 @@ const Wrapper = styled.button`
    }
 
    &:hover {
-      background: var(--chakra-colors-red-300);
+      background: #DD4237;
    }
 
    .timestamp {

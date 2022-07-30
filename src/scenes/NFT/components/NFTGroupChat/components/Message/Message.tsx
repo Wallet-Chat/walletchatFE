@@ -32,7 +32,7 @@ const MessageBox = styled.div`
    max-width: 80%;
    height: auto;
    background: #fff;
-   background: var(--chakra-colors-red-300);
+   background: #DD4237;
    border-radius: var(--chakra-radii-md);
    padding: var(--chakra-space-2) var(--chakra-space-3) var(--chakra-space-5);
    font-size: var(--chakra-fontSizes-md);
@@ -53,12 +53,12 @@ const MessageBox = styled.div`
 
    &.left {
       float: left;
-      background: #fff;
+      background: #DD4237;
    }
    &.right {
       float: left;
       background: var(--chakra-colors-darkgray-800);
-      color: var(--chakra-colors-red-100);
+      color: #DD4237;
 
       .name {
          color: var(--chakra-colors-white);
@@ -129,7 +129,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             to={`/chat/${msg.fromAddr}`}
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-red-400)',
+               background: '#DD4237',
             }}
          >
             <MenuItem icon={<IconMessage width="20px" height="20px" />}>
@@ -142,7 +142,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-red-400)',
+               background: '#DD4237',
             }}
          >
             <MenuItem
@@ -168,7 +168,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-red-400)',
+               background: '#DD4237',
             }}
          >
             <MenuItem
@@ -184,7 +184,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-red-400)',
+               background: '#DD4237',
             }}
          >
             <MenuItem
@@ -205,7 +205,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
             target="_blank"
             _hover={{
                textDecoration: 'none',
-               background: 'var(--chakra-colors-red-400)',
+               background: '#DD4237',
             }}
          >
             <MenuItem

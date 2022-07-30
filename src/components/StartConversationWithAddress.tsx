@@ -52,7 +52,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                   alignItems="center"
                   justifyContent="flex-start"
                   p={3}
-                  background="lightgray.300"
+                  background="#FEE72E"
                   borderRadius="md"
                   mt={2}
                   as={Button}
