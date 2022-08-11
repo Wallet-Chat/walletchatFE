@@ -58,6 +58,7 @@ const NotificationCount = styled.div`
 
 const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
    const [nft, setNft] = useState<NFTContractType>()
+   const [isError, setIsError] = useState(false)
 
    useEffect(() => {
       if (data.nftAddr) {
@@ -78,9 +79,14 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                   setNft(result)
                }
             })
-            .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
+            .catch((error) => {
+               console.log(`🚨[GET][NFT Contract]:`, error)
+               setIsError(true)
+            })
       }
    }, [data.nftAddr])
+
+   if (isError) return <Box></Box>
 
    return (
       <Link to={`/nft/${data.nftAddr}`} style={{ textDecoration: 'none' }}>
