@@ -14,6 +14,7 @@ import { isMobile } from 'react-device-detect'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Web3 from 'web3'
+import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
@@ -96,11 +97,11 @@ const Inbox = ({
       })
          .then((response) => response.json())
          .then((data: MessageType[]) => {
-            console.log('✅ GET [Inbox]:', data)
             if (data === null) {
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
-            } else {
+            } else if (!equal(inboxData, data)) {
+               console.log('✅ GET [Inbox]:', data)
                setInboxData(data)
                localStorage.setItem('inbox', JSON.stringify(data))
             }
