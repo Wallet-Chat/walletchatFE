@@ -292,7 +292,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                </MenuButton>
                <MenuList>
                   <MenuGroup
-                     title={name || truncateAddress(account)}
+                     title={name || (account && truncateAddress(account))}
                      fontSize="lg"
                   >
                      <MenuItem

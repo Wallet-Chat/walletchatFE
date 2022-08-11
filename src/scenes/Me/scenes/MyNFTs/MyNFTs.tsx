@@ -97,9 +97,8 @@ export default function MyNFTs({ account }: { account: string }) {
          height={isMobile ? 'unset' : '100vh'}
          overflowY="auto"
          className="custom-scrollbar"
-         p={4}
       >
-        <Box px={4} py={6} background="white" borderRadius="md">
+        <Box px={4} py={6} background="white">
         <Heading size="xl" mb={5}>My NFTs</Heading>
          <Flex wrap="wrap" >
             {nfts.map((nft, i) => (

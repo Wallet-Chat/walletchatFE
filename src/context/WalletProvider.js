@@ -233,6 +233,8 @@ const WalletProvider = React.memo(({ children }) => {
                await _provider.provider.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: _web3.utils.toHex(1) }], // chainId must be in hexadecimal numbers
+               }).then(() => {
+                  setChainId(1)
                })
             }
          }
