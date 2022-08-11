@@ -158,7 +158,7 @@ const Inbox = ({
 
    if (isFetchingInboxData && inboxData.length === 0) {
       return (
-         <Box background="white" height="100vh">
+         <Box background="white" height="100vh" width="100%">
             <Box py={8} px={3} height="100vh">
                {[...Array(5)].map((e, i) => (
                   <Stack key={i}>
