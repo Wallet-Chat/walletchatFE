@@ -80,7 +80,7 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                }
             })
             .catch((error) => {
-               console.log(`🚨[GET][NFT Contract]:`, error)
+               // console.log(`🚨[GET][NFT Contract]:`, error)
                setIsError(true)
             })
       }
@@ -116,16 +116,36 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                         </RecipientAddress>
                      )}
                      {data.message && (
-                        <Box fontSize="md" color="darkgray.100" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-                           {data.message.substring(0, 25)}{data.message.length > 25 && '...'}
+                        <Box
+                           fontSize="md"
+                           color="darkgray.100"
+                           whiteSpace="nowrap"
+                           overflow="hidden"
+                           textOverflow="ellipsis"
+                        >
+                           {data.message.substring(0, 25)}
+                           {data.message.length > 25 && '...'}
+                        </Box>
+                     )}
+                     {data.message === '' && (
+                        <Box
+                           fontSize="md"
+                           color="darkgray.100"
+                           whiteSpace="nowrap"
+                           overflow="hidden"
+                           textOverflow="ellipsis"
+                        >
+                           Welcome!
                         </Box>
                      )}
                   </Box>
                </Flex>
                <Box textAlign="right" flexShrink={0}>
-                  <Box className="timestamp">
-                     {formatInboxDate(data.timestamp)}
-                  </Box>
+                  {data.timestamp !== '' && (
+                     <Box className="timestamp">
+                        {formatInboxDate(data.timestamp)}
+                     </Box>
+                  )}
                   {data.unread && data.unread !== 0 ? (
                      <NotificationCount>{data.unread}</NotificationCount>
                   ) : (
