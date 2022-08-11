@@ -245,6 +245,10 @@ const NFT = ({
          console.log('Missing NFT Port API Key')
          return
       }
+      if (!nftContractAddr) {
+         console.log('Missing contract address')
+         return
+      }
       fetch(
          `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=ethereum`,
          {

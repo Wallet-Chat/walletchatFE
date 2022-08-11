@@ -2,6 +2,7 @@ import { Image, Badge } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
+import { convertIpfsUriToUrl } from '../helpers/ipfs'
 
 import NFTMetadataType from '../types/NFTMetadata'
 
@@ -70,6 +71,10 @@ const Sidebar = ({
          console.log('Missing NFT Port API Key')
          return
       }
+      if (!nftContractAddr || !nftId) {
+         console.log('Missing contract address or id')
+         return
+      }
       fetch(
          `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=ethereum`,
          {
@@ -87,10 +92,7 @@ const Sidebar = ({
 
             let url = result.nft?.cached_file_url
             if (url?.includes('ipfs://')) {
-               let parts = url.split('ipfs://')
-               let cid = parts[parts.length - 1]
-               url = `https://ipfs.io/ipfs/${cid}`
-               setImageUrl(url)
+               setImageUrl(convertIpfsUriToUrl(url))
             } else if (url !== null) {
                setImageUrl(url)
             }

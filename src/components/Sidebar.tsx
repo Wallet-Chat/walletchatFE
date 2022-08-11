@@ -42,6 +42,7 @@ import animatedPlaceholder from '../images/animated-placeholder.gif'
 import { useWallet } from '../context/WalletProvider'
 import { truncateAddress } from '../helpers/truncateString'
 import { useIsMobileView } from '../context/IsMobileViewProvider'
+import { convertIpfsUriToUrl } from '../helpers/ipfs'
 
 interface URLChangedEvent extends Event {
    detail?: string
@@ -102,6 +103,10 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          console.log('Missing NFT Port API Key')
          return
       }
+      if (!nftContractAddr || !nftId) {
+         console.log('Missing contract address or id')
+         return
+      }
       fetch(
          `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=ethereum`,
          {
@@ -119,10 +124,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
 
             let url = result.nft?.cached_file_url
             if (url?.includes('ipfs://')) {
-               let parts = url.split('ipfs://')
-               let cid = parts[parts.length - 1]
-               url = `https://ipfs.io/ipfs/${cid}`
-               setImageUrl(url)
+               setImageUrl(convertIpfsUriToUrl(url))
             } else if (url !== null) {
                setImageUrl(url)
             }
@@ -295,7 +297,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                   >
                      <MenuItem
                         as={NavLink}
-                        to="/change-name"
+                        to="/me/change-name"
                         icon={
                            <Box>
                               <IconPencil stroke="1.5" />

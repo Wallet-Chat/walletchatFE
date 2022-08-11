@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 
-
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
 import Inbox from './scenes/Inbox'
@@ -24,24 +23,23 @@ import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import { useIsMobileView } from './context/IsMobileViewProvider'
 import { useUnreadCount } from './context/UnreadCountProvider'
-import EnterName from './scenes/EnterName'
-import ChangeName from './scenes/ChangeName'
+import EnterName from './scenes/Me/scenes/EnterName'
+import ChangeName from './scenes/Me/scenes/ChangeName'
 import NFTById from './scenes/NFT/scenes/NFTById'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
+import MyNFTs from './scenes/Me/scenes/MyNFTs'
 
 export const App = () => {
    const { unreadCount, setUnreadCount } = useUnreadCount()
    const [btnClicks, setBtnClicks] = useState(0)
-
-   // const location = useLocation()
-   // console.log("location", location)
 
    const {
       appLoading,
       isAuthenticated,
       connectWallet,
       name,
+      isFetchingName,
       account,
       web3,
    } = useWallet()
@@ -101,11 +99,7 @@ export const App = () => {
    )
 
    const inbox = (
-      <Inbox
-         account={account}
-         web3={web3}
-         isAuthenticated={isAuthenticated}
-      />
+      <Inbox account={account} web3={web3} isAuthenticated={isAuthenticated} />
    )
 
    if (appLoading || !isAuthenticated) {
@@ -166,14 +160,30 @@ export const App = () => {
             <Flex>
                {isChromeExtension() && closeBtn}
                <Sidebar unreadCount={unreadCount} />
-               <EnterName account={account} />
+               {isFetchingName ? (
+                  <Flex
+                     justifyContent="center"
+                     alignItems="center"
+                     height="100vh"
+                     width="100%"
+                  >
+                     <Spinner />
+                  </Flex>
+               ) : (
+                  <EnterName account={account} />
+               )}
             </Flex>
          </Box>
       )
    } else {
       return (
          <Box>
-            <Flex flexDirection={(isMobile && !isChromeExtension()) ? 'column' : 'row'} minHeight={isMobile ? '100vh' : 'unset'}>
+            <Flex
+               flexDirection={
+                  isMobile && !isChromeExtension() ? 'column' : 'row'
+               }
+               minHeight={isMobile ? '100vh' : 'unset'}
+            >
                {isChromeExtension() && closeBtn}
                <Sidebar unreadCount={unreadCount} />
                <Box flex="1" overflow="hidden" minWidth="1px">
@@ -201,23 +211,32 @@ export const App = () => {
                            <Flex>
                               {inbox}
                               {!isMobileView && (
-                                 <Flex background="lightgray.200" flex="1" alignItems="center" justifyContent="center">
-                                    <Tag background="white">Select a chat to start messaging</Tag>
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       Select a chat to start messaging
+                                    </Tag>
                                  </Flex>
                               )}
                            </Flex>
                         }
                      />
-                     <Route path="/change-name" element={<ChangeName />} />
+                     <Route path="/me/change-name" element={<ChangeName />} />
+                     <Route
+                        path="/me/nfts"
+                        element={<MyNFTs account={account} />}
+                     />
 
                      <Route
                         path="/nft/:nftContractAddr/:nftId"
                         element={
                            <Flex>
                               {!isMobileView && inbox}
-                              <NFTById
-                                 account={account}
-                              />
+                              <NFTById account={account} />
                            </Flex>
                         }
                      />

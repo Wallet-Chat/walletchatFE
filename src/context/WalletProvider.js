@@ -55,6 +55,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [web3ModalProvider, setWeb3ModalProvider] = useState()
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
+   const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
    const [accounts, setAccounts] = useState(null)
    const [web3, setWeb3] = useState(null)
@@ -133,6 +134,7 @@ const WalletProvider = React.memo(({ children }) => {
          console.log('No account connected')
          return
       }
+      setIsFetchingName(true)
       fetch(` ${process.env.REACT_APP_REST_API}/name/${_account}`, {
          method: 'GET',
          headers: {
@@ -148,6 +150,9 @@ const WalletProvider = React.memo(({ children }) => {
          })
          .catch((error) => {
             console.error('🚨[GET][Name]:', error)
+         })
+         .then(() => {
+            setIsFetchingName(false)
          })
    }
 
@@ -263,6 +268,7 @@ const WalletProvider = React.memo(({ children }) => {
          value={{
             name,
             setName,
+            isFetchingName,
             account,
             accounts,
             walletRequestPermissions,
