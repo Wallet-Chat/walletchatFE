@@ -201,8 +201,8 @@ const Inbox = ({
          className="custom-scrollbar"
       >
          <Flex p={5} justifyContent="space-between">
-            <Heading size="xl">
-               Inbox {isFetchingInboxData && <Spinner />}
+            <Heading size="lg">
+               Inbox
             </Heading>
             <Button
                as={Link}

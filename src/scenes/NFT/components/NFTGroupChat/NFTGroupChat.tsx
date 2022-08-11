@@ -55,7 +55,10 @@ const NFTGroupChat = ({
 
    useEffect(() => {
       getChatData()
+   }, [account, nftContractAddr])
 
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
          getChatData()
       }, 5000) // every 5s
@@ -63,7 +66,7 @@ const NFTGroupChat = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account, nftContractAddr])
+   }, [chatData, account, nftContractAddr])
 
    const getChatData = async () => {
       if (!account) {

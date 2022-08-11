@@ -4,6 +4,7 @@ import {
    Divider,
    Flex,
    FormControl,
+   Spinner,
    Tag,
    Text,
 } from '@chakra-ui/react'
@@ -38,16 +39,17 @@ const DottedBackground = styled.div`
    overflow-y: scroll;
 `
 
-const NFTGroupChat = ({
+const CommunityGroupChat = ({
    account,
    community,
-   chatData
+   chatData,
+   isFetchingCommunityDataFirstTime,
 }: {
    account: string | undefined
    community: string
    chatData: GroupMessageType[]
+   isFetchingCommunityDataFirstTime: boolean
 }) => {
-
    const [firstLoad, setFirstLoad] = useState(true)
    const [msgInput, setMsgInput] = useState<string>('')
    const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
@@ -94,7 +96,7 @@ const NFTGroupChat = ({
       // Scroll to bottom of chat once all messages are loaded
       if (scrollToBottomRef?.current && firstLoad) {
          scrollToBottomRef.current.scrollIntoView()
-         
+
          setTimeout(() => {
             setFirstLoad(false)
          }, 5000)
@@ -128,11 +130,11 @@ const NFTGroupChat = ({
          message: msgInputCopy,
          nftaddr: community,
          fromaddr: account.toLocaleLowerCase(),
-         timestamp
+         timestamp,
       }
 
       addMessageToUI(
-         "message",
+         'message',
          msgInputCopy,
          account,
          timestamp.toString(),
@@ -173,7 +175,7 @@ const NFTGroupChat = ({
       fromaddr: string,
       timestamp: string,
       position: string,
-      isFetching: boolean,
+      isFetching: boolean
    ) => {
       console.log(`Add message to UI: ${message}`)
 
@@ -192,7 +194,6 @@ const NFTGroupChat = ({
 
    return (
       <Flex flexDirection="column" height="100%">
-
          <DottedBackground className="custom-scrollbar">
             {loadedMsgs.length === 0 && (
                <Flex
@@ -203,7 +204,11 @@ const NFTGroupChat = ({
                   p={4}
                >
                   <Box fontSize="md">
-                     Be the first to post something here 😉
+                     {isFetchingCommunityDataFirstTime ? (
+                        <Spinner />
+                     ) : (
+                        'Be the first to post something here 😉'
+                     )}
                   </Box>
                </Flex>
             )}
@@ -211,17 +216,36 @@ const NFTGroupChat = ({
                if (msg.type && msg.type === 'day') {
                   return (
                      <Box position="relative" my={6} key={msg.timestamp}>
-                        <Tag color="lightgray.800" background="lightgray.200" fontSize="xs" fontWeight="bold" mb={1} position="absolute" right="var(--chakra-space-4)" top="50%" transform="translateY(-50%)">{getFormattedDate(msg.timestamp.toString())}</Tag>
+                        <Tag
+                           color="lightgray.800"
+                           background="lightgray.200"
+                           fontSize="xs"
+                           fontWeight="bold"
+                           mb={1}
+                           position="absolute"
+                           right="var(--chakra-space-4)"
+                           top="50%"
+                           transform="translateY(-50%)"
+                        >
+                           {getFormattedDate(msg.timestamp.toString())}
+                        </Tag>
                         <Divider />
                      </Box>
                   )
-                } else if (msg.type && msg.type === 'welcome') {
+               } else if (msg.type && msg.type === 'welcome') {
                   return (
                      <Box textAlign="center">
-                        <Text fontSize="sm" color="darkgray.200">A warm welcome to  <RLink to={`/chat/${msg.fromAddr}`}>{msg.sender_name ? msg.sender_name : truncateAddress(msg.fromAddr)}</RLink></Text>
+                        <Text fontSize="sm" color="darkgray.200">
+                           A warm welcome to{' '}
+                           <RLink to={`/chat/${msg.fromAddr}`}>
+                              {msg.sender_name
+                                 ? msg.sender_name
+                                 : truncateAddress(msg.fromAddr)}
+                           </RLink>
+                        </Text>
                      </Box>
                   )
-                } else if (msg.message) {
+               } else if (msg.message) {
                   return (
                      <Message
                         key={`${msg.message}${msg.timestamp}${i}`}
@@ -231,7 +255,11 @@ const NFTGroupChat = ({
                }
                return null
             })}
-            <Box float="left" style={{ clear: 'both' }} ref={scrollToBottomRef}></Box>
+            <Box
+               float="left"
+               style={{ clear: 'both' }}
+               ref={scrollToBottomRef}
+            ></Box>
          </DottedBackground>
 
          <Flex>
@@ -269,4 +297,4 @@ const NFTGroupChat = ({
    )
 }
 
-export default NFTGroupChat
+export default CommunityGroupChat

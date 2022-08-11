@@ -80,12 +80,16 @@ const Chat = ({
 
    useEffect(() => {
       getChatData()
+   }, [isAuthenticated, account, toAddr])
+
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
          getChatData()
       }, 5000) // every 5s
 
       return () => clearInterval(interval)
-   }, [isAuthenticated, account, toAddr])
+   }, [isAuthenticated, account, toAddr, chatData])
 
    useEffect(() => {
       if (toAddr) {

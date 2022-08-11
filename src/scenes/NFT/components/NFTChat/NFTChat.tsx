@@ -69,7 +69,10 @@ const NFTChat = ({
 
    useEffect(() => {
       getChatData()
+   }, [account])
 
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
          getChatData()
       }, 5000) // every 5s
@@ -77,7 +80,7 @@ const NFTChat = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account])
+   }, [chatData, account])
 
    const getChatData = () => {
       // GET request to get off-chain data for RX user
