@@ -42,6 +42,7 @@ export const App = () => {
       isFetchingName,
       account,
       web3,
+      error
    } = useWallet()
 
    const { isMobileView } = useIsMobileView()
@@ -145,10 +146,15 @@ export const App = () => {
                   >
                      Sign in using wallet
                   </Button>
-                  {btnClicks > 0 && (
+                  {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>
                         Check the MetaMask extension to continue
                      </Alert>
+                  )}
+                  {error && (
+                     <Alert status="error" variant="solid" mt={4}>
+                     {error}
+                  </Alert>
                   )}
                </Box>
             )}
