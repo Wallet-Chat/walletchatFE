@@ -26,6 +26,7 @@ import Message from './components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
 import { isMobile } from 'react-device-detect'
+import equal from 'fast-deep-equal/es6'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 
 // import EthCrypto, { Encrypted } from 'eth-crypto'
@@ -136,9 +137,10 @@ const Chat = ({
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            console.log('✅[GET][Chat items]:', data)
-            setChatData(data)
-            setIsFetchingChatData(false)
+            if (equal(data, chatData) === false) {
+               console.log('✅[GET][Chat items]:', data)
+               setChatData(data)
+            }
          })
          .catch((error) => {
             console.error('🚨[GET][Chat items]:', error)

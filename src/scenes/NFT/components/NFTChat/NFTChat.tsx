@@ -11,6 +11,7 @@ import Blockies from 'react-blockies'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-textarea-autosize'
 import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
+import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
 
@@ -62,7 +63,7 @@ const NFTChat = ({
    )
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
-   const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
+   // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
 
    let timer: ReturnType<typeof setTimeout>
 
@@ -88,7 +89,7 @@ const NFTChat = ({
          console.log('No account connected')
          return
       }
-      setIsFetchingMessages(true)
+      // setIsFetchingMessages(true)
       fetch(
          ` ${process.env.REACT_APP_REST_API}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
          {
@@ -100,15 +101,17 @@ const NFTChat = ({
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            console.log('✅[GET][NFT][Messages]:', data)
-            setChatData(data)
+            if (equal(data, chatData) === false) {
+               console.log('✅[GET][NFT][Messages]:', data)
+               setChatData(data)
+            }
          })
          .catch((error) => {
             console.error('🚨[GET][NFT][Messages]:', error)
          })
-         .finally(() => {
-            setIsFetchingMessages(false)
-         })
+         // .finally(() => {
+         //    setIsFetchingMessages(false)
+         // })
    }
 
    const handleMessageKeyPress = (

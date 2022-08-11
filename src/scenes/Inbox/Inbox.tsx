@@ -15,7 +15,6 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
-// import EthCrypto, { Encrypted } from 'eth-crypto'
 
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
 // import { getIpfsData } from '../../services/ipfs'
@@ -100,7 +99,7 @@ const Inbox = ({
             if (data === null) {
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
-            } else if (!equal(inboxData, data)) {
+            } else if (equal(inboxData, data) === false) {
                console.log('✅ GET [Inbox]:', data)
                setInboxData(data)
                localStorage.setItem('inbox', JSON.stringify(data))

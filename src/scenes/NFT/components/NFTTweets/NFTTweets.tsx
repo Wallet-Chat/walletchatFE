@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import equal from 'fast-deep-equal/es6'
 
-// import { transformTweets } from '../../../../../../helpers/transformTweets'
 import TweetType from '../../../../types/Tweet'
 import Tweet from './components/Tweet'
 import { Box, Divider, Flex, Spinner } from '@chakra-ui/react'
+
 
 const NFTTweets = ({
    account,
@@ -36,8 +37,10 @@ const NFTTweets = ({
       )
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅[GET][NFT][Tweets]:', data)
-            setTweets(data)
+            if (equal(data, tweets) === false) {
+               console.log('✅[GET][NFT][Tweets]:', data)
+               setTweets(data)
+            }
          })
          .catch((error) => {
             console.error('🚨[GET][NFT][Tweets]:', error)

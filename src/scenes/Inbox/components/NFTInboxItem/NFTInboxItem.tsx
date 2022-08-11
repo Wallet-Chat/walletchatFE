@@ -74,7 +74,7 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
          })
             .then((response) => response.json())
             .then((result: NFTContractType) => {
-               console.log(`✅[GET][NFT Contract]:`, result)
+               // console.log(`✅[GET][NFT Contract]:`, result)
                if (result?.collection.name) {
                   setNft(result)
                }

@@ -20,13 +20,11 @@ import {
    Tooltip,
 } from '@chakra-ui/react'
 import {
-   IconBrandDiscord,
    IconBrandMedium,
    IconBrandTwitter,
    IconCircleCheck,
    IconCurrencyEthereum,
    IconLink,
-   IconShieldCheck,
 } from '@tabler/icons'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
@@ -45,7 +43,7 @@ const NFT = ({ account }: { account: string }) => {
 
    const [nftData, setNftData] = useState<NFTContractType>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
-   const [ethereumPrice, setEthereumPrice] = useState<number>()
+   // const [ethereumPrice, setEthereumPrice] = useState<number>()
    const [joined, setJoined] = useState<boolean | null>(null)
    const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
    const [isFetchingJoining, setIsFetchingJoining] = useState(false)
@@ -60,7 +58,7 @@ const NFT = ({ account }: { account: string }) => {
 
       const interval = setInterval(() => {
          getNftStatistics()
-      }, 60000) // every 1 min
+      }, 60000*10) // every 10 mins
 
       return () => {
          clearInterval(interval)
@@ -300,7 +298,7 @@ const NFT = ({ account }: { account: string }) => {
                       <Divider orientation="vertical" height="15px" /> */}
                               <Stat flex="0">
                                  <StatNumber fontSize="md" color="darkgray.700">
-                                    {nftStatistics.num_owners}
+                                    {nFormatter(nftStatistics.num_owners, 1)}
                                  </StatNumber>
                                  <StatHelpText color="darkgray.200">
                                     Owners
@@ -314,10 +312,10 @@ const NFT = ({ account }: { account: string }) => {
                                     d="flex"
                                     alignItems="center"
                                  >
-                                    {nftStatistics.floor_price}
+                                    {nftStatistics.floor_price < 0.01 
+                                       ? "<0.01"
+                                       : nftStatistics.floor_price.toFixed(2)}
                                     <IconCurrencyEthereum size="18" />
-                                    {/* <Text fontSize="sm">{ethereumPrice &&
-                      `(~ $${(ethereumPrice * nftStatistics.floor_price).toFixed(2)})`}</Text> */}
                                  </StatNumber>
                                  <StatHelpText color="darkgray.200">
                                     Floor
