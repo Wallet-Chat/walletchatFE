@@ -55,7 +55,9 @@ const NFT = ({ account }: { account: string }) => {
       getNftMetadata()
       getNftStatistics()
       getJoinStatus()
+   }, [nftContractAddr])
 
+   useEffect(() => {
       const interval = setInterval(() => {
          getNftStatistics()
       }, 60000*10) // every 10 mins
@@ -63,7 +65,7 @@ const NFT = ({ account }: { account: string }) => {
       return () => {
          clearInterval(interval)
       }
-   }, [nftContractAddr])
+   }, [nftContractAddr, nftStatistics])
 
    useEffect(() => {
       getTweetCount()
