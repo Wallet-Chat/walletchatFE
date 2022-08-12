@@ -31,7 +31,7 @@ export const isCurrentWeek = (_inputDate: string) => {
    const last = first + 6 // last day is the first day + 6
    const input = new Date(_inputDate).getDate()
    
-   return input >= first && input < last
+   return input >= first && input < last && (new Date(_inputDate)).getMonth() === (new Date()).getMonth()
 }
 
 export const isCurrentYear = (inputDate: string) => {
