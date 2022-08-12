@@ -67,7 +67,7 @@ const Inbox = ({
       setTimeout(() => setBeenHereFor3Secs(true), 3000)
 
       return () => clearInterval(interval)
-   }, [])
+   }, [inboxData])
 
    useEffect(() => {
       getInboxData()
@@ -100,7 +100,7 @@ const Inbox = ({
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) === false) {
-               console.log('✅ GET [Inbox]:', data)
+               console.log('✅[GET][Inbox]:', data)
                setInboxData(data)
                localStorage.setItem('inbox', JSON.stringify(data))
             }
