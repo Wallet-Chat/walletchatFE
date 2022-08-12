@@ -13,7 +13,7 @@ import {
  import { useForm } from 'react-hook-form'
  import { IconSend } from '@tabler/icons'
  import { useWallet } from '../../../../context/WalletProvider'
- import { NFTMetadataOpenSeaType } from '../../../../types/NFTMetadata'
+ import { NFTMetadataOpenSeaType } from '../../../../types/NFTPort/NFTMetadata'
  
  const ChangeName = () => {
     const {

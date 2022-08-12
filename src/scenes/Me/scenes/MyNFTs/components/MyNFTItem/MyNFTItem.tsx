@@ -46,8 +46,8 @@ export default function MyNFTItem({ nft }: { nft: NFTPortNFT }) {
                flex="0 0 100px"
             ></Box>
          )}
-         <Box p={3}>
-            <Text fontSize="md" fontWeight="bold">
+         <Box p={3} overflow="hidden">
+            <Text fontSize="md" fontWeight="bold" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
                {nft.name}
             </Text>
             <Box mb={2}>
@@ -84,14 +84,16 @@ export default function MyNFTItem({ nft }: { nft: NFTPortNFT }) {
                   </Link>
                )}
             </Box>
-            <RLink
-               to={`/nft/${nft.contract_address}`}
-               style={{ textDecoration: 'none' }}
-            >
-               <Button variant="outline" size="sm" width="100%">
-                  Community <IconArrowNarrowRight stroke="1.5" />
-               </Button>
-            </RLink>
+            {chain?.slug && (
+               <RLink
+                  to={`/nft/${chain.slug}/${nft.contract_address}`}
+                  style={{ textDecoration: 'none' }}
+               >
+                  <Button variant="outline" size="sm" width="100%">
+                     Community <IconArrowNarrowRight stroke="1.5" />
+                  </Button>
+               </RLink>
+            )}
          </Box>
       </Flex>
    )

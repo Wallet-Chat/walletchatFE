@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { convertIpfsUriToUrl } from '../helpers/ipfs'
 
-import NFTMetadataType from '../types/NFTMetadata'
+import NFTMetadataType from '../types/NFTPort/NFTMetadata'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -103,7 +103,7 @@ const Sidebar = ({
    return (
       <>
          {metadata && (
-            <LinkElem to={`/nft/${nftContractAddr}/${nftId}`}>
+            <LinkElem to={`/nft/ethereum/${nftContractAddr}/${nftId}`}>
                {/* <Image src={coolcat2356} alt="" width="40px" /> */}
                {imageUrl && (
                   <Image

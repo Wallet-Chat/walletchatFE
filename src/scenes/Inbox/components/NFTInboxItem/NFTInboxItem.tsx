@@ -89,7 +89,7 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
    if (isError) return <Box></Box>
 
    return (
-      <Link to={`/nft/${data.nftAddr}`} style={{ textDecoration: 'none' }}>
+      <Link to={`/nft/ethereum/${data.nftAddr}`} style={{ textDecoration: 'none' }}>
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>

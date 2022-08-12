@@ -43,12 +43,11 @@ const NFT = ({
 }: {
    account: string
 }) => {
-   let { nftContractAddr = '', nftId = '' } = useParams()
+   let { nftContractAddr = '', nftId = '', chain = '' } = useParams()
    let [searchParams] = useSearchParams()
 
    const [nftData, setNftData] = useState<NFTAssetType>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
-   const [ethereumPrice, setEthereumPrice] = useState<number>()
    const [isBookmarked, setIsBookmarked] = useState<boolean | null>(null)
    const [ownerAddr, setOwnerAddr] = useState<string>()
    const recipientAddr =
@@ -64,18 +63,18 @@ const NFT = ({
       getNftMetadata()
       getOwnerAddress()
       getNftStatistics()
-      getEthereumPrice()
       getJoinStatus()
+   }, [nftContractAddr, nftId])
 
+   useEffect(() => {
       const interval = setInterval(() => {
          getNftStatistics()
-         getEthereumPrice()
       }, 60000) // every 1 min
 
       return () => {
          clearInterval(interval)
       }
-   }, [nftContractAddr, nftId])
+   }, [nftContractAddr, nftId, nftStatistics])
 
    useEffect(() => {
       getUnreadDMCount()
@@ -269,20 +268,6 @@ const NFT = ({
          .catch((error) => console.log('error', error))
    }
 
-   const getEthereumPrice = () => {
-      fetch(`https://api.coinstats.app/public/v1/coins/ethereum?currency=USD`, {
-         method: 'GET',
-      })
-         .then((response) => response.json())
-         .then((result) => {
-            console.log('✅[GET][Ethereum Price]:', result)
-            if (result && result.coin && result.coin.id === 'ethereum') {
-               setEthereumPrice(result.coin.price)
-            }
-         })
-         .catch((error) => console.log('error', error))
-   }
-
    const getOwnerAddress = () => {
       const baseURL = `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getOwnersForToken`
 
@@ -317,7 +302,7 @@ const NFT = ({
                   {nftData?.name && <Heading size="md">{nftData.name}</Heading>}
                   <Flex alignItems="center">
                      {nftData?.collection?.name && (
-                        <CLink href={`/nft/${nftContractAddr}`} mr={2}>
+                        <CLink href={`/nft/ethereum/${nftContractAddr}`} mr={2}>
                            <Badge
                               d="flex"
                               alignItems="center"

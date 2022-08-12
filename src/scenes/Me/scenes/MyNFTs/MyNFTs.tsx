@@ -102,7 +102,7 @@ export default function MyNFTs({ account }: { account: string }) {
         <Heading size="xl" mb={5}>My NFTs</Heading>
          <Flex wrap="wrap" >
             {nfts.map((nft, i) => (
-               <Box mb={4} mr={4}>
+               <Box mb={4} mr={4} key={i}>
                   <MyNFTItem key={i} nft={nft} />
                </Box>
             ))}

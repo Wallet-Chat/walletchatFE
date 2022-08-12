@@ -37,9 +37,11 @@ import { useHover } from '../../helpers/useHover'
 import IconEtherscan from '../../images/icon-etherscan-mono.svg'
 import IconDiscord from '../../images/icon-discord.svg'
 import { nFormatter } from '../../helpers/number'
+import { convertIpfsUriToUrl } from '../../helpers/ipfs'
+import NFTMetadataType from '../../types/NFTPort/NFTMetadata'
 
 const NFT = ({ account }: { account: string }) => {
-   let { nftContractAddr = '' } = useParams()
+   let { nftContractAddr = '', chain = '' } = useParams()
 
    const [nftData, setNftData] = useState<NFTContractType>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
@@ -168,10 +170,15 @@ const NFT = ({ account }: { account: string }) => {
    }
 
    const getNftMetadata = () => {
-      if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
-         console.log('Missing OpenSea API Key')
+      if (!nftContractAddr) {
+         console.log('Missing contract address')
          return
       }
+      if (chain === 'ethereum') {
+         if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+            console.log('Missing OpenSea API Key')
+            return
+         }
       fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
          method: 'GET',
          headers: {
@@ -180,12 +187,52 @@ const NFT = ({ account }: { account: string }) => {
       })
          .then((response) => response.json())
          .then((result: NFTContractType) => {
-            console.log(`✅[GET][NFT Contract]:`, result)
             if (result?.collection.name) {
+               console.log(`✅[GET][NFT Contract]:`, result)
                setNftData(result)
             }
          })
          .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
+      } else if (chain === 'polygon') {
+         console.log('chain', chain === 'polygon')
+         if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+            console.log('Missing NFT Port API Key')
+            return
+         }
+         fetch(
+            `https://api.nftport.xyz/v0/nfts/${nftContractAddr}?chain=${chain}&page_size=1&include=all`,
+            {
+               method: 'GET',
+               headers: {
+                  Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+               },
+            }
+         )
+            .then((response) => response.json())
+            .then((result: NFTMetadataType) => {
+
+               console.log('✅[GET][NFT Metadata]:', result)
+
+               let url = (result?.contract?.metadata?.cached_thumbnail_url) || (result?.nfts && result.nfts[0]?.cached_file_url) || ""
+               if (url?.includes('ipfs://')) {
+                  url = convertIpfsUriToUrl(url)
+               }
+               let _contractAddr = (result?.nfts && result.nfts[0].contract_address) || ""
+
+               const _data: NFTContractType = {
+                  collection: {
+                     image_url: url,
+                     name: result?.contract?.name || (result?.nfts && result.nfts[0]?.metadata?.name) || "",
+                  },
+                  address: _contractAddr
+               }
+
+               setNftData(_data)
+
+
+            })
+            .catch((error) => console.log('error', error))
+      }
    }
 
    const getNftStatistics = () => {
@@ -198,7 +245,7 @@ const NFT = ({ account }: { account: string }) => {
          return
       }
       fetch(
-         `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=ethereum`,
+         `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
          {
             method: 'GET',
             headers: {
@@ -302,7 +349,7 @@ const NFT = ({ account }: { account: string }) => {
                                  <StatNumber fontSize="md" color="darkgray.700">
                                     {nFormatter(nftStatistics.num_owners, 1)}
                                  </StatNumber>
-                                 <StatHelpText color="darkgray.200">
+                                 <StatHelpText color="darkgray.200" whiteSpace="nowrap">
                                     Owners
                                  </StatHelpText>
                               </Stat>
@@ -319,7 +366,7 @@ const NFT = ({ account }: { account: string }) => {
                                        : nftStatistics.floor_price.toFixed(2)}
                                     <IconCurrencyEthereum size="18" />
                                  </StatNumber>
-                                 <StatHelpText color="darkgray.200">
+                                 <StatHelpText color="darkgray.200" whiteSpace="nowrap">
                                     Floor
                                  </StatHelpText>
                               </Stat>
@@ -334,7 +381,7 @@ const NFT = ({ account }: { account: string }) => {
                                     {nFormatter(nftStatistics.total_volume, 1)}
                                     <IconCurrencyEthereum size="18" />
                                  </StatNumber>
-                                 <StatHelpText color="darkgray.200">
+                                 <StatHelpText color="darkgray.200" whiteSpace="nowrap">
                                     Total Vol.
                                  </StatHelpText>
                               </Stat>

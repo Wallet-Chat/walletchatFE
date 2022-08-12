@@ -37,7 +37,7 @@ import IconFeedback from '../images/icon-feedback.svg'
 import IconDiscord from '../images/icon-discord.svg'
 import logoThumb from '../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../helpers/contract'
-import NFTMetadataType from '../types/NFTMetadata'
+import NFTMetadataType from '../types/NFTPort/NFTMetadata'
 import animatedPlaceholder from '../images/animated-placeholder.gif'
 import { useWallet } from '../context/WalletProvider'
 import { truncateAddress } from '../helpers/truncateString'
@@ -53,6 +53,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
    const [url, setUrl] = useState<string | undefined>('')
    const [nftContractAddr, setNftContractAddr] = useState<string>()
    const [nftId, setNftId] = useState<string>()
+   const [chainName, setChainName] = useState("ethereum")
    const [nftData, setNftData] = useState<NFTMetadataType>()
    const [imageUrl, setImageUrl] = useState<string>()
 
@@ -87,18 +88,19 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
 
    useEffect(() => {
       if (url) {
-         const [contractAddress, nftId] = getContractAddressAndNFTId(url)
-         if (contractAddress && nftId !== null) {
+         const [contractAddress, nftId, chain] = getContractAddressAndNFTId(url)
+         if (contractAddress && nftId !== null && chain) {
             setNftContractAddr(contractAddress)
             setNftId(nftId)
+            setChainName(chain)
             if (contractAddress.startsWith('0x')) {
-               getNftMetadata(contractAddress, nftId)
+               getNftMetadata(contractAddress, nftId, chain)
             }
          }
       }
    }, [url])
 
-   const getNftMetadata = (nftContractAddr: string, nftId: string) => {
+   const getNftMetadata = (nftContractAddr: string, nftId: string, chain: string) => {
       if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
          console.log('Missing NFT Port API Key')
          return
@@ -108,7 +110,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          return
       }
       fetch(
-         `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=ethereum`,
+         `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=${chain}`,
          {
             method: 'GET',
             headers: {
@@ -220,7 +222,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                </LinkElem>
             )}
             {metadata && (
-               <LinkElem2 to={`/nft/${nftContractAddr}/${nftId}`}>
+               <LinkElem2 to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
                   {imageUrl && (
                      <Image
                         src={imageUrl}

@@ -6,7 +6,7 @@ import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../helpers/date'
 import { MessageUIType } from '../../../../types/Message'
-import NFTMetadataType from '../../../../types/NFTMetadata'
+import NFTMetadataType from '../../../../types/NFTPort/NFTMetadata'
 import { useUnreadCount } from '../../../../context/UnreadCountProvider'
 import { Link } from 'react-router-dom'
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
@@ -244,7 +244,7 @@ const Message = ({
             <Box mb={1}>
                {metadata && (
                   <Link
-                     to={`/nft/${msg.nftAddr}/${msg.nftId}?recipient=${
+                     to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${
                         msg.toAddr === account ? msg.fromAddr : msg.toAddr
                      }`}
                      style={{ textDecoration: 'none' }}
