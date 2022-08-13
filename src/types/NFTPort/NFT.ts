@@ -48,14 +48,29 @@ export interface NFTPortNFT {
 export function nftPortToGeneralNFTType(data: NFTPortNFT) : GeneralNFT {
    return {
      name: data?.name,
-     image: data?.metadata?.image,
+     image: data?.cached_file_url || data?.metadata?.image,
      description: data?.metadata?.description,
      token_id: data?.token_id,
      attributes: data?.metadata?.attributes,
      collection: {
       name: data?.name,
-      image: data?.metadata?.image,
+      image: data?.cached_file_url || data?.metadata?.image,
       contract_address: data?.contract_address
+     }
+   }
+ }
+
+ export function nftPortResponseToGeneralNFTType(data: NFTPortNFTResponse) : GeneralNFT {
+   return {
+     name: data?.nfts?.[0]?.name,
+     image: data?.nfts?.[0]?.cached_file_url || data?.nfts?.[0]?.metadata?.image,
+     description: data?.nfts?.[0]?.metadata?.description,
+     token_id: data?.nfts?.[0]?.token_id,
+     attributes: data?.nfts?.[0]?.metadata?.attributes,
+     collection: {
+      name: data?.nfts?.[0]?.name,
+      image: data?.nfts?.[0]?.cached_file_url || data?.nfts?.[0]?.metadata?.image,
+      contract_address: data?.nfts?.[0]?.contract_address
      }
    }
  }

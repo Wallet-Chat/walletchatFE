@@ -32,7 +32,6 @@ import { useParams } from 'react-router-dom'
 import NFTGroupChat from './components/NFTGroupChat'
 import NFTTweets from './components/NFTTweets'
 import NFTStatisticsType from '../../types/NFTPort/NFTStatistics'
-import NFTContractType from '../../types/NFTContract'
 import { useHover } from '../../helpers/useHover'
 import IconEtherscan from '../../images/icon-etherscan-mono.svg'
 import IconDiscord from '../../images/icon-discord.svg'
@@ -40,12 +39,14 @@ import IconPolygon from '../../images/icon-polygon.svg'
 import IconEthereum from '../../images/icon-ethereum.svg'
 import { nFormatter } from '../../helpers/number'
 import { convertIpfsUriToUrl } from '../../helpers/ipfs'
-import NFTPortNFT from '../../types/NFTPort/NFT'
+import OpenSeaNFTCollection, { openseaToGeneralNFTCollectionType } from '../../types/OpenSea/NFTCollection'
+import NFTPortNFTCollection, { nftPortToGeneralNFTCollectionType } from '../../types/NFTPort/NFTCollection'
+import NFTCollection from '../../types/NFTCollection'
 
 const NFT = ({ account }: { account: string }) => {
    let { nftContractAddr = '', chain = '' } = useParams()
 
-   const [nftData, setNftData] = useState<NFTContractType>()
+   const [nftData, setNftData] = useState<NFTCollection>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
    // const [ethereumPrice, setEthereumPrice] = useState<number>()
    const [joined, setJoined] = useState<boolean | null>(null)
@@ -193,13 +194,13 @@ const NFT = ({ account }: { account: string }) => {
             }
          )
             .then((response) => response.json())
-            .then((result: NFTContractType) => {
-               if (result?.collection.name) {
-                  console.log(`✅[GET][NFT Contract]:`, result)
-                  setNftData(result)
+            .then((result: OpenSeaNFTCollection) => {
+               if (result?.collection?.name) {
+                  console.log(`✅[GET][NFT]:`, result)
+                  setNftData(openseaToGeneralNFTCollectionType(result))
                }
             })
-            .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
+            .catch((error) => console.log(`🚨[GET][NFT]:`, error))
       } else if (chain === 'polygon') {
          if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
             console.log('Missing NFT Port API Key')
@@ -215,33 +216,15 @@ const NFT = ({ account }: { account: string }) => {
             }
          )
             .then((response) => response.json())
-            .then((result: NFTPortNFT) => {
-               console.log('✅[GET][NFT Metadata]:', result)
-
-               let url =
-                  result?.contract?.metadata?.cached_thumbnail_url ||
-                  (result?.nfts && result.nfts[0]?.cached_file_url) ||
-                  ''
-               if (url?.includes('ipfs://')) {
-                  url = convertIpfsUriToUrl(url)
-               }
-               let _contractAddr =
-                  (result?.nfts && result.nfts[0].contract_address) || ''
-
-               const _data: NFTContractType = {
-                  collection: {
-                     image_url: url,
-                     name:
-                        result?.contract?.name ||
-                        (result?.nfts && result.nfts[0]?.metadata?.name) ||
-                        '',
-                  },
-                  address: _contractAddr,
-               }
-
-               setNftData(_data)
+            .then((result: NFTPortNFTCollection) => {
+               console.log('✅[GET][NFT]:', result)
+               const _transformed = nftPortToGeneralNFTCollectionType(result)
+               setNftData({
+                  ..._transformed,
+                  image_url: _transformed?.image_url?.includes('ipfs://') ? convertIpfsUriToUrl(_transformed?.image_url) : _transformed?.image_url,
+               })
             })
-            .catch((error) => console.log('error', error))
+            .catch((error) => console.log(`🚨[GET][NFT]:`, error))
       }
    }
 
@@ -278,9 +261,9 @@ const NFT = ({ account }: { account: string }) => {
       <Flex flexDirection="column" background="white" height="100vh" flex="1">
          <Flex alignItems="center" px={5} pt={4} pb={2}>
             <Flex alignItems="flex-start" p={2} borderRadius="md">
-               {nftData?.collection.image_url && (
+               {nftData?.image_url && (
                   <Image
-                     src={nftData.collection.image_url}
+                     src={nftData.image_url}
                      alt=""
                      height="60px"
                      borderRadius="var(--chakra-radii-xl)"
@@ -288,7 +271,7 @@ const NFT = ({ account }: { account: string }) => {
                   />
                )}
                <Box>
-                  {nftData?.collection?.name && (
+                  {nftData?.name && (
                      <Flex alignItems="center">
                         <Heading
                            size="md"
@@ -298,7 +281,7 @@ const NFT = ({ account }: { account: string }) => {
                            textOverflow="ellipsis"
                            whiteSpace="nowrap"
                         >
-                           {nftData.collection.name}
+                           {nftData.name}
                         </Heading>
                         <Tooltip label="OpenSea Verified">
                            <Box>
@@ -435,10 +418,10 @@ const NFT = ({ account }: { account: string }) => {
                            />
                         </Tooltip>
                      )}
-                     {nftData?.collection?.external_url && (
+                     {nftData?.external_url && (
                         <Tooltip label="Visit website">
                            <Link
-                              href={nftData.collection.external_url}
+                              href={nftData.external_url}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
@@ -451,10 +434,10 @@ const NFT = ({ account }: { account: string }) => {
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.collection?.discord_url && (
+                     {nftData?.discord_url && (
                         <Tooltip label="Discord">
                            <Link
-                              href={nftData.collection.discord_url}
+                              href={nftData.discord_url}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
@@ -469,10 +452,10 @@ const NFT = ({ account }: { account: string }) => {
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.collection?.twitter_username && (
+                     {nftData?.twitter_username && (
                         <Tooltip label="Twitter">
                            <Link
-                              href={`https://twitter.com/${nftData.collection.twitter_username}`}
+                              href={`https://twitter.com/${nftData.twitter_username}`}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
@@ -486,10 +469,10 @@ const NFT = ({ account }: { account: string }) => {
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.address && (
+                     {nftData?.contract_address && (
                         <Tooltip label="Etherscan">
                            <Link
-                              href={`https://etherscan.io/address/${nftData.address}`}
+                              href={`https://etherscan.io/address/${nftData.contract_address}`}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
@@ -505,10 +488,10 @@ const NFT = ({ account }: { account: string }) => {
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.collection?.medium_username && (
+                     {nftData?.medium_username && (
                         <Tooltip label="Medium">
                            <Link
-                              href={`https://medium.com/${nftData.collection.medium_username}`}
+                              href={`https://medium.com/${nftData.medium_username}`}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"

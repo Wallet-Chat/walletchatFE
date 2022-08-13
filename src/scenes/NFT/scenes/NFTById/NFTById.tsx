@@ -227,8 +227,8 @@ const NFTById = ({
             })
             .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
       } else if (chain === 'polygon') {
-         if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-            console.log('Missing NFT Port API Key')
+         if (process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
+            console.log('Missing Alchemy API Key')
             return
          }
          fetch(
