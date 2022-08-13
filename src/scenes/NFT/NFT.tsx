@@ -36,6 +36,8 @@ import NFTContractType from '../../types/NFTContract'
 import { useHover } from '../../helpers/useHover'
 import IconEtherscan from '../../images/icon-etherscan-mono.svg'
 import IconDiscord from '../../images/icon-discord.svg'
+import IconPolygon from '../../images/icon-polygon.svg'
+import IconEthereum from '../../images/icon-ethereum.svg'
 import { nFormatter } from '../../helpers/number'
 import { convertIpfsUriToUrl } from '../../helpers/ipfs'
 import NFTMetadataType from '../../types/NFTPort/NFTMetadata'
@@ -350,74 +352,102 @@ const NFT = ({ account }: { account: string }) => {
                   )}
 
                   {nftStatistics && (
-                     <Box
+                     <HStack
+                        d="inline-block"
                         px={4}
                         pt={2}
                         my={1}
                         border="1px solid var(--chakra-colors-lightgray-300)"
                         borderRadius="md"
                      >
-                        <HStack>
-                           {/* <Stat flex="0">
-                         <StatNumber fontSize="md" color="darkgray.700">
-                            {nftStatistics.total_supply}
-                         </StatNumber>
-                         <StatHelpText color="darkgray.200">Items</StatHelpText>
-                      </Stat>
-                      <Divider orientation="vertical" height="15px" /> */}
-                           <Stat flex="0">
-                              <StatNumber fontSize="md" color="darkgray.700">
-                                 {nFormatter(nftStatistics.num_owners, 1)}
-                              </StatNumber>
-                              <StatHelpText
-                                 color="darkgray.200"
-                                 whiteSpace="nowrap"
-                              >
-                                 Owners
-                              </StatHelpText>
-                           </Stat>
-                           <Divider orientation="vertical" height="15px" />
-                           <Stat flex="0">
-                              <StatNumber
-                                 fontSize="md"
-                                 color="darkgray.700"
-                                 d="flex"
-                                 alignItems="center"
-                              >
-                                 {nftStatistics.floor_price < 0.01
-                                    ? '<0.01'
-                                    : nftStatistics.floor_price.toFixed(2)}
-                                 <IconCurrencyEthereum size="18" />
-                              </StatNumber>
-                              <StatHelpText
-                                 color="darkgray.200"
-                                 whiteSpace="nowrap"
-                              >
-                                 Floor
-                              </StatHelpText>
-                           </Stat>
-                           <Divider orientation="vertical" height="15px" />
-                           <Stat flex="0">
-                              <StatNumber
-                                 fontSize="md"
-                                 color="darkgray.700"
-                                 d="flex"
-                                 alignItems="center"
-                              >
-                                 {nFormatter(nftStatistics.total_volume, 1)}
-                                 <IconCurrencyEthereum size="18" />
-                              </StatNumber>
-                              <StatHelpText
-                                 color="darkgray.200"
-                                 whiteSpace="nowrap"
-                              >
-                                 Total Vol.
-                              </StatHelpText>
-                           </Stat>
-                        </HStack>
-                     </Box>
+                        <Stat d="inline-block" verticalAlign="middle">
+                           <StatNumber fontSize="md" color="darkgray.700">
+                              {nFormatter(nftStatistics.num_owners, 1)}
+                           </StatNumber>
+                           <StatHelpText
+                              color="darkgray.200"
+                              whiteSpace="nowrap"
+                           >
+                              Owners
+                           </StatHelpText>
+                        </Stat>
+                        <Divider
+                           orientation="vertical"
+                           height="15px"
+                           d="inline-block"
+                           verticalAlign="middle"
+                        />
+                        <Stat d="inline-block" verticalAlign="middle">
+                           <StatNumber
+                              fontSize="md"
+                              color="darkgray.700"
+                              d="flex"
+                              alignItems="center"
+                           >
+                              {nftStatistics.floor_price < 0.01
+                                 ? '<0.01'
+                                 : nftStatistics.floor_price.toFixed(2)}
+                              <IconCurrencyEthereum size="18" />
+                           </StatNumber>
+                           <StatHelpText
+                              color="darkgray.200"
+                              whiteSpace="nowrap"
+                           >
+                              Floor
+                           </StatHelpText>
+                        </Stat>
+                        <Divider
+                           orientation="vertical"
+                           height="15px"
+                           d="inline-block"
+                           verticalAlign="middle"
+                        />
+                        <Stat d="inline-block" verticalAlign="middle">
+                           <StatNumber
+                              fontSize="md"
+                              color="darkgray.700"
+                              d="flex"
+                              alignItems="center"
+                           >
+                              {nFormatter(nftStatistics.total_volume, 1)}
+                              <IconCurrencyEthereum size="18" />
+                           </StatNumber>
+                           <StatHelpText
+                              color="darkgray.200"
+                              whiteSpace="nowrap"
+                           >
+                              Total Vol.
+                           </StatHelpText>
+                        </Stat>
+                     </HStack>
                   )}
                   <Box mb={2}>
+                     {chain === 'ethereum' && (
+                        <Tooltip label="Ethereum chain">
+                           <Image
+                              src={IconEthereum}
+                              alt="Ethereum chain"
+                              width="24px"
+                              height="24px"
+                              d="inline-block"
+                              verticalAlign="middle"
+                              p={0.5}
+                           />
+                        </Tooltip>
+                     )}
+                     {chain === 'polygon' && (
+                        <Tooltip label="Polygon chain">
+                           <Image
+                              src={IconPolygon}
+                              alt="Polygon chain"
+                              width="24px"
+                              height="24px"
+                              d="inline-block"
+                              verticalAlign="middle"
+                              p={0.5}
+                           />
+                        </Tooltip>
+                     )}
                      {nftData?.collection?.external_url && (
                         <Tooltip label="Visit website">
                            <Link

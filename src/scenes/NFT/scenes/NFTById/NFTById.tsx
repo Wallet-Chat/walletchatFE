@@ -2,15 +2,10 @@ import {
    Badge,
    Box,
    Button,
-   Divider,
    Flex,
    Heading,
-   HStack,
    Link as CLink,
    Image,
-   Stat,
-   StatHelpText,
-   StatNumber,
    Tab,
    TabList,
    TabPanel,
@@ -29,12 +24,14 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 
 import NFTGroupChat from '../../components/NFTGroupChat'
 import NFTChat from '../../components/NFTChat'
-// import NFTComments from './scenes/NFTComments'
 import NFTTweets from '../../components/NFTTweets'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import NFTStatisticsType from '../../../../types/NFTStatistics'
 import NFTOwnerAddressType from '../../../../types/NFTOwnerAddressType'
 import NFTAssetType from '../../../../types/NFTAsset'
+import IconPolygon from "../../../../images/icon-polygon.svg"
+import IconEthereum from "../../../../images/icon-ethereum.svg"
+import { capitalizeFirstLetter } from '../../../../helpers/text'
 
 const tokenType = 'erc721'
 
@@ -56,7 +53,6 @@ const NFT = ({
          : searchParams.get('recipient')
 
    const [unreadCount, setUnreadCount] = useState<number>(0)
-   const [unreadCommentsCount, setUnreadCommentsCount] = useState<number>(0)
    const [tweetCount, setTweetCount] = useState<number>(0)
 
    useEffect(() => {
@@ -78,12 +74,10 @@ const NFT = ({
 
    useEffect(() => {
       getUnreadDMCount()
-      getUnreadCommentCount()
       getTweetCount()
 
       const interval = setInterval(() => {
          getUnreadDMCount()
-         getUnreadCommentCount()
          // getTweetCount()
       }, 5000) // every 5s
 
@@ -152,28 +146,6 @@ const NFT = ({
          .catch((error) => {
             console.error('🚨 [POST][NFT][Delete Bookmark]:', error)
          })
-   }
-
-   const getUnreadCommentCount = () => {
-      if (account) {
-         fetch(
-            ` ${process.env.REACT_APP_REST_API}/get_comments_cnt/${nftContractAddr}/${nftId}`,
-            {
-               method: 'GET',
-               headers: {
-                  'Content-Type': 'application/json',
-               },
-            }
-         )
-            .then((response) => response.json())
-            .then((count: number) => {
-               console.log('✅[GET][NFT][No. of unread comments]:', count)
-               setUnreadCommentsCount(count)
-            })
-            .catch((error) => {
-               console.error('🚨[GET][NFT][No. of unread comments]:', error)
-            })
-      }
    }
 
    const getTweetCount = () => {
@@ -324,6 +296,18 @@ const NFT = ({
                         </CLink>
                      )}
                      {nftStatistics && (
+                        <Tooltip label={`${chain && capitalizeFirstLetter(chain)} chain`}>
+                           <Badge d="flex" alignItems="center" mr={2} fontSize="sm">
+                           {chain === 'ethereum' && (
+                                 <Image src={IconEthereum} alt="Ethereum chain" width="18px" height="18px" d="inline-block" verticalAlign="middle" p={0.5} />
+                           )}
+                           {chain === 'polygon' && (
+                                 <Image src={IconPolygon} alt="Polygon chain" width="18px" height="18px" d="inline-block" verticalAlign="middle" p={0.5} />
+                           )}
+                           </Badge>
+                        </Tooltip>
+                     )}
+                     {nftStatistics && (
                         <Tooltip label="Floor price">
                            <Badge d="flex" alignItems="center" mr={2} fontSize="sm">
                               {nftStatistics.floor_price}
@@ -416,16 +400,6 @@ const NFT = ({
                      </Text>
                   </Box>
                </Tab>
-               {/* <Tab>
-                  Comments{' '}
-                  {unreadCommentsCount && unreadCommentsCount !== 0 ? (
-                     <Badge variant="black" ml={1}>
-                        {unreadCommentsCount}
-                     </Badge>
-                  ) : (
-                     <></>
-                  )}
-               </Tab> */}
             </TabList>
 
             <TabPanels

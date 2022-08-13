@@ -1,12 +1,15 @@
-import { Box, Flex, Image } from '@chakra-ui/react'
+import { Box, Flex, Image, Tooltip } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
+
 import { formatInboxDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import NFTContractType from '../../../../types/NFTContract'
 import { InboxItemType } from '../../../../types/InboxItem'
+import IconPolygon from "../../../../images/icon-polygon.svg"
+import IconEthereum from "../../../../images/icon-ethereum.svg"
 
 const Wrapper = styled.button`
    display: block;
@@ -40,8 +43,19 @@ const RecipientAddress = styled.div`
    text-overflow: ellipsis;
 `
 const BlockieWrapper = styled.div`
+   position: relative;
    border-radius: 0.3rem;
    overflow: hidden;
+`
+const ChainImage = styled.div`
+   position: absolute;
+   bottom: 0;
+   right: 0;
+   width: 1rem;
+   height: 1rem;
+   background: rgba(255, 255, 255, 0.8);
+   padding: var(--chakra-space-0-5);
+   border-radius: var(--chakra-radii-sm);
 `
 const NotificationCount = styled.div`
    display: inline-block;
@@ -95,7 +109,20 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                <Flex>
                   <Box mr={2} flexShrink={0}>
                      <BlockieWrapper>
-
+                        {data?.chain === "ethereum" && (
+                           <Tooltip label="Ethereum chain">
+                              <ChainImage>
+                                 <Image src={IconEthereum} alt="Ethereum chain" width="100%" height="100%" />
+                              </ChainImage>
+                           </Tooltip>
+                        )}
+                        {data?.chain === "polygon" && (
+                           <Tooltip label="Polygon chain">
+                              <ChainImage>
+                                 <Image src={IconPolygon} alt="Polygon chain"  width="100%" height="100%" />
+                              </ChainImage>
+                           </Tooltip>
+                        )}
                         {data.nftaddr &&
                            (nft?.collection.image_url ? (
                               <Image

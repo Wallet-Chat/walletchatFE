@@ -12,6 +12,7 @@ export interface InboxItemType {
     fromaddr?: string
     toaddr?: string
     sender_name?: string
+    chain?: string
 
     nftaddr?: string | null,
     nftid?: string | null,

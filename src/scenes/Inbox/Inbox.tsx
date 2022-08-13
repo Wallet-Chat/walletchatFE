@@ -93,7 +93,6 @@ const Inbox = ({
       })
          .then((response) => response.json())
          .then((data: InboxItemType[]) => {
-            console.log('✅[GET][Inbox]:', data)
             if (data === null) {
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
