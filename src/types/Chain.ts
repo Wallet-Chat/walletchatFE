@@ -1,4 +1,4 @@
-export default interface ChainType {
+export default interface Chain {
     symbol: string
     name: string
     slug: string
@@ -8,5 +8,5 @@ export default interface ChainType {
   }
  
   export interface ChainObjectType {
-    [chainId: string]: ChainType
+    [chainId: string]: Chain
   }

@@ -96,7 +96,7 @@ const Inbox = ({
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data)
-               setInboxData(data)
+               setInboxData(data.filter(d => !(d.context_type === "nft" && d.chain === "none")))
                localStorage.setItem('inbox', JSON.stringify(data))
             }
             setIsFetchingInboxData(false)

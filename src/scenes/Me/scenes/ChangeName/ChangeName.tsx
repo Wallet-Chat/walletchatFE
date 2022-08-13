@@ -13,8 +13,8 @@ import {
  import { useForm } from 'react-hook-form'
  import { IconSend } from '@tabler/icons'
  import { useWallet } from '../../../../context/WalletProvider'
- import { NFTMetadataOpenSeaType } from '../../../../types/NFTPort/NFTMetadata'
- 
+import OpenSeaNFT from '../../../../types/OpenSea/NFT'
+
  const ChangeName = () => {
     const {
        handleSubmit,
@@ -27,7 +27,7 @@ import {
  
     const [name, setName] = useState('')
     const [isFetching, setIsFetching] = useState(false)
-    const [ownedENS, setOwnedENS] = useState<NFTMetadataOpenSeaType[]>([])
+    const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
  
     useEffect(() => {
        const getOwnedENS = () => {
@@ -128,7 +128,7 @@ import {
                          <Button
                             variant="outline"
                             key={i}
-                            onClick={() => setName(item.name)}
+                            onClick={() => item?.name && setName(item.name)}
                             mr="2"
                             mb="2"
                             size="sm"

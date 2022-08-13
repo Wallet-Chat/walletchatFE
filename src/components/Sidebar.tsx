@@ -37,7 +37,7 @@ import IconFeedback from '../images/icon-feedback.svg'
 import IconDiscord from '../images/icon-discord.svg'
 import logoThumb from '../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../helpers/contract'
-import NFTMetadataType from '../types/NFTPort/NFTMetadata'
+import NFTPortNFT from '../types/NFTPort/NFT'
 import animatedPlaceholder from '../images/animated-placeholder.gif'
 import { useWallet } from '../context/WalletProvider'
 import { truncateAddress } from '../helpers/truncateString'
@@ -54,7 +54,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
    const [nftContractAddr, setNftContractAddr] = useState<string>()
    const [nftId, setNftId] = useState<string>()
    const [chainName, setChainName] = useState("ethereum")
-   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
 
    const { isMobileView } = useIsMobileView()
@@ -119,7 +119,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
          }
       )
          .then((response) => response.json())
-         .then((result: NFTMetadataType) => {
+         .then((result: NFTPortNFT) => {
             console.log('✅[GET][NFT Metadata]:', result)
 
             setNftData(result)

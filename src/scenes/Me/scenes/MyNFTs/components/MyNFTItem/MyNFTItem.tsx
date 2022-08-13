@@ -2,15 +2,18 @@ import { Box, Button, Image, Text, Link, Flex, Tooltip } from '@chakra-ui/react'
 import { IconArrowNarrowRight } from '@tabler/icons'
 import { Link as RLink } from 'react-router-dom'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
-import NFTPortNFT from '../../../../../../types/NFTPortNFT'
+import NFT from '../../../../../../types/NFT'
 import IconEtherscan from '../../../../../../images/icon-etherscan-mono.svg'
 import { chains } from '../../../../../../constants'
 
-export default function MyNFTItem({ nft }: { nft: NFTPortNFT }) {
-   const chain = chains[nft.chain_id]
-   const blockExplorerUrl = nft.chain_id && chain?.block_explorer_url
-   const chainLogo = chain?.logo
-   const chainName = chain?.name
+export default function MyNFTItem({ nft }: { nft: NFT }) {
+   let chain, blockExplorerUrl, chainLogo, chainName
+   if (nft?.chain_id) {
+      chain = chains[nft.chain_id]
+      blockExplorerUrl = nft.chain_id && chain?.block_explorer_url
+      chainLogo = chain?.logo
+      chainName = chain?.name
+   }
 
    return (
       <Flex
@@ -21,9 +24,9 @@ export default function MyNFTItem({ nft }: { nft: NFTPortNFT }) {
          width="300px"
          maxW="100%"
       >
-         {nft.file_url ? (
+         {nft?.image ? (
             <Image
-               src={`${nft.file_url}`}
+               src={`${nft.image}`}
                alt=""
                width="100px"
                maxW="100%"
@@ -47,13 +50,19 @@ export default function MyNFTItem({ nft }: { nft: NFTPortNFT }) {
             ></Box>
          )}
          <Box p={3} overflow="hidden">
-            <Text fontSize="md" fontWeight="bold" textOverflow="ellipsis" whiteSpace="nowrap" overflow="hidden">
+            <Text
+               fontSize="md"
+               fontWeight="bold"
+               textOverflow="ellipsis"
+               whiteSpace="nowrap"
+               overflow="hidden"
+            >
                {nft.name}
             </Text>
             <Box mb={2}>
-               {nft.chain_id && (
+               {nft.chain_id && nft?.collection?.contract_address && (
                   <Link
-                     href={`${blockExplorerUrl}${nft.contract_address}`}
+                     href={`${blockExplorerUrl}${nft.collection.contract_address}`}
                      target="_blank"
                   >
                      <Flex alignItems="center">
@@ -78,15 +87,16 @@ export default function MyNFTItem({ nft }: { nft: NFTPortNFT }) {
                            alt=""
                         />
                         <Box verticalAlign="middle" fontSize="sm">
-                           {truncateAddress(nft.contract_address)}
+                           {nft?.collection?.contract_address &&
+                              truncateAddress(nft.collection.contract_address)}
                         </Box>
                      </Flex>
                   </Link>
                )}
             </Box>
-            {chain?.slug && (
+            {chain?.slug && nft?.collection?.contract_address && (
                <RLink
-                  to={`/nft/${chain.slug}/${nft.contract_address}`}
+                  to={`/nft/${chain.slug}/${nft.collection.contract_address}`}
                   style={{ textDecoration: 'none' }}
                >
                   <Button variant="outline" size="sm" width="100%">

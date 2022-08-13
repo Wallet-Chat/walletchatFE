@@ -6,7 +6,7 @@ import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../helpers/date'
 import { MessageUIType } from '../../../../types/Message'
-import NFTMetadataType from '../../../../types/NFTPort/NFTMetadata'
+import NFTPortNFT from '../../../../types/NFTPort/NFT'
 import { useUnreadCount } from '../../../../context/UnreadCountProvider'
 import { Link } from 'react-router-dom'
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
@@ -120,7 +120,7 @@ const Message = ({
    updateRead: (data: MessageUIType) => void
 }) => {
    let { unreadCount, setUnreadCount } = useUnreadCount()
-   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
 
    const { metadata } = nftData?.nft || {}
@@ -192,7 +192,7 @@ const Message = ({
          }
       )
          .then((response) => response.json())
-         .then((result: NFTMetadataType) => {
+         .then((result: NFTPortNFT) => {
             console.log('✅[GET][NFT Metadata]:', result)
 
             setNftData(result)

@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
-import { NFTMetadataOpenSeaType } from '../../../../types/NFTPort/NFTMetadata'
+import OpenSeaNFT from '../../../../types/OpenSea/NFT'
 
 const EnterName = ({ account }: { account: string }) => {
    const {
@@ -28,13 +28,16 @@ const EnterName = ({ account }: { account: string }) => {
 
    const [name, setName] = useState('')
    const [isFetching, setIsFetching] = useState(false)
-   const [ownedENS, setOwnedENS] = useState<NFTMetadataOpenSeaType[]>([])
+   const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
 
    useEffect(() => {
       const getOwnedENS = () => {
          if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
             console.log('Missing OpenSea API Key')
             return
+         }
+         if (account) {
+            console.log('No account detected')
          }
          fetch(
             `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
@@ -120,12 +123,12 @@ const EnterName = ({ account }: { account: string }) => {
                </Flex>
                {ownedENS.length > 0 && (
                <Box mt={2}>
-                  {ownedENS.map((item, i) =>
-                     (item?.name && item.name !== "Unknown ENS name") ? (
+                  {ownedENS.map((item:OpenSeaNFT, i) =>
+                     (item?.name && item?.name !== "Unknown ENS name") ? (
                         <Button
                            variant="outline"
                            key={i}
-                           onClick={() => setName(item.name)}
+                           onClick={() => item?.name && setName(item?.name)}
                            mr="2"
                            mb="2"
                            size="sm"

@@ -1,13 +1,18 @@
 import { Box, Flex, Heading, Spinner } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
-import NFTPortNFT from '../../../../types/NFTPortNFT'
+
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
 import MyNFTItem from './components/MyNFTItem'
-import NFTAssetType from '../../../../types/NFTAsset'
+import { NFTPortNFT } from '../../../../types/NFTPort/NFT'
+import OpenSeaNFT, {
+   openseaToGeneralNFTType,
+} from '../../../../types/OpenSea/NFT'
+import NFT from '../../../../types/NFT'
+import { nftPortToGeneralNFTType } from '../../../../types/NFTPort/NFT'
 
 export default function MyNFTs({ account }: { account: string }) {
-   const [nfts, setNfts] = useState<NFTPortNFT[]>([])
+   const [nfts, setNfts] = useState<NFT[]>([])
    const [isFetching, setIsFetching] = useState(true)
 
    useEffect(() => {
@@ -37,44 +42,48 @@ export default function MyNFTs({ account }: { account: string }) {
                   },
                }
             ).then((res) => res.json()),
-            fetch(
-               `https://api.opensea.io/api/v1/assets?owner=${account}`,
-               {
-                  method: 'GET',
-                  headers: {
-                     Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
-                  },
-               }
-            ).then((res) => res.json()),
+            fetch(`https://api.opensea.io/api/v1/assets?owner=${account}`, {
+               method: 'GET',
+               headers: {
+                  Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+               },
+            }).then((res) => res.json()),
          ])
             .then(([polygonData, ethereumData]) => {
-               console.log(`✅[GET][NFTs] ${account}:`, polygonData, ethereumData)
-               let transformed: NFTPortNFT[] = []
+               console.log(
+                  `✅[GET][NFTs] ${account}:`,
+                  polygonData,
+                  ethereumData
+               )
+               let transformed: NFT[] = []
                if (polygonData?.nfts?.length > 0) {
                   transformed = polygonData.nfts
                      .filter((nft: NFTPortNFT) => nft.name || nft.file_url)
-                     .map((nft: NFTPortNFT) => ({
-                        ...nft,
-                        chain_id: '137',
-                        file_url: nft.file_url.includes('ipfs://')
-                           ? convertIpfsUriToUrl(nft.file_url)
-                           : nft.file_url,
-                     }))
-                  
+                     .map((nft: NFTPortNFT) => {
+                        const _nft = nftPortToGeneralNFTType(nft)
+                        return {
+                           ..._nft,
+                           chain_id: '137',
+                           image: _nft?.image?.includes('ipfs://')
+                              ? convertIpfsUriToUrl(_nft.image)
+                              : _nft.image,
+                        }
+                     })
                }
                if (ethereumData?.assets?.length > 0) {
-                transformed = transformed.concat(ethereumData.assets
-                   .filter((nft: NFTAssetType) => nft.name || nft.image_url)
-                   .map((nft: NFTAssetType) => ({
-                      ...nft,
-                      contract_address: nft?.asset_contract?.address,
-                      chain_id: '1',
-                      file_url: nft.image_url.includes('ipfs://')
-                         ? convertIpfsUriToUrl(nft.image_url)
-                         : nft.image_url,
-                   })))
-             }
-             setNfts(transformed)
+                  transformed = transformed.concat(
+                     ethereumData.assets
+                        .filter((nft: OpenSeaNFT) => nft.name || nft.image_url)
+                        .map((nft: OpenSeaNFT) => {
+                           const _nft = openseaToGeneralNFTType(nft)
+                           return {
+                              ..._nft,
+                              chain_id: '1',
+                           }
+                        })
+                  )
+               }
+               setNfts(transformed)
             })
             .catch((error) => console.log(`🚨[GET][NFTs] ${account}`, error))
             .then(() => {
@@ -98,15 +107,17 @@ export default function MyNFTs({ account }: { account: string }) {
          overflowY="auto"
          className="custom-scrollbar"
       >
-        <Box px={4} py={6} background="white">
-        <Heading size="xl" mb={5}>My NFTs</Heading>
-         <Flex wrap="wrap" >
-            {nfts.map((nft, i) => (
-               <Box mb={4} mr={4} key={i}>
-                  <MyNFTItem key={i} nft={nft} />
-               </Box>
-            ))}
-         </Flex>
+         <Box px={4} py={6} background="white">
+            <Heading size="xl" mb={5}>
+               My NFTs
+            </Heading>
+            <Flex wrap="wrap">
+               {nfts.map((nft, i) => (
+                  <Box mb={4} mr={4} key={i}>
+                     <MyNFTItem key={i} nft={nft} />
+                  </Box>
+               ))}
+            </Flex>
          </Box>
       </Box>
    )

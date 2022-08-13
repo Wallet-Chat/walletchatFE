@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { convertIpfsUriToUrl } from '../helpers/ipfs'
 
-import NFTMetadataType from '../types/NFTPort/NFTMetadata'
+import NFTPortNFT from '../types/NFTPort/NFT'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -55,7 +55,7 @@ const Sidebar = ({
    nftId: string
 }) => {
    const nftNotificationCount = 0
-   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
 
    const { metadata } = nftData?.nft || {}
@@ -85,7 +85,7 @@ const Sidebar = ({
          }
       )
          .then((response) => response.json())
-         .then((result: NFTMetadataType) => {
+         .then((result: NFTPortNFT) => {
             console.log('✅[GET][NFT Metadata]:', result)
 
             setNftData(result)

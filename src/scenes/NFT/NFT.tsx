@@ -31,7 +31,7 @@ import { useParams } from 'react-router-dom'
 
 import NFTGroupChat from './components/NFTGroupChat'
 import NFTTweets from './components/NFTTweets'
-import NFTStatisticsType from '../../types/NFTStatistics'
+import NFTStatisticsType from '../../types/NFTPort/NFTStatistics'
 import NFTContractType from '../../types/NFTContract'
 import { useHover } from '../../helpers/useHover'
 import IconEtherscan from '../../images/icon-etherscan-mono.svg'
@@ -40,7 +40,7 @@ import IconPolygon from '../../images/icon-polygon.svg'
 import IconEthereum from '../../images/icon-ethereum.svg'
 import { nFormatter } from '../../helpers/number'
 import { convertIpfsUriToUrl } from '../../helpers/ipfs'
-import NFTMetadataType from '../../types/NFTPort/NFTMetadata'
+import NFTPortNFT from '../../types/NFTPort/NFT'
 
 const NFT = ({ account }: { account: string }) => {
    let { nftContractAddr = '', chain = '' } = useParams()
@@ -162,8 +162,10 @@ const NFT = ({ account }: { account: string }) => {
          )
             .then((response) => response.json())
             .then((count: number) => {
-               console.log('✅[GET][NFT][No. of tweets]:', count)
-               setTweetCount(count)
+               if (count !== tweetCount) {
+                  console.log('✅[GET][NFT][No. of tweets]:', count)
+                  setTweetCount(count)
+               }
             })
             .catch((error) => {
                console.error('🚨[GET][NFT][No. of tweets]:', error)
@@ -199,7 +201,6 @@ const NFT = ({ account }: { account: string }) => {
             })
             .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
       } else if (chain === 'polygon') {
-         console.log('chain', chain === 'polygon')
          if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
             console.log('Missing NFT Port API Key')
             return
@@ -214,7 +215,7 @@ const NFT = ({ account }: { account: string }) => {
             }
          )
             .then((response) => response.json())
-            .then((result: NFTMetadataType) => {
+            .then((result: NFTPortNFT) => {
                console.log('✅[GET][NFT Metadata]:', result)
 
                let url =
