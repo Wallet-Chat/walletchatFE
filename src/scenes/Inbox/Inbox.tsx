@@ -6,7 +6,6 @@ import {
    SkeletonCircle,
    SkeletonText,
    Text,
-   Spinner,
    Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
@@ -18,7 +17,6 @@ import equal from 'fast-deep-equal/es6'
 
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
 // import { getIpfsData } from '../../services/ipfs'
-import { MessageType } from '../../types/Message'
 import { InboxItemType } from '../../types/InboxItem'
 // import { EncryptedMsgBlock } from '../../types/Message'
 import ConversationItem from './components/ConversationItem'
@@ -64,7 +62,7 @@ const Inbox = ({
       }, 5000) // every 5s
 
       return () => clearInterval(interval)
-   }, [inboxData])
+   }, [isAuthenticated, account, inboxData])
 
    useEffect(() => {
       getInboxData()
@@ -96,7 +94,7 @@ const Inbox = ({
             if (data === null) {
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
-            } else if (equal(inboxData, data) === false) {
+            } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data)
                setInboxData(data)
                localStorage.setItem('inbox', JSON.stringify(data))

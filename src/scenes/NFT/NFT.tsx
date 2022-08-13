@@ -273,20 +273,6 @@ const NFT = ({ account }: { account: string }) => {
          .catch((error) => console.log('error', error))
    }
 
-   //    const getEthereumPrice = () => {
-   //       fetch(`https://api.coinstats.app/public/v1/coins/ethereum?currency=USD`, {
-   //          method: 'GET',
-   //       })
-   //          .then((response) => response.json())
-   //          .then((result) => {
-   //             console.log('✅[GET][Ethereum Price]:', result)
-   //             if (result && result.coin && result.coin.id === 'ethereum') {
-   //                setEthereumPrice(result.coin.price)
-   //             }
-   //          })
-   //          .catch((error) => console.log('error', error))
-   //    }
-
    return (
       <Flex flexDirection="column" background="white" height="100vh" flex="1">
          <Flex alignItems="center" px={5} pt={4} pb={2}>

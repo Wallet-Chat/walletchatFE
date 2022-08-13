@@ -9,33 +9,13 @@ import {
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
-import styled from 'styled-components'
 import equal from 'fast-deep-equal/es6'
 
 import { getFormattedDate } from '../../../../helpers/date'
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
-
-
-const DottedBackground = styled.div`
-   flex-grow: 1;
-   width: 100%;
-   height: auto;
-   background: linear-gradient(
-            90deg,
-            var(--chakra-colors-lightgray-200) 14px,
-            transparent 1%
-         )
-         center,
-      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
-         center,
-      #9dadc3 !important;
-   background-size: 15px 15px !important;
-   background-position: top left !important;
-   padding: var(--chakra-space-1);
-   overflow-y: scroll;
-`
+import { DottedBackground } from '../../../../styled/DottedBackground'
 
 const NFTGroupChat = ({
    account,

@@ -2,16 +2,12 @@ import { Box, Flex, Text } from '@chakra-ui/react'
 import { IconExternalLink } from '@tabler/icons'
 import { Link } from 'react-router-dom'
 import Blockies from 'react-blockies'
-import styled from 'styled-components'
 
 import CommentType from '../../../../../../types/Comment'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { timeSince } from '../../../../../../helpers/date'
+import { BlockieWrapper } from '../../../../../../styled/BlockieWrapper'
 
-const BlockieWrapper = styled.div`
-   border-radius: var(--chakra-radii-md);
-   overflow: hidden;
-`
 
 const Comment = ({ data }: { data: CommentType }) => {
 

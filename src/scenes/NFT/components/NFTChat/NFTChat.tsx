@@ -19,30 +19,10 @@ import Message from './components/Message'
 import { MessageType, MessageUIType, SettingsType } from '../../../../types/Message'
 // import EncryptedMsgBlock from '../../../../types/Message'
 import { truncateAddress } from '../../../../helpers/truncateString'
+import { DottedBackground } from '../../../../styled/DottedBackground'
+import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
-const BlockieWrapper = styled.div`
-   border-radius: 0.3rem;
-   overflow: hidden;
-`
-const DottedBackground = styled.div`
-   flex-grow: 1;
-   width: 100%;
-   height: auto;
-   background: linear-gradient(
-            90deg,
-            var(--chakra-colors-lightgray-200) 14px,
-            transparent 1%
-         )
-         center,
-      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
-         center,
-      #9dadc3 !important;
-   background-size: 15px 15px !important;
-   background-position: top left !important;
-   padding: var(--chakra-space-1);
-   overflow-y: scroll;
-`
 
 const NFTChat = ({
    recipientAddr,

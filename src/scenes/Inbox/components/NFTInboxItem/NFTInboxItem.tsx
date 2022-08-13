@@ -1,74 +1,21 @@
 import { Box, Flex, Image, Tooltip } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
 import Blockies from 'react-blockies'
 
 import { formatInboxDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import NFTContractType from '../../../../types/NFTContract'
 import { InboxItemType } from '../../../../types/InboxItem'
-import IconPolygon from "../../../../images/icon-polygon.svg"
-import IconEthereum from "../../../../images/icon-ethereum.svg"
-
-const Wrapper = styled.button`
-   display: block;
-   width: 100%;
-   padding: var(--chakra-space-3) var(--chakra-space-5);
-   background: #fff;
-   text-align: left;
-   color: var(--chakra-colors-darkgray-900);
-
-   &:not(:last-child) {
-      border-bottom: 1px solid var(--chakra-colors-lightgray-300);
-   }
-
-   &:hover {
-      background: var(--chakra-colors-lightgray-300);
-   }
-
-   .timestamp {
-      display: block;
-      color: var(--chakra-colors-darkgray-300);
-      font-size: var(--chakra-fontSizes-md);
-      user-select: none;
-      line-height: 1.7;
-   }
-`
-const RecipientAddress = styled.div`
-   font-size: var(--chakra-fontSizes-lg);
-   font-weight: bold;
-   white-space: nowrap;
-   overflow: hidden;
-   text-overflow: ellipsis;
-`
-const BlockieWrapper = styled.div`
-   position: relative;
-   border-radius: 0.3rem;
-   overflow: hidden;
-`
-const ChainImage = styled.div`
-   position: absolute;
-   bottom: 0;
-   right: 0;
-   width: 1rem;
-   height: 1rem;
-   background: rgba(255, 255, 255, 0.8);
-   padding: var(--chakra-space-0-5);
-   border-radius: var(--chakra-radii-sm);
-`
-const NotificationCount = styled.div`
-   display: inline-block;
-   background: var(--chakra-colors-information-400);
-   border-radius: var(--chakra-radii-md);
-   height: 18px;
-   color: #fff;
-   font-weight: 700;
-   font-size: 90%;
-   text-align: center;
-   margin-left: auto;
-   padding: 0 var(--chakra-space-2);
-`
+import IconPolygon from '../../../../images/icon-polygon.svg'
+import IconEthereum from '../../../../images/icon-ethereum.svg'
+import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
+import {
+   InboxItemChainImage,
+   InboxItemNotificationCount,
+   InboxItemRecipientAddress,
+   InboxItemWrapper,
+} from '../../../../styled/InboxItem'
 
 const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    const [nft, setNft] = useState<NFTContractType>()
@@ -103,24 +50,37 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    if (isError) return <Box></Box>
 
    return (
-      <Link to={`/nft/ethereum/${data.nftaddr}`} style={{ textDecoration: 'none' }}>
-         <Wrapper>
+      <Link
+         to={`/nft/ethereum/${data.nftaddr}`}
+         style={{ textDecoration: 'none' }}
+      >
+         <InboxItemWrapper>
             <Flex justifyContent="space-between">
                <Flex>
                   <Box mr={2} flexShrink={0}>
                      <BlockieWrapper>
-                        {data?.chain === "ethereum" && (
+                        {data?.chain === 'ethereum' && (
                            <Tooltip label="Ethereum chain">
-                              <ChainImage>
-                                 <Image src={IconEthereum} alt="Ethereum chain" width="100%" height="100%" />
-                              </ChainImage>
+                              <InboxItemChainImage>
+                                 <Image
+                                    src={IconEthereum}
+                                    alt="Ethereum chain"
+                                    width="100%"
+                                    height="100%"
+                                 />
+                              </InboxItemChainImage>
                            </Tooltip>
                         )}
-                        {data?.chain === "polygon" && (
+                        {data?.chain === 'polygon' && (
                            <Tooltip label="Polygon chain">
-                              <ChainImage>
-                                 <Image src={IconPolygon} alt="Polygon chain"  width="100%" height="100%" />
-                              </ChainImage>
+                              <InboxItemChainImage>
+                                 <Image
+                                    src={IconPolygon}
+                                    alt="Polygon chain"
+                                    width="100%"
+                                    height="100%"
+                                 />
+                              </InboxItemChainImage>
                            </Tooltip>
                         )}
                         {data.nftaddr &&
@@ -137,11 +97,11 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                   </Box>
                   <Box minWidth="0">
                      {data.nftaddr && (
-                        <RecipientAddress>
+                        <InboxItemRecipientAddress>
                            {nft?.collection.name
                               ? nft.collection.name
                               : truncateAddress(data.nftaddr)}
-                        </RecipientAddress>
+                        </InboxItemRecipientAddress>
                      )}
                      {data.message && (
                         <Box
@@ -175,13 +135,15 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                      </Box>
                   )}
                   {data.unread && data.unread !== 0 ? (
-                     <NotificationCount>{data.unread}</NotificationCount>
+                     <InboxItemNotificationCount>
+                        {data.unread}
+                     </InboxItemNotificationCount>
                   ) : (
                      ''
                   )}
                </Box>
             </Flex>
-         </Wrapper>
+         </InboxItemWrapper>
       </Link>
    )
 }
