@@ -167,7 +167,7 @@ const Community = ({ account }: { account: string }) => {
                <Box>
                   {communityData?.name && (
                      <Flex alignItems="center">
-                        <Heading size="md" mr="1" maxWidth="140px" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+                        <Heading size="md" mr="1" maxWidth={[140, 140, 200, 300]} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
                            {communityData.name}
                         </Heading>
                         <Tooltip label="OpenSea Verified">
