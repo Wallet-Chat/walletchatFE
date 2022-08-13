@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { Link } from 'react-router-dom'
 
-import { MessageUIType } from '../../../../types/Message'
 import { formatInboxDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
+import { InboxItemType } from '../../../../types/InboxItem'
 
 const Wrapper = styled.button`
    display: block;
@@ -61,15 +61,15 @@ const ConversationItem = ({
    data,
    account,
 }: {
-   data: MessageUIType
+   data: InboxItemType
    account: string
 }) => {
    let recipientAddress = ''
-   if (data?.toAddr && data?.fromAddr) {
+   if (data?.toaddr && data?.fromaddr) {
       recipientAddress =
-         data.toAddr.toLocaleLowerCase() === account.toLocaleLowerCase()
-            ? data.fromAddr.toLocaleLowerCase()
-            : data.toAddr.toLocaleLowerCase()
+         data.toaddr.toLocaleLowerCase() === account.toLocaleLowerCase()
+            ? data.fromaddr.toLocaleLowerCase()
+            : data.toaddr.toLocaleLowerCase()
    }
 
    let displayName = ''
@@ -86,7 +86,7 @@ const ConversationItem = ({
       <Link
          to={
             data.context_type === 'community'
-               ? `/community/${data.nftAddr}`
+               ? `/community/${data.nftaddr}`
                : `/chat/${recipientAddress}`
          }
          style={{ textDecoration: 'none' }}

@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
-import { MessageUIType } from '../../../../types/Message'
 import { formatInboxDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import NFTContractType from '../../../../types/NFTContract'
+import { InboxItemType } from '../../../../types/InboxItem'
 
 const Wrapper = styled.button`
    display: block;
@@ -56,17 +56,17 @@ const NotificationCount = styled.div`
    padding: 0 var(--chakra-space-2);
 `
 
-const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
+const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    const [nft, setNft] = useState<NFTContractType>()
    const [isError, setIsError] = useState(false)
 
    useEffect(() => {
-      if (data.nftAddr) {
+      if (data.nftaddr) {
          if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
             console.log('Missing OpenSea API Key')
             return
          }
-         fetch(`https://api.opensea.io/api/v1/asset_contract/${data.nftAddr}`, {
+         fetch(`https://api.opensea.io/api/v1/asset_contract/${data.nftaddr}`, {
             method: 'GET',
             headers: {
                Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
@@ -84,18 +84,19 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                setIsError(true)
             })
       }
-   }, [data.nftAddr])
+   }, [data.nftaddr])
 
    if (isError) return <Box></Box>
 
    return (
-      <Link to={`/nft/ethereum/${data.nftAddr}`} style={{ textDecoration: 'none' }}>
+      <Link to={`/nft/ethereum/${data.nftaddr}`} style={{ textDecoration: 'none' }}>
          <Wrapper>
             <Flex justifyContent="space-between">
                <Flex>
                   <Box mr={2} flexShrink={0}>
                      <BlockieWrapper>
-                        {data.nftAddr &&
+
+                        {data.nftaddr &&
                            (nft?.collection.image_url ? (
                               <Image
                                  src={nft.collection.image_url}
@@ -103,16 +104,16 @@ const NFTInboxItem = ({ data }: { data: MessageUIType }) => {
                                  width="41px"
                               />
                            ) : (
-                              <Blockies seed={data.nftAddr} scale={5} />
+                              <Blockies seed={data.nftaddr} scale={5} />
                            ))}
                      </BlockieWrapper>
                   </Box>
                   <Box minWidth="0">
-                     {data.nftAddr && (
+                     {data.nftaddr && (
                         <RecipientAddress>
                            {nft?.collection.name
                               ? nft.collection.name
-                              : truncateAddress(data.nftAddr)}
+                              : truncateAddress(data.nftaddr)}
                         </RecipientAddress>
                      )}
                      {data.message && (

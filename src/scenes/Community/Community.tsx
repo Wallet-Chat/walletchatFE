@@ -1,5 +1,4 @@
 import {
-   Badge,
    Box,
    Button,
    Divider,
@@ -7,7 +6,6 @@ import {
    Heading,
    Image,
    Link,
-   Stack,
    Tab,
    TabList,
    TabPanel,
@@ -17,10 +15,8 @@ import {
    Tooltip,
 } from '@chakra-ui/react'
 import {
-   IconBrandMedium,
    IconBrandTwitter,
    IconCircleCheck,
-   IconLink,
 } from '@tabler/icons'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
