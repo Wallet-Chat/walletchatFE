@@ -2,15 +2,13 @@ import {
    Box,
    Heading,
    Flex,
-   Stack,
-   SkeletonCircle,
-   SkeletonText,
    Button,
    Tabs,
    TabList,
    TabPanels,
    Tab,
    TabPanel,
+   Image,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
@@ -20,6 +18,8 @@ import equal from 'fast-deep-equal/es6'
 
 import { InboxItemType } from '../../types/InboxItem'
 import TabContent from './components/TabContent'
+import InboxSkeleton from './components/InboxSkeleton'
+import { chains } from '../../constants'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -39,6 +39,7 @@ const Inbox = ({
    const [dms, setDms] = useState<InboxItemType[]>()
    const [communities, setCommunities] = useState<InboxItemType[]>()
    const [nfts, setNfts] = useState<InboxItemType[]>()
+   const [chainsFilter, setChainsFilter] = useState([''])
 
    useEffect(() => {
       const interval = setInterval(() => {
@@ -51,10 +52,33 @@ const Inbox = ({
    useEffect(() => {
       setNfts(inboxData.filter((d) => d.context_type === 'nft'))
       setDms(inboxData.filter((d) => d.context_type === 'dm'))
-      setCommunities(
-         inboxData.filter((d) => d.context_type === 'community')
-      )
+      setCommunities(inboxData.filter((d) => d.context_type === 'community'))
    }, [inboxData])
+
+   useEffect(() => {
+      console.log('chainsFilter', chainsFilter)
+      if (chainsFilter.length === 0) {
+         setNfts([])
+      } else if (
+         chainsFilter.includes('') ||
+         chainsFilter.length === Object.keys(chains).length
+      ) {
+         const _new = inboxData.filter((d) => d.context_type === 'nft')
+         if (!equal(_new, inboxData)) setNfts(_new)
+      } else if (chainsFilter.length > 1) {
+         const _allowedChains = Object.keys(chains).map((c) => chains[c]?.name)
+         const _new = inboxData.filter(
+            (d) =>
+               d.context_type === 'nft' &&
+               d?.chain &&
+               _allowedChains.includes(d.chain)
+         )
+         setNfts(_new)
+         if (!equal(_new, inboxData)) setNfts(_new)
+      } else {
+         setNfts([])
+      }
+   }, [chainsFilter, inboxData])
 
    useEffect(() => {
       getInboxData()
@@ -103,38 +127,32 @@ const Inbox = ({
          })
    }
 
+   const toggleChain = (chain: string) => {
+      if (chain === '') {
+         if (chainsFilter.length > 1) setChainsFilter([''])
+         else if (chainsFilter.length === 1 && chainsFilter !== [''])
+            setChainsFilter([''])
+      } else {
+         const index = chainsFilter.indexOf(chain)
+         if (index > -1) {
+            // item found
+            let newChainsFilter = chainsFilter
+            newChainsFilter.splice(index, 1)
+            setChainsFilter(newChainsFilter)
+         } else {
+            if (chainsFilter[0] === '') {
+               setChainsFilter([chain])
+               // setChainsFilter(Object.keys(chains)
+               //    .filter(c => c !== chain))
+            } else {
+               setChainsFilter([...chainsFilter, chain])
+            }
+         }
+      }
+   }
+
    if (isFetchingInboxData && inboxData.length === 0) {
-      return (
-         <Box background="white" height="100vh" width="100%">
-            <Box py={8} px={3} height="100vh">
-               {[...Array(5)].map((e, i) => (
-                  <Stack key={i}>
-                     <Flex
-                        py={6}
-                        px={3}
-                        bg="white"
-                        borderBottom="1px solid var(--chakra-colors-lightgray-300)"
-                     >
-                        <SkeletonCircle
-                           size="10"
-                           startColor="lightgray.200"
-                           endColor="lightgray.400"
-                           flexShrink={0}
-                           mr={4}
-                        />
-                        <SkeletonText
-                           noOfLines={2}
-                           spacing="4"
-                           startColor="lightgray.200"
-                           endColor="lightgray.400"
-                           width="100%"
-                        />
-                     </Flex>
-                  </Stack>
-               ))}
-            </Box>
-         </Box>
-      )
+      return <InboxSkeleton />
    }
 
    return (
@@ -144,7 +162,7 @@ const Inbox = ({
          borderRight="1px solid var(--chakra-colors-lightgray-400)"
          width="360px"
          maxW="100%"
-         overflowY="auto"
+         overflowY="scroll"
          className="custom-scrollbar"
       >
          <Box
@@ -184,16 +202,79 @@ const Inbox = ({
 
             <TabPanels>
                <TabPanel p={0}>
-                  <TabContent data={inboxData} web3={web3} account={account} />
-               </TabPanel>
-               <TabPanel p={0}>
-                  <TabContent data={dms} web3={web3} account={account} />
-               </TabPanel>
-               <TabPanel p={0}>
-                  <TabContent data={nfts} web3={web3} account={account} />
+                  <TabContent
+                     context="all"
+                     data={inboxData}
+                     web3={web3}
+                     account={account}
+                  />
                </TabPanel>
                <TabPanel p={0}>
                   <TabContent
+                     context="dms"
+                     data={dms}
+                     web3={web3}
+                     account={account}
+                  />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <Box px={5} my={2}>
+                     <Button
+                        size="sm"
+                        height="auto"
+                        py={1}
+                        px={3}
+                        onClick={() => toggleChain('')}
+                        variant={chainsFilter[0] === '' ? 'lightgray' : 'white'}
+                        opacity={chainsFilter[0] === '' ? '1' : '0.7'}
+                        mr={2}
+                     >
+                        All
+                     </Button>
+                     {Object.keys(chains).map((chain) => {
+                        const _selected =
+                           chainsFilter.includes(chain) ||
+                           chainsFilter[0] === ''
+                        return (
+                           <Button
+                              size="sm"
+                              height="auto"
+                              py={1}
+                              px={3}
+                              onClick={() => toggleChain(chain)}
+                              variant={_selected ? 'lightgray' : 'white'}
+                              opacity={_selected ? '1' : '0.9'}
+                              mr={2}
+                           >
+                              {chains[chain]?.logo && (
+                                 <Image
+                                    src={`data:image/svg+xml;base64,${chains[chain]?.logo}`}
+                                    alt=""
+                                    width="15px"
+                                    height="15px"
+                                    d="inline-block"
+                                    verticalAlign="middle"
+                                    mr={1}
+                                    filter={
+                                       _selected ? 'none' : 'grayscale(100%)'
+                                    }
+                                 />
+                              )}
+                              {chains[chain]?.name}
+                           </Button>
+                        )
+                     })}
+                  </Box>
+                  <TabContent
+                     context="nfts"
+                     data={nfts}
+                     web3={web3}
+                     account={account}
+                  />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <TabContent
+                     context="communities"
                      data={communities}
                      web3={web3}
                      account={account}

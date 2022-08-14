@@ -293,6 +293,16 @@ export const theme = extendTheme(
                   color: 'white',
                   _hover: { bg: 'warning.600' },
                },
+               lightgray: {
+                  bg: 'lightgray.300',
+                  color: 'darkgray.600',
+                  _hover: {
+                     bg: 'lightgray.400',
+                     _disabled: {
+                        bg: 'lightgray.400'
+                     },
+                  }
+               },
                black: {
                   bg: 'black',
                   color: 'white',

@@ -6,10 +6,12 @@ import ConversationItem from '../ConversationItem'
 import NFTInboxItem from '../NFTInboxItem'
 
 export default function TabAll({
+   context,
    data,
    account,
    web3,
 }: {
+   context: string
    data: InboxItemType[] | undefined
    account: string
    web3: Web3
@@ -37,7 +39,7 @@ export default function TabAll({
                )
             }
          })}
-         {data?.length === 0 && (
+         {data?.length === 0 && (context === "dms" || context === "all") && (
             <Box p={5}>
                <Text mb={4} fontSize="md">
                   You have no messages.
