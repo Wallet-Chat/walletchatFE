@@ -6,7 +6,6 @@ import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../../../helpers/date'
 import { MessageUIType } from '../../../../../../types/Message'
-import { useUnreadCount } from '../../../../../../context/UnreadCountProvider'
 
 const MessageBox = styled.div`
    position: relative;
@@ -106,7 +105,6 @@ const Message = ({
    msg: MessageUIType
    updateRead: (data: MessageUIType) => void
 }) => {
-   let { unreadCount, setUnreadCount } = useUnreadCount()
 
    const { ref, inView } = useInView({
       triggerOnce: true,
@@ -141,7 +139,6 @@ const Message = ({
             .then((response) => response.json())
             .then((data) => {
                console.log('✅[PUT][Message]:', data)
-               setUnreadCount(unreadCount - 1)
                updateRead(data)
             })
             .catch((error) => {

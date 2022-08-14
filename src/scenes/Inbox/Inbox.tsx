@@ -9,6 +9,7 @@ import {
    Tab,
    TabPanel,
    Image,
+   Badge,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
@@ -20,6 +21,7 @@ import { InboxItemType } from '../../types/InboxItem'
 import TabContent from './components/TabContent'
 import InboxSkeleton from './components/InboxSkeleton'
 import { chains } from '../../constants'
+import { useUnreadCount } from '../../context/UnreadCountProvider'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -40,6 +42,7 @@ const Inbox = ({
    const [communities, setCommunities] = useState<InboxItemType[]>()
    const [nfts, setNfts] = useState<InboxItemType[]>()
    const [chainsFilter, setChainsFilter] = useState([''])
+   const { unreadCount, totalUnreadCount } = useUnreadCount()
 
    useEffect(() => {
       const interval = setInterval(() => {
@@ -192,12 +195,44 @@ const Inbox = ({
             {/* <InboxSearchInput /> */}
          </Box>
 
-         <Tabs>
-            <TabList>
-               <Tab>All</Tab>
-               <Tab>DMs</Tab>
-               <Tab>NFTs</Tab>
-               <Tab>Communities</Tab>
+         <Tabs isLazy>
+            <TabList
+               overflowX="auto"
+               overflowY="visible"
+               className="custom-scrollbar"
+            >
+               <Tab marginBottom="0">
+                  All{' '}
+                  {totalUnreadCount !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {totalUnreadCount}
+                     </Badge>
+                  )}
+               </Tab>
+               <Tab marginBottom="0">
+                  DM{' '}
+                  {unreadCount?.dm !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {unreadCount.dm}
+                     </Badge>
+                  )}
+               </Tab>
+               <Tab marginBottom="0">
+                  NFT{' '}
+                  {unreadCount?.nft !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {unreadCount.nft}
+                     </Badge>
+                  )}
+               </Tab>
+               <Tab marginBottom="0">
+                  Community{' '}
+                  {unreadCount?.community !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {unreadCount.community}
+                     </Badge>
+                  )}
+               </Tab>
             </TabList>
 
             <TabPanels>

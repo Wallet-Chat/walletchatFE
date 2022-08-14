@@ -22,7 +22,6 @@ import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import { useIsMobileView } from './context/IsMobileViewProvider'
-import { useUnreadCount } from './context/UnreadCountProvider'
 import EnterName from './scenes/Me/scenes/EnterName'
 import ChangeName from './scenes/Me/scenes/ChangeName'
 import NFTById from './scenes/NFT/scenes/NFTById'
@@ -31,7 +30,6 @@ import { isChromeExtension } from './helpers/chrome'
 import MyNFTs from './scenes/Me/scenes/MyNFTs'
 
 export const App = () => {
-   const { unreadCount, setUnreadCount } = useUnreadCount()
    const [btnClicks, setBtnClicks] = useState(0)
 
    const {
@@ -46,41 +44,6 @@ export const App = () => {
    } = useWallet()
 
    const { isMobileView } = useIsMobileView()
-
-   useEffect(() => {
-      const interval = setInterval(() => {
-         getUnreadCount()
-      }, 5000) // every 5s
-
-      return () => {
-         clearInterval(interval)
-      }
-   }, [])
-
-   useEffect(() => {
-      getUnreadCount()
-   }, [isAuthenticated, account])
-
-   const getUnreadCount = () => {
-      if (account) {
-         fetch(` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`, {
-            method: 'GET',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-         })
-            .then((response) => response.json())
-            .then((count: number) => {
-               if (count !== unreadCount) {
-                  console.log('✅[GET][Unread Count]:', count)
-                  setUnreadCount(count)
-               }
-            })
-            .catch((error) => {
-               console.error('🚨[GET][Unread Count]:', error)
-            })
-      }
-   }
 
    const closeBtn = (
       <Flex textAlign="right" position="fixed" top={0} right={0}>
@@ -167,7 +130,7 @@ export const App = () => {
          <Box>
             <Flex>
                {isChromeExtension() && closeBtn}
-               <Sidebar unreadCount={unreadCount} />
+               <Sidebar />
                {isFetchingName ? (
                   <Flex
                      justifyContent="center"
@@ -193,7 +156,7 @@ export const App = () => {
                minHeight={isMobile ? '100vh' : 'unset'}
             >
                {isChromeExtension() && closeBtn}
-               <Sidebar unreadCount={unreadCount} />
+               <Sidebar />
                <Box flex="1" overflow="hidden" minWidth="1px">
                   <Routes>
                      <Route

@@ -43,12 +43,13 @@ import { useWallet } from '../context/WalletProvider'
 import { truncateAddress } from '../helpers/truncateString'
 import { useIsMobileView } from '../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../helpers/ipfs'
+import { useUnreadCount } from '../context/UnreadCountProvider'
 
 interface URLChangedEvent extends Event {
    detail?: string
 }
 
-const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
+export default function Sidebar() {
    const nftNotificationCount = 0
    const [url, setUrl] = useState<string | undefined>('')
    const [nftContractAddr, setNftContractAddr] = useState<string>()
@@ -56,6 +57,7 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
    const [chainName, setChainName] = useState("ethereum")
    const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
+   const { totalUnreadCount } = useUnreadCount()
 
    const { isMobileView } = useIsMobileView()
 
@@ -202,21 +204,14 @@ const Sidebar = ({ unreadCount }: { unreadCount: number }) => {
                <LinkElem to={'/chat'}>
                   {/* <Box className="popup-text">Chat</Box> */}
                   <IconMessageCircle2 size="30" stroke={1.5} />
-                  {unreadCount > 0 && (
+                  {totalUnreadCount > 0 && (
                      <UnreadCountContainer>
-                        <Box className="square-content">
-                           <Box>
-                              <span>
-                                 <Badge
-                                    variant="black"
-                                    background="information.400"
-                                    fontSize="lg"
-                                 >
-                                    {unreadCount}
-                                 </Badge>
-                              </span>
-                           </Box>
-                        </Box>
+                        <Badge
+                           variant="blue"
+                           fontSize="md"
+                        >
+                           {totalUnreadCount}
+                        </Badge>
                      </UnreadCountContainer>
                   )}
                </LinkElem>
@@ -452,37 +447,8 @@ const UnreadCountContainer = styled.div`
    position: absolute;
    bottom: 0;
    right: 0;
-   width: 25px;
-   height: 25px;
    overflow: hidden;
    background: var(--chakra-colors-information-400);
    border-radius: var(--chakra-radii-md);
    border: 2px solid #fff;
-
-   &::before {
-      content: '';
-      display: block;
-      padding-top: 100%;
-   }
-
-   .square-content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      color: white;
-   }
-   .square-content div {
-      display: table;
-      width: 100%;
-      height: 100%;
-   }
-   .square-content span {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-   }
 `
-
-export default Sidebar

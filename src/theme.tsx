@@ -171,6 +171,14 @@ export const theme = extendTheme(
                black: {
                   background: 'darkgray.800',
                   color: 'lightgray.200'
+               },
+               midgray: {
+                  background: 'lightgray.800',
+                  color: 'lightgray.100'
+               },
+               blue: {
+                  background: 'information.400',
+                  color: 'lightgray.200'
                }
             }
          },
