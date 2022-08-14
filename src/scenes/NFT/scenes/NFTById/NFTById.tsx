@@ -29,20 +29,20 @@ import { truncateAddress } from '../../../../helpers/truncateString'
 import NFTStatisticsType from '../../../../types/NFTPort/NFTStatistics'
 import NFTOwnerAddressType from '../../../../types/Alchemy/NFTOwnerAddressType'
 import NFT from '../../../../types/NFT'
-import OpenSeaNFT, { openseaToGeneralNFTType } from '../../../../types/OpenSea/NFT'
-import AlchemyNFT, { alchemyToGeneralNFTType } from '../../../../types/Alchemy/NFT'
-import IconPolygon from "../../../../images/icon-polygon.svg"
-import IconEthereum from "../../../../images/icon-ethereum.svg"
+import OpenSeaNFT, {
+   openseaToGeneralNFTType,
+} from '../../../../types/OpenSea/NFT'
+import AlchemyNFT, {
+   alchemyToGeneralNFTType,
+} from '../../../../types/Alchemy/NFT'
+import IconPolygon from '../../../../images/icon-polygon.svg'
+import IconEthereum from '../../../../images/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import equal from 'fast-deep-equal/es6'
 
 const tokenType = 'erc721'
 
-const NFTById = ({
-   account,
-}: {
-   account: string
-}) => {
+const NFTById = ({ account }: { account: string }) => {
    let { nftContractAddr = '', nftId = '', chain = '' } = useParams()
    let [searchParams] = useSearchParams()
 
@@ -220,7 +220,7 @@ const NFTById = ({
          )
             .then((response) => response.json())
             .then((result: OpenSeaNFT) => {
-               if (result?.collection?.name) {
+               if (result?.collection?.name && !equal(result, nftData)) {
                   console.log(`✅[GET][NFT]:`, result)
                   setNftData(openseaToGeneralNFTType(result))
                }
@@ -270,7 +270,11 @@ const NFTById = ({
       )
          .then((response) => response.json())
          .then((result) => {
-            if (result && result.statistics && !equal(result.statistics, nftStatistics)) {
+            if (
+               result &&
+               result.statistics &&
+               !equal(result.statistics, nftStatistics)
+            ) {
                console.log('✅[GET][NFT Statistics]:', result)
                setNftStatistics(result.statistics)
             }
@@ -283,10 +287,10 @@ const NFTById = ({
    const getOwnerAddress = () => {
       let alchemyUrl, key
       if (chain === 'ethereum') {
-         alchemyUrl = "https://eth-mainnet.g.alchemy.com/v2/"
+         alchemyUrl = 'https://eth-mainnet.g.alchemy.com/v2/'
          key = process.env.REACT_APP_ALCHEMY_API_KEY_ETHEREUM
       } else if (chain === 'polygon') {
-         alchemyUrl = "https://polygon-mainnet.g.alchemy.com/v2/"
+         alchemyUrl = 'https://polygon-mainnet.g.alchemy.com/v2/'
          key = process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON
       }
 
@@ -347,52 +351,54 @@ const NFTById = ({
                         </CLink>
                      )}
                      {nftStatistics && (
-                        <Tooltip label={`${chain && capitalizeFirstLetter(chain)} chain`}>
-                           <Badge d="flex" alignItems="center" mr={2} fontSize="sm">
-                           {chain === 'ethereum' && (
-                                 <Image src={IconEthereum} alt="Ethereum chain" width="18px" height="18px" d="inline-block" verticalAlign="middle" p={0.5} />
-                           )}
-                           {chain === 'polygon' && (
-                                 <Image src={IconPolygon} alt="Polygon chain" width="18px" height="18px" d="inline-block" verticalAlign="middle" p={0.5} />
-                           )}
+                        <Tooltip
+                           label={`${
+                              chain && capitalizeFirstLetter(chain)
+                           } chain`}
+                        >
+                           <Badge
+                              d="flex"
+                              alignItems="center"
+                              mr={2}
+                              fontSize="sm"
+                           >
+                              {chain === 'ethereum' && (
+                                 <Image
+                                    src={IconEthereum}
+                                    alt="Ethereum chain"
+                                    width="18px"
+                                    height="18px"
+                                    d="inline-block"
+                                    verticalAlign="middle"
+                                    p={0.5}
+                                 />
+                              )}
+                              {chain === 'polygon' && (
+                                 <Image
+                                    src={IconPolygon}
+                                    alt="Polygon chain"
+                                    width="18px"
+                                    height="18px"
+                                    d="inline-block"
+                                    verticalAlign="middle"
+                                    p={0.5}
+                                 />
+                              )}
                            </Badge>
                         </Tooltip>
                      )}
                      {nftStatistics && (
                         <Tooltip label="Floor price">
-                           <Badge d="flex" alignItems="center" mr={2} fontSize="sm">
-                              {nftStatistics.floor_price}
+                           <Badge
+                              d="flex"
+                              alignItems="center"
+                              mr={2}
+                              fontSize="sm"
+                           >
+                              {nftStatistics.floor_price < 0.01
+                                 ? '<0.01'
+                                 : nftStatistics.floor_price.toFixed(2)}
                               <IconCurrencyEthereum size="15" />
-                           </Badge>
-                        </Tooltip>
-                     )}
-                     {chain === 'ethereum' && (
-                        <Tooltip label="Ethereum chain">
-                           <Badge mr={2}>
-                           <Image
-                              src={IconEthereum}
-                              alt="Ethereum chain"
-                              width="20px"
-                              height="20px"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              p={0.5}
-                           />
-                           </Badge>
-                        </Tooltip>
-                     )}
-                     {chain === 'polygon' && (
-                        <Tooltip label="Polygon chain">
-                           <Badge mr={2}>
-                           <Image
-                              src={IconPolygon}
-                              alt="Polygon chain"
-                              width="20px"
-                              height="20px"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              p={0.5}
-                           />
                            </Badge>
                         </Tooltip>
                      )}
@@ -475,10 +481,10 @@ const NFTById = ({
                      ) : (
                         <></>
                      )}
-                     <Text fontSize="xs" color="darkgray.100" d="flex">
+                     <Box fontSize="xs" color="darkgray.100" d="flex">
                         <IconShieldLock size="15" />
-                        <Box ml={1}>Private</Box>
-                     </Text>
+                        <Text ml={1}>Private</Text>
+                     </Box>
                   </Box>
                </Tab>
             </TabList>
@@ -495,13 +501,13 @@ const NFTById = ({
                   />
                </TabPanel>
                {tweetCount && tweetCount !== 0 && (
-               <TabPanel p={5}>
-                  <NFTTweets
-                     account={account}
-                     nftContractAddr={nftContractAddr}
-                  />
-               </TabPanel>
-)}
+                  <TabPanel p={5}>
+                     <NFTTweets
+                        account={account}
+                        nftContractAddr={nftContractAddr}
+                     />
+                  </TabPanel>
+               )}
                <TabPanel px="0" height="100%" padding="0">
                   <NFTChat
                      recipientAddr={recipientAddr}

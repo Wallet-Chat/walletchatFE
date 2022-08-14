@@ -8,7 +8,6 @@ import {
    Text,
 } from '@chakra-ui/react'
 import Blockies from 'react-blockies'
-import styled from 'styled-components'
 import TextareaAutosize from 'react-textarea-autosize'
 import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
 import equal from 'fast-deep-equal/es6'
@@ -118,6 +117,7 @@ const NFTChat = ({
       const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
       console.log('nft id from sendMessage: ', nftId)
+
       let data = {
          message: msgInputCopy,
          fromAddr: account.toLocaleLowerCase(),

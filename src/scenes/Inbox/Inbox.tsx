@@ -272,6 +272,7 @@ const Inbox = ({
                            chainsFilter[0] === ''
                         return (
                            <Button
+                              key={chain}
                               size="sm"
                               height="auto"
                               py={1}
