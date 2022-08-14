@@ -5,37 +5,21 @@ import {
    Stack,
    SkeletonCircle,
    SkeletonText,
-   Text,
    Button,
+   Tabs,
+   TabList,
+   TabPanels,
+   Tab,
+   TabPanel,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
 
-import StartConversationWithAddress from '../../components/StartConversationWithAddress'
-// import { getIpfsData } from '../../services/ipfs'
 import { InboxItemType } from '../../types/InboxItem'
-// import { EncryptedMsgBlock } from '../../types/Message'
-import ConversationItem from './components/ConversationItem'
-import NFTInboxItem from './components/NFTInboxItem'
-
-const Divider = styled.div`
-   display: block;
-   width: 100%;
-   height: 1px;
-   margin-bottom: var(--chakra-space-4);
-   &::before {
-      content: '';
-      display: block;
-      margin-left: var(--chakra-space-5);
-      width: 40px;
-      height: 1px;
-      border-bottom: 1px solid #cbcbcb;
-   }
-`
+import TabContent from './components/TabContent'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -49,12 +33,12 @@ const Inbox = ({
    isAuthenticated: boolean
 }) => {
    const [inboxData, setInboxData] = useState<InboxItemType[]>(
-      localStorageInbox
-         ? JSON.parse(localStorageInbox)
-         : new Array<InboxItemType>()
+      localStorageInbox ? JSON.parse(localStorageInbox) : []
    )
-   const [isFetchingInboxData, setIsFetchingInboxData] =
-      useState<boolean>(false)
+   const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
+   const [dms, setDms] = useState<InboxItemType[]>()
+   const [communities, setCommunities] = useState<InboxItemType[]>()
+   const [nfts, setNfts] = useState<InboxItemType[]>()
 
    useEffect(() => {
       const interval = setInterval(() => {
@@ -63,6 +47,14 @@ const Inbox = ({
 
       return () => clearInterval(interval)
    }, [isAuthenticated, account, inboxData])
+
+   useEffect(() => {
+      setNfts(inboxData.filter((d) => d.context_type === 'nft'))
+      setDms(inboxData.filter((d) => d.context_type === 'dm'))
+      setCommunities(
+         inboxData.filter((d) => d.context_type === 'community')
+      )
+   }, [inboxData])
 
    useEffect(() => {
       getInboxData()
@@ -96,7 +88,11 @@ const Inbox = ({
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data)
-               setInboxData(data.filter(d => !(d.context_type === "nft" && d.chain === "none")))
+
+               const _filtered = data.filter(
+                  (d) => !(d.context_type === 'nft' && d.chain === 'none')
+               )
+               setInboxData(_filtered)
                localStorage.setItem('inbox', JSON.stringify(data))
             }
             setIsFetchingInboxData(false)
@@ -146,61 +142,65 @@ const Inbox = ({
          background="white"
          height={isMobile ? 'unset' : '100vh'}
          borderRight="1px solid var(--chakra-colors-lightgray-400)"
-         minWidth="300px"
-         width={isMobile ? '100%' : 'auto'}
+         width="360px"
+         maxW="100%"
          overflowY="auto"
          className="custom-scrollbar"
       >
-         <Flex p={5} justifyContent="space-between">
-            <Heading size="lg">
-               Inbox
-            </Heading>
-            <Button
-               as={Link}
-               to="/new"
-               size="sm"
-               variant="outline"
-               _hover={{
-                  textDecoration: 'none',
-                  backgroundColor: 'var(--chakra-colors-lightgray-300)',
-               }}
-            >
-               + New
-            </Button>
-         </Flex>
-         <Divider />
-
-         <Box overflowY="auto">
-            {inboxData.map((conversation, i) => {
-               if (
-                  conversation.context_type === 'dm' ||
-                  conversation.context_type === 'community'
-               ) {
-                  return (
-                     <ConversationItem
-                        key={`${conversation.timestamp.toString()}${i}`}
-                        data={conversation}
-                        account={account}
-                     />
-                  )
-               } else if (conversation.context_type === 'nft') {
-                  return (
-                     <NFTInboxItem
-                        key={`${conversation.timestamp.toString()}${i}`}
-                        data={conversation}
-                     />
-                  )
-               }
-            })}
-            {inboxData.length === 0 && (
-               <Box p={5}>
-                  <Text mb={4} fontSize="md">
-                     You have no messages.
-                  </Text>
-                  <StartConversationWithAddress web3={web3} />
-               </Box>
-            )}
+         <Box
+            px={5}
+            pt={5}
+            pb={3}
+            pos="sticky"
+            top="0"
+            background="white"
+            zIndex="sticky"
+         >
+            <Flex justifyContent="space-between" mb={2}>
+               <Heading size="lg">Inbox</Heading>
+               <Button
+                  as={Link}
+                  to="/new"
+                  size="sm"
+                  variant="outline"
+                  _hover={{
+                     textDecoration: 'none',
+                     backgroundColor: 'var(--chakra-colors-lightgray-300)',
+                  }}
+               >
+                  + New
+               </Button>
+            </Flex>
+            {/* <InboxSearchInput /> */}
          </Box>
+
+         <Tabs>
+            <TabList>
+               <Tab>All</Tab>
+               <Tab>DMs</Tab>
+               <Tab>NFTs</Tab>
+               <Tab>Communities</Tab>
+            </TabList>
+
+            <TabPanels>
+               <TabPanel p={0}>
+                  <TabContent data={inboxData} web3={web3} account={account} />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <TabContent data={dms} web3={web3} account={account} />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <TabContent data={nfts} web3={web3} account={account} />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <TabContent
+                     data={communities}
+                     web3={web3}
+                     account={account}
+                  />
+               </TabPanel>
+            </TabPanels>
+         </Tabs>
       </Box>
    )
 }
