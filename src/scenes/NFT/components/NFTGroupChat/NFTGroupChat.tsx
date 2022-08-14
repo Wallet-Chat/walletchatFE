@@ -4,37 +4,18 @@ import {
    Divider,
    Flex,
    FormControl,
-   Spinner,
    Tag,
 } from '@chakra-ui/react'
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
-import styled from 'styled-components'
-import { getFormattedDate } from '../../../../helpers/date'
+import equal from 'fast-deep-equal/es6'
 
+import { getFormattedDate } from '../../../../helpers/date'
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
-
-const DottedBackground = styled.div`
-   flex-grow: 1;
-   width: 100%;
-   height: auto;
-   background: linear-gradient(
-            90deg,
-            var(--chakra-colors-lightgray-200) 14px,
-            transparent 1%
-         )
-         center,
-      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
-         center,
-      #9dadc3 !important;
-   background-size: 15px 15px !important;
-   background-position: top left !important;
-   padding: var(--chakra-space-1);
-   overflow-y: scroll;
-`
+import { DottedBackground } from '../../../../styled/DottedBackground'
 
 const NFTGroupChat = ({
    account,
@@ -46,7 +27,7 @@ const NFTGroupChat = ({
    const [firstLoad, setFirstLoad] = useState(true)
    const [msgInput, setMsgInput] = useState<string>('')
    const [isSendingMessage, setIsSendingMessage] = useState(false)
-   const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
+   // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
@@ -54,7 +35,10 @@ const NFTGroupChat = ({
 
    useEffect(() => {
       getChatData()
+   }, [account, nftContractAddr])
 
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
          getChatData()
       }, 5000) // every 5s
@@ -62,15 +46,15 @@ const NFTGroupChat = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account, nftContractAddr])
+   }, [chatData, account, nftContractAddr])
 
-   const getChatData = () => {
+   const getChatData = async () => {
       if (!account) {
          console.log('No account connected')
          return
       }
 
-      setIsFetchingMessages(true)
+      // setIsFetchingMessages(true)
 
       fetch(
          ` ${process.env.REACT_APP_REST_API}/get_groupchatitems/${nftContractAddr}/${account}`,
@@ -82,14 +66,16 @@ const NFTGroupChat = ({
          }
       )
          .then((response) => response.json())
-         .then(async (data: GroupMessageType[]) => {
-            console.log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
-            setChatData(data)
+         .then((data: GroupMessageType[]) => {
+            if (equal(data, chatData) === false) {
+               console.log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
+               setChatData(data)
+            }
          })
          .catch((error) => {
             console.error('🚨[GET][NFT][Group Chat Messages By Addr]:', error)
          })
-         .finally(() => setIsFetchingMessages(false))
+         // .finally(() => setIsFetchingMessages(false))
    }
 
    useEffect(() => {
@@ -241,13 +227,9 @@ const NFTGroupChat = ({
                   background="white"
                   p={4}
                >
-                  {isFetchingMessages ? (
-                     <Spinner />
-                  ) : (
-                     <Box fontSize="md">
-                        Be the first to post something here 😉
-                     </Box>
-                  )}
+                  <Box fontSize="md">
+                     Be the first to post something here 😉
+                  </Box>
                </Flex>
             )}
             {loadedMsgs.map((msg, i) => {

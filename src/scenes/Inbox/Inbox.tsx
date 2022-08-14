@@ -2,41 +2,26 @@ import {
    Box,
    Heading,
    Flex,
-   Stack,
-   SkeletonCircle,
-   SkeletonText,
-   Text,
-   Spinner,
    Button,
+   Tabs,
+   TabList,
+   TabPanels,
+   Tab,
+   TabPanel,
+   Image,
+   Badge,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
 import Web3 from 'web3'
-// import EthCrypto, { Encrypted } from 'eth-crypto'
+import equal from 'fast-deep-equal/es6'
 
-import StartConversationWithAddress from '../../components/StartConversationWithAddress'
-// import { getIpfsData } from '../../services/ipfs'
-import { MessageType, MessageUIType } from '../../types/Message'
-// import { EncryptedMsgBlock } from '../../types/Message'
-import ConversationItem from './components/ConversationItem'
-import NFTInboxItem from './components/NFTInboxItem'
-
-const Divider = styled.div`
-   display: block;
-   width: 100%;
-   height: 1px;
-   margin-bottom: var(--chakra-space-4);
-   &::before {
-      content: '';
-      display: block;
-      margin-left: var(--chakra-space-5);
-      width: 40px;
-      height: 1px;
-      border-bottom: 1px solid #cbcbcb;
-   }
-`
+import { InboxItemType } from '../../types/InboxItem'
+import TabContent from './components/TabContent'
+import InboxSkeleton from './components/InboxSkeleton'
+import { chains } from '../../constants'
+import { useUnreadCount } from '../../context/UnreadCountProvider'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -49,25 +34,54 @@ const Inbox = ({
    web3: Web3
    isAuthenticated: boolean
 }) => {
-   const [inboxData, setInboxData] = useState<MessageType[]>(
-      localStorageInbox
-         ? JSON.parse(localStorageInbox)
-         : new Array<MessageType>()
+   const [inboxData, setInboxData] = useState<InboxItemType[]>(
+      localStorageInbox ? JSON.parse(localStorageInbox) : []
    )
-   const [isFetchingInboxData, setIsFetchingInboxData] =
-      useState<boolean>(false)
-   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-   const [beenHereFor3Secs, setBeenHereFor3Secs] = useState(false)
+   const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
+   const [dms, setDms] = useState<InboxItemType[]>()
+   const [communities, setCommunities] = useState<InboxItemType[]>()
+   const [nfts, setNfts] = useState<InboxItemType[]>()
+   const [chainsFilter, setChainsFilter] = useState([''])
+   const { unreadCount, totalUnreadCount } = useUnreadCount()
 
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
       }, 5000) // every 5s
 
-      setTimeout(() => setBeenHereFor3Secs(true), 3000)
-
       return () => clearInterval(interval)
-   }, [])
+   }, [isAuthenticated, account, inboxData])
+
+   useEffect(() => {
+      setNfts(inboxData.filter((d) => d.context_type === 'nft'))
+      setDms(inboxData.filter((d) => d.context_type === 'dm'))
+      setCommunities(inboxData.filter((d) => d.context_type === 'community'))
+   }, [inboxData])
+
+   useEffect(() => {
+      console.log('chainsFilter', chainsFilter)
+      if (chainsFilter.length === 0) {
+         setNfts([])
+      } else if (
+         chainsFilter.includes('') ||
+         chainsFilter.length === Object.keys(chains).length
+      ) {
+         const _new = inboxData.filter((d) => d.context_type === 'nft')
+         if (!equal(_new, inboxData)) setNfts(_new)
+      } else if (chainsFilter.length > 1) {
+         const _allowedChains = Object.keys(chains).map((c) => chains[c]?.name)
+         const _new = inboxData.filter(
+            (d) =>
+               d.context_type === 'nft' &&
+               d?.chain &&
+               _allowedChains.includes(d.chain)
+         )
+         setNfts(_new)
+         if (!equal(_new, inboxData)) setNfts(_new)
+      } else {
+         setNfts([])
+      }
+   }, [chainsFilter, inboxData])
 
    useEffect(() => {
       getInboxData()
@@ -95,13 +109,17 @@ const Inbox = ({
          },
       })
          .then((response) => response.json())
-         .then((data: MessageType[]) => {
-            console.log('✅ GET [Inbox]:', data)
+         .then((data: InboxItemType[]) => {
             if (data === null) {
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
-            } else {
-               setInboxData(data)
+            } else if (equal(inboxData, data) !== true) {
+               console.log('✅[GET][Inbox]:', data)
+
+               const _filtered = data.filter(
+                  (d) => !(d.context_type === 'nft' && d.chain === 'none')
+               )
+               setInboxData(_filtered)
                localStorage.setItem('inbox', JSON.stringify(data))
             }
             setIsFetchingInboxData(false)
@@ -112,82 +130,32 @@ const Inbox = ({
          })
    }
 
-   useEffect(() => {
-      const populateUI = async () => {
-         const toAddToUI = [] as MessageUIType[]
-         for (let i = 0; i < inboxData.length; i++) {
-            if (
-               inboxData[i]?.context_type === 'nft' ||
-               inboxData[i]?.context_type === 'community' ||
-               (account &&
-                  inboxData[i]?.toaddr &&
-                  inboxData[i]?.toaddr.toLowerCase() === account.toLowerCase())
-            ) {
-               toAddToUI.push({
-                  ...inboxData[i],
-                  message: inboxData[i].message, //await getIpfsData(inboxData[i].message),
-                  fromAddr: inboxData[i].fromaddr,
-                  toAddr: inboxData[i].toaddr,
-                  position: 'left',
-                  isFetching: false,
-                  nftAddr: inboxData[i].nftaddr,
-                  nftId: inboxData[i].nftid,
-               })
-            } else if (
-               account &&
-               inboxData[i]?.toaddr &&
-               inboxData[i]?.fromaddr.toLowerCase() === account.toLowerCase()
-            ) {
-               toAddToUI.push({
-                  ...inboxData[i],
-                  message: inboxData[i].message, //await getIpfsData(inboxData[i].message),
-                  fromAddr: inboxData[i].fromaddr,
-                  toAddr: inboxData[i].toaddr,
-                  position: 'right',
-                  isFetching: false,
-                  nftAddr: inboxData[i].nftaddr,
-                  nftId: inboxData[i].nftid,
-               })
+   const toggleChain = (chain: string) => {
+      if (chain === '') {
+         if (chainsFilter.length > 1) setChainsFilter([''])
+         else if (chainsFilter.length === 1 && chainsFilter !== [''])
+            setChainsFilter([''])
+      } else {
+         const index = chainsFilter.indexOf(chain)
+         if (index > -1) {
+            // item found
+            let newChainsFilter = chainsFilter
+            newChainsFilter.splice(index, 1)
+            setChainsFilter(newChainsFilter)
+         } else {
+            if (chainsFilter[0] === '') {
+               setChainsFilter([chain])
+               // setChainsFilter(Object.keys(chains)
+               //    .filter(c => c !== chain))
+            } else {
+               setChainsFilter([...chainsFilter, chain])
             }
          }
-         toAddToUI.sort((a, b) => (a.timestamp as any) - (b.timestamp as any))
-         setLoadedMsgs(toAddToUI)
       }
-      populateUI()
-   }, [inboxData, account])
+   }
 
    if (isFetchingInboxData && inboxData.length === 0) {
-      return (
-         <Box background="white" height="100vh">
-            <Box py={8} px={3} height="100vh">
-               {[...Array(5)].map((e, i) => (
-                  <Stack key={i}>
-                     <Flex
-                        py={6}
-                        px={3}
-                        bg="white"
-                        borderBottom="1px solid var(--chakra-colors-lightgray-300)"
-                     >
-                        <SkeletonCircle
-                           size="10"
-                           startColor="lightgray.200"
-                           endColor="lightgray.400"
-                           flexShrink={0}
-                           mr={4}
-                        />
-                        <SkeletonText
-                           noOfLines={2}
-                           spacing="4"
-                           startColor="lightgray.200"
-                           endColor="lightgray.400"
-                           width="100%"
-                        />
-                     </Flex>
-                  </Stack>
-               ))}
-            </Box>
-         </Box>
-      )
+      return <InboxSkeleton />
    }
 
    return (
@@ -195,61 +163,161 @@ const Inbox = ({
          background="white"
          height={isMobile ? 'unset' : '100vh'}
          borderRight="1px solid var(--chakra-colors-lightgray-400)"
-         minWidth="300px"
-         width={isMobile ? '100%' : 'auto'}
-         overflowY="auto"
+         width="360px"
+         maxW="100%"
+         overflowY="scroll"
          className="custom-scrollbar"
       >
-         <Flex p={5} justifyContent="space-between">
-            <Heading size="xl">
-               Inbox {isFetchingInboxData && <Spinner />}
-            </Heading>
-            <Button
-               as={Link}
-               to="/new"
-               size="sm"
-               variant="outline"
-               _hover={{
-                  textDecoration: 'none',
-                  backgroundColor: 'var(--chakra-colors-lightgray-300)',
-               }}
-            >
-               + New
-            </Button>
-         </Flex>
-         <Divider />
-
-         <Box overflowY="auto">
-            {loadedMsgs.map((conversation, i) => {
-               if (
-                  conversation.context_type === 'dm' ||
-                  conversation.context_type === 'community'
-               ) {
-                  return (
-                     <ConversationItem
-                        key={`${conversation.timestamp.toString()}${i}`}
-                        data={conversation}
-                        account={account}
-                     />
-                  )
-               } else if (conversation.context_type === 'nft') {
-                  return (
-                     <NFTInboxItem
-                        key={`${conversation.timestamp.toString()}${i}`}
-                        data={conversation}
-                     />
-                  )
-               }
-            })}
-            {loadedMsgs.length === 0 && (
-               <Box p={5}>
-                  <Text mb={4} fontSize="md">
-                     You have no messages.
-                  </Text>
-                  <StartConversationWithAddress web3={web3} />
-               </Box>
-            )}
+         <Box
+            px={5}
+            pt={5}
+            pb={3}
+            pos="sticky"
+            top="0"
+            background="white"
+            zIndex="sticky"
+         >
+            <Flex justifyContent="space-between" mb={2}>
+               <Heading size="lg">Inbox</Heading>
+               <Button
+                  as={Link}
+                  to="/new"
+                  size="sm"
+                  variant="outline"
+                  _hover={{
+                     textDecoration: 'none',
+                     backgroundColor: 'var(--chakra-colors-lightgray-300)',
+                  }}
+               >
+                  + New
+               </Button>
+            </Flex>
+            {/* <InboxSearchInput /> */}
          </Box>
+
+         <Tabs isLazy>
+            <TabList
+               overflowX="auto"
+               overflowY="visible"
+               className="custom-scrollbar"
+            >
+               <Tab marginBottom="0">
+                  All{' '}
+                  {totalUnreadCount !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {totalUnreadCount}
+                     </Badge>
+                  )}
+               </Tab>
+               <Tab marginBottom="0">
+                  DM{' '}
+                  {unreadCount?.dm !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {unreadCount.dm}
+                     </Badge>
+                  )}
+               </Tab>
+               <Tab marginBottom="0">
+                  NFT{' '}
+                  {unreadCount?.nft !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {unreadCount.nft}
+                     </Badge>
+                  )}
+               </Tab>
+               <Tab marginBottom="0">
+                  Community{' '}
+                  {unreadCount?.community !== 0 && (
+                     <Badge ml={1} variant="midgray">
+                        {unreadCount.community}
+                     </Badge>
+                  )}
+               </Tab>
+            </TabList>
+
+            <TabPanels>
+               <TabPanel p={0}>
+                  <TabContent
+                     context="all"
+                     data={inboxData}
+                     web3={web3}
+                     account={account}
+                  />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <TabContent
+                     context="dms"
+                     data={dms}
+                     web3={web3}
+                     account={account}
+                  />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <Box px={5} my={2}>
+                     <Button
+                        size="sm"
+                        height="auto"
+                        py={1}
+                        px={3}
+                        onClick={() => toggleChain('')}
+                        variant={chainsFilter[0] === '' ? 'lightgray' : 'white'}
+                        opacity={chainsFilter[0] === '' ? '1' : '0.7'}
+                        mr={2}
+                     >
+                        All
+                     </Button>
+                     {Object.keys(chains).map((chain) => {
+                        const _selected =
+                           chainsFilter.includes(chain) ||
+                           chainsFilter[0] === ''
+                        return (
+                           <Button
+                              key={chain}
+                              size="sm"
+                              height="auto"
+                              py={1}
+                              px={3}
+                              onClick={() => toggleChain(chain)}
+                              variant={_selected ? 'lightgray' : 'white'}
+                              opacity={_selected ? '1' : '0.9'}
+                              mr={2}
+                           >
+                              {chains[chain]?.logo && (
+                                 <Image
+                                    src={`data:image/svg+xml;base64,${chains[chain]?.logo}`}
+                                    alt=""
+                                    width="15px"
+                                    height="15px"
+                                    d="inline-block"
+                                    verticalAlign="middle"
+                                    mr={1}
+                                    filter={
+                                       _selected ? 'none' : 'grayscale(100%)'
+                                    }
+                                 />
+                              )}
+                              {chains[chain]?.name}
+                           </Button>
+                        )
+                     })}
+                  </Box>
+                  <TabContent
+                     context="nfts"
+                     data={nfts}
+                     web3={web3}
+                     account={account}
+                  />
+               </TabPanel>
+               <TabPanel p={0}>
+                  <TabContent
+                     context="communities"
+                     data={communities}
+                     web3={web3}
+                     account={account}
+                  />
+               </TabPanel>
+            </TabPanels>
+         </Tabs>
       </Box>
    )
 }

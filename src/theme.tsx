@@ -171,6 +171,14 @@ export const theme = extendTheme(
                black: {
                   background: 'darkgray.800',
                   color: 'lightgray.200'
+               },
+               midgray: {
+                  background: 'lightgray.800',
+                  color: 'lightgray.100'
+               },
+               blue: {
+                  background: 'information.400',
+                  color: 'lightgray.200'
                }
             }
          },
@@ -292,6 +300,16 @@ export const theme = extendTheme(
                   bg: 'warning.700',
                   color: 'white',
                   _hover: { bg: 'warning.600' },
+               },
+               lightgray: {
+                  bg: 'lightgray.300',
+                  color: 'darkgray.600',
+                  _hover: {
+                     bg: 'lightgray.400',
+                     _disabled: {
+                        bg: 'lightgray.400'
+                     },
+                  }
                },
                black: {
                   bg: 'black',

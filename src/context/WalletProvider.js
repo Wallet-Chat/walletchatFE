@@ -55,11 +55,13 @@ const WalletProvider = React.memo(({ children }) => {
    const [web3ModalProvider, setWeb3ModalProvider] = useState()
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
+   const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
    const [accounts, setAccounts] = useState(null)
    const [web3, setWeb3] = useState(null)
    const [isAuthenticated, setAuthenticated] = useState(false)
    const [appLoading, setAppLoading] = useState(false)
+   const [error, setError] = useState()
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -108,17 +110,32 @@ const WalletProvider = React.memo(({ children }) => {
 
          console.log('subscribeToEvents', web3ModalProvider)
          web3ModalProvider.on(EthereumEvents.CHAIN_CHANGED, handleChainChanged)
-         web3ModalProvider.on(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged)
+         web3ModalProvider.on(
+            EthereumEvents.ACCOUNTS_CHANGED,
+            handleAccountsChanged
+         )
          web3ModalProvider.on(EthereumEvents.CONNECT, handleConnect)
          web3ModalProvider.on(EthereumEvents.DISCONNECT, handleDisconnect)
 
          return () => {
             console.log('unsubscribeToEvents', web3ModalProvider)
             if (web3ModalProvider?.removeListener) {
-               web3ModalProvider.removeListener(EthereumEvents.CHAIN_CHANGED, handleChainChanged)
-               web3ModalProvider.removeListener(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged)
-               web3ModalProvider.removeListener(EthereumEvents.CONNECT, handleConnect)
-               web3ModalProvider.removeListener(EthereumEvents.DISCONNECT, handleDisconnect)
+               web3ModalProvider.removeListener(
+                  EthereumEvents.CHAIN_CHANGED,
+                  handleChainChanged
+               )
+               web3ModalProvider.removeListener(
+                  EthereumEvents.ACCOUNTS_CHANGED,
+                  handleAccountsChanged
+               )
+               web3ModalProvider.removeListener(
+                  EthereumEvents.CONNECT,
+                  handleConnect
+               )
+               web3ModalProvider.removeListener(
+                  EthereumEvents.DISCONNECT,
+                  handleDisconnect
+               )
             }
          }
       }
@@ -133,6 +150,7 @@ const WalletProvider = React.memo(({ children }) => {
          console.log('No account connected')
          return
       }
+      setIsFetchingName(true)
       fetch(` ${process.env.REACT_APP_REST_API}/name/${_account}`, {
          method: 'GET',
          headers: {
@@ -149,30 +167,31 @@ const WalletProvider = React.memo(({ children }) => {
          .catch((error) => {
             console.error('🚨[GET][Name]:', error)
          })
+         .then(() => {
+            setIsFetchingName(false)
+         })
    }
 
    const getAccountsExtension = async (provider) => {
       if (provider) {
-         // const [accounts, chainId] = await Promise.all([
-         //    provider.request({
-         //       method: 'eth_requestAccounts',
-         //       params: [
-         //          {
-         //             eth_accounts: {},
-         //          },
-         //       ],
-         //    }),
-         //    provider.request({ method: 'eth_chainId' }),
-         // ])
-         // return [accounts, chainId]
-         const accounts = await provider.request({
-            method: 'eth_requestAccounts',
-            params: [
-               {
-                  eth_accounts: {},
-               },
-            ],
-         })
+         const accounts = await provider
+            .request({
+               method: 'eth_requestAccounts',
+               params: [
+                  {
+                     eth_accounts: {},
+                  },
+               ],
+            })
+            .catch((error) => {
+               if (error.code === 4001) {
+                  // EIP-1193 userRejectedRequest error
+                  console.log('Permissions needed to continue')
+                  setError(error.message)
+               } else {
+                  console.error(error)
+               }
+            })
          return accounts
       }
       return false
@@ -195,6 +214,7 @@ const WalletProvider = React.memo(({ children }) => {
       console.log('connectWallet')
       try {
          let _provider, _account
+         let _web3 = new Web3(provider)
 
          if (isChromeExtension()) {
             _provider = createMetaMaskProvider()
@@ -204,10 +224,19 @@ const WalletProvider = React.memo(({ children }) => {
             const instance = await web3Modal.connect()
             setWeb3ModalProvider(instance)
             _provider = new ethers.providers.Web3Provider(instance)
-            await _provider.getSigner().getAddress()
             _account = await _provider.getSigner().getAddress()
             const network = await _provider.getNetwork()
-            setChainId(network)
+            setChainId(network.chainId)
+
+            if (network.chainId !== '1') {
+               // check if the chain to connect to is installed
+               await _provider.provider.request({
+                  method: 'wallet_switchEthereumChain',
+                  params: [{ chainId: _web3.utils.toHex(1) }], // chainId must be in hexadecimal numbers
+               }).then(() => {
+                  setChainId(1)
+               })
+            }
          }
 
          setProvider(_provider)
@@ -218,18 +247,20 @@ const WalletProvider = React.memo(({ children }) => {
             // setChainId(chainId)
             setAuthenticated(true)
             getName(_account)
-            const _web3 = new Web3(provider)
             setWeb3(_web3)
 
             if (isChromeExtension()) {
                storage.set('metamask-connected', { connected: true })
                chrome.storage.local.set({
-                  account: _account
-               });
+                  account: _account,
+               })
             }
          }
-      } catch (e) {
-         console.log('🚨connectWallet', e)
+      } catch (error) {
+         console.log('🚨connectWallet', error)
+         if (error.message === "User Rejected") {
+            setError("Your permission is needed to continue. Please try signing in again.")
+         }
       } finally {
          setAppLoading(false)
       }
@@ -263,6 +294,7 @@ const WalletProvider = React.memo(({ children }) => {
          value={{
             name,
             setName,
+            isFetchingName,
             account,
             accounts,
             walletRequestPermissions,
@@ -271,6 +303,8 @@ const WalletProvider = React.memo(({ children }) => {
             isAuthenticated,
             appLoading,
             web3,
+            provider,
+            error,
          }}
       >
          {children}

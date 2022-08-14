@@ -8,9 +8,9 @@ import {
    Text,
 } from '@chakra-ui/react'
 import Blockies from 'react-blockies'
-import styled from 'styled-components'
 import TextareaAutosize from 'react-textarea-autosize'
 import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
+import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
 
@@ -18,30 +18,10 @@ import Message from './components/Message'
 import { MessageType, MessageUIType, SettingsType } from '../../../../types/Message'
 // import EncryptedMsgBlock from '../../../../types/Message'
 import { truncateAddress } from '../../../../helpers/truncateString'
+import { DottedBackground } from '../../../../styled/DottedBackground'
+import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
-const BlockieWrapper = styled.div`
-   border-radius: 0.3rem;
-   overflow: hidden;
-`
-const DottedBackground = styled.div`
-   flex-grow: 1;
-   width: 100%;
-   height: auto;
-   background: linear-gradient(
-            90deg,
-            var(--chakra-colors-lightgray-200) 14px,
-            transparent 1%
-         )
-         center,
-      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
-         center,
-      #9dadc3 !important;
-   background-size: 15px 15px !important;
-   background-position: top left !important;
-   padding: var(--chakra-space-1);
-   overflow-y: scroll;
-`
 
 const NFTChat = ({
    recipientAddr,
@@ -62,13 +42,16 @@ const NFTChat = ({
    )
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
-   const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
+   // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
 
    let timer: ReturnType<typeof setTimeout>
 
    useEffect(() => {
       getChatData()
+   }, [account])
 
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
          getChatData()
       }, 5000) // every 5s
@@ -76,7 +59,7 @@ const NFTChat = ({
       return () => {
          clearInterval(interval)
       }
-   }, [account])
+   }, [chatData, account])
 
    const getChatData = () => {
       // GET request to get off-chain data for RX user
@@ -88,7 +71,7 @@ const NFTChat = ({
          console.log('No account connected')
          return
       }
-      setIsFetchingMessages(true)
+      // setIsFetchingMessages(true)
       fetch(
          ` ${process.env.REACT_APP_REST_API}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
          {
@@ -100,15 +83,17 @@ const NFTChat = ({
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            console.log('✅[GET][NFT][Messages]:', data)
-            setChatData(data)
+            if (equal(data, chatData) === false) {
+               console.log('✅[GET][NFT][Messages]:', data)
+               setChatData(data)
+            }
          })
          .catch((error) => {
             console.error('🚨[GET][NFT][Messages]:', error)
          })
-         .finally(() => {
-            setIsFetchingMessages(false)
-         })
+         // .finally(() => {
+         //    setIsFetchingMessages(false)
+         // })
    }
 
    const handleMessageKeyPress = (
@@ -132,6 +117,7 @@ const NFTChat = ({
       const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
       console.log('nft id from sendMessage: ', nftId)
+
       let data = {
          message: msgInputCopy,
          fromAddr: account.toLocaleLowerCase(),

@@ -24,6 +24,7 @@ import IconLooksRare from '../../../../../../images/icon-looksrare.svg'
 import IconX2Y2 from '../../../../../../images/icon-x2y2.svg'
 import IconEtherscan from '../../../../../../images/icon-etherscan.svg'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { BlockieWrapper } from '../../../../../../styled/BlockieWrapper'
 
 const MessageBox = styled.div`
    position: relative;
@@ -115,10 +116,6 @@ const MessageBox = styled.div`
          }
       }
    }
-`
-const BlockieWrapper = styled.div`
-   border-radius: 0.3rem;
-   overflow: hidden;
 `
 
 const Message = ({ msg }: { msg: MessageUIType }) => {

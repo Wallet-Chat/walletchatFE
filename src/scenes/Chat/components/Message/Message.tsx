@@ -6,9 +6,9 @@ import { useInView } from 'react-intersection-observer'
 
 import { formatMessageDate } from '../../../../helpers/date'
 import { MessageUIType } from '../../../../types/Message'
-import NFTMetadataType from '../../../../types/NFTMetadata'
-import { useUnreadCount } from '../../../../context/UnreadCountProvider'
+import NFTPortNFT from '../../../../types/NFTPort/NFT'
 import { Link } from 'react-router-dom'
+import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
 
 const MessageBox = styled.div`
    position: relative;
@@ -118,8 +118,7 @@ const Message = ({
    msg: MessageUIType
    updateRead: (data: MessageUIType) => void
 }) => {
-   let { unreadCount, setUnreadCount } = useUnreadCount()
-   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
 
    const { metadata } = nftData?.nft || {}
@@ -161,7 +160,6 @@ const Message = ({
             .then((response) => response.json())
             .then((data) => {
                console.log('✅[PUT][Message]:', data)
-               setUnreadCount(unreadCount - 1)
                updateRead(data)
             })
             .catch((error) => {
@@ -171,38 +169,40 @@ const Message = ({
    }
 
    const getNftMetadata = () => {
-      if (msg.nftAddr && msg.nftId) {
-         if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-            console.log('Missing NFT Port API Key')
-            return
-         }
-         fetch(
-            `https://api.nftport.xyz/v0/nfts/${msg.nftAddr}/${msg.nftId}?chain=ethereum`,
-            {
-               method: 'GET',
-               headers: {
-                  Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
-               },
-            }
-         )
-            .then((response) => response.json())
-            .then((result: NFTMetadataType) => {
-               console.log('✅[GET][NFT Metadata]:', result)
 
-               setNftData(result)
-
-               let url = result.nft?.cached_file_url
-               if (url?.includes('ipfs://')) {
-                  let parts = url.split('ipfs://')
-                  let cid = parts[parts.length - 1]
-                  url = `https://ipfs.io/ipfs/${cid}`
-                  setImageUrl(url)
-               } else if (url !== null) {
-                  setImageUrl(url)
-               }
-            })
-            .catch((error) => console.log('error', error))
+      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+         console.log('Missing NFT Port API Key')
+         return
       }
+      if (!msg.nftAddr || !msg.nftId) {
+         console.log('Missing contract address or id')
+         return
+      }
+      
+      fetch(
+         `https://api.nftport.xyz/v0/nfts/${msg.nftAddr}/${msg.nftId}?chain=ethereum`,
+         {
+            method: 'GET',
+            headers: {
+               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+            },
+         }
+      )
+         .then((response) => response.json())
+         .then((result: NFTPortNFT) => {
+            console.log('✅[GET][NFT Metadata]:', result)
+
+            setNftData(result)
+
+            let url = result.nft?.cached_file_url
+            if (url?.includes('ipfs://')) {
+               setImageUrl(convertIpfsUriToUrl(url))
+            } else if (url !== null) {
+               setImageUrl(url)
+            }
+         })
+         .catch((error) => console.log('error', error))
+
    }
 
    return (
@@ -241,7 +241,7 @@ const Message = ({
             <Box mb={1}>
                {metadata && (
                   <Link
-                     to={`/nft/${msg.nftAddr}/${msg.nftId}?recipient=${
+                     to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${
                         msg.toAddr === account ? msg.fromAddr : msg.toAddr
                      }`}
                      style={{ textDecoration: 'none' }}

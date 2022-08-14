@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 
-
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
 import Inbox from './scenes/Inbox'
@@ -23,63 +22,28 @@ import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import { useIsMobileView } from './context/IsMobileViewProvider'
-import { useUnreadCount } from './context/UnreadCountProvider'
-import EnterName from './scenes/EnterName'
-import ChangeName from './scenes/ChangeName'
+import EnterName from './scenes/Me/scenes/EnterName'
+import ChangeName from './scenes/Me/scenes/ChangeName'
 import NFTById from './scenes/NFT/scenes/NFTById'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
+import MyNFTs from './scenes/Me/scenes/MyNFTs'
 
 export const App = () => {
-   const { unreadCount, setUnreadCount } = useUnreadCount()
    const [btnClicks, setBtnClicks] = useState(0)
-
-   // const location = useLocation()
-   // console.log("location", location)
 
    const {
       appLoading,
       isAuthenticated,
       connectWallet,
       name,
+      isFetchingName,
       account,
       web3,
+      error
    } = useWallet()
 
    const { isMobileView } = useIsMobileView()
-
-   useEffect(() => {
-      const interval = setInterval(() => {
-         getUnreadCount()
-      }, 5000) // every 5s
-
-      return () => {
-         clearInterval(interval)
-      }
-   }, [])
-
-   useEffect(() => {
-      getUnreadCount()
-   }, [isAuthenticated, account])
-
-   const getUnreadCount = () => {
-      if (account) {
-         fetch(` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`, {
-            method: 'GET',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-         })
-            .then((response) => response.json())
-            .then((count: number) => {
-               console.log('✅[GET][Unread Count]:', count)
-               setUnreadCount(count)
-            })
-            .catch((error) => {
-               console.error('🚨[GET][Unread Count]:', error)
-            })
-      }
-   }
 
    const closeBtn = (
       <Flex textAlign="right" position="fixed" top={0} right={0}>
@@ -101,11 +65,7 @@ export const App = () => {
    )
 
    const inbox = (
-      <Inbox
-         account={account}
-         web3={web3}
-         isAuthenticated={isAuthenticated}
-      />
+      <Inbox account={account} web3={web3} isAuthenticated={isAuthenticated} />
    )
 
    if (appLoading || !isAuthenticated) {
@@ -151,10 +111,15 @@ export const App = () => {
                   >
                      Sign in using wallet
                   </Button>
-                  {btnClicks > 0 && (
+                  {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>
                         Check the MetaMask extension to continue
                      </Alert>
+                  )}
+                  {error && (
+                     <Alert status="error" variant="solid" mt={4}>
+                     {error}
+                  </Alert>
                   )}
                </Box>
             )}
@@ -165,17 +130,33 @@ export const App = () => {
          <Box>
             <Flex>
                {isChromeExtension() && closeBtn}
-               <Sidebar unreadCount={unreadCount} />
-               <EnterName account={account} />
+               <Sidebar />
+               {isFetchingName ? (
+                  <Flex
+                     justifyContent="center"
+                     alignItems="center"
+                     height="100vh"
+                     width="100%"
+                  >
+                     <Spinner />
+                  </Flex>
+               ) : (
+                  <EnterName account={account} />
+               )}
             </Flex>
          </Box>
       )
    } else {
       return (
          <Box>
-            <Flex flexDirection={(isMobile && !isChromeExtension()) ? 'column' : 'row'} minHeight={isMobile ? '100vh' : 'unset'}>
+            <Flex
+               flexDirection={
+                  isMobile && !isChromeExtension() ? 'column' : 'row'
+               }
+               minHeight={isMobile ? '100vh' : 'unset'}
+            >
                {isChromeExtension() && closeBtn}
-               <Sidebar unreadCount={unreadCount} />
+               <Sidebar />
                <Box flex="1" overflow="hidden" minWidth="1px">
                   <Routes>
                      <Route
@@ -201,28 +182,37 @@ export const App = () => {
                            <Flex>
                               {inbox}
                               {!isMobileView && (
-                                 <Flex background="lightgray.200" flex="1" alignItems="center" justifyContent="center">
-                                    <Tag background="white">Select a chat to start messaging</Tag>
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       Select a chat to start messaging
+                                    </Tag>
                                  </Flex>
                               )}
                            </Flex>
                         }
                      />
-                     <Route path="/change-name" element={<ChangeName />} />
+                     <Route path="/me/change-name" element={<ChangeName />} />
+                     <Route
+                        path="/me/nfts"
+                        element={<MyNFTs account={account} />}
+                     />
 
                      <Route
-                        path="/nft/:nftContractAddr/:nftId"
+                        path="/nft/:chain/:nftContractAddr/:nftId"
                         element={
                            <Flex>
                               {!isMobileView && inbox}
-                              <NFTById
-                                 account={account}
-                              />
+                              <NFTById account={account} />
                            </Flex>
                         }
                      />
                      <Route
-                        path="/nft/:nftContractAddr"
+                        path="/nft/:chain/:nftContractAddr"
                         element={
                            <Flex>
                               {!isMobileView && inbox}

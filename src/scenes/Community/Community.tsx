@@ -1,5 +1,4 @@
 import {
-   Badge,
    Box,
    Button,
    Divider,
@@ -7,7 +6,6 @@ import {
    Heading,
    Image,
    Link,
-   Stack,
    Tab,
    TabList,
    TabPanel,
@@ -17,10 +15,8 @@ import {
    Tooltip,
 } from '@chakra-ui/react'
 import {
-   IconBrandMedium,
    IconBrandTwitter,
    IconCircleCheck,
-   IconLink,
 } from '@tabler/icons'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -35,14 +31,18 @@ const Community = ({ account }: { account: string }) => {
    let { community = '' } = useParams()
 
    const [communityData, setCommunityData] = useState<CommunityType>()
-   const [isFetchingCommunityData, setIsFetchingCommunityData] = useState(false)
+   const [isFetchingCommunityDataFirstTime, setIsFetchingCommunityDataFirstTime] = useState(true)
    const [joined, setJoined] = useState<boolean | null>(null)
    const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
    const [isFetchingJoining, setIsFetchingJoining] = useState(false)
 
+
    useEffect(() => {
       getCommunityData()
+   }, [account])
 
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
          getCommunityData()
       }, 5000) // every 5s
@@ -50,7 +50,7 @@ const Community = ({ account }: { account: string }) => {
       return () => {
          clearInterval(interval)
       }
-   }, [account])
+   }, [communityData, account])
 
    const getCommunityData = () => {
       if (account) {
@@ -58,8 +58,6 @@ const Community = ({ account }: { account: string }) => {
             console.log('No account connected')
             return
          }
-   
-         setIsFetchingCommunityData(true)
 
          fetch(
             `${process.env.REACT_APP_REST_API}/community/${community}/${account}`,
@@ -87,7 +85,11 @@ const Community = ({ account }: { account: string }) => {
             .catch((error) => {
                console.error('🚨[GET][Community]:', error)
             })
-            .finally(() => setIsFetchingCommunityData(false))
+            .finally(() => {
+               if (isFetchingCommunityDataFirstTime) {
+                  setIsFetchingCommunityDataFirstTime(false)
+               }
+            })
       }
    }
 
@@ -161,7 +163,7 @@ const Community = ({ account }: { account: string }) => {
                <Box>
                   {communityData?.name && (
                      <Flex alignItems="center">
-                        <Heading size="md" mr="1" maxWidth="140px" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+                        <Heading size="md" mr="1" maxWidth={[140, 140, 200, 300]} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
                            {communityData.name}
                         </Heading>
                         <Tooltip label="OpenSea Verified">
@@ -335,6 +337,7 @@ const Community = ({ account }: { account: string }) => {
                      account={account}
                      community={community}
                      chatData={communityData?.messages || []}
+                     isFetchingCommunityDataFirstTime={isFetchingCommunityDataFirstTime}
                   />
                </TabPanel>
                <TabPanel p={5}>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
    Button,
@@ -7,15 +7,21 @@ import {
    FormErrorMessage,
    Heading,
    Input,
+   Spinner,
    Text,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import Blockies from 'react-blockies'
 import { truncateAddress } from '../helpers/truncateString'
 import { IconArrowRight } from '@tabler/icons'
+import { useWallet } from '../context/WalletProvider'
 
 const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    const [toAddr, setToAddr] = useState<string>('')
+   const [resolvedAddr, setResolvedAddr] = useState<string|null>()
+   const [isResolvingENS, setIsResolvingENS] = useState(false)
+   const { provider } = useWallet()
+
    const {
       handleSubmit,
       register,
@@ -28,8 +34,25 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    }
 
    const addressIsValid = async (address: string) => {
-      return web3.utils.isAddress(address)
+      return web3.utils.isAddress(address) || address.includes(".eth")
    }
+
+   const checkENS = async (address: string) => {
+      if (address.includes(".eth")) {
+         setIsResolvingENS(true)
+         const _addr = await provider.resolveName(address)
+         setResolvedAddr(_addr)
+         setIsResolvingENS(false)
+      }
+   }
+
+   useEffect(() => {
+      const delayDebounceFn = setTimeout(() => {
+        checkENS(toAddr)
+      }, 800)
+  
+      return () => clearTimeout(delayDebounceFn)
+    }, [toAddr])
 
    return (
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -40,7 +63,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter address (0x939...) here"
+               placeholder="Enter ENS or address (0x...) here"
                {...register('toAddr', {
                   validate: addressIsValid,
                })}
@@ -60,6 +83,25 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                   <Blockies seed={toAddr.toLocaleLowerCase()} scale={3} />
                   <Text fontWeight="bold" fontSize="md" ml={2}>
                      {truncateAddress(toAddr)}
+                  </Text>
+               </Flex>
+               </Link>
+            )}
+            {isResolvingENS && <Spinner size="sm" mt={2} />}
+            {toAddr.includes(".eth") && resolvedAddr && !isResolvingENS && (
+               <Link to={`/chat/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
+               <Flex
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  p={3}
+                  background="lightgray.300"
+                  borderRadius="md"
+                  mt={2}
+                  as={Button}
+               >
+                  <Blockies seed={resolvedAddr.toLocaleLowerCase()} scale={3} />
+                  <Text fontWeight="bold" fontSize="md" ml={2}>
+                     {truncateAddress(resolvedAddr)}
                   </Text>
                </Flex>
                </Link>

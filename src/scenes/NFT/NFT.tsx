@@ -20,32 +20,35 @@ import {
    Tooltip,
 } from '@chakra-ui/react'
 import {
-   IconBrandDiscord,
    IconBrandMedium,
    IconBrandTwitter,
    IconCircleCheck,
    IconCurrencyEthereum,
    IconLink,
-   IconShieldCheck,
 } from '@tabler/icons'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import NFTGroupChat from './components/NFTGroupChat'
 import NFTTweets from './components/NFTTweets'
-import NFTStatisticsType from '../../types/NFTStatistics'
-import NFTContractType from '../../types/NFTContract'
+import NFTStatisticsType from '../../types/NFTPort/NFTStatistics'
 import { useHover } from '../../helpers/useHover'
 import IconEtherscan from '../../images/icon-etherscan-mono.svg'
 import IconDiscord from '../../images/icon-discord.svg'
+import IconPolygon from '../../images/icon-polygon.svg'
+import IconEthereum from '../../images/icon-ethereum.svg'
 import { nFormatter } from '../../helpers/number'
+import { convertIpfsUriToUrl } from '../../helpers/ipfs'
+import OpenSeaNFTCollection, { openseaToGeneralNFTCollectionType } from '../../types/OpenSea/NFTCollection'
+import NFTPortNFTCollection, { nftPortToGeneralNFTCollectionType } from '../../types/NFTPort/NFTCollection'
+import NFTCollection from '../../types/NFTCollection'
 
 const NFT = ({ account }: { account: string }) => {
-   let { nftContractAddr = '' } = useParams()
+   let { nftContractAddr = '', chain = '' } = useParams()
 
-   const [nftData, setNftData] = useState<NFTContractType>()
+   const [nftData, setNftData] = useState<NFTCollection>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
-   const [ethereumPrice, setEthereumPrice] = useState<number>()
+   // const [ethereumPrice, setEthereumPrice] = useState<number>()
    const [joined, setJoined] = useState<boolean | null>(null)
    const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
    const [isFetchingJoining, setIsFetchingJoining] = useState(false)
@@ -57,15 +60,17 @@ const NFT = ({ account }: { account: string }) => {
       getNftMetadata()
       getNftStatistics()
       getJoinStatus()
+   }, [nftContractAddr])
 
+   useEffect(() => {
       const interval = setInterval(() => {
          getNftStatistics()
-      }, 60000) // every 1 min
+      }, 60000 * 10) // every 10 mins
 
       return () => {
          clearInterval(interval)
       }
-   }, [nftContractAddr])
+   }, [nftContractAddr, nftStatistics])
 
    useEffect(() => {
       getTweetCount()
@@ -158,8 +163,10 @@ const NFT = ({ account }: { account: string }) => {
          )
             .then((response) => response.json())
             .then((count: number) => {
-               console.log('✅[GET][NFT][No. of tweets]:', count)
-               setTweetCount(count)
+               if (count !== tweetCount) {
+                  console.log('✅[GET][NFT][No. of tweets]:', count)
+                  setTweetCount(count)
+               }
             })
             .catch((error) => {
                console.error('🚨[GET][NFT][No. of tweets]:', error)
@@ -168,24 +175,57 @@ const NFT = ({ account }: { account: string }) => {
    }
 
    const getNftMetadata = () => {
-      if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
-         console.log('Missing OpenSea API Key')
+      if (!nftContractAddr) {
+         console.log('Missing contract address')
          return
       }
-      fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
-         method: 'GET',
-         headers: {
-            Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
-         },
-      })
-         .then((response) => response.json())
-         .then((result: NFTContractType) => {
-            console.log(`✅[GET][NFT Contract]:`, result)
-            if (result?.collection.name) {
-               setNftData(result)
+      if (chain === 'ethereum') {
+         if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+            console.log('Missing OpenSea API Key')
+            return
+         }
+         fetch(
+            `https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`,
+            {
+               method: 'GET',
+               headers: {
+                  Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+               },
             }
-         })
-         .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
+         )
+            .then((response) => response.json())
+            .then((result: OpenSeaNFTCollection) => {
+               if (result?.collection?.name) {
+                  console.log(`✅[GET][NFT]:`, result)
+                  setNftData(openseaToGeneralNFTCollectionType(result))
+               }
+            })
+            .catch((error) => console.log(`🚨[GET][NFT]:`, error))
+      } else if (chain === 'polygon') {
+         if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+            console.log('Missing NFT Port API Key')
+            return
+         }
+         fetch(
+            `https://api.nftport.xyz/v0/nfts/${nftContractAddr}?chain=${chain}&page_size=1&include=all`,
+            {
+               method: 'GET',
+               headers: {
+                  Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+               },
+            }
+         )
+            .then((response) => response.json())
+            .then((result: NFTPortNFTCollection) => {
+               console.log('✅[GET][NFT]:', result)
+               const _transformed = nftPortToGeneralNFTCollectionType(result)
+               setNftData({
+                  ..._transformed,
+                  image_url: _transformed?.image_url?.includes('ipfs://') ? convertIpfsUriToUrl(_transformed?.image_url) : _transformed?.image_url,
+               })
+            })
+            .catch((error) => console.log(`🚨[GET][NFT]:`, error))
+      }
    }
 
    const getNftStatistics = () => {
@@ -193,8 +233,12 @@ const NFT = ({ account }: { account: string }) => {
          console.log('Missing NFT Port API Key')
          return
       }
+      if (!nftContractAddr) {
+         console.log('Missing contract address')
+         return
+      }
       fetch(
-         `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=ethereum`,
+         `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
          {
             method: 'GET',
             headers: {
@@ -213,27 +257,13 @@ const NFT = ({ account }: { account: string }) => {
          .catch((error) => console.log('error', error))
    }
 
-//    const getEthereumPrice = () => {
-//       fetch(`https://api.coinstats.app/public/v1/coins/ethereum?currency=USD`, {
-//          method: 'GET',
-//       })
-//          .then((response) => response.json())
-//          .then((result) => {
-//             console.log('✅[GET][Ethereum Price]:', result)
-//             if (result && result.coin && result.coin.id === 'ethereum') {
-//                setEthereumPrice(result.coin.price)
-//             }
-//          })
-//          .catch((error) => console.log('error', error))
-//    }
-
    return (
       <Flex flexDirection="column" background="white" height="100vh" flex="1">
          <Flex alignItems="center" px={5} pt={4} pb={2}>
             <Flex alignItems="flex-start" p={2} borderRadius="md">
-               {nftData?.collection.image_url && (
+               {nftData?.image_url && (
                   <Image
-                     src={nftData.collection.image_url}
+                     src={nftData.image_url}
                      alt=""
                      height="60px"
                      borderRadius="var(--chakra-radii-xl)"
@@ -241,15 +271,29 @@ const NFT = ({ account }: { account: string }) => {
                   />
                )}
                <Box>
-                  {nftData?.collection?.name && (
+                  {nftData?.name && (
                      <Flex alignItems="center">
-                        <Heading size="md" mr="1" maxWidth="140px" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
-                           {nftData.collection.name}
+                        <Heading
+                           size="md"
+                           mr="1"
+                           maxWidth={[140, 140, 200, 300]}
+                           overflow="hidden"
+                           textOverflow="ellipsis"
+                           whiteSpace="nowrap"
+                        >
+                           {nftData.name}
                         </Heading>
                         <Tooltip label="OpenSea Verified">
-                        <Box><IconCircleCheck stroke="2" color="white" fill="var(--chakra-colors-success-600)" /></Box></Tooltip>
+                           <Box>
+                              <IconCircleCheck
+                                 stroke="2"
+                                 color="white"
+                                 fill="var(--chakra-colors-success-600)"
+                              />
+                           </Box>
+                        </Tooltip>
                         <Button
-                            ml={2}
+                           ml={2}
                            size="xs"
                            variant={joined ? 'black' : 'outline'}
                            isLoading={isFetchingJoining}
@@ -277,125 +321,177 @@ const NFT = ({ account }: { account: string }) => {
                      </Flex>
                   )}
 
-                  <Box
-                     px={4}
-                     pt={2}
-                     my={1}
-                     border="1px solid var(--chakra-colors-lightgray-300)"
-                     borderRadius="md"
-                  >
-                     <HStack>
-                        {nftStatistics && (
-                           <>
-                              {/* <Stat flex="0">
-                         <StatNumber fontSize="md" color="darkgray.700">
-                            {nftStatistics.total_supply}
-                         </StatNumber>
-                         <StatHelpText color="darkgray.200">Items</StatHelpText>
-                      </Stat>
-                      <Divider orientation="vertical" height="15px" /> */}
-                              <Stat flex="0">
-                                 <StatNumber fontSize="md" color="darkgray.700">
-                                    {nftStatistics.num_owners}
-                                 </StatNumber>
-                                 <StatHelpText color="darkgray.200">
-                                    Owners
-                                 </StatHelpText>
-                              </Stat>
-                              <Divider orientation="vertical" height="15px" />
-                              <Stat flex="0">
-                                 <StatNumber
-                                    fontSize="md"
-                                    color="darkgray.700"
-                                    d="flex"
-                                    alignItems="center"
-                                 >
-                                    {nftStatistics.floor_price}
-                                    <IconCurrencyEthereum size="18" />
-                                    {/* <Text fontSize="sm">{ethereumPrice &&
-                      `(~ $${(ethereumPrice * nftStatistics.floor_price).toFixed(2)})`}</Text> */}
-                                 </StatNumber>
-                                 <StatHelpText color="darkgray.200">
-                                    Floor
-                                 </StatHelpText>
-                              </Stat>
-                              <Divider orientation="vertical" height="15px" />
-                              <Stat flex="0">
-                                 <StatNumber
-                                    fontSize="md"
-                                    color="darkgray.700"
-                                    d="flex"
-                                    alignItems="center"
-                                 >
-                                    {nFormatter(nftStatistics.total_volume, 1)}
-                                    <IconCurrencyEthereum size="18" />
-                                 </StatNumber>
-                                 <StatHelpText color="darkgray.200">
-                                    Total Vol.
-                                 </StatHelpText>
-                              </Stat>
-                           </>
-                        )}
+                  {nftStatistics && (
+                     <HStack
+                        d="inline-block"
+                        px={4}
+                        pt={2}
+                        my={1}
+                        border="1px solid var(--chakra-colors-lightgray-300)"
+                        borderRadius="md"
+                     >
+                        <Stat d="inline-block" verticalAlign="middle">
+                           <StatNumber fontSize="md" color="darkgray.700">
+                              {nFormatter(nftStatistics.num_owners, 1)}
+                           </StatNumber>
+                           <StatHelpText
+                              color="darkgray.200"
+                              whiteSpace="nowrap"
+                           >
+                              Owners
+                           </StatHelpText>
+                        </Stat>
+                        <Divider
+                           orientation="vertical"
+                           height="15px"
+                           d="inline-block"
+                           verticalAlign="middle"
+                        />
+                        <Stat d="inline-block" verticalAlign="middle">
+                           <StatNumber
+                              fontSize="md"
+                              color="darkgray.700"
+                              d="flex"
+                              alignItems="center"
+                           >
+                              {nftStatistics.floor_price < 0.01
+                                 ? '<0.01'
+                                 : nftStatistics.floor_price.toFixed(2)}
+                              <IconCurrencyEthereum size="18" />
+                           </StatNumber>
+                           <StatHelpText
+                              color="darkgray.200"
+                              whiteSpace="nowrap"
+                           >
+                              Floor
+                           </StatHelpText>
+                        </Stat>
+                        <Divider
+                           orientation="vertical"
+                           height="15px"
+                           d="inline-block"
+                           verticalAlign="middle"
+                        />
+                        <Stat d="inline-block" verticalAlign="middle">
+                           <StatNumber
+                              fontSize="md"
+                              color="darkgray.700"
+                              d="flex"
+                              alignItems="center"
+                           >
+                              {nFormatter(nftStatistics.total_volume, 1)}
+                              <IconCurrencyEthereum size="18" />
+                           </StatNumber>
+                           <StatHelpText
+                              color="darkgray.200"
+                              whiteSpace="nowrap"
+                           >
+                              Total Vol.
+                           </StatHelpText>
+                        </Stat>
                      </HStack>
-                  </Box>
+                  )}
                   <Box mb={2}>
-                     {nftData?.collection?.external_url && (
+                     {chain === 'ethereum' && (
+                        <Tooltip label="Ethereum chain">
+                           <Image
+                              src={IconEthereum}
+                              alt="Ethereum chain"
+                              width="24px"
+                              height="24px"
+                              d="inline-block"
+                              verticalAlign="middle"
+                              p={0.5}
+                           />
+                        </Tooltip>
+                     )}
+                     {chain === 'polygon' && (
+                        <Tooltip label="Polygon chain">
+                           <Image
+                              src={IconPolygon}
+                              alt="Polygon chain"
+                              width="24px"
+                              height="24px"
+                              d="inline-block"
+                              verticalAlign="middle"
+                              p={0.5}
+                           />
+                        </Tooltip>
+                     )}
+                     {nftData?.external_url && (
                         <Tooltip label="Visit website">
                            <Link
-                              href={nftData.collection.external_url}
+                              href={nftData.external_url}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
                               mr={1}
                            >
-                              <IconLink stroke={1.5} color="var(--chakra-colors-lightgray-800)" />
+                              <IconLink
+                                 stroke={1.5}
+                                 color="var(--chakra-colors-lightgray-800)"
+                              />
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.collection?.discord_url && (
+                     {nftData?.discord_url && (
                         <Tooltip label="Discord">
                            <Link
-                              href={nftData.collection.discord_url}
+                              href={nftData.discord_url}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
                               mr={1}
                            >
-                              <Image src={IconDiscord} alt="" height="24px" width="24px" />
+                              <Image
+                                 src={IconDiscord}
+                                 alt=""
+                                 height="24px"
+                                 width="24px"
+                              />
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.collection?.twitter_username && (
+                     {nftData?.twitter_username && (
                         <Tooltip label="Twitter">
                            <Link
-                              href={`https://twitter.com/${nftData.collection.twitter_username}`}
+                              href={`https://twitter.com/${nftData.twitter_username}`}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
                               mr={1}
                            >
-                              <IconBrandTwitter stroke={1.5} color="white"
-                                 fill="var(--chakra-colors-lightgray-800)" />
+                              <IconBrandTwitter
+                                 stroke={1.5}
+                                 color="white"
+                                 fill="var(--chakra-colors-lightgray-800)"
+                              />
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.address && (
+                     {nftData?.contract_address && (
                         <Tooltip label="Etherscan">
                            <Link
-                              href={`https://etherscan.io/address/${nftData.address}`}
+                              href={`https://etherscan.io/address/${nftData.contract_address}`}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"
                               mr={1}
                            >
-                              <Image src={IconEtherscan} alt="" height="21px" width="21px" padding="2px" />
+                              <Image
+                                 src={IconEtherscan}
+                                 alt=""
+                                 height="21px"
+                                 width="21px"
+                                 padding="2px"
+                              />
                            </Link>
                         </Tooltip>
                      )}
-                     {nftData?.collection?.medium_username && (
+                     {nftData?.medium_username && (
                         <Tooltip label="Medium">
                            <Link
-                              href={`https://medium.com/${nftData.collection.medium_username}`}
+                              href={`https://medium.com/${nftData.medium_username}`}
                               target="_blank"
                               d="inline-block"
                               verticalAlign="middle"

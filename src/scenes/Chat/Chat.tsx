@@ -5,12 +5,10 @@ import {
    Flex,
    Text,
    Link as CLink,
-   Spinner,
 } from '@chakra-ui/react'
 import { KeyboardEvent, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Web3 from 'web3'
-import styled from 'styled-components'
 import {
    IconArrowLeft,
    IconCheck,
@@ -26,33 +24,12 @@ import Message from './components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../helpers/truncateString'
 import { isMobile } from 'react-device-detect'
+import equal from 'fast-deep-equal/es6'
+import { DottedBackground } from '../../styled/DottedBackground'
+import { BlockieWrapper } from '../../styled/BlockieWrapper'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
-
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
-
-const BlockieWrapper = styled.div`
-   border-radius: 0.3rem;
-   overflow: hidden;
-`
-const DottedBackground = styled.div`
-   flex-grow: 1;
-   width: 100%;
-   height: auto;
-   background: linear-gradient(
-            90deg,
-            var(--chakra-colors-lightgray-200) 14px,
-            transparent 1%
-         )
-         center,
-      linear-gradient(var(--chakra-colors-lightgray-200) 14px, transparent 1%)
-         center,
-      #9dadc3 !important;
-   background-size: 15px 15px !important;
-   background-position: top left !important;
-   padding: var(--chakra-space-1);
-   overflow-y: scroll;
-`
 
 const Chat = ({
    account,
@@ -79,12 +56,16 @@ const Chat = ({
 
    useEffect(() => {
       getChatData()
+   }, [isAuthenticated, account, toAddr])
+
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
          getChatData()
       }, 5000) // every 5s
 
       return () => clearInterval(interval)
-   }, [isAuthenticated, account, toAddr])
+   }, [isAuthenticated, account, toAddr, chatData])
 
    useEffect(() => {
       if (toAddr) {
@@ -136,9 +117,10 @@ const Chat = ({
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            console.log('✅[GET][Chat items]:', data)
-            setChatData(data)
-            setIsFetchingChatData(false)
+            if (equal(data, chatData) === false) {
+               console.log('✅[GET][Chat items]:', data)
+               setChatData(data)
+            }
          })
          .catch((error) => {
             console.error('🚨[GET][Chat items]:', error)

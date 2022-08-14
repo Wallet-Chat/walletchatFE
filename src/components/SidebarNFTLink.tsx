@@ -2,8 +2,9 @@ import { Image, Badge } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
+import { convertIpfsUriToUrl } from '../helpers/ipfs'
 
-import NFTMetadataType from '../types/NFTMetadata'
+import NFTPortNFT from '../types/NFTPort/NFT'
 
 const LinkElem = styled(NavLink)`
    position: relative;
@@ -54,7 +55,7 @@ const Sidebar = ({
    nftId: string
 }) => {
    const nftNotificationCount = 0
-   const [nftData, setNftData] = useState<NFTMetadataType>()
+   const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
 
    const { metadata } = nftData?.nft || {}
@@ -70,6 +71,10 @@ const Sidebar = ({
          console.log('Missing NFT Port API Key')
          return
       }
+      if (!nftContractAddr || !nftId) {
+         console.log('Missing contract address or id')
+         return
+      }
       fetch(
          `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=ethereum`,
          {
@@ -80,17 +85,14 @@ const Sidebar = ({
          }
       )
          .then((response) => response.json())
-         .then((result: NFTMetadataType) => {
+         .then((result: NFTPortNFT) => {
             console.log('✅[GET][NFT Metadata]:', result)
 
             setNftData(result)
 
             let url = result.nft?.cached_file_url
             if (url?.includes('ipfs://')) {
-               let parts = url.split('ipfs://')
-               let cid = parts[parts.length - 1]
-               url = `https://ipfs.io/ipfs/${cid}`
-               setImageUrl(url)
+               setImageUrl(convertIpfsUriToUrl(url))
             } else if (url !== null) {
                setImageUrl(url)
             }
@@ -101,7 +103,7 @@ const Sidebar = ({
    return (
       <>
          {metadata && (
-            <LinkElem to={`/nft/${nftContractAddr}/${nftId}`}>
+            <LinkElem to={`/nft/ethereum/${nftContractAddr}/${nftId}`}>
                {/* <Image src={coolcat2356} alt="" width="40px" /> */}
                {imageUrl && (
                   <Image
