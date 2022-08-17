@@ -22,6 +22,7 @@ import TabContent from './components/TabContent'
 import InboxSkeleton from './components/InboxSkeleton'
 import { chains } from '../../constants'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
+import { getIpfsData } from '../../services/ipfs'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -109,17 +110,31 @@ const Inbox = ({
          },
       })
          .then((response) => response.json())
-         .then((data: InboxItemType[]) => {
+         .then(async (data: InboxItemType[]) => {
             if (data === null) {
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
-               console.log('✅[GET][Inbox]:', data)
+               console.log('✅[GET][Inbox ipfs]:', data)
 
                const _filtered = data.filter(
                   (d) => !(d.context_type === 'nft' && d.chain === 'none')
                )
-               setInboxData(_filtered)
+
+               const replica = JSON.parse(JSON.stringify(_filtered));
+               console.log("Filtered data ipfs: ", replica);
+
+               //Get data from IPFS and replace the message with the fetched text
+               for (let i = 0; i < replica.length; i++) {
+                  if(replica[i].message != "") {
+                     console.log('requesting CID inbox:', replica[i].message)
+                     const rawmsg = await getIpfsData(replica[i].message)
+                     console.log('raw IPFS returned data ipfs :', rawmsg)
+                     replica[i].message = rawmsg
+                  }
+               }
+               console.log("Replica datazzzz: ", replica);
+               setInboxData(replica)
                localStorage.setItem('inbox', JSON.stringify(data))
             }
             setIsFetchingInboxData(false)
