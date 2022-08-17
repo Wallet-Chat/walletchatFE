@@ -22,6 +22,7 @@ import TabContent from './components/TabContent'
 import InboxSkeleton from './components/InboxSkeleton'
 import { chains } from '../../constants'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
+import ChainFilters from '../../components/ChainFilters'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -41,7 +42,7 @@ const Inbox = ({
    const [dms, setDms] = useState<InboxItemType[]>()
    const [communities, setCommunities] = useState<InboxItemType[]>()
    const [nfts, setNfts] = useState<InboxItemType[]>()
-   const [chainsFilter, setChainsFilter] = useState([''])
+   const [chainFilters, setChainFilters] = useState([''])
    const { unreadCount, totalUnreadCount } = useUnreadCount()
 
    useEffect(() => {
@@ -59,16 +60,16 @@ const Inbox = ({
    }, [inboxData])
 
    useEffect(() => {
-      console.log('chainsFilter', chainsFilter)
-      if (chainsFilter.length === 0) {
+      // console.log('chainFilters', chainFilters)
+      if (chainFilters.length === 0) {
          setNfts([])
       } else if (
-         chainsFilter.includes('') ||
-         chainsFilter.length === Object.keys(chains).length
+         chainFilters.includes('') ||
+         chainFilters.length === Object.keys(chains).length
       ) {
          const _new = inboxData.filter((d) => d.context_type === 'nft')
          if (!equal(_new, inboxData)) setNfts(_new)
-      } else if (chainsFilter.length > 1) {
+      } else if (chainFilters.length > 1) {
          const _allowedChains = Object.keys(chains).map((c) => chains[c]?.name)
          const _new = inboxData.filter(
             (d) =>
@@ -81,7 +82,7 @@ const Inbox = ({
       } else {
          setNfts([])
       }
-   }, [chainsFilter, inboxData])
+   }, [chainFilters, inboxData])
 
    useEffect(() => {
       getInboxData()
@@ -128,30 +129,6 @@ const Inbox = ({
             console.error('🚨[GET][Inbox]:', error)
             setIsFetchingInboxData(false)
          })
-   }
-
-   const toggleChain = (chain: string) => {
-      if (chain === '') {
-         if (chainsFilter.length > 1) setChainsFilter([''])
-         else if (chainsFilter.length === 1 && chainsFilter[0] !== '')
-            setChainsFilter([''])
-      } else {
-         const index = chainsFilter.indexOf(chain)
-         if (index > -1) {
-            // item found
-            let newChainsFilter = chainsFilter
-            newChainsFilter.splice(index, 1)
-            setChainsFilter(newChainsFilter)
-         } else {
-            if (chainsFilter[0] === '') {
-               setChainsFilter([chain])
-               // setChainsFilter(Object.keys(chains)
-               //    .filter(c => c !== chain))
-            } else {
-               setChainsFilter([...chainsFilter, chain])
-            }
-         }
-      }
    }
 
    if (isFetchingInboxData && inboxData.length === 0) {
@@ -253,54 +230,10 @@ const Inbox = ({
                   />
                </TabPanel>
                <TabPanel p={0}>
-                  <Box px={5} my={2}>
-                     <Button
-                        size="sm"
-                        height="auto"
-                        py={1}
-                        px={3}
-                        onClick={() => toggleChain('')}
-                        variant={chainsFilter[0] === '' ? 'lightgray' : 'white'}
-                        opacity={chainsFilter[0] === '' ? '1' : '0.7'}
-                        mr={2}
-                     >
-                        All
-                     </Button>
-                     {Object.keys(chains).map((chain) => {
-                        const _selected =
-                           chainsFilter.includes(chain) ||
-                           chainsFilter[0] === ''
-                        return (
-                           <Button
-                              key={chain}
-                              size="sm"
-                              height="auto"
-                              py={1}
-                              px={3}
-                              onClick={() => toggleChain(chain)}
-                              variant={_selected ? 'lightgray' : 'white'}
-                              opacity={_selected ? '1' : '0.9'}
-                              mr={2}
-                           >
-                              {chains[chain]?.logo && (
-                                 <Image
-                                    src={`data:image/svg+xml;base64,${chains[chain]?.logo}`}
-                                    alt=""
-                                    width="15px"
-                                    height="15px"
-                                    d="inline-block"
-                                    verticalAlign="middle"
-                                    mr={1}
-                                    filter={
-                                       _selected ? 'none' : 'grayscale(100%)'
-                                    }
-                                 />
-                              )}
-                              {chains[chain]?.name}
-                           </Button>
-                        )
-                     })}
-                  </Box>
+                  <ChainFilters
+                     chainFilters={chainFilters}
+                     setChainFilters={setChainFilters}
+                  />
                   <TabContent
                      context="nfts"
                      data={nfts}

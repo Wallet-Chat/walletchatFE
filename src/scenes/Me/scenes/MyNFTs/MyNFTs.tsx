@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, Image, Spinner } from '@chakra-ui/react'
+import { Box,Flex, Heading } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
@@ -14,17 +14,22 @@ import { nftPortToGeneralNFTType } from '../../../../types/NFTPort/NFT'
 import POAP from '../../../../types/POAP/POAP'
 import MyNFTPOAP from './components/MyNFTPOAP'
 import { chains } from '../../../../constants'
-
+import ChainFilters from '../../../../components/ChainFilters'
+import MyNFTSkeleton from './components/MyNFTSkeleton'
 
 export default function MyNFTs({ account }: { account: string }) {
+   // NFTs
    const [nfts, setNfts] = useState<NFT[]>([])
    const [filteredNfts, setFilteredNfts] = useState<NFT[]>([])
+   const [isFetchingNFTs, setIsFetchingNFTs] = useState(true)
+
+   // POAPs
    const [poaps, setPoaps] = useState<POAP[]>([])
    const [filteredPoaps, setFilteredPoaps] = useState<POAP[]>([])
-   const [isFetchingNFTs, setIsFetchingNFTs] = useState(true)
    const [isFetchingPOAPs, setIsFetchingPOAPs] = useState(true)
-   const [chainsFilter, setChainsFilter] = useState([''])
-   
+
+   // Filters
+   const [chainFilters, setChainFilters] = useState<Array<string>>([''])
 
    useEffect(() => {
       const fetchAllNfts = async () => {
@@ -113,15 +118,12 @@ export default function MyNFTs({ account }: { account: string }) {
 
          setIsFetchingPOAPs(true)
 
-         fetch(
-            `https://api.poap.tech/actions/scan/${account}`,
-            {
-               method: 'GET',
-               headers: {
-                  Authorization: process.env.REACT_APP_POAP_API_KEY,
-               },
-            }
-         )
+         fetch(`https://api.poap.tech/actions/scan/${account}`, {
+            method: 'GET',
+            headers: {
+               Authorization: process.env.REACT_APP_POAP_API_KEY,
+            },
+         })
             .then((response) => response.json())
             .then((result: POAP[]) => {
                console.log(`✅[GET][POAPs] ${account}:`, result)
@@ -137,68 +139,34 @@ export default function MyNFTs({ account }: { account: string }) {
    }, [account])
 
    useEffect(() => {
-      console.log('chainsFilter', chainsFilter)
-      if (chainsFilter.length === 0) {
+
+      if (chainFilters.length === 0) {
          setNfts([])
       } else if (
-         chainsFilter.includes('') ||
-         chainsFilter.length === Object.keys(chains).length
+         chainFilters.includes('') ||
+         chainFilters.length === Object.keys(chains).length
       ) {
          if (!equal(nfts, filteredNfts)) setFilteredNfts(nfts)
          if (!equal(poaps, filteredPoaps)) setFilteredPoaps(poaps)
-      } else if (chainsFilter.length > 0) {
-         const _allowedChainIds = Object.keys(chains)
-         const _newNfts = nfts.filter(
-            (d) =>
-               d?.chain_id &&
-               _allowedChainIds.includes(d.chain_id)
+      } else if (chainFilters.length > 0) {
+         const _newFilteredNfts = nfts.filter(
+            (d) => d?.chain_id && chainFilters.includes(d.chain_id)
          )
-         setFilteredNfts(_newNfts)
+         if (!equal(_newFilteredNfts, filteredNfts))
+            setFilteredNfts(_newFilteredNfts)
 
-         const _allowedChainNames = _allowedChainIds.map((c) => chains[c]?.name)
-         if (!equal(_newNfts, nfts)) setNfts(_newNfts)
-         const _newPoaps = poaps.filter(
-            (d) =>
-               d?.chain &&
-               _allowedChainNames.includes(d.chain)
+         const _allowedChainNames = chainFilters.map((c) => chains[c]?.slug)
+
+         const _newFilteredPoaps = poaps.filter(
+            (d) => d?.chain && _allowedChainNames.includes(d.chain)
          )
-         setFilteredPoaps(_newPoaps)
-         if (!equal(_newPoaps, poaps)) setPoaps(_newPoaps)
+         if (!equal(_newFilteredPoaps, filteredPoaps))
+            setFilteredPoaps(_newFilteredPoaps)
       } else {
          setNfts([])
          setPoaps([])
       }
-   }, [chainsFilter, nfts, poaps])
-
-   const toggleChain = (chain: string) => {
-      if (chain === '') {
-         if (chainsFilter.length > 1) setChainsFilter([''])
-         else if (chainsFilter.length === 1 && chainsFilter[0] !== '')
-            setChainsFilter([''])
-      } else {
-         const index = chainsFilter.indexOf(chain)
-         if (index > -1) {
-            // item found
-            let newChainsFilter = chainsFilter
-            newChainsFilter.splice(index, 1)
-            setChainsFilter(newChainsFilter)
-         } else {
-            if (chainsFilter[0] === '') {
-               setChainsFilter([chain])
-            } else {
-               setChainsFilter([...chainsFilter, chain])
-            }
-         }
-      }
-   }
-
-   if (isFetchingNFTs || isFetchingPOAPs) {
-      return (
-         <Flex justifyContent="center" alignItems="center">
-            <Spinner />
-         </Flex>
-      )
-   }
+   }, [chainFilters, nfts, poaps])
 
    return (
       <Box
@@ -210,55 +178,16 @@ export default function MyNFTs({ account }: { account: string }) {
             <Heading size="xl" mb={5}>
                My NFTs
             </Heading>
-            <Box px={5} my={2}>
-                     <Button
-                        size="sm"
-                        height="auto"
-                        py={1}
-                        px={3}
-                        onClick={() => toggleChain('')}
-                        variant={chainsFilter[0] === '' ? 'lightgray' : 'white'}
-                        opacity={chainsFilter[0] === '' ? '1' : '0.7'}
-                        mr={2}
-                     >
-                        All
-                     </Button>
-                     {Object.keys(chains).map((chain) => {
-                        const _selected =
-                           chainsFilter.includes(chain) ||
-                           chainsFilter[0] === ''
-                        return (
-                           <Button
-                              key={chain}
-                              size="sm"
-                              height="auto"
-                              py={1}
-                              px={3}
-                              onClick={() => toggleChain(chain)}
-                              variant={_selected ? 'lightgray' : 'white'}
-                              opacity={_selected ? '1' : '0.9'}
-                              mr={2}
-                           >
-                              {chains[chain]?.logo && (
-                                 <Image
-                                    src={`data:image/svg+xml;base64,${chains[chain]?.logo}`}
-                                    alt=""
-                                    width="15px"
-                                    height="15px"
-                                    d="inline-block"
-                                    verticalAlign="middle"
-                                    mr={1}
-                                    filter={
-                                       _selected ? 'none' : 'grayscale(100%)'
-                                    }
-                                 />
-                              )}
-                              {chains[chain]?.name}
-                           </Button>
-                        )
-                     })}
-                  </Box>
+            <Box mb={4}>
+            <ChainFilters
+               chainFilters={chainFilters}
+               setChainFilters={setChainFilters}
+            />
+            </Box>
             <Flex wrap="wrap">
+               {(isFetchingNFTs || isFetchingPOAPs) && (
+                  <MyNFTSkeleton />
+               )}
                {filteredPoaps.map((poap, i) => (
                   <Box mb={4} mr={4} key={i}>
                      <MyNFTPOAP key={i} poap={poap} />
