@@ -135,7 +135,7 @@ const Inbox = ({
                }
                console.log("Replica datazzzz: ", replica);
                setInboxData(replica)
-               localStorage.setItem('inbox', JSON.stringify(data))
+               localStorage.setItem('inbox', JSON.stringify(replica))
             }
             setIsFetchingInboxData(false)
          })

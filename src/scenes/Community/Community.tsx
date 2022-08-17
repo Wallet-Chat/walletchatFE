@@ -26,6 +26,7 @@ import CommunityTweets from './components/CommunityTweets'
 import { useHover } from '../../helpers/useHover'
 import IconDiscord from '../../images/icon-discord.svg'
 import CommunityType from '../../types/Community'
+import { getIpfsData } from '../../services/ipfs'
 
 const Community = ({ account }: { account: string }) => {
    let { community = '' } = useParams()
@@ -71,6 +72,18 @@ const Community = ({ account }: { account: string }) => {
             .then((response) => response.json())
             .then(async (data: CommunityType) => {
                console.log('✅[GET][Community]:', data)
+
+               const replica = JSON.parse(JSON.stringify(data.messages));
+
+               // Get data from IPFS and replace the message with the fetched text
+               for (let i = 0; i < replica.length; i++) {
+                  console.log('requesting CID:', replica[i].message)
+                  const rawmsg = await getIpfsData(replica[i].message)
+                  console.log('raw IPFS returned data:', rawmsg)
+                  replica[i].message = rawmsg
+               }
+               //setChatData(replica)
+               data.messages = replica
                setCommunityData({
                   ...data,
                   twitter: data?.social?.find(i => i.type === 'twitter')?.username,
