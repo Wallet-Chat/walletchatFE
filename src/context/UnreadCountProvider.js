@@ -21,7 +21,7 @@ const UnreadCountProvider = React.memo(({ children }) => {
 
    const getUnreadCount = useCallback(() => {
       if (account) {
-         fetch(` ${process.env.REACT_APP_REST_API}/unreadcount/${account}`, {
+         fetch(` ${process.env.REACT_APP_REST_API_IPFS}/unreadcount/${account}`, {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',

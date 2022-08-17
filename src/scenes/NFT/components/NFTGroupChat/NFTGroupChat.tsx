@@ -16,6 +16,7 @@ import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
 import { DottedBackground } from '../../../../styled/DottedBackground'
+import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
 const NFTGroupChat = ({
    account,
@@ -57,7 +58,7 @@ const NFTGroupChat = ({
       // setIsFetchingMessages(true)
 
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_groupchatitems/${nftContractAddr}/${account}`,
+         ` ${process.env.REACT_APP_REST_API_IPFS}/get_groupchatitems/${nftContractAddr}/${account}`,
          {
             method: 'GET',
             headers: {
@@ -162,10 +163,11 @@ const NFTGroupChat = ({
          nftContractAddr
       )
 
-      data.message = msgInputCopy
+      const cid = await postIpfsData(msgInputCopy)
+      data.message = cid
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_groupchatitem`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

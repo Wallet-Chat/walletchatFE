@@ -27,7 +27,7 @@ const NFTTweets = ({
    const getTwitterInfo = async (nftContractAddr: string) => {
       setIsFetchingTweets(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_twitter/${nftContractAddr}`,
+         ` ${process.env.REACT_APP_REST_API_IPFS}/get_twitter/${nftContractAddr}`,
          {
             method: 'GET',
             headers: {

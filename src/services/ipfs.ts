@@ -1,23 +1,26 @@
 import { create } from 'ipfs-http-client'
 import { v4 as uuidv4 } from 'uuid'
 
+// const projectId = process.env.REACT_APP_IPFS_INFURA_PROJ_KEY
+// const projectSecret = process.env.REACT_APP_IPFS_INFURA_API_KEY
+// const authorization = "Basic " + btoa(projectId + ":" + projectSecret)
+
 const ipfsClient = create({
-   url: 'https://ipfs.infura.io:5001/api/v0',
+   url: 'https://ipfs.infura.io:5001/',
+   headers: {
+      authorization: "Basic " + btoa(process.env.REACT_APP_IPFS_INFURA_PROJ_KEY + ":" + process.env.REACT_APP_IPFS_INFURA_API_KEY)
+    }
 })
 
 export const getIpfsData = async (cid: string) => {
-   
-   if (cid.length === 46) {
-      let returnData = '**failed - call devs**'
-      const rawmessage = await fetch(`https://ipfs.infura.io/ipfs/${cid}`)
-      returnData = await rawmessage.text()
-      return returnData
-   } else {
-      return cid
-   }
+   let message = await ipfsClient.get(cid)
+   return message
 }
 
 export const postIpfsData = async (text: string) => {
+   // const projectId = process.env.REACT_APP_IPFS_INFURA_PROJ_KEY
+   // const projectSecret = process.env.REACT_APP_IPFS_INFURA_API_KEY
+   // console.log('IPFS info: ', projectId, projectSecret)
    let cidReturn = 'failed'
    let cid = await ipfsClient.add(text)
    // const url = `https://ipfs.infura.io/ipfs/${cid.path}`

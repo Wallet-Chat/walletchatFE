@@ -60,7 +60,7 @@ const Community = ({ account }: { account: string }) => {
          }
 
          fetch(
-            `${process.env.REACT_APP_REST_API}/community/${community}/${account}`,
+            `${process.env.REACT_APP_REST_API_IPFS}/community/${community}/${account}`,
             {
                method: 'GET',
                headers: {
@@ -96,7 +96,7 @@ const Community = ({ account }: { account: string }) => {
    const joinGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
+         fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_bookmark`, {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ const Community = ({ account }: { account: string }) => {
    const leaveGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
+         fetch(` ${process.env.REACT_APP_REST_API_IPFS}/delete_bookmark`, {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',

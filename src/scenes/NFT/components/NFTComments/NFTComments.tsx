@@ -38,7 +38,7 @@ const NFTComments = ({
    const getComments = () => {
       setIsFetchingComments(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_comments/${nftContractAddr}/${nftId}`,
+         ` ${process.env.REACT_APP_REST_API_IPFS}/get_comments/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
          }
@@ -89,7 +89,7 @@ const NFTComments = ({
       }
 
       setIsPostingComment(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_comments`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_comments`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

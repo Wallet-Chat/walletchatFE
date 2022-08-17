@@ -27,7 +27,7 @@ import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
 import { DottedBackground } from '../../styled/DottedBackground'
 import { BlockieWrapper } from '../../styled/BlockieWrapper'
-// import { getIpfsData, postIpfsData } from '../../services/ipfs'
+import { getIpfsData, postIpfsData } from '../../services/ipfs'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
 
@@ -69,7 +69,7 @@ const Chat = ({
 
    useEffect(() => {
       if (toAddr) {
-         fetch(` ${process.env.REACT_APP_REST_API}/name/${toAddr}`, {
+         fetch(` ${process.env.REACT_APP_REST_API_IPFS}/name/${toAddr}`, {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const Chat = ({
 
    function getChatData() {
       // GET request to get off-chain data for RX user
-      if (!process.env.REACT_APP_REST_API) {
+      if (!process.env.REACT_APP_REST_API_IPFS) {
          console.log('REST API url not in .env', process.env)
          return
       }
@@ -107,7 +107,7 @@ const Chat = ({
       setIsFetchingChatData(true)
       //console.log(`getall_chatitems/${account}/${toAddr}`)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${toAddr}`,
+         ` ${process.env.REACT_APP_REST_API_IPFS}/getall_chatitems/${account}/${toAddr}`,
          {
             method: 'GET',
             headers: {
@@ -119,7 +119,16 @@ const Chat = ({
          .then(async (data: MessageType[]) => {
             if (equal(data, chatData) === false) {
                console.log('✅[GET][Chat items]:', data)
-               setChatData(data)
+               
+               const replica = JSON.parse(JSON.stringify(data));
+
+               // Get data from IPFS and replace the message with the fetched text
+               for (let i = 0; i < replica.length; i++) {
+                  const rawmsg = await getIpfsData(replica[i].message)
+                  replica[i].message = rawmsg
+               }
+               setChatData(replica)
+               //setChatData(data)
             }
          })
          .catch((error) => {
@@ -230,10 +239,11 @@ const Chat = ({
          null
       )
 
-      data.message = msgInputCopy
+      const cid = await postIpfsData(msgInputCopy)
+      data.message = cid
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_chatitem`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

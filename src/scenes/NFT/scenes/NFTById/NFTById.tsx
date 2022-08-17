@@ -91,7 +91,7 @@ const NFTById = ({ account }: { account: string }) => {
 
    const getJoinStatus = () => {
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}/${nftContractAddr}`,
+         ` ${process.env.REACT_APP_REST_API_IPFS}/get_bookmarks/${account}/${nftContractAddr}`,
          {
             method: 'GET',
             headers: {
@@ -110,7 +110,7 @@ const NFTById = ({ account }: { account: string }) => {
    }
 
    const joinGroup = () => {
-      fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_bookmark`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const NFTById = ({ account }: { account: string }) => {
    }
 
    const leaveGroup = () => {
-      fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/delete_bookmark`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const NFTById = ({ account }: { account: string }) => {
    const getTweetCount = () => {
       if (account) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/get_twitter_cnt/${nftContractAddr}`,
+            ` ${process.env.REACT_APP_REST_API_IPFS}/get_twitter_cnt/${nftContractAddr}`,
             {
                method: 'GET',
                headers: {
@@ -178,7 +178,7 @@ const NFTById = ({ account }: { account: string }) => {
    const getUnreadDMCount = () => {
       if (account) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
+            ` ${process.env.REACT_APP_REST_API_IPFS}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
             {
                method: 'GET',
                headers: {

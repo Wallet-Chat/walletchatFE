@@ -20,7 +20,7 @@ import { MessageType, MessageUIType, SettingsType } from '../../../../types/Mess
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
-// import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
+import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
 
 const NFTChat = ({
@@ -63,7 +63,7 @@ const NFTChat = ({
 
    const getChatData = () => {
       // GET request to get off-chain data for RX user
-      if (!process.env.REACT_APP_REST_API) {
+      if (!process.env.REACT_APP_REST_API_IPFS) {
          console.log('REST API url not in .env', process.env)
          return
       }
@@ -73,7 +73,7 @@ const NFTChat = ({
       }
       // setIsFetchingMessages(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
+         ` ${process.env.REACT_APP_REST_API_IPFS}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
             headers: {
@@ -161,11 +161,11 @@ const NFTChat = ({
       //    JSON.stringify({ to: encryptedTo, from: encryptedFrom })
       // )
 
-      //const cid = await postIpfsData(msgInputCopy)
-      data.message = msgInputCopy //await cid
+      const cid = await postIpfsData(msgInputCopy)
+      data.message = cid
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_chatitem`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ const NFTChat = ({
    const getPublicKeyFromSettings = async () => {
       let toAddrPublicKey = ''
       await fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_settings/${
+         ` ${process.env.REACT_APP_REST_API_IPFS}/get_settings/${
             recipientAddr ? recipientAddr.toLocaleLowerCase() : ''
          }`,
          {

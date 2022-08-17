@@ -19,6 +19,7 @@ import { DottedBackground } from '../../../../styled/DottedBackground'
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import Message from './components/Message'
+import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
 const CommunityGroupChat = ({
    account,
@@ -123,11 +124,12 @@ const CommunityGroupChat = ({
          false
       )
 
-      data.message = msgInputCopy
+      const cid = await postIpfsData(msgInputCopy)
+      data.message = cid
 
       setIsSendingMessage(true)
 
-      fetch(`${process.env.REACT_APP_REST_API}/community`, {
+      fetch(`${process.env.REACT_APP_REST_API_IPFS}/community`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

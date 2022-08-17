@@ -142,7 +142,7 @@ const WalletProvider = React.memo(({ children }) => {
    }, [web3ModalProvider])
 
    const getName = (_account) => {
-      if (!process.env.REACT_APP_REST_API) {
+      if (!process.env.REACT_APP_REST_API_IPFS) {
          console.log('REST API url not in .env', process.env)
          return
       }
@@ -151,7 +151,7 @@ const WalletProvider = React.memo(({ children }) => {
          return
       }
       setIsFetchingName(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/name/${_account}`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/name/${_account}`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',

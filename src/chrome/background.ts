@@ -113,7 +113,7 @@ function startAlarm() {
 async function getInboxCount(account: string) {
    console.log('[background.ts] getInboxCount', account)
    if (account) {
-      fetch(` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`, {
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/get_unread_cnt/${account}`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',
