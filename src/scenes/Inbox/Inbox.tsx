@@ -133,7 +133,7 @@ const Inbox = ({
    const toggleChain = (chain: string) => {
       if (chain === '') {
          if (chainsFilter.length > 1) setChainsFilter([''])
-         else if (chainsFilter.length === 1 && chainsFilter !== [''])
+         else if (chainsFilter.length === 1 && chainsFilter[0] !== '')
             setChainsFilter([''])
       } else {
          const index = chainsFilter.indexOf(chain)

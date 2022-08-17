@@ -3,7 +3,7 @@ import { IconArrowNarrowRight } from '@tabler/icons'
 import { Link as RLink } from 'react-router-dom'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import NFT from '../../../../../../types/NFT'
-import IconEtherscan from '../../../../../../images/icon-etherscan-mono.svg'
+import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg'
 import { chains } from '../../../../../../constants'
 
 export default function MyNFTItem({ nft }: { nft: NFT }) {

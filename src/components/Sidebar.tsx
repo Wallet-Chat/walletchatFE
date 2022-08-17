@@ -34,7 +34,7 @@ import { isMobile } from 'react-device-detect'
 import { IconBrandTwitter } from '@tabler/icons'
 
 import IconFeedback from '../images/icon-feedback.svg'
-import IconDiscord from '../images/icon-discord.svg'
+import IconDiscord from '../images/icon-products/icon-discord.svg'
 import logoThumb from '../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../helpers/contract'
 import NFTPortNFT from '../types/NFTPort/NFT'

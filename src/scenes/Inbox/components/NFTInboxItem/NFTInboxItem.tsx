@@ -6,8 +6,8 @@ import Blockies from 'react-blockies'
 import { formatInboxDate } from '../../../../helpers/date'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { InboxItemType } from '../../../../types/InboxItem'
-import IconPolygon from '../../../../images/icon-polygon.svg'
-import IconEthereum from '../../../../images/icon-ethereum.svg'
+import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
+import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import {
    InboxItemChainImage,

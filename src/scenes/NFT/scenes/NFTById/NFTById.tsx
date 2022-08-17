@@ -35,8 +35,8 @@ import OpenSeaNFT, {
 import AlchemyNFT, {
    alchemyToGeneralNFTType,
 } from '../../../../types/Alchemy/NFT'
-import IconPolygon from '../../../../images/icon-polygon.svg'
-import IconEthereum from '../../../../images/icon-ethereum.svg'
+import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
+import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import equal from 'fast-deep-equal/es6'
 

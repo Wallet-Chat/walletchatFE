@@ -24,7 +24,7 @@ import { useParams } from 'react-router-dom'
 import CommunityGroupChat from './components/CommunityGroupChat'
 import CommunityTweets from './components/CommunityTweets'
 import { useHover } from '../../helpers/useHover'
-import IconDiscord from '../../images/icon-discord.svg'
+import IconDiscord from '../../images/icon-products/icon-discord.svg'
 import CommunityType from '../../types/Community'
 
 const Community = ({ account }: { account: string }) => {
