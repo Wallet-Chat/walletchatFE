@@ -75,7 +75,9 @@ const NFTGroupChat = ({
 
                // Get data from IPFS and replace the message with the fetched text
                for (let i = 0; i < replica.length; i++) {
+                  console.log('requesting CID:', replica[i].message)
                   const rawmsg = await getIpfsData(replica[i].message)
+                  console.log('raw IPFS returned data:', rawmsg)
                   replica[i].message = rawmsg
                }
                setChatData(replica)
