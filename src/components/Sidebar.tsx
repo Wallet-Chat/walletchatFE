@@ -43,6 +43,9 @@ import { truncateAddress } from '../helpers/truncateString'
 import { useIsMobileView } from '../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../helpers/ipfs'
 import { useUnreadCount } from '../context/UnreadCountProvider'
+import IconChat from '../images/icon-chat.svg'
+import IconCommunity from '../images/icon-community.svg'
+import IconNFT from '../images/icon-nft.svg'
 
 interface URLChangedEvent extends Event {
    detail?: string
@@ -56,7 +59,7 @@ export default function Sidebar() {
    const [chainName, setChainName] = useState('ethereum')
    const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
-   const { totalUnreadCount } = useUnreadCount()
+   const { unreadCount } = useUnreadCount()
 
    const { isMobileView } = useIsMobileView()
 
@@ -202,20 +205,43 @@ export default function Sidebar() {
             <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0}></Box>
             <Divider />
             <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0}></Box>
-
+           
             {name !== null && (
+               <>
                <LinkElem to={'/chat'}>
                   {/* <Box className="popup-text">Chat</Box> */}
-                  <IconMessageCircle2 size="30" stroke={1.5} />
-                  {totalUnreadCount > 0 && (
+                  <Image src={IconChat} alt="" />
+                  {unreadCount?.dm > 0 && (
                      <UnreadCountContainer>
                         <Badge variant="blue" fontSize="md">
-                           {totalUnreadCount}
+                           {unreadCount?.dm}
                         </Badge>
                      </UnreadCountContainer>
                   )}
                </LinkElem>
+               <LinkElem to={'/nft'}>
+                  <Image src={IconNFT} alt="" />
+                  {unreadCount?.nft > 0 && (
+                     <UnreadCountContainer>
+                        <Badge variant="blue" fontSize="md">
+                           {unreadCount?.nft}
+                        </Badge>
+                     </UnreadCountContainer>
+                  )}
+               </LinkElem>
+               <LinkElem to={'/community'}>
+                  <Image src={IconCommunity} alt="" />
+                  {unreadCount?.community > 0 && (
+                     <UnreadCountContainer>
+                        <Badge variant="blue" fontSize="md">
+                           {unreadCount?.community}
+                        </Badge>
+                     </UnreadCountContainer>
+                  )}
+               </LinkElem>
+               </>
             )}
+            
             {metadata && (
                <LinkElem2 to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
                   {imageUrl && (
@@ -381,7 +407,7 @@ const LinkElem = styled(NavLink)`
    align-items: center;
    width: 60px;
    height: 60px;
-   padding: 0.8rem;
+   padding: var(--chakra-space-2);
    margin-bottom: 0.2rem;
    border-radius: 0.5rem;
    text-align: center;
@@ -401,6 +427,10 @@ const LinkElem = styled(NavLink)`
       border-bottom-right-radius: 0.2rem;
    }
 
+   img {
+      opacity: 0.6;
+   }
+
    &:hover,
    &.active {
       background: var(--chakra-colors-lightgray-400);
@@ -411,6 +441,9 @@ const LinkElem = styled(NavLink)`
 
       svg {
          stroke: var(--chakra-colors-darkgray-900);
+      }
+      img {
+         opacity: 1;
       }
    }
 
@@ -473,7 +506,7 @@ const Divider = styled.div`
 `
 const UnreadCountContainer = styled.div`
    position: absolute;
-   bottom: 0;
+   top: 0;
    right: 0;
    overflow: hidden;
    background: var(--chakra-colors-information-400);
