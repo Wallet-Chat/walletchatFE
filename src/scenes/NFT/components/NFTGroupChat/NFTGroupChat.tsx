@@ -49,7 +49,7 @@ const NFTGroupChat = ({
       }
    }, [chatData, account, nftContractAddr])
 
-   const getChatData = async () => {
+   const getChatData = () => {
       if (!account) {
          console.log('No account connected')
          return
@@ -67,10 +67,19 @@ const NFTGroupChat = ({
          }
       )
          .then((response) => response.json())
-         .then((data: GroupMessageType[]) => {
+         .then(async (data: GroupMessageType[]) => {
             if (equal(data, chatData) === false) {
                console.log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
-               setChatData(data)
+
+               const replica = JSON.parse(JSON.stringify(data));
+
+               // Get data from IPFS and replace the message with the fetched text
+               for (let i = 0; i < replica.length; i++) {
+                  const rawmsg = await getIpfsData(replica[i].message)
+                  replica[i].message = rawmsg
+               }
+               setChatData(replica)
+               //setChatData(data)
             }
          })
          .catch((error) => {

@@ -85,7 +85,16 @@ const NFTChat = ({
          .then(async (data: MessageType[]) => {
             if (equal(data, chatData) === false) {
                console.log('✅[GET][NFT][Messages]:', data)
-               setChatData(data)
+
+               const replica = JSON.parse(JSON.stringify(data));
+
+               // Get data from IPFS and replace the message with the fetched text
+               for (let i = 0; i < replica.length; i++) {
+                  const rawmsg = await getIpfsData(replica[i].message)
+                  replica[i].message = rawmsg
+               }
+               setChatData(replica)
+               //setChatData(data)
             }
          })
          .catch((error) => {
