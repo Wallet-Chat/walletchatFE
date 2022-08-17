@@ -2,7 +2,7 @@ import { Box, Text } from '@chakra-ui/react'
 import Web3 from 'web3'
 import StartConversationWithAddress from '../../../../components/StartConversationWithAddress'
 import { InboxItemType } from '../../../../types/InboxItem'
-import ConversationItem from '../ConversationItem'
+import NFTInboxItem from '../NFTInboxItem'
 
 export default function TabAll({
    context,
@@ -18,15 +18,11 @@ export default function TabAll({
    return (
       <Box>
          {data?.map((conversation, i) => {
-            if (
-               conversation.context_type === 'dm' ||
-               conversation.context_type === 'community'
-            ) {
+            if (conversation.context_type === 'nft') {
                return (
-                  <ConversationItem
+                  <NFTInboxItem
                      key={`${conversation.timestamp.toString()}${i}`}
                      data={conversation}
-                     account={account}
                   />
                )
             } return <Box></Box>

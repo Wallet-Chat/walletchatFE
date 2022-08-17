@@ -42,7 +42,7 @@ import equal from 'fast-deep-equal/es6'
 
 const tokenType = 'erc721'
 
-const NFTById = ({ account }: { account: string }) => {
+const NFTByContractAndId = ({ account }: { account: string }) => {
    let { nftContractAddr = '', nftId = '', chain = '' } = useParams()
    let [searchParams] = useSearchParams()
 
@@ -529,4 +529,4 @@ const NFTById = ({ account }: { account: string }) => {
    )
 }
 
-export default NFTById
+export default NFTByContractAndId

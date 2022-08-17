@@ -23,7 +23,6 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import {
    IconLogout,
-   IconMessageCircle2,
    IconMessagePlus,
    IconPencil,
    IconSwitchHorizontal,
@@ -44,7 +43,7 @@ import { useIsMobileView } from '../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../helpers/ipfs'
 import { useUnreadCount } from '../context/UnreadCountProvider'
 import IconChat from '../images/icon-chat.svg'
-import IconCommunity from '../images/icon-community.svg'
+// import IconCommunity from '../images/icon-community.svg'
 import IconNFT from '../images/icon-nft.svg'
 
 interface URLChangedEvent extends Event {
@@ -211,10 +210,10 @@ export default function Sidebar() {
                <LinkElem to={'/chat'}>
                   {/* <Box className="popup-text">Chat</Box> */}
                   <Image src={IconChat} alt="" />
-                  {unreadCount?.dm > 0 && (
+                  {(unreadCount?.dm > 0 || unreadCount?.community > 0) && (
                      <UnreadCountContainer>
                         <Badge variant="blue" fontSize="md">
-                           {unreadCount?.dm}
+                           {unreadCount?.dm + unreadCount?.community}
                         </Badge>
                      </UnreadCountContainer>
                   )}
@@ -229,7 +228,7 @@ export default function Sidebar() {
                      </UnreadCountContainer>
                   )}
                </LinkElem>
-               <LinkElem to={'/community'}>
+               {/* <LinkElem to={'/community'}>
                   <Image src={IconCommunity} alt="" />
                   {unreadCount?.community > 0 && (
                      <UnreadCountContainer>
@@ -238,7 +237,7 @@ export default function Sidebar() {
                         </Badge>
                      </UnreadCountContainer>
                   )}
-               </LinkElem>
+               </LinkElem> */}
                </>
             )}
             
@@ -268,7 +267,7 @@ export default function Sidebar() {
             )}
          </Flex>
          <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
-            <Button
+            {/* <Button
                size="sm"
                background="lightgray.200"
                px={2}
@@ -282,7 +281,7 @@ export default function Sidebar() {
                <Link to="/me/nfts" style={{ textDecoration: 'none' }}>
                   <Text fontSize="sm">My NFTs</Text>
                </Link>
-            </Button>
+            </Button> */}
             <Menu>
                <MenuButton as={AccountInfo}>
                   {account && (
@@ -473,12 +472,14 @@ const LinkElem2 = styled(LinkElem)`
 `
 const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
-   border-bottom-left-radius: 0.5rem;
-   border-bottom-right-radius: 0.5rem;
+   border-radius: var(--chakra-radii-md);
+   /* border-bottom-left-radius: 0.5rem;
+   border-bottom-right-radius: 0.5rem; */
+   margin-bottom: .3rem;
    text-align: center;
    background: var(--chakra-colors-lightgray-400);
    border: 1px solid var(--chakra-colors-lightgray-900);
-   border-top: none;
+   /* border-top: none; */
 
    & > span {
       display: flex;

@@ -170,15 +170,11 @@ export default function MyNFTs({ account }: { account: string }) {
 
    return (
       <Box
-         height={isMobile ? 'unset' : '100vh'}
          overflowY="auto"
          className="custom-scrollbar"
       >
-         <Box px={4} py={6} background="white">
-            <Heading size="xl" mb={5}>
-               My NFTs
-            </Heading>
-            <Box mb={4}>
+         <Box px={4} background="white">
+            <Box mt={2}>
             <ChainFilters
                chainFilters={chainFilters}
                setChainFilters={setChainFilters}

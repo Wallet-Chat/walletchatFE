@@ -34,16 +34,17 @@ export default function ChainFilters({
    }
 
    return (
-      <Box my={2}>
+      <Box>
          <Button
             size="sm"
             height="auto"
             py={1}
-            px={3}
+            px={2}
             onClick={() => toggleChain('')}
             variant={chainFilters[0] === '' ? 'lightgray' : 'white'}
             opacity={chainFilters[0] === '' ? '1' : '0.7'}
             mr={2}
+            mb={2}
          >
             All
          </Button>
@@ -56,11 +57,12 @@ export default function ChainFilters({
                   size="sm"
                   height="auto"
                   py={1}
-                  px={3}
+                  px={2}
                   onClick={() => toggleChain(chain)}
                   variant={_selected ? 'lightgray' : 'white'}
                   opacity={_selected ? '1' : '0.9'}
                   mr={2}
+                  mb={2}
                >
                   {chains[chain]?.logo && (
                      <Image

@@ -2,7 +2,7 @@ import { FormControl, Input } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-export default function InboxSearchInput() {
+export default function NFTInboxSearchInput() {
    const [query, setQuery] = useState('')
 
    const { handleSubmit, register } = useForm()
@@ -17,7 +17,7 @@ export default function InboxSearchInput() {
             <Input
                type="text"
                value={query}
-               placeholder="Search or paste address (0x.. or .eth) to chat"
+               placeholder="Search by contract address (0x...)"
                {...register('toAddr')}
                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setQuery(e.target.value)
