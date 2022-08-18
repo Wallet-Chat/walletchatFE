@@ -2,7 +2,6 @@ import {
    Box,
    Heading,
    Flex,
-   Button,
    Tabs,
    TabList,
    TabPanels,
@@ -56,7 +55,7 @@ const Inbox = ({
    }, [inboxData])
 
    useEffect(() => {
-      // console.log('chainFilters', chainFilters)
+      console.log('chainFilters', chainFilters)
       if (chainFilters.length === 0) {
          setNfts([])
       } else if (
@@ -65,14 +64,15 @@ const Inbox = ({
       ) {
          const _new = inboxData.filter((d) => d.context_type === 'nft')
          if (!equal(_new, inboxData)) setNfts(_new)
-      } else if (chainFilters.length > 1) {
-         const _allowedChains = Object.keys(chains).map((c) => chains[c]?.name)
+      } else if (chainFilters.length > 0) {
+         const _allowedChainNames = chainFilters.map((c) => chains[c]?.slug)
+         
          const _new = inboxData.filter(
             (d) =>
                d.context_type === 'nft' &&
-               d?.chain &&
-               _allowedChains.includes(d.chain)
+               d?.chain && _allowedChainNames.includes(d.chain)
          )
+
          setNfts(_new)
          if (!equal(_new, inboxData)) setNfts(_new)
       } else {
