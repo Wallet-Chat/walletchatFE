@@ -11,20 +11,18 @@ import {
    MenuGroup,
    Text,
    MenuDivider,
-   Tooltip,
    Link as CLink,
    Popover,
    PopoverTrigger,
    PopoverContent,
    PopoverArrow,
    PopoverBody,
-   Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import {
    IconLogout,
-   IconMessageCircle2,
+   IconMessagePlus,
    IconPencil,
    IconSwitchHorizontal,
 } from '@tabler/icons'
@@ -33,7 +31,6 @@ import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
 import { IconBrandTwitter } from '@tabler/icons'
 
-import IconFeedback from '../images/icon-feedback.svg'
 import IconDiscord from '../images/icon-products/icon-discord.svg'
 import logoThumb from '../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../helpers/contract'
@@ -44,6 +41,9 @@ import { truncateAddress } from '../helpers/truncateString'
 import { useIsMobileView } from '../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../helpers/ipfs'
 import { useUnreadCount } from '../context/UnreadCountProvider'
+import IconDM from '../images/icon-dm.svg'
+import IconCommunity from '../images/icon-community.svg'
+import IconNFT from '../images/icon-nft.svg'
 
 interface URLChangedEvent extends Event {
    detail?: string
@@ -54,10 +54,10 @@ export default function Sidebar() {
    const [url, setUrl] = useState<string | undefined>('')
    const [nftContractAddr, setNftContractAddr] = useState<string>()
    const [nftId, setNftId] = useState<string>()
-   const [chainName, setChainName] = useState("ethereum")
+   const [chainName, setChainName] = useState('ethereum')
    const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
-   const { totalUnreadCount } = useUnreadCount()
+   const { unreadCount } = useUnreadCount()
 
    const { isMobileView } = useIsMobileView()
 
@@ -102,7 +102,11 @@ export default function Sidebar() {
       }
    }, [url])
 
-   const getNftMetadata = (nftContractAddr: string, nftId: string, chain: string) => {
+   const getNftMetadata = (
+      nftContractAddr: string,
+      nftId: string,
+      chain: string
+   ) => {
       if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
          console.log('Missing NFT Port API Key')
          return
@@ -199,23 +203,43 @@ export default function Sidebar() {
             <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0}></Box>
             <Divider />
             <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0}></Box>
-
+           
             {name !== null && (
-               <LinkElem to={'/chat'}>
+               <>
+               <LinkElem to={'/dm'}>
                   {/* <Box className="popup-text">Chat</Box> */}
-                  <IconMessageCircle2 size="30" stroke={1.5} />
-                  {totalUnreadCount > 0 && (
+                  <Image src={IconDM} alt="" />
+                  {(unreadCount?.dm > 0 || unreadCount?.community > 0) && (
                      <UnreadCountContainer>
-                        <Badge
-                           variant="blue"
-                           fontSize="md"
-                        >
-                           {totalUnreadCount}
+                        <Badge variant="blue" fontSize="md">
+                           {unreadCount?.dm}
                         </Badge>
                      </UnreadCountContainer>
                   )}
                </LinkElem>
+               <LinkElem to={'/nft'}>
+                  <Image src={IconNFT} alt="" />
+                  {unreadCount?.nft > 0 && (
+                     <UnreadCountContainer>
+                        <Badge variant="blue" fontSize="md">
+                           {unreadCount?.nft}
+                        </Badge>
+                     </UnreadCountContainer>
+                  )}
+               </LinkElem>
+               <LinkElem to={'/community'}>
+                  <Image src={IconCommunity} alt="" />
+                  {unreadCount?.community > 0 && (
+                     <UnreadCountContainer>
+                        <Badge variant="blue" fontSize="md">
+                           {unreadCount?.community}
+                        </Badge>
+                     </UnreadCountContainer>
+                  )}
+               </LinkElem>
+               </>
             )}
+            
             {metadata && (
                <LinkElem2 to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
                   {imageUrl && (
@@ -242,20 +266,11 @@ export default function Sidebar() {
             )}
          </Flex>
          <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
-            <Tooltip label="Feedback" placement="top">
-               <FeedbackLinkElem
-                  to={`/chat/0x17FA0A61bf1719D12C08c61F211A063a58267A19`}
-               >
-                  <Image src={IconFeedback} width="50px" height="50px" alt="" />
-               </FeedbackLinkElem>
-            </Tooltip>
-            <Box my={2}>
-               <Divider />
-            </Box>
-            <Button
+            {/* <Button
                size="sm"
                background="lightgray.200"
                px={2}
+               width="100%"
                borderEndStartRadius="0"
                borderEndEndRadius="0"
                border="1px solid var(--chakra-colors-lightgray-900)"
@@ -265,7 +280,7 @@ export default function Sidebar() {
                <Link to="/me/nfts" style={{ textDecoration: 'none' }}>
                   <Text fontSize="sm">My NFTs</Text>
                </Link>
-            </Button>
+            </Button> */}
             <Menu>
                <MenuButton as={AccountInfo}>
                   {account && (
@@ -287,7 +302,7 @@ export default function Sidebar() {
                      </>
                   )}
                </MenuButton>
-               <MenuList>
+               <MenuList pb={0} borderColor="darkgray.100">
                   <MenuGroup
                      title={name || (account && truncateAddress(account))}
                      fontSize="lg"
@@ -333,6 +348,49 @@ export default function Sidebar() {
                         </MenuItem>
                      </>
                   )}
+                  <MenuDivider borderColor="lightgray.500" />
+                  <MenuGroup>
+                     <MenuItem
+                        as={NavLink}
+                        to="/dm/0x17FA0A61bf1719D12C08c61F211A063a58267A19"
+                        icon={
+                           <Box>
+                              <IconMessagePlus stroke="1.5" />
+                           </Box>
+                        }
+                        _hover={{ textDecoration: 'none' }}
+                     >
+                        Feedback &amp; Suggestions
+                     </MenuItem>
+                     <Flex justifyContent="space-between" alignItems="center" px={3} background="lightgray.300" pb={1} borderRadius="md" mt={2}>
+                     <Text fontSize="sm" mt={2} color="lightgray.900">
+                        WalletChat Ver. {process.env.REACT_APP_VERSION}
+                     </Text>
+                     <Flex alignItems="center">
+                        <CLink
+                           href="https://twitter.com/wallet_chat"
+                           target="_blank"
+                        >
+                           <IconBrandTwitter
+                              fill="var(--chakra-colors-lightgray-800)"
+                              stroke="none"
+                           />
+                        </CLink>
+                        <CLink
+                           href="https://discord.gg/walletchat"
+                           target="_blank"
+                        >
+                           <Image
+                              src={IconDiscord}
+                              alt=""
+                              height="24px"
+                              width="24px"
+                           />
+                        </CLink>
+                     </Flex>
+                     
+                     </Flex>
+                  </MenuGroup>
                </MenuList>
             </Menu>
          </Flex>
@@ -347,7 +405,7 @@ const LinkElem = styled(NavLink)`
    align-items: center;
    width: 60px;
    height: 60px;
-   padding: 0.8rem;
+   padding: var(--chakra-space-2);
    margin-bottom: 0.2rem;
    border-radius: 0.5rem;
    text-align: center;
@@ -367,6 +425,10 @@ const LinkElem = styled(NavLink)`
       border-bottom-right-radius: 0.2rem;
    }
 
+   img {
+      opacity: 0.6;
+   }
+
    &:hover,
    &.active {
       background: var(--chakra-colors-lightgray-400);
@@ -377,6 +439,9 @@ const LinkElem = styled(NavLink)`
 
       svg {
          stroke: var(--chakra-colors-darkgray-900);
+      }
+      img {
+         opacity: 1;
       }
    }
 
@@ -404,20 +469,16 @@ const LinkElem = styled(NavLink)`
 const LinkElem2 = styled(LinkElem)`
    background: var(--chakra-colors-lightgray-200);
 `
-const FeedbackLinkElem = styled(LinkElem)`
-   background: var(--chakra-colors-warning-200);
-   &.active {
-      background: var(--chakra-colors-warning-200);
-   }
-`
 const AccountInfo = styled.button`
    padding: 0.6rem 0.8rem;
-   border-bottom-left-radius: 0.5rem;
-   border-bottom-right-radius: 0.5rem;
+   border-radius: var(--chakra-radii-md);
+   /* border-bottom-left-radius: 0.5rem;
+   border-bottom-right-radius: 0.5rem; */
+   margin-bottom: .3rem;
    text-align: center;
    background: var(--chakra-colors-lightgray-400);
    border: 1px solid var(--chakra-colors-lightgray-900);
-   border-top: none;
+   /* border-top: none; */
 
    & > span {
       display: flex;
@@ -445,7 +506,7 @@ const Divider = styled.div`
 `
 const UnreadCountContainer = styled.div`
    position: absolute;
-   bottom: 0;
+   top: 0;
    right: 0;
    overflow: hidden;
    background: var(--chakra-colors-information-400);

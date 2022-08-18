@@ -15,6 +15,7 @@ import Blockies from 'react-blockies'
 import { truncateAddress } from '../helpers/truncateString'
 import { IconArrowRight } from '@tabler/icons'
 import { useWallet } from '../context/WalletProvider'
+import { addressIsValid } from '../helpers/address'
 
 const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    const [toAddr, setToAddr] = useState<string>('')
@@ -30,11 +31,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    let navigate = useNavigate()
 
    const onSubmit = (values: any) => {
-      navigate(`/chat/${toAddr}`)
-   }
-
-   const addressIsValid = async (address: string) => {
-      return web3.utils.isAddress(address) || address.includes(".eth")
+      navigate(`/dm/${toAddr}`)
    }
 
    const checkENS = async (address: string) => {
@@ -65,12 +62,12 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                value={toAddr}
                placeholder="Enter ENS or address (0x...) here"
                {...register('toAddr', {
-                  validate: addressIsValid,
+                  validate: (val) => addressIsValid(web3, val),
                })}
                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setToAddr(e.target.value)}
             />
             {web3.utils.isAddress(toAddr) && (
-               <Link to={`/chat/${toAddr}`} style={{ textDecoration: 'none' }}>
+               <Link to={`/dm/${toAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
                   justifyContent="flex-start"
@@ -89,7 +86,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
             )}
             {isResolvingENS && <Spinner size="sm" mt={2} />}
             {toAddr.includes(".eth") && resolvedAddr && !isResolvingENS && (
-               <Link to={`/chat/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
+               <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
                   justifyContent="flex-start"
@@ -101,7 +98,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                >
                   <Blockies seed={resolvedAddr.toLocaleLowerCase()} scale={3} />
                   <Text fontWeight="bold" fontSize="md" ml={2}>
-                     {truncateAddress(resolvedAddr)}
+                     {toAddr}{" "}({truncateAddress(resolvedAddr)})
                   </Text>
                </Flex>
                </Link>

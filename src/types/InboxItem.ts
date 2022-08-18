@@ -2,6 +2,7 @@ export interface InboxItemType {
     id?: number,
     type?: string,
     context_type?: string,
+    poap?: boolean,
     timestamp: string,
     read?: boolean
     unread?: number

@@ -2,26 +2,19 @@ import {
    Box,
    Heading,
    Flex,
-   Tabs,
-   TabList,
-   TabPanels,
-   Tab,
-   TabPanel,
-   Badge,
+   Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
+import { Link } from 'react-router-dom'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
 
 import { InboxItemType } from '../../types/InboxItem'
 import TabContent from './components/TabContent'
 import InboxSkeleton from './components/InboxSkeleton'
-import { chains } from '../../constants'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
-import ChainFilters from '../../components/ChainFilters'
-import MyNFTs from './components/MyNFTs'
-import NFTInboxSearchInput from './components/NFTInboxSearchInput'
+import InboxSearchInput from './components/InboxSearchInput'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -38,8 +31,8 @@ const Inbox = ({
       localStorageInbox ? JSON.parse(localStorageInbox) : []
    )
    const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
-   const [nfts, setNfts] = useState<InboxItemType[]>()
-   const [chainFilters, setChainFilters] = useState([''])
+   const [dms, setDms] = useState<InboxItemType[]>()
+   const [communities, setCommunities] = useState<InboxItemType[]>()
    const { unreadCount } = useUnreadCount()
 
    useEffect(() => {
@@ -51,34 +44,9 @@ const Inbox = ({
    }, [isAuthenticated, account, inboxData])
 
    useEffect(() => {
-      setNfts(inboxData.filter((d) => d.context_type === 'nft'))
+      setDms(inboxData.filter((d) => d.context_type === 'dm'))
+      setCommunities(inboxData.filter((d) => d.context_type === 'community'))
    }, [inboxData])
-
-   useEffect(() => {
-      // console.log('chainFilters', chainFilters)
-      if (chainFilters.length === 0) {
-         setNfts([])
-      } else if (
-         chainFilters.includes('') ||
-         chainFilters.length === Object.keys(chains).length
-      ) {
-         const _new = inboxData.filter((d) => d.context_type === 'nft')
-         if (!equal(_new, inboxData)) setNfts(_new)
-      } else if (chainFilters.length > 0) {
-         const _allowedChainNames = chainFilters.map((c) => chains[c]?.slug)
-         
-         const _new = inboxData.filter(
-            (d) =>
-               d.context_type === 'nft' &&
-               d?.chain && _allowedChainNames.includes(d.chain)
-         )
-
-         setNfts(_new)
-         if (!equal(_new, inboxData)) setNfts(_new)
-      } else {
-         setNfts([])
-      }
-   }, [chainFilters, inboxData])
 
    useEffect(() => {
       getInboxData()
@@ -151,48 +119,24 @@ const Inbox = ({
             zIndex="sticky"
          >
             <Flex justifyContent="space-between" mb={2}>
-               <Heading size="lg">NFT</Heading>
+               <Heading size="lg">Wallet-to-wallet chat</Heading>
+               <Button
+                  as={Link}
+                  to="/dm/new"
+                  size="sm"
+                  variant="outline"
+                  _hover={{
+                     textDecoration: 'none',
+                     backgroundColor: 'var(--chakra-colors-lightgray-300)',
+                  }}
+               >
+                  + New
+               </Button>
             </Flex>
-            <NFTInboxSearchInput />
+            <InboxSearchInput />
          </Box>
 
-         <Tabs isLazy>
-            <TabList
-               overflowX="auto"
-               overflowY="visible"
-               className="custom-scrollbar"
-            >
-               <Tab marginBottom="0">
-                  Joined{' '}
-                  {unreadCount?.nft !== 0 && (
-                     <Badge ml={1} variant="midgray">
-                        {unreadCount.nft}
-                     </Badge>
-                  )}
-               </Tab>
-               <Tab marginBottom="0">Your NFTs </Tab>
-            </TabList>
-
-            <TabPanels>
-               <TabPanel p={0}>
-                  <Box px={4} pt={2}>
-                  <ChainFilters
-                     chainFilters={chainFilters}
-                     setChainFilters={setChainFilters}
-                  />
-                  </Box>
-                  <TabContent
-                     context="nfts"
-                     data={nfts}
-                     web3={web3}
-                     account={account}
-                  />
-               </TabPanel>
-               <TabPanel p={0}>
-                  <MyNFTs account={account} />
-               </TabPanel>
-            </TabPanels>
-         </Tabs>
+         <TabContent context="dms" data={dms} web3={web3} account={account} />
       </Box>
    )
 }

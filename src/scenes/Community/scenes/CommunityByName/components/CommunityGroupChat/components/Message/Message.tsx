@@ -17,14 +17,14 @@ import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { IconExternalLink, IconMessage } from '@tabler/icons'
 
-import { formatMessageDate } from '../../../../../../helpers/date'
-import { MessageUIType } from '../../../../../../types/Message'
-import IconOpenSea from '../../../../../../images/icon-products/icon-opensea.svg'
-import IconLooksRare from '../../../../../../images/icon-products/icon-looksrare.svg'
-import IconX2Y2 from '../../../../../../images/icon-products/icon-x2y2.svg'
-import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan.svg'
-import { truncateAddress } from '../../../../../../helpers/truncateString'
-import { BlockieWrapper } from '../../../../../../styled/BlockieWrapper'
+import { formatMessageDate } from '../../../../../../../../helpers/date'
+import { MessageUIType } from '../../../../../../../../types/Message'
+import IconOpenSea from '../../../../../../../../images/icon-products/icon-opensea.svg'
+import IconLooksRare from '../../../../../../../../images/icon-products/icon-looksrare.svg'
+import IconX2Y2 from '../../../../../../../../images/icon-products/icon-x2y2.svg'
+import IconEtherscan from '../../../../../../../../images/icon-products/icon-etherscan.svg'
+import { truncateAddress } from '../../../../../../../../helpers/truncateString'
+import { BlockieWrapper } from '../../../../../../../../styled/BlockieWrapper'
 
 const MessageBox = styled.div`
    position: relative;
@@ -47,7 +47,6 @@ const MessageBox = styled.div`
    .msg-bubble {
       display: inline-block;
    }
-
    .name {
       color: var(--chakra-colors-information-600);
    }
@@ -59,7 +58,7 @@ const MessageBox = styled.div`
    &.right {
       float: left;
       background: var(--chakra-colors-darkgray-800);
-      color: var(--chakra-colors-lightgray-100);
+      color: var(--chakra-colors-lightgray-400);
 
       .name {
          color: var(--chakra-colors-white);
@@ -133,7 +132,6 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
                <Text>Chat</Text>
             </MenuItem>
          </Link>
-         <Divider />
          <Link
             href={`https://etherscan.io/address/${msg.fromAddr}`}
             target="_blank"
