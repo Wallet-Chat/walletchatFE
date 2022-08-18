@@ -55,7 +55,7 @@ const Inbox = ({
    }, [inboxData])
 
    useEffect(() => {
-      console.log('chainFilters', chainFilters)
+      // console.log('chainFilters', chainFilters)
       if (chainFilters.length === 0) {
          setNfts([])
       } else if (
