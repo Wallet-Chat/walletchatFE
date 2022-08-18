@@ -31,7 +31,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    let navigate = useNavigate()
 
    const onSubmit = (values: any) => {
-      navigate(`/chat/${toAddr}`)
+      navigate(`/dm/${toAddr}`)
    }
 
    const checkENS = async (address: string) => {
@@ -67,7 +67,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setToAddr(e.target.value)}
             />
             {web3.utils.isAddress(toAddr) && (
-               <Link to={`/chat/${toAddr}`} style={{ textDecoration: 'none' }}>
+               <Link to={`/dm/${toAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
                   justifyContent="flex-start"
@@ -86,7 +86,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
             )}
             {isResolvingENS && <Spinner size="sm" mt={2} />}
             {toAddr.includes(".eth") && resolvedAddr && !isResolvingENS && (
-               <Link to={`/chat/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
+               <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
                   justifyContent="flex-start"

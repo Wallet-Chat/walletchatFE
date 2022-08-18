@@ -17,10 +17,9 @@ import {
    PopoverContent,
    PopoverArrow,
    PopoverBody,
-   Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import {
    IconLogout,
    IconMessagePlus,
@@ -42,8 +41,8 @@ import { truncateAddress } from '../helpers/truncateString'
 import { useIsMobileView } from '../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../helpers/ipfs'
 import { useUnreadCount } from '../context/UnreadCountProvider'
-import IconChat from '../images/icon-chat.svg'
-// import IconCommunity from '../images/icon-community.svg'
+import IconDM from '../images/icon-dm.svg'
+import IconCommunity from '../images/icon-community.svg'
 import IconNFT from '../images/icon-nft.svg'
 
 interface URLChangedEvent extends Event {
@@ -207,13 +206,13 @@ export default function Sidebar() {
            
             {name !== null && (
                <>
-               <LinkElem to={'/chat'}>
+               <LinkElem to={'/dm'}>
                   {/* <Box className="popup-text">Chat</Box> */}
-                  <Image src={IconChat} alt="" />
+                  <Image src={IconDM} alt="" />
                   {(unreadCount?.dm > 0 || unreadCount?.community > 0) && (
                      <UnreadCountContainer>
                         <Badge variant="blue" fontSize="md">
-                           {unreadCount?.dm + unreadCount?.community}
+                           {unreadCount?.dm}
                         </Badge>
                      </UnreadCountContainer>
                   )}
@@ -228,7 +227,7 @@ export default function Sidebar() {
                      </UnreadCountContainer>
                   )}
                </LinkElem>
-               {/* <LinkElem to={'/community'}>
+               <LinkElem to={'/community'}>
                   <Image src={IconCommunity} alt="" />
                   {unreadCount?.community > 0 && (
                      <UnreadCountContainer>
@@ -237,7 +236,7 @@ export default function Sidebar() {
                         </Badge>
                      </UnreadCountContainer>
                   )}
-               </LinkElem> */}
+               </LinkElem>
                </>
             )}
             
@@ -353,7 +352,7 @@ export default function Sidebar() {
                   <MenuGroup>
                      <MenuItem
                         as={NavLink}
-                        to="/chat/0x17FA0A61bf1719D12C08c61F211A063a58267A19"
+                        to="/dm/0x17FA0A61bf1719D12C08c61F211A063a58267A19"
                         icon={
                            <Box>
                               <IconMessagePlus stroke="1.5" />

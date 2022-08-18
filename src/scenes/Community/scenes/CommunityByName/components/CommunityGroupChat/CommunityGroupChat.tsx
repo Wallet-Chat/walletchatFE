@@ -12,12 +12,12 @@ import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import { Link as RLink } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
-import { getFormattedDate } from '../../../../helpers/date'
-import { truncateAddress } from '../../../../helpers/truncateString'
-import { DottedBackground } from '../../../../styled/DottedBackground'
+import { getFormattedDate } from '../../../../../../helpers/date'
+import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { DottedBackground } from '../../../../../../styled/DottedBackground'
 
-import { GroupMessageType, MessageUIType } from '../../../../types/Message'
-import generateItems from '../../helpers/generateGroupedByDays'
+import { GroupMessageType, MessageUIType } from '../../../../../../types/Message'
+import generateItems from '../../../../helpers/generateGroupedByDays'
 import Message from './components/Message'
 
 const CommunityGroupChat = ({
@@ -218,7 +218,7 @@ const CommunityGroupChat = ({
                      <Box textAlign="center">
                         <Text fontSize="sm" color="darkgray.200">
                            A warm welcome to{' '}
-                           <RLink to={`/chat/${msg.fromAddr}`}>
+                           <RLink to={`/dm/${msg.fromAddr}`}>
                               {msg.sender_name
                                  ? msg.sender_name
                                  : truncateAddress(msg.fromAddr)}

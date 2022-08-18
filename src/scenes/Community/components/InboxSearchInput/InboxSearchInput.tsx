@@ -103,7 +103,7 @@ export default function InboxSearchInput() {
                      Start chatting with
                   </Text>
                   <Link
-                     to={`/chat/${suggestedAddress}`}
+                     to={`/dm/${suggestedAddress}`}
                      onClick={() => {
                         setIsSuggestionListOpen(false)
                         setToAddr('')

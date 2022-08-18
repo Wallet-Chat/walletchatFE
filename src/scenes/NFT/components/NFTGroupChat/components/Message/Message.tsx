@@ -123,7 +123,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
       <MenuList>
          <Link
             as={RLink}
-            to={`/chat/${msg.fromAddr}`}
+            to={`/dm/${msg.fromAddr}`}
             _hover={{
                textDecoration: 'none',
                background: 'var(--chakra-colors-lightgray-400)',

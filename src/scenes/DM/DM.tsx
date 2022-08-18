@@ -3,12 +3,6 @@ import {
    Heading,
    Flex,
    Button,
-   Tabs,
-   TabList,
-   TabPanels,
-   Tab,
-   TabPanel,
-   Badge,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
@@ -125,10 +119,10 @@ const Inbox = ({
             zIndex="sticky"
          >
             <Flex justifyContent="space-between" mb={2}>
-               <Heading size="lg">Chat</Heading>
+               <Heading size="lg">Wallet-to-wallet chat</Heading>
                <Button
                   as={Link}
-                  to="/chat/new"
+                  to="/dm/new"
                   size="sm"
                   variant="outline"
                   _hover={{
@@ -142,65 +136,7 @@ const Inbox = ({
             <InboxSearchInput />
          </Box>
 
-         <Tabs isLazy>
-            <TabList
-               overflowX="auto"
-               overflowY="visible"
-               className="custom-scrollbar"
-            >
-               <Tab marginBottom="0">
-                  All{' '}
-                  {(unreadCount?.dm !== 0 || unreadCount?.community !== 0) && (
-                     <Badge ml={1} variant="midgray">
-                        {unreadCount?.dm + unreadCount?.community}
-                     </Badge>
-                  )}
-               </Tab>
-               <Tab marginBottom="0">
-                  DM{' '}
-                  {unreadCount?.dm !== 0 && (
-                     <Badge ml={1} variant="midgray">
-                        {unreadCount.dm}
-                     </Badge>
-                  )}
-               </Tab>
-               <Tab marginBottom="0">
-                  Community{' '}
-                  {unreadCount?.community !== 0 && (
-                     <Badge ml={1} variant="midgray">
-                        {unreadCount.community}
-                     </Badge>
-                  )}
-               </Tab>
-            </TabList>
-
-            <TabPanels>
-               <TabPanel p={0}>
-                  <TabContent
-                     context="all"
-                     data={inboxData}
-                     web3={web3}
-                     account={account}
-                  />
-               </TabPanel>
-               <TabPanel p={0}>
-                  <TabContent
-                     context="dms"
-                     data={dms}
-                     web3={web3}
-                     account={account}
-                  />
-               </TabPanel>
-               <TabPanel p={0}>
-                  <TabContent
-                     context="communities"
-                     data={communities}
-                     web3={web3}
-                     account={account}
-                  />
-               </TabPanel>
-            </TabPanels>
-         </Tabs>
+         <TabContent context="dms" data={dms} web3={web3} account={account} />
       </Box>
    )
 }

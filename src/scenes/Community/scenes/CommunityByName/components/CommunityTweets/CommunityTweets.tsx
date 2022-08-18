@@ -1,4 +1,4 @@
-import TweetType from '../../../../types/Tweet'
+import TweetType from '../../../../../../types/Tweet'
 import Tweet from './components/Tweet'
 import { Box, Divider } from '@chakra-ui/react'
 

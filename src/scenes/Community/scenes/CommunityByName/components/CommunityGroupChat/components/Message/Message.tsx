@@ -17,14 +17,14 @@ import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { IconExternalLink, IconMessage } from '@tabler/icons'
 
-import { formatMessageDate } from '../../../../../../helpers/date'
-import { MessageUIType } from '../../../../../../types/Message'
-import IconOpenSea from '../../../../../../images/icon-products/icon-opensea.svg'
-import IconLooksRare from '../../../../../../images/icon-products/icon-looksrare.svg'
-import IconX2Y2 from '../../../../../../images/icon-products/icon-x2y2.svg'
-import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan.svg'
-import { truncateAddress } from '../../../../../../helpers/truncateString'
-import { BlockieWrapper } from '../../../../../../styled/BlockieWrapper'
+import { formatMessageDate } from '../../../../../../../../helpers/date'
+import { MessageUIType } from '../../../../../../../../types/Message'
+import IconOpenSea from '../../../../../../../../images/icon-products/icon-opensea.svg'
+import IconLooksRare from '../../../../../../../../images/icon-products/icon-looksrare.svg'
+import IconX2Y2 from '../../../../../../../../images/icon-products/icon-x2y2.svg'
+import IconEtherscan from '../../../../../../../../images/icon-products/icon-etherscan.svg'
+import { truncateAddress } from '../../../../../../../../helpers/truncateString'
+import { BlockieWrapper } from '../../../../../../../../styled/BlockieWrapper'
 
 const MessageBox = styled.div`
    position: relative;
@@ -122,7 +122,7 @@ const Message = ({ msg }: { msg: MessageUIType }) => {
       <MenuList>
          <Link
             as={RLink}
-            to={`/chat/${msg.fromAddr}`}
+            to={`/dm/${msg.fromAddr}`}
             _hover={{
                textDecoration: 'none',
                background: 'var(--chakra-colors-lightgray-400)',

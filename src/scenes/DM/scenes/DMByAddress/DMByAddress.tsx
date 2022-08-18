@@ -19,19 +19,19 @@ import {
 import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
-import { MessageType, MessageUIType } from '../../types/Message'
-import Message from './components/Message'
+import { MessageType, MessageUIType } from '../../../../types/Message'
+import Message from '../../components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
-import { truncateAddress } from '../../helpers/truncateString'
+import { truncateAddress } from '../../../../helpers/truncateString'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
-import { DottedBackground } from '../../styled/DottedBackground'
-import { BlockieWrapper } from '../../styled/BlockieWrapper'
+import { DottedBackground } from '../../../../styled/DottedBackground'
+import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
 
-const Chat = ({
+const DMByAddress = ({
    account,
    web3,
    isAuthenticated,
@@ -347,7 +347,7 @@ const Chat = ({
          >
             {isMobile && (
                <Box mb={4}>
-                  <Link to="/chat" style={{ textDecoration: 'none' }}>
+                  <Link to="/dm" style={{ textDecoration: 'none' }}>
                      <Button
                         colorScheme="gray"
                         background="lightgray.300"
@@ -508,4 +508,4 @@ const Chat = ({
    )
 }
 
-export default Chat
+export default DMByAddress

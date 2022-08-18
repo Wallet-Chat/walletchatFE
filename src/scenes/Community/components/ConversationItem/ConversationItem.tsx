@@ -39,7 +39,7 @@ const ConversationItem = ({
          to={
             data.context_type === 'community'
                ? `/community/${data.nftaddr}`
-               : `/chat/${recipientAddress}`
+               : `/dm/${recipientAddress}`
          }
          style={{ textDecoration: 'none' }}
       >
