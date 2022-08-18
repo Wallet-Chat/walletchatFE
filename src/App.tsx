@@ -164,8 +164,24 @@ export const App = () => {
                <Box flex="1" overflow="hidden" minWidth="1px">
                   <Routes>
                      <Route
-                        path="/new"
-                        element={<NewConversation web3={web3} />}
+                        path="/chat/new"
+                        element={
+                           <Flex>
+                              <NewConversation web3={web3} />
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       Select a chat to start messaging
+                                    </Tag>
+                                 </Flex>
+                              )}
+                           </Flex>
+                        }
                      />
                      <Route
                         path="/chat/:address"

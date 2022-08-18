@@ -11,7 +11,7 @@ const NewConversation = ({ web3 }: { web3: any }) => {
          minHeight={isMobile ? 'unset' : '100vh'}
          justifyContent="center"
          alignItems="center"
-         flex="1"
+         width="360px"
       >
          <StartConversationWithAddress web3={web3} />
       </Flex>

@@ -128,7 +128,7 @@ const Inbox = ({
                <Heading size="lg">Chat</Heading>
                <Button
                   as={Link}
-                  to="/new"
+                  to="/chat/new"
                   size="sm"
                   variant="outline"
                   _hover={{
