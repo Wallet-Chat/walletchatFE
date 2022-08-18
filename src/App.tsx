@@ -230,8 +230,7 @@ export const App = () => {
                                     justifyContent="center"
                                  >
                                     <Tag background="white">
-                                       Explore bookmarked NFT groups and your
-                                       NFTs.
+                                       Explore NFT groups
                                     </Tag>
                                  </Flex>
                               )}

@@ -8,7 +8,7 @@ import {
    Text,
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Blockies from 'react-blockies'
 import { useWallet } from '../../../../context/WalletProvider'
 import { truncateAddress } from '../../../../helpers/truncateString'
@@ -22,7 +22,6 @@ export default function InboxSearchInput() {
    const { provider, web3 } = useWallet()
 
    const ref = useRef(null)
-   let navigate = useNavigate()
 
    const checkENS = async (address: string) => {
       if (address.endsWith('.eth')) {
@@ -30,6 +29,7 @@ export default function InboxSearchInput() {
          const _addr = await provider.resolveName(address)
          if (_addr) {
             setResolvedAddr(_addr)
+            setIsSuggestionListOpen(true)
          }
          setIsResolvingENS(false)
       }
@@ -57,7 +57,7 @@ export default function InboxSearchInput() {
    }
 
    return (
-      <Box position={'relative'}>
+      <Box position={'relative'} ref={ref}>
          <FormControl pos="relative">
             <Input
                type="text"
@@ -70,7 +70,6 @@ export default function InboxSearchInput() {
                   if (resolvedAddr) setIsSuggestionListOpen(true)
                }}
                background="lightgray.300"
-               ref={ref}
             />
             {isResolvingENS && (
                <Box
@@ -85,51 +84,56 @@ export default function InboxSearchInput() {
             )}
          </FormControl>
 
-         {suggestedAddress !== '' && isSuggestionListOpen && suggestedAddress !== toAddr && (
-            <Box
-               position="absolute"
-               top={'100%'}
-               left={0}
-               width="100%"
-               borderRadius="md"
-               p={2}
-               background="white"
-               borderColor="darkgray.100"
-               borderWidth="1px"
-            >
-               <Text color="darkgray.500" fontSize="md" mb={1}>
-                  Start chatting with
-               </Text>
+         {suggestedAddress !== '' &&
+            isSuggestionListOpen &&
+            suggestedAddress !== toAddr &&
+            !isResolvingENS && (
                <Box
-                  onClick={() => {
-                     setIsSuggestionListOpen(false)
-                     navigate(`/chat/${suggestedAddress}`)
-                  }}
-                  style={{ textDecoration: 'none', width: '100%' }}
+                  position="absolute"
+                  top={'100%'}
+                  left={0}
+                  width="100%"
+                  borderRadius="md"
+                  p={2}
+                  background="white"
+                  borderColor="darkgray.100"
+                  borderWidth="1px"
                >
-                  <Flex
-                     alignItems="center"
-                     justifyContent="flex-start"
-                     p={3}
-                     background="lightgray.300"
-                     borderRadius="md"
-                     as={Button}
-                     width="100%"
+                  <Text color="darkgray.500" fontSize="md" mb={1}>
+                     Start chatting with
+                  </Text>
+                  <Link
+                     to={`/chat/${suggestedAddress}`}
+                     onClick={() => {
+                        setIsSuggestionListOpen(false)
+                        setToAddr('')
+                     }}
+                     style={{ textDecoration: 'none', width: '100%' }}
                   >
-                     <Blockies
-                        seed={suggestedAddress.toLocaleLowerCase()}
-                        scale={3}
-                     />
-                     <Text fontWeight="bold" fontSize="md" ml={2}>
-                        {toAddr.endsWith('.eth')
-                           ? toAddr
-                           : truncateAddress(toAddr)}{' '}
-                        {toAddr.endsWith('.eth') && `(${truncateAddress(suggestedAddress)})`}
-                     </Text>
-                  </Flex>
+                     <Flex
+                        alignItems="center"
+                        justifyContent="flex-start"
+                        p={3}
+                        background="lightgray.300"
+                        borderRadius="md"
+                        as={Button}
+                        width="100%"
+                     >
+                        <Blockies
+                           seed={suggestedAddress.toLocaleLowerCase()}
+                           scale={3}
+                        />
+                        <Text fontWeight="bold" fontSize="md" ml={2}>
+                           {toAddr.endsWith('.eth')
+                              ? toAddr
+                              : truncateAddress(toAddr)}{' '}
+                           {toAddr.endsWith('.eth') &&
+                              `(${truncateAddress(suggestedAddress)})`}
+                        </Text>
+                     </Flex>
+                  </Link>
                </Box>
-            </Box>
-         )}
+            )}
       </Box>
    )
 }
