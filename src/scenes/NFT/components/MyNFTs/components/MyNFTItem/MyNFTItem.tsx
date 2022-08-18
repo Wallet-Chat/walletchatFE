@@ -49,7 +49,7 @@ export default function MyNFTItem({ nft }: { nft: NFT }) {
                flex="0 0 100px"
             ></Box>
          )}
-         <Box p={3} overflow="hidden">
+         <Box p={3} overflow="hidden" width="100%">
             <Text
                fontSize="md"
                fontWeight="bold"

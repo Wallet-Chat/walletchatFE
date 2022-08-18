@@ -39,6 +39,7 @@ import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
 import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import equal from 'fast-deep-equal/es6'
+import { useHover } from '../../../../helpers/useHover'
 
 const tokenType = 'erc721'
 
@@ -48,7 +49,11 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const [nftData, setNftData] = useState<NFT>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
-   const [isBookmarked, setIsBookmarked] = useState<boolean | null>(null)
+
+   const [joined, setJoined] = useState<boolean | null>(null)
+   const [isFetchingJoining, setIsFetchingJoining] = useState(false)
+   const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
+
    const [ownerAddr, setOwnerAddr] = useState<string>()
    const recipientAddr =
       searchParams.get('recipient') === null
@@ -100,16 +105,17 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
          }
       )
          .then((response) => response.json())
-         .then((isBookmarked: boolean) => {
-            console.log('✅ [GET][NFT][Bookmarked?]')
-            setIsBookmarked(isBookmarked)
+         .then((joined: boolean) => {
+            console.log('✅[GET][NFT][Bookmarked?]')
+            setJoined(joined)
          })
          .catch((error) => {
-            console.error('🚨 [POST][NFT][Bookmarked?]:', error)
+            console.error('🚨[POST][NFT][Bookmarked?]:', error)
          })
    }
 
    const joinGroup = () => {
+      setIsFetchingJoining(true)
       fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
          method: 'POST',
          headers: {
@@ -121,16 +127,18 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
          }),
       })
          .then((response) => response.json())
-         .then((count: number) => {
-            console.log('✅ [POST][NFT][Bookmark]')
-            setIsBookmarked(true)
+         .then(() => {
+            console.log('✅[POST][NFT][Join]')
+            setJoined(true)
          })
+         .finally(() => setIsFetchingJoining(false))
          .catch((error) => {
-            console.error('🚨 [POST][NFT][Bookmark]:', error)
+            console.error('🚨 [POST][NFT][Join]:', error)
          })
    }
 
    const leaveGroup = () => {
+      setIsFetchingJoining(true)
       fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
          method: 'POST',
          headers: {
@@ -142,12 +150,13 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
          }),
       })
          .then((response) => response.json())
-         .then((count: number) => {
-            console.log('✅ [POST][NFT][ Delete Bookmark]')
-            setIsBookmarked(false)
+         .then(() => {
+            console.log('✅[POST][NFT][Leave]')
+            setJoined(false)
          })
+         .finally(() => setIsFetchingJoining(false))
          .catch((error) => {
-            console.error('🚨 [POST][NFT][Delete Bookmark]:', error)
+            console.error('🚨[POST][NFT][Leave]:', error)
          })
    }
 
@@ -402,21 +411,32 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
                            </Badge>
                         </Tooltip>
                      )}
-                     <Tooltip label="Join">
-                        <Button
-                           size="xs"
-                           onClick={() => {
-                              if (isBookmarked === null) return
-                              else if (isBookmarked === false) {
-                                 joinGroup()
-                              } else if (isBookmarked === true) {
-                                 leaveGroup()
-                              }
-                           }}
-                        >
-                           <Text ml={1}>+ Join</Text>
-                        </Button>
-                     </Tooltip>
+                     <Button
+                        ml={2}
+                        size="xs"
+                        variant={joined ? 'black' : 'outline'}
+                        isLoading={isFetchingJoining}
+                        onClick={() => {
+                           if (joined === null) return
+                           else if (joined === false) {
+                              joinGroup()
+                           } else if (joined === true) {
+                              leaveGroup()
+                           }
+                        }}
+                        // @ts-ignore
+                        {...joinBtnHoverProps}
+                     >
+                        <Text ml={1}>
+                           {joinBtnIsHovering
+                              ? joined
+                                 ? 'Leave?'
+                                 : '+ Join'
+                              : joined
+                              ? 'Joined'
+                              : '+ Join'}
+                        </Text>
+                     </Button>
                   </Flex>
                   {ownerAddr && (
                      <Box mb="1">

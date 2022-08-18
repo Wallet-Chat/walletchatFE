@@ -4,8 +4,6 @@ export default function InboxSkeleton() {
    return (
       <Box background="white" height="100vh" width="100%">
          <Flex
-            py={8}
-            px={3}
             flexDirection={['column', 'column', 'row']}
             flexWrap="wrap"
          >

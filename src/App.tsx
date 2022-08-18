@@ -28,6 +28,7 @@ import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
 import NFTByContract from './scenes/NFT/scenes/NFTByContract'
+import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
@@ -240,6 +241,15 @@ export const App = () => {
                                     </Tag>
                                  </Flex>
                               )}
+                           </Flex>
+                        }
+                     />
+                     <Route
+                        path="/nft/poap/:poapId"
+                        element={
+                           <Flex>
+                              {!isMobileView && nftInbox}
+                              <POAPById account={account} />
                            </Flex>
                         }
                      />

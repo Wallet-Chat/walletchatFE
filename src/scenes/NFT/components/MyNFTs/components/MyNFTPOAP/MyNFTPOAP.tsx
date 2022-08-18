@@ -96,9 +96,9 @@ export default function MyNFTItem({ poap }: { poap: POAP }) {
                   </Link>
                )}
             </Box>
-            {poap?.tokenId && (
+            {poap?.event?.id && (
                <RLink
-                  to={`/poap/${poap.tokenId}`}
+                  to={`/nft/poap/${poap.event.id}`}
                   style={{ textDecoration: 'none' }}
                >
                   <Button variant="outline" size="sm" width="100%">
