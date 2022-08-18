@@ -17,9 +17,12 @@ import {
 } from '../../../../styled/InboxItem'
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
 import NFTCollection from '../../../../types/NFTCollection'
-import OpenSeaNFTCollection, { openseaToGeneralNFTCollectionType } from '../../../../types/OpenSea/NFTCollection'
-import NFTPortNFTCollection, { nftPortToGeneralNFTCollectionType } from '../../../../types/NFTPort/NFTCollection'
-
+import OpenSeaNFTCollection, {
+   openseaToGeneralNFTCollectionType,
+} from '../../../../types/OpenSea/NFTCollection'
+import NFTPortNFTCollection, {
+   nftPortToGeneralNFTCollectionType,
+} from '../../../../types/NFTPort/NFTCollection'
 
 const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    const [nft, setNft] = useState<NFTCollection>()
@@ -74,10 +77,13 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                .then((data: NFTPortNFTCollection) => {
                   // console.log('✅[GET][NFT Metadata]:', data)
 
-                  let _transformed: NFTCollection = nftPortToGeneralNFTCollectionType(data)
+                  let _transformed: NFTCollection =
+                     nftPortToGeneralNFTCollectionType(data)
                   setNft({
                      ..._transformed,
-                     image_url: _transformed.image_url?.includes('ipfs://') ? convertIpfsUriToUrl(_transformed.image_url) : _transformed.image_url 
+                     image_url: _transformed.image_url?.includes('ipfs://')
+                        ? convertIpfsUriToUrl(_transformed.image_url)
+                        : _transformed.image_url,
                   })
                })
                .catch((error) => {
@@ -90,11 +96,15 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
       getNftMetadata()
    }, [data.nftaddr, data?.chain])
 
-   if (isError || data?.chain === "none") return <Box></Box>
+   if (isError || data?.chain === 'none') return <Box></Box>
 
    return (
       <Link
-         to={`/nft/ethereum/${data.nftaddr}`}
+         to={
+            data?.nftaddr?.includes('poap')
+               ? `nft/poap/${data?.nftaddr?.split('_')[1]}`
+               : `/nft/ethereum/${data.nftaddr}`
+         }
          style={{ textDecoration: 'none' }}
       >
          <InboxItemWrapper>
@@ -128,11 +138,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                         )}
                         {data.nftaddr &&
                            (nft?.image_url ? (
-                              <Image
-                                 src={nft.image_url}
-                                 alt=""
-                                 width="41px"
-                              />
+                              <Image src={nft.image_url} alt="" width="41px" />
                            ) : (
                               <Blockies seed={data.nftaddr} scale={5} />
                            ))}
