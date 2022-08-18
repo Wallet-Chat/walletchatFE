@@ -51,7 +51,7 @@ const Inbox = ({
    }, [isAuthenticated, account, inboxData])
 
    useEffect(() => {
-      setNfts(inboxData.filter((d) => d.context_type === 'nft'))
+      setNfts(inboxData.filter((d) => d.context_type === 'nft' && !(d.chain === 'none')))
    }, [inboxData])
 
    useEffect(() => {
@@ -112,12 +112,8 @@ const Inbox = ({
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data)
-
-               const _filtered = data.filter(
-                  (d) => !(d.context_type === 'nft' && d.chain === 'none')
-               )
-               setInboxData(_filtered)
-               localStorage.setItem('inbox', JSON.stringify(_filtered))
+               setInboxData(data)
+               localStorage.setItem('inbox', JSON.stringify(data))
             }
             setIsFetchingInboxData(false)
          })

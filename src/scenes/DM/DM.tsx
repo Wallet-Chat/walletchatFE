@@ -44,8 +44,8 @@ const Inbox = ({
    }, [isAuthenticated, account, inboxData])
 
    useEffect(() => {
-      setDms(inboxData.filter((d) => d.context_type === 'dm'))
-      setCommunities(inboxData.filter((d) => d.context_type === 'community'))
+      setDms(inboxData.filter((d) => d.context_type === 'dm' && !(d.chain === 'none')))
+      setCommunities(inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')))
    }, [inboxData])
 
    useEffect(() => {
@@ -80,12 +80,8 @@ const Inbox = ({
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data)
-
-               const _filtered = data.filter(
-                  (d) => !(d.context_type === 'nft' && d.chain === 'none')
-               )
-               setInboxData(_filtered)
-               localStorage.setItem('inbox', JSON.stringify(_filtered))
+               setInboxData(data)
+               localStorage.setItem('inbox', JSON.stringify(data))
             }
             setIsFetchingInboxData(false)
          })
