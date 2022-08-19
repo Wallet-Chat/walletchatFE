@@ -71,7 +71,7 @@ const POAPById = ({ account }: { account: string }) => {
          },
          body: JSON.stringify({
             walletaddr: account,
-            nftaddr: `POAP_${poapId}`,
+            nftaddr: `poap_${poapId}`,
          }),
       })
          .then((response) => response.json())
@@ -96,7 +96,7 @@ const POAPById = ({ account }: { account: string }) => {
          },
          body: JSON.stringify({
             walletaddr: account,
-            nftaddr: `POAP_${poapId}`,
+            nftaddr: `poap_${poapId}`,
          }),
       })
          .then((response) => response.json())
@@ -272,7 +272,7 @@ const POAPById = ({ account }: { account: string }) => {
                <TabPanel px="0" height="100%" padding="0">
                   <NFTGroupChat
                      account={account}
-                     nftContractAddr={`POAP_${poapId}`}
+                     nftContractAddr={`poap_${poapId}`}
                   />
                </TabPanel>
             </TabPanels>

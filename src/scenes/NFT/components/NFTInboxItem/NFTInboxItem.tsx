@@ -8,6 +8,7 @@ import { truncateAddress } from '../../../../helpers/truncateString'
 import { InboxItemType } from '../../../../types/InboxItem'
 import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
 import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
+import IconGnosis from '../../../../images/icon-chains/icon-gnosis.svg'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import {
    InboxItemChainImage,
@@ -23,10 +24,19 @@ import OpenSeaNFTCollection, {
 import NFTPortNFTCollection, {
    nftPortToGeneralNFTCollectionType,
 } from '../../../../types/NFTPort/NFTCollection'
+import POAPEvent from '../../../../types/POAP/POAPEvent'
 
 const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    const [nft, setNft] = useState<NFTCollection>()
+   const [poapEvent, setPoapEvent] = useState<POAPEvent>()
    const [isError, setIsError] = useState(false)
+
+   const isPoap = data?.nftaddr?.includes('poap')
+   const url = isPoap
+      ? `/nft/poap/${data?.nftaddr?.split('_')[1]}`
+      : `/nft/ethereum/${data.nftaddr}`
+
+   const poapId = isPoap && data?.nftaddr?.split('_')[1]
 
    useEffect(() => {
       const getNftMetadata = () => {
@@ -93,20 +103,36 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
          }
       }
 
-      getNftMetadata()
+      const getPOAPEvent = () => {
+         if (!process.env.REACT_APP_POAP_API_KEY) {
+            console.log('Missing POAP API key')
+            return
+         }
+         if (!poapId) {
+            console.log('Missing POAP id')
+            return
+         }
+
+         fetch(`https://api.poap.tech/events/id/${poapId}`, {
+            method: 'GET',
+            headers: {
+               Authorization: process.env.REACT_APP_POAP_API_KEY,
+            },
+         })
+            .then((response) => response.json())
+            .then((result: POAPEvent) => {
+               console.log(`✅[GET][POAP Event]:`, result)
+               setPoapEvent(result)
+            })
+            .catch((error) => console.log(error))
+      }
+      isPoap ? getPOAPEvent() : getNftMetadata()
    }, [data.nftaddr, data?.chain])
 
    if (isError || data?.chain === 'none') return <Box></Box>
 
    return (
-      <Link
-         to={
-            data?.nftaddr?.includes('poap')
-               ? `nft/poap/${data?.nftaddr?.split('_')[1]}`
-               : `/nft/ethereum/${data.nftaddr}`
-         }
-         style={{ textDecoration: 'none' }}
-      >
+      <Link to={url} style={{ textDecoration: 'none' }}>
          <InboxItemWrapper>
             <Flex justifyContent="space-between">
                <Flex>
@@ -136,20 +162,31 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                               </InboxItemChainImage>
                            </Tooltip>
                         )}
+                        {data?.chain === 'xdai' && (
+                           <Tooltip label="Gnosis chain">
+                              <InboxItemChainImage>
+                                 <Image
+                                    src={IconGnosis}
+                                    alt="Gnosis chain"
+                                    width="100%"
+                                    height="100%"
+                                 />
+                              </InboxItemChainImage>
+                           </Tooltip>
+                        )}
                         {data.nftaddr &&
-                           (nft?.image_url ? (
-                              <Image src={nft.image_url} alt="" width="41px" />
+                           ((nft?.image_url || poapEvent?.image_url) ? (
+                              <Image src={nft?.image_url || poapEvent?.image_url} alt="" width="41px" />
                            ) : (
-                              <Blockies seed={data.nftaddr} scale={5} />
+                              <Blockies seed={isPoap ? '0x22c1f6050e56d2876009903609a2cc3fef83b415' : data.nftaddr} scale={5} />
                            ))}
                      </BlockieWrapper>
                   </Box>
                   <Box minWidth="0">
                      {data.nftaddr && (
                         <InboxItemRecipientAddress>
-                           {nft?.name
-                              ? nft.name
-                              : truncateAddress(data.nftaddr)}
+                           {nft?.name && truncateAddress(data.nftaddr)}
+                           {poapEvent?.name}
                         </InboxItemRecipientAddress>
                      )}
                      {data.message && (
