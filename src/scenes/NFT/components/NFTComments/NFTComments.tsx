@@ -5,6 +5,7 @@ import { Button, Divider, Flex, FormControl } from '@chakra-ui/react'
 
 import CommentType from '../../../../types/Comment'
 import Comment from './components/Comment'
+import { postIpfsData } from '../../../../services/ipfs'
 
 const NFTComments = ({
    account,
@@ -87,6 +88,9 @@ const NFTComments = ({
          timestamp: new Date(),
          message: commentInputCopy,
       }
+
+      const cid = await postIpfsData(commentInputCopy)
+      data.message = cid
 
       setIsPostingComment(true)
       fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_comments`, {

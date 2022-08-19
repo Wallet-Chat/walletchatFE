@@ -7,9 +7,9 @@ WalletChat is a browser extension that makes communication easy in web3.
 
 ## Screenshots
 
-![alt text](https://github.com/manapixels/walletchat/blob/main/src/images/Browser%20Extension%20-%20Inbox%20-%20All.png?raw=true)
+![alt text](https://github.com/manapixels/walletchat/blob/main/src/images/screenshots/Browser%20Extension%20-%20Inbox%20-%20All.png?raw=true)
 
-![alt text](https://github.com/manapixels/walletchat/blob/main/src/images/Browser%20Extension%20-%20NFT%20Page%20-%20Comments.png?raw=true)
+![alt text](https://github.com/manapixels/walletchat/blob/main/src/images/screenshots/Browser%20Extension%20-%20NFT%20Page%20-%20Comments.png?raw=true)
 
 ## To get it running
 

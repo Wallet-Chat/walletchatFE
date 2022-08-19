@@ -1,367 +1,141 @@
 import {
    Box,
-   Button,
-   Divider,
-   Flex,
    Heading,
-   Image,
-   Link,
-   Tab,
-   TabList,
-   TabPanel,
-   TabPanels,
-   Tabs,
-   Text,
-   Tooltip,
+   Flex,
+   Button,
 } from '@chakra-ui/react'
-import {
-   IconBrandTwitter,
-   IconCircleCheck,
-} from '@tabler/icons'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { isMobile } from 'react-device-detect'
+import { Link } from 'react-router-dom'
+import Web3 from 'web3'
+import equal from 'fast-deep-equal/es6'
 
-import CommunityGroupChat from './components/CommunityGroupChat'
-import CommunityTweets from './components/CommunityTweets'
-import { useHover } from '../../helpers/useHover'
-import IconDiscord from '../../images/icon-discord.svg'
-import CommunityType from '../../types/Community'
+import { InboxItemType } from '../../types/InboxItem'
+import TabContent from './components/TabContent'
+import InboxSkeleton from './components/InboxSkeleton'
+import { useUnreadCount } from '../../context/UnreadCountProvider'
+import InboxSearchInput from './components/InboxSearchInput'
 import { getIpfsData } from '../../services/ipfs'
 
-const Community = ({ account }: { account: string }) => {
-   let { community = '' } = useParams()
+const localStorageInbox = localStorage.getItem('inbox')
 
-   const [communityData, setCommunityData] = useState<CommunityType>()
-   const [isFetchingCommunityDataFirstTime, setIsFetchingCommunityDataFirstTime] = useState(true)
-   const [joined, setJoined] = useState<boolean | null>(null)
-   const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
-   const [isFetchingJoining, setIsFetchingJoining] = useState(false)
-
+const Inbox = ({
+   account,
+   web3,
+   isAuthenticated,
+}: {
+   account: string
+   web3: Web3
+   isAuthenticated: boolean
+}) => {
+   const [inboxData, setInboxData] = useState<InboxItemType[]>(
+      localStorageInbox ? JSON.parse(localStorageInbox) : []
+   )
+   const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
+   const [communities, setCommunities] = useState<InboxItemType[]>()
+   const { unreadCount } = useUnreadCount()
 
    useEffect(() => {
-      getCommunityData()
-   }, [account])
-
-   useEffect(() => {
-      // Interval needs to reset else getChatData will use old state
       const interval = setInterval(() => {
-         getCommunityData()
+         getInboxData()
       }, 5000) // every 5s
 
-      return () => {
-         clearInterval(interval)
+      return () => clearInterval(interval)
+   }, [isAuthenticated, account, inboxData])
+
+   useEffect(() => {
+      setCommunities(inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')))
+   }, [inboxData])
+
+   useEffect(() => {
+      getInboxData()
+   }, [isAuthenticated, account])
+
+   const getInboxData = () => {
+      // GET request to get off-chain data for RX user
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
       }
-   }, [communityData, account])
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+      if (!isAuthenticated) {
+         console.log('Not authenticated')
+         return
+      }
+      setIsFetchingInboxData(true)
+      fetch(` ${process.env.REACT_APP_REST_API_IPFS}/get_inbox/${account}`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+         .then((response) => response.json())
+         .then(async (data: InboxItemType[]) => {
+            if (data === null) {
+               setInboxData([])
+               localStorage.setItem('inbox', JSON.stringify([]))
+            } else if (equal(inboxData, data) !== true) {
+               console.log('✅[GET][Inbox ipfs]:', data)
 
-   const getCommunityData = () => {
-      if (account) {
-         if (!account) {
-            console.log('No account connected')
-            return
-         }
+               const replica = JSON.parse(JSON.stringify(data));
+               //console.log("Filtered data ipfs: ", replica);
 
-         fetch(
-            `${process.env.REACT_APP_REST_API_IPFS}/community/${community}/${account}`,
-            {
-               method: 'GET',
-               headers: {
-                  'Content-Type': 'application/json',
-               },
-            }
-         )
-            .then((response) => response.json())
-            .then(async (data: CommunityType) => {
-               console.log('✅[GET][Community]:', data)
-
-               const replica = JSON.parse(JSON.stringify(data.messages));
-
-               // Get data from IPFS and replace the message with the fetched text
+               //Get data from IPFS and replace the message with the fetched text
                for (let i = 0; i < replica.length; i++) {
-                  console.log('requesting CID:', replica[i].message)
-                  const rawmsg = await getIpfsData(replica[i].message)
-                  console.log('raw IPFS returned data:', rawmsg)
-                  replica[i].message = rawmsg
+                  if(replica[i].message != "") {
+                     console.log('requesting CID inbox:', replica[i].message)
+                     const rawmsg = await getIpfsData(replica[i].message)
+                     console.log('raw IPFS returned data ipfs :', rawmsg)
+                     replica[i].message = rawmsg
+                  }
                }
-               //setChatData(replica)
-               data.messages = replica
-               setCommunityData({
-                  ...data,
-                  twitter: data?.social?.find(i => i.type === 'twitter')?.username,
-                  discord: data?.social?.find(i => i.type === 'discord')?.username,
-               })
-               if (data?.joined === true && joined !== true) {
-                  setJoined(true)
-               } else if (data?.joined === false && joined !== false) {
-                  setJoined(false)
-               }
-            })
-            .catch((error) => {
-               console.error('🚨[GET][Community]:', error)
-            })
-            .finally(() => {
-               if (isFetchingCommunityDataFirstTime) {
-                  setIsFetchingCommunityDataFirstTime(false)
-               }
-            })
-      }
+               //console.log("Replica datazzzz: ", replica);
+               setInboxData(replica)
+               localStorage.setItem('inbox', JSON.stringify(replica))
+            }
+            setIsFetchingInboxData(false)
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Inbox]:', error)
+            setIsFetchingInboxData(false)
+         })
    }
 
-   const joinGroup = () => {
-      if (!isFetchingJoining) {
-         setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API_IPFS}/create_bookmark`, {
-            method: 'POST',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-               walletaddr: account,
-               nftaddr: community
-            }),
-         })
-            .then((response) => response.json())
-            .then((response) => {
-               console.log('✅[POST][Community][Join]', response)
-               setJoined(true)
-            })
-            .catch((error) => {
-               console.error('🚨[POST][Community][Join]:', error)
-            })
-            .then(() => {
-               setIsFetchingJoining(false)
-            })
-      }
-   }
-
-   const leaveGroup = () => {
-      if (!isFetchingJoining) {
-         setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API_IPFS}/delete_bookmark`, {
-            method: 'POST',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-               walletaddr: account,
-               nftaddr: community,
-            }),
-         })
-            .then((response) => response.json())
-            .then((count: number) => {
-               console.log('✅[POST][Community][Leave]')
-               setJoined(false)
-            })
-            .catch((error) => {
-               console.error('🚨[POST][Community][Leave]:', error)
-            })
-            .then(() => {
-               setIsFetchingJoining(false)
-            })
-      }
+   if (isFetchingInboxData && inboxData.length === 0) {
+      return <InboxSkeleton />
    }
 
    return (
-      <Flex flexDirection="column" background="white" height="100vh" flex="1">
-         <Flex alignItems="center" px={5} pt={4} pb={2}>
-            <Flex alignItems="flex-start" p={2} borderRadius="md">
-               {communityData?.logo && (
-                  <Image
-                     src={communityData.logo}
-                     alt=""
-                     height="60px"
-                     borderRadius="var(--chakra-radii-xl)"
-                     mr={3}
-                  />
-               )}
-               <Box>
-                  {communityData?.name && (
-                     <Flex alignItems="center">
-                        <Heading size="md" mr="1" maxWidth={[140, 140, 200, 300]} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
-                           {communityData.name}
-                        </Heading>
-                        <Tooltip label="OpenSea Verified">
-                        <Box><IconCircleCheck stroke="2" color="white" fill="var(--chakra-colors-success-600)" /></Box></Tooltip>
-                        <Button
-                            ml={2}
-                           size="xs"
-                           variant={joined ? 'black' : 'outline'}
-                           isLoading={isFetchingJoining}
-                           onClick={() => {
-                              if (joined === null) return
-                              else if (joined === false) {
-                                 joinGroup()
-                              } else if (joined === true) {
-                                 leaveGroup()
-                              }
-                           }}
-                           // @ts-ignore
-                           {...joinBtnHoverProps}
-                        >
-                           <Text ml={1}>
-                              {joinBtnIsHovering
-                                 ? joined
-                                    ? 'Leave?'
-                                    : '+ Join'
-                                 : joined
-                                 ? 'Joined'
-                                 : '+ Join'}
-                           </Text>
-                        </Button>
-                     </Flex>
-                  )}
-                  <Flex alignItems="center">
-                     {communityData?.discord && (
-                        <Tooltip label="Discord">
-                        <Link
-                           href={`https://www.discord.com/channels/${communityData.discord}`}
-                           target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
-                           mr={1}
-                        >
-                           <Image src={IconDiscord} alt="" height="24px" width="24px" />
-                        </Link>
-                     </Tooltip>
-                     )}
-                     {communityData?.twitter && (
-                        <Tooltip label="Twitter">
-                        <Link
-                           href={`https://twitter.com/${communityData?.twitter}`}
-                           target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
-                        >
-                           <IconBrandTwitter stroke={1.5} color="white"
-                              fill="var(--chakra-colors-lightgray-800)" />
-                        </Link>
-                     </Tooltip>
-                     )}
-                     <Divider orientation='vertical' height="12px" mx={2} />
-                  
-                  {communityData?.members && (
-                     <Box>
-                        <Text fontSize="md">{communityData.members} members</Text>
-                     </Box>
-                  )}
-                  </Flex>
-{/* 
-                  <Box mb={2}>
-                     {nftData?.collection?.external_url && (
-                        <Tooltip label="Visit website">
-                           <Link
-                              href={nftData.collection.external_url}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <IconLink stroke={1.5} color="var(--chakra-colors-lightgray-800)" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.collection?.discord_url && (
-                        <Tooltip label="Discord">
-                           <Link
-                              href={nftData.collection.discord_url}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <Image src={IconDiscord} alt="" height="24px" width="24px" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.collection?.twitter_username && (
-                        <Tooltip label="Twitter">
-                           <Link
-                              href={`https://twitter.com/${nftData.collection.twitter_username}`}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <IconBrandTwitter stroke={1.5} color="white"
-                                 fill="var(--chakra-colors-lightgray-800)" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.address && (
-                        <Tooltip label="Etherscan">
-                           <Link
-                              href={`https://etherscan.io/address/${nftData.address}`}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <Image src={IconEtherscan} alt="" height="21px" width="21px" padding="2px" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.collection?.medium_username && (
-                        <Tooltip label="Medium">
-                           <Link
-                              href={`https://medium.com/${nftData.collection.medium_username}`}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                           >
-                              <IconBrandMedium
-                                 stroke={1.5}
-                                 color="white"
-                                 fill="var(--chakra-colors-lightgray-800)"
-                              />
-                           </Link>
-                        </Tooltip>
-                     )}
-                  </Box> */}
-               </Box>
-            </Flex>
-         </Flex>
-         <Tabs
-            display="flex"
-            flexDirection="column"
-            overflowY="auto"
-            flexGrow={1}
-            variant="enclosed"
-            isLazy
+      <Box
+         background="white"
+         height={isMobile ? 'unset' : '100vh'}
+         borderRight="1px solid var(--chakra-colors-lightgray-400)"
+         width="360px"
+         maxW="100%"
+         overflowY="scroll"
+         className="custom-scrollbar"
+      >
+         <Box
+            px={5}
+            pt={5}
+            pb={3}
+            pos="sticky"
+            top="0"
+            background="white"
+            zIndex="sticky"
          >
-            <TabList padding="0 var(--chakra-space-5)">
-               <Tab>
-                  Chat
-               </Tab>
-               {communityData?.tweets && communityData.tweets.length > 0 ? (
-                  <Tab>
-                     Tweets{' '}
-                  </Tab>
-               ) : (
-                  <></>
-               )}
-            </TabList>
+            <Flex justifyContent="space-between" mb={2}>
+               <Heading size="lg">Communities</Heading>
+            </Flex>
+            {/* <InboxSearchInput /> */}
+         </Box>
 
-            <TabPanels
-               overflowY="auto"
-               className="custom-scrollbar"
-               height="100%"
-            >
-               <TabPanel px="0" height="100%" padding="0">
-                  <CommunityGroupChat
-                     account={account}
-                     community={community}
-                     chatData={communityData?.messages || []}
-                     isFetchingCommunityDataFirstTime={isFetchingCommunityDataFirstTime}
-                  />
-               </TabPanel>
-               <TabPanel p={5}>
-                  <CommunityTweets
-                     tweets={communityData?.tweets || []}
-                  />
-               </TabPanel>
-            </TabPanels>
-         </Tabs>
-      </Flex>
+         <TabContent context="communities" data={communities} web3={web3} account={account} />
+      </Box>
    )
 }
 
-export default Community
+export default Inbox

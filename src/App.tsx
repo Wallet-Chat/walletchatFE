@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { IconX } from '@tabler/icons'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import {
@@ -15,19 +15,21 @@ import { isMobile } from 'react-device-detect'
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
-import Inbox from './scenes/Inbox'
+import Inbox from './scenes/DM'
 import NewConversation from './scenes/NewConversation'
-import Chat from './scenes/Chat'
+import Chat from './scenes/DM/scenes/DMByAddress'
 import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar'
 import { useWallet } from './context/WalletProvider'
 import { useIsMobileView } from './context/IsMobileViewProvider'
 import EnterName from './scenes/Me/scenes/EnterName'
 import ChangeName from './scenes/Me/scenes/ChangeName'
-import NFTById from './scenes/NFT/scenes/NFTById'
+import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
-import MyNFTs from './scenes/Me/scenes/MyNFTs'
+import NFTByContract from './scenes/NFT/scenes/NFTByContract'
+import POAPById from './scenes/NFT/scenes/POAPById'
+import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
    const [btnClicks, setBtnClicks] = useState(0)
@@ -40,7 +42,7 @@ export const App = () => {
       isFetchingName,
       account,
       web3,
-      error
+      error,
    } = useWallet()
 
    const { isMobileView } = useIsMobileView()
@@ -67,6 +69,15 @@ export const App = () => {
    const inbox = (
       <Inbox account={account} web3={web3} isAuthenticated={isAuthenticated} />
    )
+
+   const nftInbox = (
+      <NFT account={account} web3={web3} isAuthenticated={isAuthenticated} />
+   )
+
+   const communityInbox = (
+      <Community account={account} web3={web3} isAuthenticated={isAuthenticated} />
+   )
+
 
    if (appLoading || !isAuthenticated) {
       return (
@@ -118,8 +129,8 @@ export const App = () => {
                   )}
                   {error && (
                      <Alert status="error" variant="solid" mt={4}>
-                     {error}
-                  </Alert>
+                        {error}
+                     </Alert>
                   )}
                </Box>
             )}
@@ -160,11 +171,27 @@ export const App = () => {
                <Box flex="1" overflow="hidden" minWidth="1px">
                   <Routes>
                      <Route
-                        path="/new"
-                        element={<NewConversation web3={web3} />}
+                        path="/dm/new"
+                        element={
+                           <Flex>
+                              <NewConversation web3={web3} />
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       Select a chat to start messaging
+                                    </Tag>
+                                 </Flex>
+                              )}
+                           </Flex>
+                        }
                      />
                      <Route
-                        path="/chat/:address"
+                        path="/dm/:address"
                         element={
                            <Flex>
                               {!isMobileView && inbox}
@@ -177,7 +204,7 @@ export const App = () => {
                         }
                      />
                      <Route
-                        path="/chat"
+                        path="/dm"
                         element={
                            <Flex>
                               {inbox}
@@ -198,16 +225,40 @@ export const App = () => {
                      />
                      <Route path="/me/change-name" element={<ChangeName />} />
                      <Route
-                        path="/me/nfts"
-                        element={<MyNFTs account={account} />}
+                        path="/nft"
+                        element={
+                           <Flex>
+                              {nftInbox}
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       Explore NFT groups
+                                    </Tag>
+                                 </Flex>
+                              )}
+                           </Flex>
+                        }
                      />
-
+                     <Route
+                        path="/nft/poap/:poapId"
+                        element={
+                           <Flex>
+                              {!isMobileView && nftInbox}
+                              <POAPById account={account} />
+                           </Flex>
+                        }
+                     />
                      <Route
                         path="/nft/:chain/:nftContractAddr/:nftId"
                         element={
                            <Flex>
-                              {!isMobileView && inbox}
-                              <NFTById account={account} />
+                              {!isMobileView && nftInbox}
+                              <NFTByContractAndId account={account} />
                            </Flex>
                         }
                      />
@@ -215,8 +266,28 @@ export const App = () => {
                         path="/nft/:chain/:nftContractAddr"
                         element={
                            <Flex>
-                              {!isMobileView && inbox}
-                              <NFT account={account} />
+                              {!isMobileView && nftInbox}
+                              <NFTByContract account={account} />
+                           </Flex>
+                        }
+                     />
+                     <Route
+                        path="/community"
+                        element={
+                           <Flex>
+                              {communityInbox}
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       Select a chat to start messaging
+                                    </Tag>
+                                 </Flex>
+                              )}
                            </Flex>
                         }
                      />
@@ -224,18 +295,18 @@ export const App = () => {
                         path="/community/:community"
                         element={
                            <Flex>
-                              {!isMobileView && inbox}
-                              <Community account={account} />
+                              {!isMobileView && communityInbox}
+                              <CommunityByName account={account} />
                            </Flex>
                         }
                      />
                      <Route
                         path="/"
-                        element={<Navigate to="/chat" replace />}
+                        element={<Navigate to="/dm" replace />}
                      />
                      <Route
                         path="/index.html"
-                        element={<Navigate to="/chat" replace />}
+                        element={<Navigate to="/dm" replace />}
                      />
                   </Routes>
                </Box>
