@@ -185,7 +185,9 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                   <Box minWidth="0">
                      {data.nftaddr && (
                         <InboxItemRecipientAddress>
-                           {nft?.name && truncateAddress(data.nftaddr)}
+                           {nft?.name
+                              ? nft.name
+                              : truncateAddress(data.nftaddr)}
                            {poapEvent?.name}
                         </InboxItemRecipientAddress>
                      )}
