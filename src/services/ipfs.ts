@@ -36,7 +36,7 @@ export const postIpfsData = async (text: string) => {
    let cid = await ipfsClient.add(text)
    // const url = `https://ipfs.infura.io/ipfs/${cid.path}`
    // console.log('IPFS link: ', url)
-   console.log("text/cid:", text, cid)
+   //console.log("text/cid:", text, cid)
    cidReturn = `${cid.path}`
    return await cidReturn
 }

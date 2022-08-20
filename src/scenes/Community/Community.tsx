@@ -78,7 +78,7 @@ const Inbox = ({
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
-               console.log('✅[GET][Inbox ipfs]:', data)
+               //console.log('✅[GET][Inbox ipfs]:', data)
 
                const replica = JSON.parse(JSON.stringify(data));
                //console.log("Filtered data ipfs: ", replica);
@@ -86,9 +86,9 @@ const Inbox = ({
                //Get data from IPFS and replace the message with the fetched text
                for (let i = 0; i < replica.length; i++) {
                   if(replica[i].message != "") {
-                     console.log('requesting CID inbox:', replica[i].message)
+                     //console.log('requesting CID inbox:', replica[i].message)
                      const rawmsg = await getIpfsData(replica[i].message)
-                     console.log('raw IPFS returned data ipfs :', rawmsg)
+                     //console.log('raw IPFS returned data ipfs :', rawmsg)
                      replica[i].message = rawmsg
                   }
                }
