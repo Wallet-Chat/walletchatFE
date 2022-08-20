@@ -4,6 +4,7 @@ import createMetaMaskProvider from 'metamask-extension-provider'
 import Web3 from 'web3'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import { sequence } from '0xsequence'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import { getNormalizeAddress } from '.'
 
@@ -26,6 +27,13 @@ const providerOptions = {
          infuraId: process.env.REACT_APP_INFURA_ID,
       },
    },
+   sequence: {
+      package: sequence,
+      options: {
+         appName: 'WalletChat',
+         //defaultNetwork: 'ethereum' // optional
+      },
+   }
 }
 
 if (!process.env.REACT_APP_INFURA_ID) {
