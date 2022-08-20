@@ -88,7 +88,7 @@ const DMByAddress = ({
 
    function getChatData() {
       // GET request to get off-chain data for RX user
-      if (!process.env.REACT_APP_REST_API) {
+      if (!process.env.REACT_APP_REST_API_IPFS) {
          console.log('REST API url not in .env', process.env)
          return
       }
