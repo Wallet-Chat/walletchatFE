@@ -3,6 +3,7 @@
    "version": "1.4.7",
    "private": true,
    "dependencies": {
+      "@0xsequence/web3modal": "^2.0.2",
       "@chakra-ui/react": "^1.8.6",
       "@coinbase/wallet-sdk": "^3.3.0",
       "@craco/craco": "^6.4.3",
