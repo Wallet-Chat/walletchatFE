@@ -54,7 +54,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    return (
       <form onSubmit={handleSubmit(onSubmit)}>
          <FormControl mb={5}>
-            <Heading size="lg" mb={3}>
+            <Heading size="md" mb={3}>
                Start a conversation with...
             </Heading>
             <Input

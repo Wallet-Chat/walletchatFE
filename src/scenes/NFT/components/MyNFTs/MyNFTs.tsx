@@ -1,4 +1,4 @@
-import { Box,Flex, Heading } from '@chakra-ui/react'
+import { Box,Flex, Heading, Text } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
@@ -183,6 +183,11 @@ export default function MyNFTs({ account }: { account: string }) {
             <Flex wrap="wrap">
                {(isFetchingNFTs || isFetchingPOAPs) && (
                   <MyNFTSkeleton />
+               )}
+               {filteredPoaps.length === 0 && filteredNfts.length === 0 && !isFetchingNFTs && (
+                  <Box textAlign="center" d="block" m="auto" p={5}>
+                     <Text color="darkgray.100" fontSize="md">No NFTs found</Text>
+                  </Box>
                )}
                {filteredPoaps.map((poap, i) => (
                   <Box mb={4} mr={4} key={i}>

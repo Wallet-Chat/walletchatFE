@@ -40,6 +40,7 @@ const Inbox = ({
    const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
    const [nfts, setNfts] = useState<InboxItemType[]>()
    const [chainFilters, setChainFilters] = useState([''])
+   const [tabIndex, setTabIndex] = useState(0)
    const { unreadCount } = useUnreadCount()
 
    useEffect(() => {
@@ -51,6 +52,11 @@ const Inbox = ({
    }, [isAuthenticated, account, inboxData])
 
    useEffect(() => {
+      const filtered = inboxData.filter((d) => d.context_type === 'nft' && !(d.chain === 'none'))
+      if (filtered.length === 0) {
+         // Show "My NFTs" if Inbox is blank
+         setTabIndex(1)
+      }
       setNfts(inboxData.filter((d) => d.context_type === 'nft' && !(d.chain === 'none')))
    }, [inboxData])
 
@@ -111,7 +117,7 @@ const Inbox = ({
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
-               console.log('✅[GET][Inbox]:', data)
+               console.log('✅[GET][Inbox]:', data, inboxData, equal(inboxData, data))
                setInboxData(data)
                localStorage.setItem('inbox', JSON.stringify(data))
             }
@@ -121,6 +127,10 @@ const Inbox = ({
             console.error('🚨[GET][Inbox]:', error)
             setIsFetchingInboxData(false)
          })
+   }
+
+   const handleTabsChange = (index: number) => {
+      setTabIndex(index)
    }
 
    if (isFetchingInboxData && inboxData.length === 0) {
@@ -152,7 +162,7 @@ const Inbox = ({
             <NFTInboxSearchInput />
          </Box>
 
-         <Tabs isLazy>
+         <Tabs isLazy index={tabIndex} onChange={handleTabsChange}>
             <TabList
                overflowX="auto"
                overflowY="visible"
@@ -166,7 +176,7 @@ const Inbox = ({
                      </Badge>
                   )}
                </Tab>
-               <Tab marginBottom="0">Your NFTs </Tab>
+               <Tab marginBottom="0">Your NFTs</Tab>
             </TabList>
 
             <TabPanels>

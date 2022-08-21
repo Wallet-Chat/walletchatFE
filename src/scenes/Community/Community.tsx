@@ -77,7 +77,7 @@ const Inbox = ({
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
-               console.log('✅[GET][Inbox]:', data)
+               console.log('✅[GET][Inbox]:', data, inboxData, equal(inboxData, data))
                setInboxData(data)
                localStorage.setItem('inbox', JSON.stringify(data))
             }
