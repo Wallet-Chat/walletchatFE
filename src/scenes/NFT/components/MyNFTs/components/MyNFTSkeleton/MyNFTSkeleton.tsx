@@ -2,7 +2,7 @@ import { Box, Flex, Skeleton, Stack } from '@chakra-ui/react'
 
 export default function InboxSkeleton() {
    return (
-      <Box background="white" height="100vh" width="100%">
+      <Box background="white" width="100%">
          <Flex
             flexDirection={['column', 'column', 'row']}
             flexWrap="wrap"
