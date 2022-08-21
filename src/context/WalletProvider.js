@@ -37,19 +37,6 @@ const providerOptions = {
    }
 }
 
-// if (!window?.ethereum?.isSequence) {
-//    providerOptions = {
-//      ...providerOptions,
-//      sequence: {
-//        package: sequence,
-//        options: {
-//          appName: 'Web3Modal Demo Dapp',
-//          defaultNetwork: 'polygon'
-//        }
-//      }
-//    }
-//  }
-
 if (!process.env.REACT_APP_INFURA_ID) {
    console.log('Missing REACT_APP_INFURA_ID')
 }
@@ -93,7 +80,7 @@ const WalletProvider = React.memo(({ children }) => {
                await connectWallet()
             }
          } else {
-            if (web3Modal?.cachexdProvider) connectWallet()
+            if (web3Modal?.cachedProvider) connectWallet()
          }
       }
 

@@ -41,6 +41,7 @@ const Inbox = ({
    const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
    const [nfts, setNfts] = useState<InboxItemType[]>()
    const [chainFilters, setChainFilters] = useState([''])
+   const [tabIndex, setTabIndex] = useState(0)
    const { unreadCount } = useUnreadCount()
 
    useEffect(() => {
@@ -52,6 +53,11 @@ const Inbox = ({
    }, [isAuthenticated, account, inboxData])
 
    useEffect(() => {
+      const filtered = inboxData.filter((d) => d.context_type === 'nft' && !(d.chain === 'none'))
+      if (filtered.length === 0) {
+         // Show "My NFTs" if Inbox is blank
+         setTabIndex(1)
+      }
       setNfts(inboxData.filter((d) => d.context_type === 'nft' && !(d.chain === 'none')))
    }, [inboxData])
 
@@ -138,6 +144,10 @@ const Inbox = ({
          })
    }
 
+   const handleTabsChange = (index: number) => {
+      setTabIndex(index)
+   }
+
    if (isFetchingInboxData && inboxData.length === 0) {
       return <InboxSkeleton />
    }
@@ -167,7 +177,7 @@ const Inbox = ({
             <NFTInboxSearchInput />
          </Box>
 
-         <Tabs isLazy>
+         <Tabs isLazy index={tabIndex} onChange={handleTabsChange}>
             <TabList
                overflowX="auto"
                overflowY="visible"

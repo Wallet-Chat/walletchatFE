@@ -38,6 +38,13 @@ export default function TabAll({
                <StartConversationWithAddress web3={web3} />
             </Box>
          )}
+         {data?.length === 0 && !(context === "dms" || context === "all") && (
+            <Box p={5} textAlign="center" d="block">
+               <Text mb={4} fontSize="md" color="darkgray.100">
+                  You have not joined any group
+               </Text>
+            </Box>
+         )}
       </Box>
    )
 }

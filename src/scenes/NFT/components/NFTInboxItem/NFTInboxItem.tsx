@@ -187,7 +187,8 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                         <InboxItemRecipientAddress>
                            {nft?.name
                               ? nft.name
-                              : truncateAddress(data.nftaddr)}
+                              : (data?.nftaddr.includes("poap_") ? "" : truncateAddress(data.nftaddr))
+                           }
                            {poapEvent?.name}
                         </InboxItemRecipientAddress>
                      )}
