@@ -43,7 +43,7 @@ const Inbox = ({
    }, [isAuthenticated, account, inboxData])
 
    useEffect(() => {
-      setCommunities(inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')))
+      setCommunities(inboxData.filter((d) => d.context_type === 'community'))
    }, [inboxData])
 
    useEffect(() => {
@@ -77,7 +77,7 @@ const Inbox = ({
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))
             } else if (equal(inboxData, data) !== true) {
-               console.log('✅[GET][Inbox]:', data, inboxData, equal(inboxData, data))
+               console.log('✅[GET][Inbox]:', data)
                setInboxData(data)
                localStorage.setItem('inbox', JSON.stringify(data))
             }

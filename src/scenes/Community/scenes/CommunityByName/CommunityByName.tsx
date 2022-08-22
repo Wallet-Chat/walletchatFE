@@ -20,6 +20,7 @@ import {
 } from '@tabler/icons'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import equal from 'fast-deep-equal/es6'
 
 import CommunityGroupChat from './components/CommunityGroupChat'
 import CommunityTweets from './components/CommunityTweets'
@@ -58,7 +59,6 @@ const CommunityByName = ({ account }: { account: string }) => {
             console.log('No account connected')
             return
          }
-
          fetch(
             `${process.env.REACT_APP_REST_API}/community/${community}/${account}`,
             {
@@ -70,12 +70,14 @@ const CommunityByName = ({ account }: { account: string }) => {
          )
             .then((response) => response.json())
             .then(async (data: CommunityType) => {
-               console.log('✅[GET][Community]:', data)
-               setCommunityData({
-                  ...data,
-                  twitter: data?.social?.find(i => i.type === 'twitter')?.username,
-                  discord: data?.social?.find(i => i.type === 'discord')?.username,
-               })
+               if (!equal(data?.messages, communityData?.messages)) {
+                  console.log('✅[GET][Community]:', data)
+                  setCommunityData({
+                     ...data,
+                     twitter: data?.social?.find(i => i.type === 'twitter')?.username,
+                     discord: data?.social?.find(i => i.type === 'discord')?.username,
+                  })
+               }
                if (data?.joined === true && joined !== true) {
                   setJoined(true)
                } else if (data?.joined === false && joined !== false) {
