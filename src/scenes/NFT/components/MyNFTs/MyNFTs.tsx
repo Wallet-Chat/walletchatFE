@@ -101,10 +101,11 @@ export default function MyNFTs({ account }: { account: string }) {
                }
                setNfts(transformed)
             })
-            .catch((error) => console.log(`🚨[GET][NFTs] ${account}`, error))
-            .then(() => {
+            .finally(() => {
                setIsFetchingNFTs(false)
             })
+            .catch((error) => console.log(`🚨[GET][NFTs] ${account}`, error))
+            
       }
       const fetchPoaps = async () => {
          if (process.env.REACT_APP_POAP_API_KEY === undefined) {
@@ -129,7 +130,7 @@ export default function MyNFTs({ account }: { account: string }) {
                console.log(`✅[GET][POAPs] ${account}:`, result)
                setPoaps(result)
             })
-            .then(() => {
+            .finally(() => {
                setIsFetchingPOAPs(false)
             })
             .catch((error) => console.log(error))

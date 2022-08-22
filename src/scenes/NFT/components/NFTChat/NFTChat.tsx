@@ -189,29 +189,6 @@ const NFTChat = ({
          })
    }
 
-   //TODO: only get this TO address public key once per conversation (was't sure where this would go yet)
-   const getPublicKeyFromSettings = async () => {
-      let toAddrPublicKey = ''
-      await fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_settings/${
-            recipientAddr ? recipientAddr.toLocaleLowerCase() : ''
-         }`,
-         {
-            method: 'GET',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-         }
-      )
-         .then((response) => response.json())
-         .then(async (settings: SettingsType[]) => {
-            console.log('✅ GET [Public Key]:', settings)
-            toAddrPublicKey = settings[0].publickey
-         })
-
-      return await toAddrPublicKey
-   }
-
    const addMessageToUI = (
       message: string,
       fromAddr: string,
