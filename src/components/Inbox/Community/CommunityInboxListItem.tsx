@@ -1,6 +1,6 @@
-import { truncateAddress } from '../../helpers/truncateString'
-import { InboxItemType } from '../../types/InboxItem'
-import InboxItem from './InboxListItem'
+import { truncateAddress } from '../../../helpers/truncateString'
+import { InboxItemType } from '../../../types/InboxItem'
+import InboxItem from '../InboxListItem'
 
 const CommunityInboxItem = ({
    data,

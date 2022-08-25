@@ -1,17 +1,17 @@
 import { Box } from '@chakra-ui/react'
 import { memo, useEffect, useState } from 'react'
-import { truncateAddress } from '../../helpers/truncateString'
-import { InboxItemType } from '../../types/InboxItem'
-import { convertIpfsUriToUrl } from '../../helpers/ipfs'
-import NFTCollection from '../../types/NFTCollection'
+import { truncateAddress } from '../../../helpers/truncateString'
+import { InboxItemType } from '../../../types/InboxItem'
+import { convertIpfsUriToUrl } from '../../../helpers/ipfs'
+import NFTCollection from '../../../types/NFTCollection'
 import OpenSeaNFTCollection, {
    openseaToGeneralNFTCollectionType,
-} from '../../types/OpenSea/NFTCollection'
+} from '../../../types/OpenSea/NFTCollection'
 import NFTPortNFTCollection, {
    nftPortToGeneralNFTCollectionType,
-} from '../../types/NFTPort/NFTCollection'
-import POAPEvent from '../../types/POAP/POAPEvent'
-import InboxItem from './InboxListItem'
+} from '../../../types/NFTPort/NFTCollection'
+import POAPEvent from '../../../types/POAP/POAPEvent'
+import InboxItem from '../InboxListItem'
 
 const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    const [nft, setNft] = useState<NFTCollection>()

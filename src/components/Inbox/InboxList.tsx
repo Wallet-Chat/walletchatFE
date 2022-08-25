@@ -1,11 +1,11 @@
 import { Box, Text } from '@chakra-ui/react'
 import Web3 from 'web3'
-import NFTInboxItem from './NFTInboxListItem'
+import NFTInboxItem from './NFT/NFTInboxListItem'
 import { InboxItemType } from '../../types/InboxItem'
 import { memo } from 'react'
-import CommunityInboxItem from './CommunityInboxListItem'
+import CommunityInboxItem from './Community/CommunityInboxListItem'
 import StartConversationWithAddress from '../StartConversationWithAddress'
-import DMInboxItem from './DMInboxListItem'
+import DMInboxItem from './DM/DMInboxListItem'
 
 const InboxList = ({
    context,
