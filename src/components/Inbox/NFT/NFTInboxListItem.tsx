@@ -28,7 +28,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
          : data?.nftaddr?.includes('poap_')
          ? ''
          : truncateAddress(data?.nftaddr)
-   }${poapEvent?.name}`
+   }${poapEvent?.name || ""}`
 
    const poapId = isPoap && data?.nftaddr?.split('_')[1]
 
