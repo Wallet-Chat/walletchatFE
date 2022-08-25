@@ -1,15 +1,14 @@
 import { Box, Flex, Image } from '@chakra-ui/react'
-import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { Link } from 'react-router-dom'
 
-import { formatInboxDate } from '../../../../helpers/date'
-import { truncateAddress } from '../../../../helpers/truncateString'
-import { InboxItemType } from '../../../../types/InboxItem'
-import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
-import { InboxItemNotificationCount, InboxItemRecipientAddress, InboxItemWrapper } from '../../../../styled/InboxItem'
+import { formatInboxDate } from '../../helpers/date'
+import { truncateAddress } from '../../helpers/truncateString'
+import { InboxItemType } from '../../types/InboxItem'
+import { BlockieWrapper } from '../../styled/BlockieWrapper'
+import { InboxItemNotificationCount, InboxItemRecipientAddress, InboxItemWrapper } from '../../styled/InboxItem'
 
-const ConversationItem = ({
+const DMInboxItem = ({
    data,
    account,
 }: {
@@ -86,4 +85,4 @@ const ConversationItem = ({
    )
 }
 
-export default ConversationItem
+export default DMInboxItem

@@ -2,19 +2,17 @@ import {
    Box,
    Heading,
    Flex,
-   Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
-import { Link } from 'react-router-dom'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
 
 import { InboxItemType } from '../../types/InboxItem'
-import TabContent from './components/TabContent'
-import InboxSkeleton from './components/InboxSkeleton'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
-import InboxSearchInput from './components/InboxSearchInput'
+import InboxList from '../../components/Inbox/InboxList'
+import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
+// import InboxSearchInput from './components/InboxSearchInput'
 
 const localStorageInbox = localStorage.getItem('inbox')
 
@@ -90,7 +88,7 @@ const Inbox = ({
    }
 
    if (isFetchingInboxData && inboxData.length === 0) {
-      return <InboxSkeleton />
+      return <InboxListLoadingSkeleton />
    }
 
    return (
@@ -118,7 +116,7 @@ const Inbox = ({
             {/* <InboxSearchInput /> */}
          </Box>
 
-         <TabContent context="communities" data={communities} web3={web3} account={account} />
+         <InboxList context="communities" data={communities} web3={web3} account={account} />
       </Box>
    )
 }

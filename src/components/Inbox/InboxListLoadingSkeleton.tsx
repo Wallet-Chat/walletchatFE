@@ -6,7 +6,7 @@ import {
    Stack,
 } from '@chakra-ui/react'
 
-export default function InboxSkeleton() {
+export default function InboxListLoadingSkeleton() {
    return (
       <Box background="white" height="100vh" width="100%">
          <Box py={8} px={3} height="100vh">

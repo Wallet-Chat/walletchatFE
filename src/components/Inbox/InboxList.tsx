@@ -1,10 +1,13 @@
 import { Box, Text } from '@chakra-ui/react'
 import Web3 from 'web3'
-import StartConversationWithAddress from '../../../../components/StartConversationWithAddress'
-import { InboxItemType } from '../../../../types/InboxItem'
-import NFTInboxItem from '../NFTInboxItem'
+import NFTInboxItem from './NFTInboxListItem'
+import { InboxItemType } from '../../types/InboxItem'
+import { memo } from 'react'
+import CommunityInboxItem from './CommunityInboxListItem'
+import StartConversationWithAddress from '../StartConversationWithAddress'
+import DMInboxItem from './DMInboxListItem'
 
-export default function TabAll({
+const InboxList = ({
    context,
    data,
    account,
@@ -14,7 +17,7 @@ export default function TabAll({
    data: InboxItemType[] | undefined
    account: string
    web3: Web3
-}) {
+}) => {
    return (
       <Box>
          {data?.map((conversation, i) => {
@@ -25,7 +28,28 @@ export default function TabAll({
                      data={conversation}
                   />
                )
-            } return <Box></Box>
+            } else if (
+                conversation.context_type === 'community'
+             ) {
+                return (
+                   <CommunityInboxItem
+                      key={`${conversation.timestamp.toString()}${i}`}
+                      data={conversation}
+                      account={account}
+                   />
+                )
+             } else if (
+                conversation.context_type === 'dm' ||
+                conversation.context_type === 'community'
+             ) {
+                return (
+                   <DMInboxItem
+                      key={`${conversation.timestamp.toString()}${i}`}
+                      data={conversation}
+                      account={account}
+                   />
+                )
+             } return <Box></Box>
          })}
          {data?.length === 0 && (context === "dms" || context === "all") && (
             <Box p={5}>
@@ -45,3 +69,5 @@ export default function TabAll({
       </Box>
    )
 }
+
+export default memo(InboxList)

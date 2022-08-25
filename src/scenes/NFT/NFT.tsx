@@ -15,15 +15,16 @@ import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
 
 import { InboxItemType } from '../../types/InboxItem'
-import TabContent from './components/TabContent'
-import InboxSkeleton from './components/InboxSkeleton'
 import { chains } from '../../constants'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
 import ChainFilters from '../../components/ChainFilters'
 import MyNFTs from './components/MyNFTs'
 import NFTInboxSearchInput from './components/NFTInboxSearchInput'
+import InboxList from '../../components/Inbox/InboxList'
+import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 
-const localStorageInbox = localStorage.getItem('inbox')
+const _inbox = localStorage.getItem('inbox')
+const localStorageInbox = _inbox ? JSON.parse(_inbox) : []
 
 const Inbox = ({
    account,
@@ -34,9 +35,7 @@ const Inbox = ({
    web3: Web3
    isAuthenticated: boolean
 }) => {
-   const [inboxData, setInboxData] = useState<InboxItemType[]>(
-      localStorageInbox ? JSON.parse(localStorageInbox) : []
-   )
+   const [inboxData, setInboxData] = useState<InboxItemType[]>(localStorageInbox)
    const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
    const [nfts, setNfts] = useState<InboxItemType[]>()
    const [chainFilters, setChainFilters] = useState([''])
@@ -134,7 +133,7 @@ const Inbox = ({
    }
 
    if (isFetchingInboxData && inboxData.length === 0) {
-      return <InboxSkeleton />
+      return <InboxListLoadingSkeleton />
    }
 
    return (
@@ -187,7 +186,7 @@ const Inbox = ({
                      setChainFilters={setChainFilters}
                   />
                   </Box>
-                  <TabContent
+                  <InboxList
                      context="nfts"
                      data={nfts}
                      web3={web3}
