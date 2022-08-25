@@ -9,7 +9,7 @@ import {
    TabPanel,
    Badge,
 } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
@@ -26,7 +26,7 @@ import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSke
 const _inbox = localStorage.getItem('inbox')
 const localStorageInbox = _inbox ? JSON.parse(_inbox) : []
 
-const Inbox = ({
+const NFTInbox = ({
    account,
    web3,
    isAuthenticated,
@@ -202,4 +202,4 @@ const Inbox = ({
    )
 }
 
-export default Inbox
+export default NFTInbox

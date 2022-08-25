@@ -1,14 +1,15 @@
+import React from 'react'
 import { Box, Button, Image } from '@chakra-ui/react'
 import { SetStateAction, Dispatch } from 'react'
 import { chains } from '../constants'
 
-export default function ChainFilters({
+const ChainFilters = ({
    chainFilters,
    setChainFilters,
 }: {
    chainFilters: Array<string>
    setChainFilters: Dispatch<SetStateAction<Array<string>>>
-}) {
+}) => {
    const toggleChain = (chain: string) => {
       if (chain === '') {
          // Clear all filters
@@ -83,3 +84,5 @@ export default function ChainFilters({
       </Box>
    )
 }
+
+export default React.memo(ChainFilters)

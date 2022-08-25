@@ -281,7 +281,7 @@ export default function Sidebar() {
                   <Text fontSize="sm">My NFTs</Text>
                </Link>
             </Button> */}
-            <Menu>
+            <Menu isLazy>
                <MenuButton as={AccountInfo}>
                   {account && (
                      <>
