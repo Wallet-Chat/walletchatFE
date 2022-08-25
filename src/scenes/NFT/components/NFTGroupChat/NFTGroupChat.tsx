@@ -14,8 +14,8 @@ import equal from 'fast-deep-equal/es6'
 import { getFormattedDate } from '../../../../helpers/date'
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
-import Message from './components/Message'
 import { DottedBackground } from '../../../../styled/DottedBackground'
+import ChatMessage from '../../../../components/Chat/ChatMessage'
 
 const NFTGroupChat = ({
    account,
@@ -258,8 +258,10 @@ const NFTGroupChat = ({
                   )
                } else if (msg.message) {
                   return (
-                     <Message
+                     <ChatMessage
                         key={`${msg.message}${msg.timestamp}${i}`}
+                        account={account}
+                        context="nfts"
                         msg={msg}
                      />
                   )

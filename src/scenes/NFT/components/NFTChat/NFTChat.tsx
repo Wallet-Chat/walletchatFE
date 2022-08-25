@@ -14,12 +14,12 @@ import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
 
-import Message from './components/Message'
 import { MessageType, MessageUIType, SettingsType } from '../../../../types/Message'
 // import EncryptedMsgBlock from '../../../../types/Message'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
+import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
 
@@ -374,11 +374,12 @@ const NFTChat = ({
             {loadedMsgs.map((msg: MessageUIType, i) => {
                if (msg && msg.message) {
                   return (
-                     <Message
+                     <ChatMessage
                         key={`${msg.message}${msg.timestamp}`}
                         account={account}
                         msg={msg}
                         updateRead={updateRead}
+                        context="nfts"
                      />
                   )
                }

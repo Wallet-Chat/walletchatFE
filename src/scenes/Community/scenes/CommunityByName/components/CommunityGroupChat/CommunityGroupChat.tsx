@@ -12,13 +12,13 @@ import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import { Link as RLink } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
+import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 
 import { GroupMessageType, MessageUIType } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
-import Message from './components/Message'
 
 const CommunityGroupChat = ({
    account,
@@ -228,8 +228,10 @@ const CommunityGroupChat = ({
                   )
                } else if (msg.message) {
                   return (
-                     <Message
+                     <ChatMessage
                         key={`${msg.message}${msg.timestamp}${i}`}
+                        context="communities"
+                        account={account}
                         msg={msg}
                      />
                   )

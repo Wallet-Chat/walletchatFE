@@ -20,13 +20,13 @@ import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
 import { MessageType, MessageUIType } from '../../../../types/Message'
-import Message from '../../components/Message'
 // import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
+import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
@@ -461,8 +461,9 @@ const DMByAddress = ({
             {loadedMsgs.map((msg: MessageUIType, i) => {
                if (msg && msg.message) {
                   return (
-                     <Message
+                     <ChatMessage
                         key={`${msg.message}${msg.timestamp}`}
+                        context="dms"
                         account={account}
                         msg={msg}
                         updateRead={updateRead}
