@@ -1,14 +1,6 @@
-import {
-   Box,
-   Button,
-   Divider,
-   Flex,
-   FormControl,
-   Tag,
-} from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, Tag } from '@chakra-ui/react'
 import { IconSend } from '@tabler/icons'
-import { useEffect, useState, KeyboardEvent, useRef } from 'react'
-import TextareaAutosize from 'react-textarea-autosize'
+import { useEffect, useState, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
 
 import { getFormattedDate } from '../../../../helpers/date'
@@ -16,6 +8,7 @@ import { GroupMessageType, MessageUIType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
+import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
 
 const NFTGroupChat = ({
    account,
@@ -25,9 +18,8 @@ const NFTGroupChat = ({
    nftContractAddr: string
 }) => {
    const [firstLoad, setFirstLoad] = useState(true)
-   const [msgInput, setMsgInput] = useState<string>('')
-   const [isSendingMessage, setIsSendingMessage] = useState(false)
    // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
+   const [isSendingMessage, setIsSendingMessage] = useState(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
@@ -75,7 +67,60 @@ const NFTGroupChat = ({
          .catch((error) => {
             console.error('🚨[GET][NFT][Group Chat Messages By Addr]:', error)
          })
-         // .finally(() => setIsFetchingMessages(false))
+      // .finally(() => setIsFetchingMessages(false))
+   }
+
+   const sendMessage = async (msgInput: string) => {
+      if (msgInput.length <= 0) return
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+
+      // Make a copy
+      const msgInputCopy = (' ' + msgInput).slice(1)
+
+      const timestamp = new Date()
+
+      const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
+
+      let data = {
+         message: msgInputCopy,
+         fromaddr: account.toLocaleLowerCase(),
+         nftaddr: nftContractAddr.toLocaleLowerCase(),
+         timestamp,
+      }
+
+      addMessageToUI(
+         msgInputCopy,
+         account,
+         timestamp.toString(),
+         'right',
+         false,
+         nftContractAddr
+      )
+
+      data.message = msgInputCopy
+
+      setIsSendingMessage(true)
+      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem`, {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(data),
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[POST][Message]:', data, latestLoadedMsgs)
+            getChatData()
+         })
+         .catch((error) => {
+            console.error('🚨[POST][Message]:', error, JSON.stringify(data))
+         })
+         .finally(() => {
+            setIsSendingMessage(false)
+         })
    }
 
    useEffect(() => {
@@ -123,67 +168,6 @@ const NFTGroupChat = ({
          }, 5000)
       }
    }, [loadedMsgs])
-
-   const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (event.key === 'Enter') {
-         event.preventDefault()
-         sendMessage()
-      }
-   }
-
-   const sendMessage = async () => {
-      if (msgInput.length <= 0) return
-      if (!account) {
-         console.log('No account connected')
-         return
-      }
-
-      // Make a copy and clear input field
-      const msgInputCopy = (' ' + msgInput).slice(1)
-      setMsgInput('')
-
-      const timestamp = new Date()
-
-      const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
-
-      let data = {
-         message: msgInputCopy,
-         fromaddr: account.toLocaleLowerCase(),
-         nftaddr: nftContractAddr.toLocaleLowerCase(),
-         timestamp,
-      }
-
-      addMessageToUI(
-         msgInputCopy,
-         account,
-         timestamp.toString(),
-         'right',
-         false,
-         nftContractAddr
-      )
-
-      data.message = msgInputCopy
-
-      setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem`, {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
-         .then((data) => {
-            console.log('✅[POST][Message]:', data, latestLoadedMsgs)
-            getChatData()
-         })
-         .catch((error) => {
-            console.error('🚨[POST][Message]:', error, JSON.stringify(data))
-         })
-         .finally(() => {
-            setIsSendingMessage(false)
-         })
-   }
 
    const addMessageToUI = (
       message: string,
@@ -275,37 +259,10 @@ const NFTGroupChat = ({
             ></Box>
          </DottedBackground>
 
-         <Flex>
-            <FormControl style={{ flexGrow: 1 }}>
-               <TextareaAutosize
-                  placeholder="Write a message..."
-                  value={msgInput}
-                  onChange={(e) => setMsgInput(e.target.value)}
-                  onKeyPress={(e) => handleKeyPress(e)}
-                  className="custom-scrollbar"
-                  style={{
-                     resize: 'none',
-                     padding: '.5rem 1rem',
-                     width: '100%',
-                     fontSize: 'var(--chakra-fontSizes-md)',
-                     background: 'var(--chakra-colors-lightgray-400)',
-                     borderRadius: '0.3rem',
-                     marginBottom: '-6px',
-                  }}
-                  maxRows={8}
-               />
-            </FormControl>
-            <Flex alignItems="flex-end">
-               <Button
-                  variant="black"
-                  height="100%"
-                  onClick={() => sendMessage()}
-                  isLoading={isSendingMessage}
-               >
-                  <IconSend size="20" />
-               </Button>
-            </Flex>
-         </Flex>
+         <ChatTextAreaInput
+            isSendingMessage={isSendingMessage}
+            sendMessage={sendMessage}
+         />
       </Flex>
    )
 }
