@@ -6,7 +6,7 @@ import {
    Text,
    Link as CLink,
 } from '@chakra-ui/react'
-import { KeyboardEvent, useEffect, useState } from 'react'
+import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Web3 from 'web3'
 import {
@@ -46,26 +46,13 @@ const DMByAddress = ({
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
    const [isSendingMessage, setIsSendingMessage] = useState(false)
-   const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
+   const [copiedAddr, setCopiedAddr] = useState(false)
    const [chatData, setChatData] = useState<MessageType[]>(
       new Array<MessageType>()
    )
-   const [isFetchingChatData, setIsFetchingChatData] = useState<boolean>(false)
+   const [isFetchingChatData, setIsFetchingChatData] = useState(false)
 
-   let timer: ReturnType<typeof setTimeout>
-
-   useEffect(() => {
-      getChatData()
-   }, [isAuthenticated, account, toAddr])
-
-   useEffect(() => {
-      // Interval needs to reset else getChatData will use old state
-      const interval = setInterval(() => {
-         getChatData()
-      }, 5000) // every 5s
-
-      return () => clearInterval(interval)
-   }, [isAuthenticated, account, toAddr, chatData])
+   const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
 
    useEffect(() => {
       if (toAddr) {
@@ -86,7 +73,7 @@ const DMByAddress = ({
       }
    }, [toAddr])
 
-   function getChatData() {
+   const getChatData = useCallback(() => {
       // GET request to get off-chain data for RX user
       if (!process.env.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
@@ -126,9 +113,23 @@ const DMByAddress = ({
             console.error('🚨[GET][Chat items]:', error)
             setIsFetchingChatData(false)
          })
-   }
+   }, [account, chatData, isAuthenticated, toAddr])
 
    useEffect(() => {
+      getChatData()
+   }, [isAuthenticated, account, toAddr, getChatData])
+
+   useEffect(() => {
+      // Interval needs to reset else getChatData will use old state
+      const interval = setInterval(() => {
+         getChatData()
+      }, 5000) // every 5s
+
+      return () => clearInterval(interval)
+   }, [isAuthenticated, account, toAddr, chatData, getChatData])
+
+   useEffect(() => {
+      
       const toAddToUI = [] as MessageUIType[]
 
       for (let i = 0; i < chatData.length; i++) {
@@ -170,7 +171,9 @@ const DMByAddress = ({
             })
          }
       }
-      setLoadedMsgs(toAddToUI)
+      if (!equal(toAddToUI, chatData)) {
+         setLoadedMsgs(toAddToUI)
+      }
    }, [chatData, account])
 
    const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -180,7 +183,7 @@ const DMByAddress = ({
       }
    }
 
-   const copyToClipboard = () => {
+   const copyToClipboard = useCallback(() => {
       if (toAddr) {
          console.log('Copy to clipboard', toAddr)
          let textField = document.createElement('textarea')
@@ -192,14 +195,47 @@ const DMByAddress = ({
          textField.remove()
          setCopiedAddr(true)
 
-         window.clearTimeout(timer)
-         timer = setTimeout(() => {
+         timerRef?.current && window.clearTimeout(timerRef.current)
+         timerRef.current = setTimeout(() => {
             setCopiedAddr(false)
          }, 3000)
       }
-   }
+   }, [toAddr])
 
-   const sendMessage = async () => {
+   const addMessageToUI = useCallback(
+      (
+         message: string,
+         fromAddr: string,
+         toAddr: string,
+         timestamp: string,
+         read: boolean,
+         position: string,
+         isFetching: boolean,
+         nftAddr: string | null,
+         nftId: string | null
+      ) => {
+         console.log(`Add message to UI: ${message}`)
+
+         const newMsg: MessageUIType = {
+            message,
+            fromAddr,
+            toAddr,
+            timestamp,
+            read,
+            position,
+            isFetching,
+            nftAddr,
+            nftId,
+         }
+         let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
+         newLoadedMsgs.push(newMsg)
+         setLoadedMsgs(newLoadedMsgs)
+      },
+      [loadedMsgs]
+   )
+
+   const sendMessage = useCallback(() => {
+      console.log('sendMessage')
       if (msgInput.length <= 0) return
 
       // Make a copy and clear input field
@@ -260,22 +296,19 @@ const DMByAddress = ({
          if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
             console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
          } else {
-            fetch(
-               `https://api.sleekplan.com/v1/post`,
-               {
-                  method: 'POST',
-                  headers: {
-                     'Content-Type': 'application/json',
-                     'Authorization': `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
-                  },
-                  body: JSON.stringify({
-                     title: account,
-                     type: 'feedback',
-                     description: msgInputCopy,
-                     user: 347112,
-                  }),
-               }
-            )
+            fetch(`https://api.sleekplan.com/v1/post`, {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
+               },
+               body: JSON.stringify({
+                  title: account,
+                  type: 'feedback',
+                  description: msgInputCopy,
+                  user: 347112,
+               }),
+            })
                .then((response) => response.json())
                .then((data) => {
                   console.log('✅[POST][Feedback]:', data)
@@ -289,57 +322,32 @@ const DMByAddress = ({
                })
          }
       }
-   }
+   }, [account, addMessageToUI, getChatData, loadedMsgs, msgInput, toAddr])
 
-   const addMessageToUI = (
-      message: string,
-      fromAddr: string,
-      toAddr: string,
-      timestamp: string,
-      read: boolean,
-      position: string,
-      isFetching: boolean,
-      nftAddr: string | null,
-      nftId: string | null
-   ) => {
-      console.log(`Add message to UI: ${message}`)
-
-      const newMsg: MessageUIType = {
-         message,
-         fromAddr,
-         toAddr,
-         timestamp,
-         read,
-         position,
-         isFetching,
-         nftAddr,
-         nftId,
-      }
-      let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-      newLoadedMsgs.push(newMsg)
-      setLoadedMsgs(newLoadedMsgs)
-   }
-
-   const updateRead = (data: MessageUIType) => {
-      let indexOfMsg = -1
-      let newLoadedMsgs = [...loadedMsgs]
-      for (let i = newLoadedMsgs.length - 1; i > 0; i--) {
-         if (newLoadedMsgs[i].timestamp === data.timestamp) {
-            indexOfMsg = i
-            break
+   const updateRead = useCallback(
+      (data: MessageUIType) => {
+         console.log('updateRead')
+         let indexOfMsg = -1
+         let newLoadedMsgs = [...loadedMsgs]
+         for (let i = newLoadedMsgs.length - 1; i > 0; i--) {
+            if (newLoadedMsgs[i].timestamp === data.timestamp) {
+               indexOfMsg = i
+               break
+            }
          }
-      }
-      if (indexOfMsg !== -1) {
-         newLoadedMsgs[indexOfMsg] = {
-            ...newLoadedMsgs[indexOfMsg],
-            read: true,
+         if (indexOfMsg !== -1) {
+            newLoadedMsgs[indexOfMsg] = {
+               ...newLoadedMsgs[indexOfMsg],
+               read: true,
+            }
+            setLoadedMsgs(newLoadedMsgs)
          }
-         setLoadedMsgs(newLoadedMsgs)
-      }
-   }
+      },
+      [loadedMsgs]
+   )
 
-   return (
-      <Flex background="white" height="100vh" flexDirection="column" flex="1">
+   const header = useMemo(() => {
+      return (
          <Box
             p={5}
             pb={3}
@@ -391,11 +399,6 @@ const DMByAddress = ({
                               {truncateAddress(toAddr)}
                            </Text>
                         )}
-                        {/* {ens && (
-                           <Text fontWeight="bold" color="darkgray.800">
-                              {ens}
-                           </Text>
-                        )} */}
                      </Box>
                   </Flex>
                   <Box>
@@ -438,6 +441,29 @@ const DMByAddress = ({
                </Flex>
             )}
          </Box>
+      )
+   }, [copiedAddr, copyToClipboard, name, toAddr])
+
+   const renderedMessages = useMemo(() => {
+      return loadedMsgs.map((msg: MessageUIType, i) => {
+         if (msg && msg.message) {
+            return (
+               <ChatMessage
+                  key={i}
+                  context="dms"
+                  account={account}
+                  msg={msg}
+                  updateRead={updateRead}
+               />
+            )
+         }
+         return null
+      })
+   }, [account, loadedMsgs, updateRead])
+
+   return (
+      <Flex background="white" height="100vh" flexDirection="column" flex="1">
+         {header}
 
          <DottedBackground className="custom-scrollbar">
             {/* {isFetchingChatData && loadedMsgs.length === 0 && (
@@ -458,20 +484,7 @@ const DMByAddress = ({
                   </Box>
                </Flex>
             )}
-            {loadedMsgs.map((msg: MessageUIType, i) => {
-               if (msg && msg.message) {
-                  return (
-                     <ChatMessage
-                        key={`${msg.message}${msg.timestamp}`}
-                        context="dms"
-                        account={account}
-                        msg={msg}
-                        updateRead={updateRead}
-                     />
-                  )
-               }
-               return null
-            })}
+            {renderedMessages}
          </DottedBackground>
 
          <Flex>

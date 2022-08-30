@@ -18,6 +18,7 @@ const InboxList = ({
    account: string
    web3: Web3
 }) => {
+
    return (
       <Box>
          {data?.map((conversation, i) => {

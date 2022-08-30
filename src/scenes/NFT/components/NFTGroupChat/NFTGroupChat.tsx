@@ -1,6 +1,5 @@
-import { Box, Button, Divider, Flex, Tag } from '@chakra-ui/react'
-import { IconSend } from '@tabler/icons'
-import { useEffect, useState, useRef } from 'react'
+import { Box, Divider, Flex, Tag } from '@chakra-ui/react'
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import equal from 'fast-deep-equal/es6'
 
 import { getFormattedDate } from '../../../../helpers/date'
@@ -169,38 +168,69 @@ const NFTGroupChat = ({
       }
    }, [loadedMsgs])
 
-   const addMessageToUI = (
-      message: string,
-      fromaddr: string,
-      timestamp: string,
-      position: string,
-      isFetching: boolean,
-      nftaddr: string | null
-   ) => {
-      console.log(`Add message to UI: ${message}`)
+   const addMessageToUI = useCallback(
+      (
+         message: string,
+         fromaddr: string,
+         timestamp: string,
+         position: string,
+         isFetching: boolean,
+         nftaddr: string | null
+      ) => {
+         console.log(`Add message to UI: ${message}`)
 
-      const newMsg: MessageUIType = {
-         message,
-         fromAddr: fromaddr,
-         timestamp,
-         position,
-         isFetching,
-         nftAddr: nftaddr,
-      }
-      let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-      newLoadedMsgs.push(newMsg)
-      setLoadedMsgs(newLoadedMsgs)
-   }
+         const newMsg: MessageUIType = {
+            message,
+            fromAddr: fromaddr,
+            timestamp,
+            position,
+            isFetching,
+            nftAddr: nftaddr,
+         }
+         let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
+         newLoadedMsgs.push(newMsg)
+         setLoadedMsgs(newLoadedMsgs)
+      },
+      [loadedMsgs]
+   )
+
+   const renderedMessages = useMemo(() => {
+      return loadedMsgs.map((msg, i) => {
+         if (msg.type && msg.type === 'day') {
+            return (
+               <Box position="relative" my={6} key={i}>
+                  <Tag
+                     color="lightgray.800"
+                     background="lightgray.200"
+                     fontSize="xs"
+                     fontWeight="bold"
+                     mb={1}
+                     position="absolute"
+                     right="var(--chakra-space-4)"
+                     top="50%"
+                     transform="translateY(-50%)"
+                  >
+                     {getFormattedDate(msg.timestamp.toString())}
+                  </Tag>
+                  <Divider />
+               </Box>
+            )
+         } else if (msg.message) {
+            return (
+               <ChatMessage
+                  key={i}
+                  account={account}
+                  context="nfts"
+                  msg={msg}
+               />
+            )
+         }
+         return null
+      })
+   }, [loadedMsgs, account])
 
    return (
       <Flex flexDirection="column" height="100%">
-         {/* <Box py={2} px={6}>
-            <Stack spacing={5} direction="row">
-               <Checkbox defaultChecked size="sm">Project</Checkbox>
-               <Checkbox defaultChecked size="sm">Users</Checkbox>
-               <Checkbox defaultChecked size="sm">Holders</Checkbox>
-            </Stack>
-         </Box> */}
 
          <DottedBackground className="custom-scrollbar">
             {loadedMsgs.length === 0 && (
@@ -216,42 +246,7 @@ const NFTGroupChat = ({
                   </Box>
                </Flex>
             )}
-            {loadedMsgs.map((msg, i) => {
-               if (msg.type && msg.type === 'day') {
-                  return (
-                     <Box
-                        position="relative"
-                        my={6}
-                        key={`${msg.timestamp}${i}`}
-                     >
-                        <Tag
-                           color="lightgray.800"
-                           background="lightgray.200"
-                           fontSize="xs"
-                           fontWeight="bold"
-                           mb={1}
-                           position="absolute"
-                           right="var(--chakra-space-4)"
-                           top="50%"
-                           transform="translateY(-50%)"
-                        >
-                           {getFormattedDate(msg.timestamp.toString())}
-                        </Tag>
-                        <Divider />
-                     </Box>
-                  )
-               } else if (msg.message) {
-                  return (
-                     <ChatMessage
-                        key={`${msg.message}${msg.timestamp}${i}`}
-                        account={account}
-                        context="nfts"
-                        msg={msg}
-                     />
-                  )
-               }
-               return null
-            })}
+            {renderedMessages}
             <Box
                float="left"
                style={{ clear: 'both' }}

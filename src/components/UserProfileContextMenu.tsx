@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-   Button,
    Divider,
    Flex,
    Image,
@@ -26,6 +25,7 @@ const UserProfileContextMenu = ({
    address: string
    children?: React.ReactNode
 }) => {
+   
    return (
       <Menu isLazy>
          <MenuButton
@@ -126,4 +126,4 @@ const UserProfileContextMenu = ({
    )
 }
 
-export default React.memo(UserProfileContextMenu)
+export default UserProfileContextMenu

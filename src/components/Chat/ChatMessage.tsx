@@ -3,8 +3,7 @@ import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
 import Blockies from 'react-blockies'
 import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
-import { useEffect, useState } from 'react'
-import { useInView } from 'react-intersection-observer'
+import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
 
 import { formatMessageDate } from '../../helpers/date'
@@ -14,6 +13,7 @@ import NFT from '../../types/NFT'
 import OpenSeaNFT, { openseaToGeneralNFTType } from '../../types/OpenSea/NFT'
 import AlchemyNFT, { alchemyToGeneralNFTType } from '../../types/Alchemy/NFT'
 import UserProfileContextMenu from '../UserProfileContextMenu'
+import { useIsInViewport } from '../../helpers/useIsInViewport'
 
 const MessageBox = styled.div`
    position: relative;
@@ -130,14 +130,13 @@ const ChatMessage = ({
 }) => {
    const [nftData, setNftData] = useState<NFT>()
 
-   const { ref, inView } = useInView({
-      triggerOnce: true,
-   })
+   const messageRef = useRef(null)
+   const isInViewport = useIsInViewport(messageRef)
 
    useEffect(() => {
       const getNftMetadata = () => {
          if (!msg.nftAddr || !msg.nftId) {
-            console.log('Missing contract address or id')
+            // console.log('Missing contract address or id')
             return
          }
 
@@ -192,20 +191,9 @@ const ChatMessage = ({
       if (context === 'dms') {
          getNftMetadata()
       }
-   }, [msg, account])
+   }, [msg, account, context, nftData])
 
-   useEffect(() => {
-      if (
-         context === 'dms' &&
-         inView &&
-         msg?.read === false &&
-         msg?.toAddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
-      ) {
-         setMessageAsRead()
-      }
-   }, [inView])
-
-   const setMessageAsRead = () => {
+   const setMessageAsRead = useCallback(() => {
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
          fetch(
             ` ${process.env.REACT_APP_REST_API}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
@@ -229,7 +217,25 @@ const ChatMessage = ({
                console.error('🚨[PUT][Message]:', error)
             })
       }
-   }
+   }, [msg, updateRead])
+
+   useEffect(() => {
+      if (
+         context === 'dms' &&
+         isInViewport &&
+         msg?.read === false &&
+         msg?.toAddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
+      ) {
+         setMessageAsRead()
+      }
+   }, [
+      isInViewport,
+      account,
+      context,
+      msg?.read,
+      msg?.toAddr,
+      setMessageAsRead,
+   ])
 
    return (
       <Flex
@@ -255,7 +261,7 @@ const ChatMessage = ({
 
          <MessageBox
             className={`msg ${msg.position} ${msg.read && 'read'}`}
-            ref={ref}
+            ref={messageRef}
          >
             <Box className="msg-bubble">
                {msg?.sender_name && msg?.fromAddr && (
@@ -333,4 +339,4 @@ const ChatMessage = ({
    )
 }
 
-export default ChatMessage
+export default memo(ChatMessage)
