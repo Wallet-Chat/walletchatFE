@@ -60,6 +60,7 @@ const DMByAddress = ({
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
             },
          })
             .then((response) => response.json())
@@ -99,6 +100,7 @@ const DMByAddress = ({
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
             },
          }
       )
@@ -273,6 +275,7 @@ const DMByAddress = ({
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
          },
          body: JSON.stringify(data),
       })

@@ -69,6 +69,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
              method: 'PUT',
              headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
              },
              body: JSON.stringify({
                 name: values.name,

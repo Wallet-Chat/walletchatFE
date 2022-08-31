@@ -93,6 +93,7 @@ const NFTComments = ({
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
          },
          body: JSON.stringify(data),
       })

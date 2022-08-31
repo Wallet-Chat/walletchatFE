@@ -49,6 +49,7 @@ const POAPById = ({ account }: { account: string }) => {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
             },
          }
       )
@@ -68,6 +69,7 @@ const POAPById = ({ account }: { account: string }) => {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
          },
          body: JSON.stringify({
             walletaddr: account,
@@ -93,6 +95,7 @@ const POAPById = ({ account }: { account: string }) => {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
          },
          body: JSON.stringify({
             walletaddr: account,
