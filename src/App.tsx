@@ -30,8 +30,11 @@ import { isChromeExtension } from './helpers/chrome'
 import NFTByContract from './scenes/NFT/scenes/NFTByContract'
 import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
+import OneSignal from 'react-onesignal';
 
 export const App = () => {
+   OneSignal.init({ appId: '407b94c1-24df-4d29-ae74-e0f066737c05' });
+
    const [btnClicks, setBtnClicks] = useState(0)
 
    const {
@@ -109,6 +112,20 @@ export const App = () => {
                   flexGrow={1}
                >
                   <Image src={logoThumb} mb={5} width="40px" />
+                  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+      <script>
+      window.OneSignal = window.OneSignal || [];
+      OneSignal.push(function() {
+         OneSignal.init({
+            appId: "407b94c1-24df-4d29-ae74-e0f066737c05",
+            safari_web_id: "web.onesignal.auto.201c9c11-2835-4563-82b9-55a6f9094e87",
+            notifyButton: {
+            enable: true,
+            },
+            subdomainName: "app-walletchat",
+         })
+      })
+      </script>
                   <Heading size="2xl" mb={8}>
                      Login to start chatting
                   </Heading>
