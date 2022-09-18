@@ -395,7 +395,7 @@ export default function Sidebar() {
                            />
                         </CLink>
                         <CLink
-                           href="https://discord.gg/walletchat"
+                           href="https://discord.com/invite/S47CDmDtdf"
                            target="_blank"
                         >
                            <Image
