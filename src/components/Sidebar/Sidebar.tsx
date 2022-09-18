@@ -204,7 +204,24 @@ export default function Sidebar() {
             <Divider />
             <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0}></Box>
            
-            {name !== null && (
+            {/* for an iFrame we only want DMs */}
+            {name !== null && window !== window.parent && (
+               <>
+               <LinkElem to={'/dm'}>
+                  {/* <Box className="popup-text">Chat</Box> */}
+                  <Image src={IconDM} alt="" />
+                  {(unreadCount?.dm > 0 || unreadCount?.community > 0) && (
+                     <UnreadCountContainer>
+                        <Badge variant="blue" fontSize="md">
+                           {unreadCount?.dm}
+                        </Badge>
+                     </UnreadCountContainer>
+                  )}         
+               </LinkElem>
+               </>
+            )}
+
+            {name !== null && window == window.parent && (
                <>
                <LinkElem to={'/dm'}>
                   {/* <Box className="popup-text">Chat</Box> */}
@@ -216,6 +233,7 @@ export default function Sidebar() {
                         </Badge>
                      </UnreadCountContainer>
                   )}
+         
                </LinkElem>
                <LinkElem to={'/nft'}>
                   <Image src={IconNFT} alt="" />
@@ -238,7 +256,7 @@ export default function Sidebar() {
                   )}
                </LinkElem>
                </>
-            )}
+            )} 
             
             {metadata && (
                <LinkElem2 to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
