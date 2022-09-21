@@ -73,7 +73,7 @@ const NFTChat = ({
       }
       // setIsFetchingMessages(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
             headers: {
@@ -166,7 +166,7 @@ const NFTChat = ({
       data.message = msgInputCopy //await cid
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

@@ -78,7 +78,7 @@ import {
  
     const getJoinStatus = () => {
        fetch(
-          ` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}/${nftContractAddr}`,
+          ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
           {
              method: 'GET',
              headers: {
@@ -100,7 +100,7 @@ import {
     const joinGroup = () => {
        if (!isFetchingJoining) {
           setIsFetchingJoining(true)
-          fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
+          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
              method: 'POST',
              headers: {
                 'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ import {
     const leaveGroup = () => {
        if (!isFetchingJoining) {
           setIsFetchingJoining(true)
-          fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
+          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
              method: 'POST',
              headers: {
                 'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ import {
     const getTweetCount = () => {
        if (account) {
           fetch(
-             ` ${process.env.REACT_APP_REST_API}/get_twitter_cnt/${nftContractAddr}`,
+             ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
              {
                 method: 'GET',
                 headers: {

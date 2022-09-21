@@ -56,7 +56,7 @@ const DMByAddress = ({
 
    useEffect(() => {
       if (toAddr) {
-         fetch(` ${process.env.REACT_APP_REST_API}/name/${toAddr}`, {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`, {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ const DMByAddress = ({
       setIsFetchingChatData(true)
       //console.log(`getall_chatitems/${account}/${toAddr}`)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${toAddr}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}`,
          {
             method: 'GET',
             headers: {
@@ -271,7 +271,7 @@ const DMByAddress = ({
       data.message = msgInputCopy
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

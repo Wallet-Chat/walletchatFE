@@ -67,7 +67,7 @@ const Inbox = ({
          return
       }
       setIsFetchingInboxData(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/get_inbox/${account}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
          method: 'GET',
          headers: {
             'Content-Type': 'application/json',

@@ -96,7 +96,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const getJoinStatus = () => {
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}/${nftContractAddr}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
          {
             method: 'GET',
             headers: {
@@ -117,7 +117,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const joinGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const leaveGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
    const getTweetCount = () => {
       if (account) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/get_twitter_cnt/${nftContractAddr}`,
+            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
             {
                method: 'GET',
                headers: {
@@ -191,7 +191,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
    const getUnreadDMCount = () => {
       if (account) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
+            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
             {
                method: 'GET',
                headers: {

@@ -65,7 +65,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
 
          setIsFetching(true)
 
-          fetch(` ${process.env.REACT_APP_REST_API}/name`, {
+          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
              method: 'PUT',
              headers: {
                 'Content-Type': 'application/json',

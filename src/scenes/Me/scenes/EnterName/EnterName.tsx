@@ -69,7 +69,7 @@ const EnterName = ({ account }: { account: string }) => {
 
          setIsFetching(true)
 
-         fetch(` ${process.env.REACT_APP_REST_API}/name`, {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',

@@ -127,7 +127,7 @@ const CommunityGroupChat = ({
 
       setIsSendingMessage(true)
 
-      fetch(`${process.env.REACT_APP_REST_API}/community`, {
+      fetch(`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community`, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

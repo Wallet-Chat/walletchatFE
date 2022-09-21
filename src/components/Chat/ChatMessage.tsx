@@ -196,7 +196,7 @@ const ChatMessage = ({
    const setMessageAsRead = useCallback(() => {
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
+            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
             {
                method: 'PUT',
                headers: {
