@@ -38,11 +38,18 @@ async function myMainFunction() {
 }
 
 var extensionOrigin = 'chrome-extension://' + chrome.runtime.id
-if (!window.location.ancestorOrigins.contains(extensionOrigin)) {
+//if (!window.location.ancestorOrigins.contains(extensionOrigin)) 
+{
+   var url = (window.location != window.parent.location)
+            ? document.referrer
+            : document.location.href;
+            
    if (
       window.location.host === 'looksrare.org' ||
       window.location.host === 'x2y2.io' ||
-      window.location.host === 'opensea.io'
+      window.location.host === 'opensea.io' ||
+      window.location.host === 'eth-global2022.vercel.app' ||
+      window.location.host === 'localhost:3000'
    ) {
       var iframe = document.createElement('iframe')
       // Must be declared at web_accessible_resources in manifest.json

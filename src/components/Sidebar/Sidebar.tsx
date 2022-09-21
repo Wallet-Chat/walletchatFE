@@ -100,6 +100,20 @@ export default function Sidebar() {
             }
          }
       }
+      if (window !== window.parent) // (another way to check for iFrame)
+      {        
+         var urlLocal = document.referrer;
+         console.log('✅[INFO][Inside iFrame of Parent URL]:', urlLocal)
+         const [contractAddress, nftId, chain] = getContractAddressAndNFTId(urlLocal)
+         if (contractAddress && nftId !== null && chain) {
+            setNftContractAddr(contractAddress)
+            setNftId(nftId)
+            setChainName(chain)
+            if (contractAddress.startsWith('0x')) {
+               getNftMetadata(contractAddress, nftId, chain)
+            }
+         }
+      }
    }, [url])
 
    const getNftMetadata = (
