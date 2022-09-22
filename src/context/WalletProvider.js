@@ -220,35 +220,10 @@ const WalletProvider = React.memo(({ children }) => {
       }
    }
 
-   const handleSignMessage = async ( publicAddress, nonce ) => {
-      //return new Promise((resolve, reject) =>
-        await web3.personal.sign(
-          web3.fromUtf8(`I am signing my one-time nonce: ${nonce}`),
-          publicAddress,
-          (err, signature) => {
-            // if (err) return reject(err);
-            // return resolve({ publicAddress, signature });
-            return signature;
-          }
-        )
-      //);
-   }
-
-    const handleAuthenticate = async ( publicAddress, nonce, signature ) => {
-      const retVal = await fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-         body: JSON.stringify({ account, nonce, signature }),
-         headers: {
-         'Content-Type': 'application/json'
-         },
-         method: 'POST'
-      })
-      return retVal;
-   }
-
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
-         let _provider, _account, _nonce
+         let _provider, _account, _nonce, _signer
          let _web3 = new Web3(provider)
 
          if (isChromeExtension()) {
@@ -260,8 +235,10 @@ const WalletProvider = React.memo(({ children }) => {
             setWeb3ModalProvider(instance)
             _provider = new ethers.providers.Web3Provider(instance)
             _account = await _provider.getSigner().getAddress()
+            _signer = await _provider.getSigner()
             const network = await _provider.getNetwork()
             setChainId(network.chainId)
+            const _w3 = new Web3(_provider)
 
             //TODO JWT
             fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
@@ -275,21 +252,18 @@ const WalletProvider = React.memo(({ children }) => {
                console.log('✅[GET][Nonce]:', data)
                _nonce = data.Nonce
                //console.log('✅[GET][Data.nonce]:', data.Nonce)
-               //var parsedData = JSON.parse(data); 
-
-               //Now once we have nonce for user, make user sign it:
-               var signature = _web3.eth.personal.sign(`I am signing my one-time nonce: ${_nonce}`, _account)
-               //var signature = await handleSignMessage(_account, data.Nonce)
+               const signature = await _signer.signMessage("Sign to Log in to WalletChat: \r\n" + _nonce)
                console.log('✅[INFO][Signature]:', signature)
-               var JWT = await handleAuthenticate(_account, data.Nonce, signature)
-               console.log('✅[INFO][JWT]:', JWT)
+
+               const jwt = await fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                  body: JSON.stringify({ _account, _nonce, signature }),
+                  headers: {
+                  'Content-Type': 'application/json'
+                  },
+                  method: 'POST'
+               })
+               console.log('✅[INFO][JWT]:', jwt)
             })
-            // // Popup MetaMask confirmation modal to sign message
-            // .then(handleSignMessage(_account, _nonce))
-            // // Send signature to back end on the /auth route
-            // .then((publicAddress, signature) => {
-            //    handleAuthenticate(_account, _nonce, signature)
-            // })
             .catch((error) => {
                console.error('🚨[GET][Nonce]:', error)
             })
