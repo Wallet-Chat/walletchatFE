@@ -199,6 +199,7 @@ const ChatMessage = ({
             ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
             {
                method: 'PUT',
+               credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
                   //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,

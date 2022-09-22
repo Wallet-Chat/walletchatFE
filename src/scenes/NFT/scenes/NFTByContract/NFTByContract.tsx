@@ -81,6 +81,7 @@ import {
           ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
           {
              method: 'GET',
+             credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
                 //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -102,6 +103,7 @@ import {
           setIsFetchingJoining(true)
           fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
              method: 'POST',
+             credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
                 //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -130,6 +132,7 @@ import {
           setIsFetchingJoining(true)
           fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
              method: 'POST',
+             credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
                 //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -159,6 +162,7 @@ import {
              ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
              {
                 method: 'GET',
+                credentials: "include",
                 headers: {
                    'Content-Type': 'application/json',
                    //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,

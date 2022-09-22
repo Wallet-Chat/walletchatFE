@@ -67,6 +67,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
 
           fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
              method: 'PUT',
+             credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
                 //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,

@@ -65,6 +65,7 @@ const Inbox = ({
       setIsFetchingInboxData(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
          method: 'GET',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
             //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,

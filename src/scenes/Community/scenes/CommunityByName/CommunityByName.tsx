@@ -63,6 +63,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community/${community}/${account}`,
             {
                method: 'GET',
+               credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
                   //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -101,6 +102,7 @@ const CommunityByName = ({ account }: { account: string }) => {
          setIsFetchingJoining(true)
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
             method: 'POST',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -129,6 +131,7 @@ const CommunityByName = ({ account }: { account: string }) => {
          setIsFetchingJoining(true)
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
             method: 'POST',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,

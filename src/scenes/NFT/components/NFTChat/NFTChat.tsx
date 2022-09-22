@@ -76,6 +76,7 @@ const NFTChat = ({
          ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -168,6 +169,7 @@ const NFTChat = ({
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
             //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,

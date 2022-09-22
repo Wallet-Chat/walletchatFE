@@ -47,6 +47,7 @@ const POAPById = ({ account }: { account: string }) => {
          ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/POAP_${poapId}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -67,6 +68,7 @@ const POAPById = ({ account }: { account: string }) => {
       setIsFetchingJoining(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
             //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -93,6 +95,7 @@ const POAPById = ({ account }: { account: string }) => {
       setIsFetchingJoining(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
             //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,

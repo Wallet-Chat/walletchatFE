@@ -58,6 +58,7 @@ const DMByAddress = ({
       if (toAddr) {
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -98,6 +99,7 @@ const DMByAddress = ({
          ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -273,6 +275,7 @@ const DMByAddress = ({
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
             //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
@@ -301,6 +304,7 @@ const DMByAddress = ({
          } else {
             fetch(`https://api.sleekplan.com/v1/post`, {
                method: 'POST',
+               credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
                   Authorization: `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,

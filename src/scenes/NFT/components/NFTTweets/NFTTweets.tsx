@@ -30,6 +30,7 @@ const NFTTweets = ({
          ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter/${nftContractAddr}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
