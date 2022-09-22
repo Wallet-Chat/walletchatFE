@@ -65,7 +65,7 @@ const CommunityByName = ({ account }: { account: string }) => {
                method: 'GET',
                headers: {
                   'Content-Type': 'application/json',
-                  Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+                  //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
                },
             }
          )
@@ -103,7 +103,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
             },
             body: JSON.stringify({
                walletaddr: account,
@@ -131,7 +131,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
             },
             body: JSON.stringify({
                walletaddr: account,

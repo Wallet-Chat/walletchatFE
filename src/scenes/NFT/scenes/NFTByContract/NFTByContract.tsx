@@ -83,7 +83,7 @@ import {
              method: 'GET',
              headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
              },
           }
        )
@@ -104,7 +104,7 @@ import {
              method: 'POST',
              headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
              },
              body: JSON.stringify({
                 walletaddr: account,
@@ -132,7 +132,7 @@ import {
              method: 'POST',
              headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+                //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
              },
              body: JSON.stringify({
                 walletaddr: account,
@@ -161,7 +161,7 @@ import {
                 method: 'GET',
                 headers: {
                    'Content-Type': 'application/json',
-                   Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+                   //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
                 },
              }
           )
