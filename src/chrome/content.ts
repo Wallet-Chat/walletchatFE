@@ -28,7 +28,7 @@ const main = () => {
    // SetTerminal to run every 5 seconds (5000 ms), setTimeout to run just on
    setTimeout(myMainFunction, 5000); 
 }
-main()
+// main() // idk what these code do 
 
 async function myMainFunction() {
    const iframe = document.querySelector('iframe') 

@@ -67,7 +67,7 @@
       "sass": "^1.54.4"
    },
    "scripts": {
-      "start": "react-scripts start",
+      "start": "BROWSER=NONE react-scripts start",
       "build": "craco build",
       "test": "react-scripts test",
       "eject": "react-scripts eject"
@@ -89,5 +89,6 @@
          "last 1 firefox version",
          "last 1 safari version"
       ]
-   }
+   },
+   "proxy": "http://localhost:8080/"
 }

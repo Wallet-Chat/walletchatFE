@@ -68,7 +68,7 @@ const EnterName = ({ account }: { account: string }) => {
       if (values?.name) {
 
          setIsFetching(true)
-
+         console.log("process.env.REACT_APP_REST_API: ", process.env.REACT_APP_REST_API)
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
             method: 'POST',
             credentials: "include",

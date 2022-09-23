@@ -151,16 +151,20 @@ const WalletProvider = React.memo(({ children }) => {
    }, [web3ModalProvider])
 
    const getName = (_account) => {
+      let base_url = process.env.REACT_APP_REST_API
       if (!process.env.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
-         return
+         
+         if(process.env.REACT_APP_IS_PPOXY != "yes"){
+            console.log('REST API url not in .env', process.env)
+         }
+         base_url = ""
       }
       if (!_account) {
          console.log('No account connected')
          return
       }
       setIsFetchingName(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${_account}`, {
+      fetch(` ${base_url}/${process.env.REACT_APP_API_VERSION}/name/${_account}`, {
          method: 'GET',
          credentials: "include",
          headers: {
@@ -288,6 +292,7 @@ const WalletProvider = React.memo(({ children }) => {
 
          if (_account) {
             setAppLoading(true)
+            console.log("App is loaded, account is " + _account)
             setAccount(_account)
             // setChainId(chainId)
             setAuthenticated(true)

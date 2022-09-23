@@ -59,6 +59,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             console.log('No account connected')
             return
          }
+         console.log(process.env.REACT_APP_REST_API)
          fetch(
             `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community/${community}/${account}`,
             {
