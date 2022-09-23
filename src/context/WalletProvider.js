@@ -13,6 +13,7 @@ import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
 import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
+import { get, post } from "../services/api"
 
 const providerOptions = {
    walletconnect: {
@@ -164,15 +165,7 @@ const WalletProvider = React.memo(({ children }) => {
          return
       }
       setIsFetchingName(true)
-      fetch(` ${base_url}/${process.env.REACT_APP_API_VERSION}/name/${_account}`, {
-         method: 'GET',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-      })
-         .then((response) => response.json())
+      get(`/name/${_account}`)
          .then((data) => {
             console.log('✅[GET][Name]:', data)
             if (data[0]?.name) {
@@ -245,14 +238,7 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(network.chainId)
             const _w3 = new Web3(_provider)
 
-            //TODO JWT
-            fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
-               method: 'GET',
-               headers: {
-                  'Content-Type': 'application/json',
-               },
-            })
-            .then((response) => response.json())
+            get(`/users/${_account}/nonce`)
             .then(async (data) => {
                console.log('✅[GET][Nonce]:', data)
                _nonce = data.Nonce
@@ -260,14 +246,7 @@ const WalletProvider = React.memo(({ children }) => {
                //const signature = await _signer.signMessage("Sign to Log in to WalletChat: \r\n" + _nonce)
                const signature = await _signer.signMessage(_nonce)
                console.log('✅[INFO][Signature]:', signature)
-
-               fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                  body: JSON.stringify({ "address": _account, "nonce": _nonce, "sig": signature }),
-                  headers: {
-                  'Content-Type': 'application/json'
-                  },
-                  method: 'POST'
-               }).then((response) => response.json())
+               post('/signin',{ "address": _account, "nonce": _nonce, "sig": signature } )
                .then(async (data) => {
                   console.log('✅[INFO][JWT]:', data.access)
                })

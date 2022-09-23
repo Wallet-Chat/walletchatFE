@@ -8,6 +8,7 @@ import generateItems from '../../helpers/generateGroupedByDays'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
+import { get, post } from '../../../../services/api'
 
 const NFTGroupChat = ({
    account,
@@ -47,18 +48,7 @@ const NFTGroupChat = ({
 
       // setIsFetchingMessages(true)
 
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_groupchatitems/${nftContractAddr}/${account}`,
-         {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-         }
-      )
-         .then((response) => response.json())
+      get(`/get_groupchatitems/${nftContractAddr}/${account}`)
          .then((data: GroupMessageType[]) => {
             if (equal(data, chatData) === false) {
                console.log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
@@ -104,16 +94,8 @@ const NFTGroupChat = ({
       data.message = msgInputCopy
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_groupchatitem`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
+
+      post(`/create_groupchatitem`, data)
          .then((data) => {
             console.log('✅[POST][Message]:', data, latestLoadedMsgs)
             getChatData()

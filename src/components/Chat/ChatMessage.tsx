@@ -14,6 +14,7 @@ import OpenSeaNFT, { openseaToGeneralNFTType } from '../../types/OpenSea/NFT'
 import AlchemyNFT, { alchemyToGeneralNFTType } from '../../types/Alchemy/NFT'
 import UserProfileContextMenu from '../UserProfileContextMenu'
 import { useIsInViewport } from '../../helpers/useIsInViewport'
+import { put } from '../../services/api'
 
 const MessageBox = styled.div`
    position: relative;
@@ -195,22 +196,10 @@ const ChatMessage = ({
 
    const setMessageAsRead = useCallback(() => {
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
-         fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
-            {
-               method: 'PUT',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-               },
-               body: JSON.stringify({
-                  ...msg,
-                  read: true,
-               }),
-            }
-         )
-            .then((response) => response.json())
+         put(`/update_chatitem/${msg.fromAddr}/${msg.toAddr}`, {
+            ...msg,
+            read: true,
+         })
             .then((data) => {
                console.log('✅[PUT][Message]:', data)
                updateRead && updateRead(data)

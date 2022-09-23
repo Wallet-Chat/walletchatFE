@@ -23,6 +23,7 @@ import { useParams } from 'react-router-dom'
 import NFTGroupChat from '../../components/NFTGroupChat'
 import POAPEvent from '../../../../types/POAP/POAPEvent'
 import { useHover } from '../../../../helpers/useHover'
+import { get, post } from '../../../../services/api'
 
 const POAPById = ({ account }: { account: string }) => {
    let { poapId = '' } = useParams()
@@ -43,18 +44,8 @@ const POAPById = ({ account }: { account: string }) => {
          console.log('Missing POAP id')
          return
       }
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/POAP_${poapId}`,
-         {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-         }
-      )
-         .then((response) => response.json())
+
+      get( `/get_bookmarks/${account}/POAP_${poapId}`)
          .then((_joined: boolean) => {
             console.log('✅[GET][POAP][Joined?]')
             setJoined(_joined)
@@ -66,19 +57,11 @@ const POAPById = ({ account }: { account: string }) => {
 
    const joinGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify({
-            walletaddr: account,
-            nftaddr: `poap_${poapId}`,
-         }),
+
+      post( `/create_bookmark`, {
+         walletaddr: account,
+         nftaddr: `poap_${poapId}`,
       })
-         .then((response) => response.json())
          .then(() => {
             console.log('✅[POST][POAP][Join]')
             setJoined(true)
@@ -93,19 +76,10 @@ const POAPById = ({ account }: { account: string }) => {
 
    const leaveGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify({
-            walletaddr: account,
-            nftaddr: `poap_${poapId}`,
-         }),
+      post( `/delete_bookmark`, {
+         walletaddr: account,
+         nftaddr: `poap_${poapId}`,
       })
-         .then((response) => response.json())
          .then((count: number) => {
             console.log('✅[POST][POAP][Leave]')
             setJoined(false)

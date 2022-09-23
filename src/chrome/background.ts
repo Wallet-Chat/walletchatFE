@@ -1,5 +1,7 @@
 // import createMetaMaskProvider from 'metamask-extension-provider'
 
+import { get } from "../services/api"
+
 let activeTabId: number,
    lastUrl: string | undefined,
    lastTitle: string | undefined
@@ -113,15 +115,7 @@ function startAlarm() {
 async function getInboxCount(account: string) {
    console.log('[background.ts] getInboxCount', account)
    if (account) {
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${account}`, {
-         method: 'GET',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-      })
-         .then((response) => response.json())
+      get(`/get_unread_cnt/${account}`)
          .then((count: number) => {
             console.log('✅[GET][Unread Count]:', count)
             chrome.storage.local.get(['count'], (data) => {

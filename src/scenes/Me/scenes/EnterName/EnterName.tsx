@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 import OpenSeaNFT from '../../../../types/OpenSea/NFT'
+import { post, put } from '../../../../services/api'
 
 const EnterName = ({ account }: { account: string }) => {
    const {
@@ -69,19 +70,10 @@ const EnterName = ({ account }: { account: string }) => {
 
          setIsFetching(true)
          console.log("process.env.REACT_APP_REST_API: ", process.env.REACT_APP_REST_API)
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
-            method: 'POST',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-            body: JSON.stringify({
-               name: values.name,
-               address: account,
-            }),
+         post(`/name`, {
+            name: values.name,
+            address: account,
          })
-            .then((response) => response.json())
             .then((response) => {
                console.log('✅[POST][Name]:', response)
                globalSetName(name)
@@ -124,25 +116,25 @@ const EnterName = ({ account }: { account: string }) => {
                   </Button>
                </Flex>
                {ownedENS.length > 0 && (
-               <Box mt={2}>
-                  {ownedENS.map((item:OpenSeaNFT, i) =>
-                     (item?.name && item?.name !== "Unknown ENS name") ? (
-                        <Button
-                           variant="outline"
-                           key={i}
-                           onClick={() => item?.name && setName(item?.name)}
-                           mr="2"
-                           mb="2"
-                           size="sm"
-                        >
-                           {item.name}
-                        </Button>
-                     ) : (
-                        ''
-                     )
-                  )}
-               </Box>
-            )}
+                  <Box mt={2}>
+                     {ownedENS.map((item: OpenSeaNFT, i) =>
+                        (item?.name && item?.name !== "Unknown ENS name") ? (
+                           <Button
+                              variant="outline"
+                              key={i}
+                              onClick={() => item?.name && setName(item?.name)}
+                              mr="2"
+                              mb="2"
+                              size="sm"
+                           >
+                              {item.name}
+                           </Button>
+                        ) : (
+                           ''
+                        )
+                     )}
+                  </Box>
+               )}
                <FormHelperText>
                   You can change it anytime in your settings
                </FormHelperText>

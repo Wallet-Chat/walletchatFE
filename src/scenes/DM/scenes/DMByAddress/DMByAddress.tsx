@@ -27,6 +27,7 @@ import equal from 'fast-deep-equal/es6'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
+import { get, post, post_external } from '../../../../services/api'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
@@ -56,15 +57,7 @@ const DMByAddress = ({
 
    useEffect(() => {
       if (toAddr) {
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`, {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-         })
-            .then((response) => response.json())
+         get(`/name/${toAddr}`)
             .then((response) => {
                console.log('✅[GET][Name]:', response)
                if (response[0]?.name) setName(response[0].name)
@@ -95,18 +88,8 @@ const DMByAddress = ({
       }
       setIsFetchingChatData(true)
       //console.log(`getall_chatitems/${account}/${toAddr}`)
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}`,
-         {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-         }
-      )
-         .then((response) => response.json())
+
+      get(`/getall_chatitems/${account}/${toAddr}`)
          .then(async (data: MessageType[]) => {
             if (equal(data, chatData) === false) {
                console.log('✅[GET][Chat items]:', data)
@@ -133,7 +116,7 @@ const DMByAddress = ({
    }, [isAuthenticated, account, toAddr, chatData, getChatData])
 
    useEffect(() => {
-      
+
       const toAddToUI = [] as MessageUIType[]
 
       for (let i = 0; i < chatData.length; i++) {
@@ -273,16 +256,8 @@ const DMByAddress = ({
       data.message = msgInputCopy
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
+
+      post(`/create_chatitem`, data)
          .then((data) => {
             console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
             getChatData()
@@ -302,21 +277,16 @@ const DMByAddress = ({
          if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
             console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
          } else {
-            fetch(`https://api.sleekplan.com/v1/post`, {
-               method: 'POST',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
-               },
-               body: JSON.stringify({
-                  title: account,
-                  type: 'feedback',
-                  description: msgInputCopy,
-                  user: 347112,
-               }),
+
+            post_external(`https://api.sleekplan.com/v1/post`, {
+               title: account,
+               type: 'feedback',
+               description: msgInputCopy,
+               user: 347112,
+            }, {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
             })
-               .then((response) => response.json())
                .then((data) => {
                   console.log('✅[POST][Feedback]:', data)
                })

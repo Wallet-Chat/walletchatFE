@@ -23,6 +23,8 @@ import NFTInboxSearchInput from './components/NFTInboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 
+import { get } from "../../services/api"
+
 const _inbox = localStorage.getItem('inbox')
 const localStorageInbox = _inbox ? JSON.parse(_inbox) : []
 
@@ -104,15 +106,8 @@ const NFTInbox = ({
          return
       }
       setIsFetchingInboxData(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
-         method: 'GET',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-      })
-         .then((response) => response.json())
+
+      get(`/get_inbox/${account}`)
          .then((data: InboxItemType[]) => {
             if (data === null) {
                setInboxData([])

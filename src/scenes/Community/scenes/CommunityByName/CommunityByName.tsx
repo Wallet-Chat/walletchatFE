@@ -27,6 +27,7 @@ import CommunityTweets from './components/CommunityTweets'
 import { useHover } from '../../../../helpers/useHover'
 import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
 import CommunityType from '../../../../types/Community'
+import { get, post } from '../../../../services/api'
 
 const CommunityByName = ({ account }: { account: string }) => {
    let { community = '' } = useParams()
@@ -60,18 +61,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             return
          }
          console.log(process.env.REACT_APP_REST_API)
-         fetch(
-            `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community/${community}/${account}`,
-            {
-               method: 'GET',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-               },
-            }
-         )
-            .then((response) => response.json())
+         get(`/community/${community}/${account}`)
             .then(async (data: CommunityType) => {
                if (!equal(data?.messages, communityData?.messages)) {
                   console.log('✅[GET][Community]:', data)
@@ -101,19 +91,10 @@ const CommunityByName = ({ account }: { account: string }) => {
    const joinGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
-            method: 'POST',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-            body: JSON.stringify({
-               walletaddr: account,
-               nftaddr: community
-            }),
+         post(`/create_bookmark`, {
+            walletaddr: account,
+            nftaddr: community
          })
-            .then((response) => response.json())
             .then((response) => {
                console.log('✅[POST][Community][Join]', response)
                setJoined(true)
@@ -130,17 +111,9 @@ const CommunityByName = ({ account }: { account: string }) => {
    const leaveGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
-            method: 'POST',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-            body: JSON.stringify({
-               walletaddr: account,
-               nftaddr: community,
-            }),
+         post(`/delete_bookmark`, {
+            walletaddr: account,
+            nftaddr: community
          })
             .then((response) => response.json())
             .then((count: number) => {
@@ -176,9 +149,9 @@ const CommunityByName = ({ account }: { account: string }) => {
                            {communityData.name}
                         </Heading>
                         <Tooltip label="OpenSea Verified">
-                        <Box><IconCircleCheck stroke="2" color="white" fill="var(--chakra-colors-success-600)" /></Box></Tooltip>
+                           <Box><IconCircleCheck stroke="2" color="white" fill="var(--chakra-colors-success-600)" /></Box></Tooltip>
                         <Button
-                            ml={2}
+                           ml={2}
                            size="xs"
                            variant={joined ? 'black' : 'outline'}
                            isLoading={isFetchingJoining}
@@ -199,8 +172,8 @@ const CommunityByName = ({ account }: { account: string }) => {
                                     ? 'Leave?'
                                     : '+ Join'
                                  : joined
-                                 ? 'Joined'
-                                 : '+ Join'}
+                                    ? 'Joined'
+                                    : '+ Join'}
                            </Text>
                         </Button>
                      </Flex>
@@ -208,39 +181,39 @@ const CommunityByName = ({ account }: { account: string }) => {
                   <Flex alignItems="center">
                      {communityData?.discord && (
                         <Tooltip label="Discord">
-                        <Link
-                           href={`https://www.discord.com/channels/${communityData.discord}`}
-                           target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
-                           mr={1}
-                        >
-                           <Image src={IconDiscord} alt="" height="24px" width="24px" />
-                        </Link>
-                     </Tooltip>
+                           <Link
+                              href={`https://www.discord.com/channels/${communityData.discord}`}
+                              target="_blank"
+                              d="inline-block"
+                              verticalAlign="middle"
+                              mr={1}
+                           >
+                              <Image src={IconDiscord} alt="" height="24px" width="24px" />
+                           </Link>
+                        </Tooltip>
                      )}
                      {communityData?.twitter && (
                         <Tooltip label="Twitter">
-                        <Link
-                           href={`https://twitter.com/${communityData?.twitter}`}
-                           target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
-                        >
-                           <IconBrandTwitter stroke={1.5} color="white"
-                              fill="var(--chakra-colors-lightgray-800)" />
-                        </Link>
-                     </Tooltip>
+                           <Link
+                              href={`https://twitter.com/${communityData?.twitter}`}
+                              target="_blank"
+                              d="inline-block"
+                              verticalAlign="middle"
+                           >
+                              <IconBrandTwitter stroke={1.5} color="white"
+                                 fill="var(--chakra-colors-lightgray-800)" />
+                           </Link>
+                        </Tooltip>
                      )}
                      <Divider orientation='vertical' height="12px" mx={2} />
-                  
-                  {communityData?.members && (
-                     <Box>
-                        <Text fontSize="md">{communityData.members} members</Text>
-                     </Box>
-                  )}
+
+                     {communityData?.members && (
+                        <Box>
+                           <Text fontSize="md">{communityData.members} members</Text>
+                        </Box>
+                     )}
                   </Flex>
-{/* 
+                  {/* 
                   <Box mb={2}>
                      {nftData?.collection?.external_url && (
                         <Tooltip label="Visit website">

@@ -4,6 +4,7 @@ import equal from 'fast-deep-equal/es6'
 import TweetType from '../../../../types/Tweet'
 import Tweet from './components/Tweet'
 import { Box, Divider, Flex, Spinner } from '@chakra-ui/react'
+import { get } from '../../../../services/api'
 
 
 const NFTTweets = ({
@@ -26,18 +27,7 @@ const NFTTweets = ({
 
    const getTwitterInfo = async (nftContractAddr: string) => {
       setIsFetchingTweets(true)
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter/${nftContractAddr}`,
-         {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-         }
-      )
-         .then((response) => response.json())
+      get(`/get_twitter/${nftContractAddr}`)
          .then((data) => {
             if (equal(data, tweets) === false) {
                console.log('✅[GET][NFT][Tweets]:', data)

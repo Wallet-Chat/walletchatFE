@@ -20,6 +20,7 @@ import { truncateAddress } from '../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
+import { get, post } from "../../../../services/api"
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
 
@@ -71,18 +72,8 @@ const NFTChat = ({
          console.log('No account connected')
          return
       }
-      // setIsFetchingMessages(true)
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
-         {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-         }
-      )
+      // setIsFetchingMessages(true)\
+      get(`getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`)
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
             if (equal(data, chatData) === false) {
@@ -93,9 +84,9 @@ const NFTChat = ({
          .catch((error) => {
             console.error('🚨[GET][NFT][Messages]:', error)
          })
-         // .finally(() => {
-         //    setIsFetchingMessages(false)
-         // })
+      // .finally(() => {
+      //    setIsFetchingMessages(false)
+      // })
    }
 
    const handleMessageKeyPress = (
@@ -167,16 +158,8 @@ const NFTChat = ({
       data.message = msgInputCopy //await cid
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
+
+      post("/create_chatitem", data)
          .then((data) => {
             console.log('✅[POST][NFT][Send message]:', data, latestLoadedMsgs)
             getChatData()

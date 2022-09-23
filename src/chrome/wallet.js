@@ -50,18 +50,7 @@ export default function WalletAccount(address) {
         if (address) {
             // console.log(`[getInboxCount][${address}`)
 
-            fetch(
-                ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${address}`,
-                {
-                    method: 'GET',
-                    credentials: "include",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-                    },
-                }
-            )
-                .then((response) => response.json())
+            get(`/get_unread_cnt/${address}`)
                 .then((count) => {
                     console.log('✅ [GET][Unread Count] UNREAD COUNT:', count)
                     handleSuccess(count)

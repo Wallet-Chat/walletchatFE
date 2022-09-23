@@ -40,6 +40,7 @@ import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import equal from 'fast-deep-equal/es6'
 import { useHover } from '../../../../helpers/useHover'
+import { get, post } from '../../../../services/api'
 
 const tokenType = 'erc721'
 
@@ -95,18 +96,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
    }, [account, ownerAddr])
 
    const getJoinStatus = () => {
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
-         {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-            },
-         }
-      )
-         .then((response) => response.json())
+      get(`/get_bookmarks/${account}/${nftContractAddr}`)
          .then((joined: boolean) => {
             console.log('✅[GET][NFT][Bookmarked?]')
             setJoined(joined)
@@ -118,19 +108,10 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const joinGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify({
-            walletaddr: account,
-            nftaddr: nftContractAddr,
-         }),
+      post(`create_bookmark`, {
+         walletaddr: account,
+         nftaddr: nftContractAddr,
       })
-         .then((response) => response.json())
          .then(() => {
             console.log('✅[POST][NFT][Join]')
             setJoined(true)
@@ -143,19 +124,10 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const leaveGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify({
-            walletaddr: account,
-            nftaddr: nftContractAddr,
-         }),
+      post(`delete_bookmark`, {
+         walletaddr: account,
+         nftaddr: nftContractAddr,
       })
-         .then((response) => response.json())
          .then(() => {
             console.log('✅[POST][NFT][Leave]')
             setJoined(false)
@@ -168,18 +140,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const getTweetCount = () => {
       if (account) {
-         fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
-            {
-               method: 'GET',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-               },
-            }
-         )
-            .then((response) => response.json())
+         get( `/get_twitter_cnt/${nftContractAddr}`)
             .then((count: number) => {
                if (count !== tweetCount) {
                   console.log('✅[GET][NFT][No. of tweets]:', count)
@@ -194,18 +155,8 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const getUnreadDMCount = () => {
       if (account) {
-         fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
-            {
-               method: 'GET',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-               },
-            }
-         )
-            .then((response) => response.json())
+
+         get( `/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`)
             .then((count: number) => {
                if (count !== unreadCount) {
                   console.log('✅[GET][NFT][No. of unread msgs]:', count)
@@ -371,9 +322,8 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
                      )}
                      {nftStatistics && (
                         <Tooltip
-                           label={`${
-                              chain && capitalizeFirstLetter(chain)
-                           } chain`}
+                           label={`${chain && capitalizeFirstLetter(chain)
+                              } chain`}
                         >
                            <Badge
                               d="flex"
@@ -443,8 +393,8 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
                                  ? 'Leave?'
                                  : '+ Join'
                               : joined
-                              ? 'Joined'
-                              : '+ Join'}
+                                 ? 'Joined'
+                                 : '+ Join'}
                         </Text>
                      </Button>
                   </Flex>

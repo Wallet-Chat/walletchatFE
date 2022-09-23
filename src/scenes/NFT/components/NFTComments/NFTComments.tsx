@@ -5,6 +5,7 @@ import { Button, Divider, Flex, FormControl } from '@chakra-ui/react'
 
 import CommentType from '../../../../types/Comment'
 import Comment from './components/Comment'
+import { get, post } from '../../../../services/api'
 
 const NFTComments = ({
    account,
@@ -37,13 +38,8 @@ const NFTComments = ({
 
    const getComments = () => {
       setIsFetchingComments(true)
-      fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_comments/${nftContractAddr}/${nftId}`,
-         {
-            method: 'GET',
-         }
-      )
-         .then((response) => response.json())
+
+      get(`/get_comments/${nftContractAddr}/${nftId}`)
          .then((data) => {
             console.log('✅[GET][NFT][Comments]:', data)
             const translatedData = data.map((item: any) => ({
@@ -89,16 +85,7 @@ const NFTComments = ({
       }
 
       setIsPostingComment(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_comments`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
+      post(`/create_comments`, data)
          .then((data) => {
             console.log('nft id: ', nftId)
             console.log('✅[POST][NFT][Comment]:', data)

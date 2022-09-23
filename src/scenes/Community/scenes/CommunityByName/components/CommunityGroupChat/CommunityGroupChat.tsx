@@ -15,6 +15,7 @@ import TextareaAutosize from 'react-textarea-autosize'
 import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { post } from '../../../../../../services/api'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 
 import { GroupMessageType, MessageUIType } from '../../../../../../types/Message'
@@ -127,16 +128,8 @@ const CommunityGroupChat = ({
 
       setIsSendingMessage(true)
 
-      fetch(`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
+
+      post("/community",data)
          .then((data) => {
             console.log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
          })
