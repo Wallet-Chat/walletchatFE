@@ -66,7 +66,7 @@ const CommunityByName = ({ account }: { account: string }) => {
                credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
-                  //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
                },
             }
          )
@@ -105,7 +105,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
                walletaddr: account,
@@ -134,7 +134,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
                walletaddr: account,
