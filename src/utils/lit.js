@@ -44,6 +44,7 @@ class Lit {
   litNodeClient
 
   async connect() {
+    console.log("conneting to LIT")
     await client.connect()
     this.litNodeClient = client
   }
@@ -89,6 +90,40 @@ class Lit {
     })
     return { decryptedFile }
   }
-}
 
+    /**
+     * This function encodes into base 64.
+     * it's useful for storing symkeys and files in ceramic
+     * @param {Uint8Array} input a file or any data
+     * @returns {string} returns a string of b64
+     */
+    encodeb64(uintarray) {
+        var b64 = Buffer.from(uintarray).toString("base64");
+        return b64;
+    }
+
+    /**
+     * This function converts blobs to base 64.
+     * for easier storage in ceramic
+     * @param {Blob} blob what you'd like to encode
+     * @returns {Promise<String>} returns a string of b64
+     */
+    async blobToB64(blob) {
+        return await LitJsSdk.blobToBase64String(blob)
+    }
+
+    b64toBlob(b64Data) {
+        return LitJsSdk.base64StringToBlob(b64Data)
+    }
+
+    /**
+     * This function decodes from base 64.
+     * it's useful for decrypting symkeys and files in ceramic
+     * @param {blob} input a b64 string
+     * @returns {string} returns the data as a string
+     */
+    decodeb64(b64String) {
+        return new Uint8Array(Buffer.from(b64String, "base64"));
+    }
+}
 export default new Lit()

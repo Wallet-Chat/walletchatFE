@@ -111,9 +111,40 @@ const DMByAddress = ({
                const replica = JSON.parse(JSON.stringify(data));
                // Get data from LIT and replace the message with the decrypted text
                for (let i = 0; i < replica.length; i++) {
-                  if(replica[i].encryptedsymkey){  //only needed for mixed DB with plain and encrypted data
-                     const rawmsg = await lit.decryptString(replica[i].message, replica[i].encryptsymkey)
-                     replica[i].message = rawmsg
+                  if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+                     const _accessControlConditions = [
+                        {
+                          contractAddress: '',
+                          standardContractType: '',
+                          chain: 'ethereum',
+                          method: '',
+                          parameters: [
+                            ':userAddress',
+                          ],
+                          returnValueTest: {
+                            comparator: '=',
+                            value: replica[i].toaddr
+                          }
+                        },
+                        {"operator": "or"},
+                        {
+                          contractAddress: '',
+                          standardContractType: '',
+                          chain: 'ethereum',
+                          method: '',
+                          parameters: [
+                            ':userAddress',
+                          ],
+                          returnValueTest: {
+                            comparator: '=',
+                            value: replica[i].fromaddr
+                          }
+                        }
+                      ]     
+                     
+                     console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                     const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                     replica[i].message = rawmsg.decryptedFile.toString()
                   }
                }
                setChatData(replica)
@@ -261,7 +292,7 @@ const DMByAddress = ({
          fromAddr: account.toLocaleLowerCase(),
          toAddr: toAddr.toLocaleLowerCase(),
          timestamp,
-         encryptedsymkey: "",
+         encrypted_sym_lit_key: "",
          read: false,
       }
 
@@ -282,7 +313,7 @@ const DMByAddress = ({
          {
            contractAddress: '',
            standardContractType: '',
-           chain: 'polygon',
+           chain: 'ethereum',
            method: '',
            parameters: [
              ':userAddress',
@@ -296,7 +327,7 @@ const DMByAddress = ({
          {
            contractAddress: '',
            standardContractType: '',
-           chain: 'polygon',
+           chain: 'ethereum',
            method: '',
            parameters: [
              ':userAddress',
@@ -308,9 +339,11 @@ const DMByAddress = ({
          }
        ]     
 
+      console.log('✅[POST][Encrypt Message]:', msgInputCopy, accessControlConditions)
       const encrypted = await lit.encryptString(msgInputCopy, accessControlConditions);
-      data.message = encrypted.encryptedFile
-      data.encryptedsymkey = encrypted.encryptedSymmetricKey
+      console.log('✅[POST][Encrypted Message]:', encrypted)
+      data.message = await lit.blobToB64(encrypted.encryptedFile)
+      data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
 
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
