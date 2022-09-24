@@ -243,18 +243,18 @@ const WalletProvider = React.memo(({ children }) => {
             const _w3 = new Web3(_provider)
 
             //check if JWT exists or is timed out:
-            fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
-               method: 'GET',
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-               },
-            })
-            .then((response) => response.json())
-            .then(async (data) => {
-               console.log('✅[POST][Welcome]:', data.msg)
-               console.log('msg log: ', data.msg.includes(_account))
-               if (!data.msg.includes(_account)) {
+            // fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
+            //    method: 'GET',
+            //    headers: {
+            //       'Content-Type': 'application/json',
+            //       Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            //    },
+            // })
+            // .then((response) => response.json())
+            // .then(async (data) => {
+            //    console.log('✅[POST][Welcome]:', data.msg)
+            //    console.log('msg log: ', data.msg.includes(_account))
+            //    if (!data.msg.includes(_account)) {
                   //TODO JWT
                   fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
                      method: 'GET',
@@ -288,11 +288,11 @@ const WalletProvider = React.memo(({ children }) => {
                      console.error('🚨[GET][Nonce]:', error)
                   })
                   //END JWT AUTH sequence
-               }
-            })
-            .catch((error) => {
-               console.error('🚨[POST][Welcome]:', error)
-            })
+             // }
+            //})
+            // .catch((error) => {
+            //    console.error('🚨[POST][Welcome]:', error)
+            // })
 
             if (network.chainId !== '1') {
                // check if the chain to connect to is installed
