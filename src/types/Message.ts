@@ -18,6 +18,7 @@ interface MessageSkeletonType {
    fromaddr: string
    timestamp: string
    read: boolean
+   encryptmsgkey: string
    id?: number
 }
 

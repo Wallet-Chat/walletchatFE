@@ -30,6 +30,7 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
+import lit from "../../../../utils/lit";
 
 const DMByAddress = ({
    account,
@@ -106,7 +107,17 @@ const DMByAddress = ({
          .then(async (data: MessageType[]) => {
             if (equal(data, chatData) === false) {
                console.log('✅[GET][Chat items]:', data)
-               setChatData(data)
+
+               const replica = JSON.parse(JSON.stringify(data));
+               // Get data from LIT and replace the message with the decrypted text
+               for (let i = 0; i < replica.length; i++) {
+                  if(replica[i].encryptedsymkey){  //only needed for mixed DB with plain and encrypted data
+                     const rawmsg = await lit.decryptString(replica[i].message, replica[i].encryptsymkey)
+                     replica[i].message = rawmsg
+                  }
+               }
+               setChatData(replica)
+               //setChatData(data)
             }
          })
          .catch((error) => {
@@ -129,7 +140,6 @@ const DMByAddress = ({
    }, [isAuthenticated, account, toAddr, chatData, getChatData])
 
    useEffect(() => {
-      
       const toAddToUI = [] as MessageUIType[]
 
       for (let i = 0; i < chatData.length; i++) {
@@ -234,7 +244,7 @@ const DMByAddress = ({
       [loadedMsgs]
    )
 
-   const sendMessage = useCallback(() => {
+   const sendMessage = async () => {
       console.log('sendMessage')
       if (msgInput.length <= 0) return
 
@@ -251,6 +261,7 @@ const DMByAddress = ({
          fromAddr: account.toLocaleLowerCase(),
          toAddr: toAddr.toLocaleLowerCase(),
          timestamp,
+         encryptedsymkey: "",
          read: false,
       }
 
@@ -266,7 +277,40 @@ const DMByAddress = ({
          null
       )
 
-      data.message = msgInputCopy
+      //data.message = msgInputCopy
+      const accessControlConditions = [
+         {
+           contractAddress: '',
+           standardContractType: '',
+           chain: 'polygon',
+           method: '',
+           parameters: [
+             ':userAddress',
+           ],
+           returnValueTest: {
+             comparator: '=',
+             value: `${data.toAddr}`
+           }
+         },
+         {"operator": "or"},
+         {
+           contractAddress: '',
+           standardContractType: '',
+           chain: 'polygon',
+           method: '',
+           parameters: [
+             ':userAddress',
+           ],
+           returnValueTest: {
+             comparator: '=',
+             value: `${data.fromAddr}`
+           }
+         }
+       ]     
+
+      const encrypted = await lit.encryptString(msgInputCopy, accessControlConditions);
+      data.message = encrypted.encryptedFile
+      data.encryptedsymkey = encrypted.encryptedSymmetricKey
 
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
@@ -322,7 +366,7 @@ const DMByAddress = ({
                })
          }
       }
-   }, [account, addMessageToUI, getChatData, loadedMsgs, msgInput, toAddr])
+   }
 
    const updateRead = useCallback(
       (data: MessageUIType) => {
