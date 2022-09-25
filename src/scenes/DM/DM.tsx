@@ -88,7 +88,7 @@ const Inbox = ({
                // Get data from LIT and replace the message with the decrypted text
                for (let i = 0; i < replica.length; i++) {
                   if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-                     const _accessControlConditions = replica[i].lit_access_conditions
+                     const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
                      
                      console.log('✅[POST][Decrypt GetInbox Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
                      const blob = lit.b64toBlob(replica[i].message)
