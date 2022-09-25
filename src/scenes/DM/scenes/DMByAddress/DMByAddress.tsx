@@ -325,7 +325,7 @@ const DMByAddress = ({
            ],
            returnValueTest: {
              comparator: '=',
-             value: `${data.toAddr}`
+             value: data.toAddr
            }
          },
          {"operator": "or"},
@@ -339,7 +339,7 @@ const DMByAddress = ({
            ],
            returnValueTest: {
              comparator: '=',
-             value: `${data.fromAddr}`
+             value: data.fromAddr
            }
          }
        ]     
