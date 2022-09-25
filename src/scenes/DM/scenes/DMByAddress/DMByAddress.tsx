@@ -321,7 +321,7 @@ const DMByAddress = ({
       const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
       data.message = await lit.blobToB64(encrypted.encryptedFile)
       data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-      data.lit_access_conditions = _accessControlConditions.toString()
+      data.lit_access_conditions = JSON.stringify(_accessControlConditions)
       console.log('✅[POST][Encrypted Message]:', data)
 
       setIsSendingMessage(true)
