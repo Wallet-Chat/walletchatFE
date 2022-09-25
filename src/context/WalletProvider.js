@@ -242,7 +242,7 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(network.chainId)
             const _w3 = new Web3(_provider)
 
-            //check if JWT exists or is timed out:
+            // check if JWT exists or is timed out:
             // fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
             //    method: 'GET',
             //    headers: {
@@ -255,6 +255,8 @@ const WalletProvider = React.memo(({ children }) => {
             //    console.log('✅[POST][Welcome]:', data.msg)
             //    console.log('msg log: ', data.msg.includes(_account))
             //    if (!data.msg.includes(_account)) {
+            //above code doesn't see to work
+
                   //TODO JWT
                   fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
                      method: 'GET',
@@ -288,6 +290,8 @@ const WalletProvider = React.memo(({ children }) => {
                      console.error('🚨[GET][Nonce]:', error)
                   })
                   //END JWT AUTH sequence
+
+             //below part of /wecome check for existing token     
              // }
             //})
             // .catch((error) => {
