@@ -86,7 +86,7 @@ export default function InboxSearchInput() {
 
          {suggestedAddress !== '' &&
             isSuggestionListOpen &&
-            suggestedAddress !== toAddr &&
+            //suggestedAddress !== toAddr &&
             !isResolvingENS && (
                <Box
                   position="absolute"
