@@ -112,19 +112,21 @@ const DMByAddress = ({
             if (equal(data, chatData) === false) {
                console.log('✅[GET][Chat items]:', data)
 
-               const replica = JSON.parse(JSON.stringify(data));
-               // Get data from LIT and replace the message with the decrypted text
-               for (let i = 0; i < replica.length; i++) {
-                  if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-                     const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+               //START LIT ENCRYPTION
+               // const replica = JSON.parse(JSON.stringify(data));
+               // // Get data from LIT and replace the message with the decrypted text
+               // for (let i = 0; i < replica.length; i++) {
+               //    if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+               //       const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
                      
-                     console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                     const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                     replica[i].message = rawmsg.decryptedFile.toString()
-                  }
-               }
-               setChatData(replica)
-               //setChatData(data)
+               //       console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+               //       const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+               //       replica[i].message = rawmsg.decryptedFile.toString()
+               //    }
+               // }
+               // setChatData(replica)
+               //END LIT ENCRYPTION
+               setChatData(data)  //use when not using encryption
             }
          })
          .catch((error) => {
@@ -286,43 +288,43 @@ const DMByAddress = ({
          null
       )
 
-      //data.message = msgInputCopy
-      const _accessControlConditions = [
-         {
-           contractAddress: '',
-           standardContractType: '',
-           chain: 'ethereum',
-           method: '',
-           parameters: [
-             ':userAddress',
-           ],
-           returnValueTest: {
-             comparator: '=',
-             value: data.toAddr
-           }
-         },
-         {"operator": "or"},
-         {
-           contractAddress: '',
-           standardContractType: '',
-           chain: 'ethereum',
-           method: '',
-           parameters: [
-             ':userAddress',
-           ],
-           returnValueTest: {
-             comparator: '=',
-             value: data.fromAddr
-           }
-         }
-       ]     
+      data.message = msgInputCopy
+      // const _accessControlConditions = [
+      //    {
+      //      contractAddress: '',
+      //      standardContractType: '',
+      //      chain: 'ethereum',
+      //      method: '',
+      //      parameters: [
+      //        ':userAddress',
+      //      ],
+      //      returnValueTest: {
+      //        comparator: '=',
+      //        value: data.toAddr
+      //      }
+      //    },
+      //    {"operator": "or"},
+      //    {
+      //      contractAddress: '',
+      //      standardContractType: '',
+      //      chain: 'ethereum',
+      //      method: '',
+      //      parameters: [
+      //        ':userAddress',
+      //      ],
+      //      returnValueTest: {
+      //        comparator: '=',
+      //        value: data.fromAddr
+      //      }
+      //    }
+      //  ]     
 
-      console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
-      const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
-      data.message = await lit.blobToB64(encrypted.encryptedFile)
-      data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-      data.lit_access_conditions = JSON.stringify(_accessControlConditions)
-      console.log('✅[POST][Encrypted Message]:', data)
+      // console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
+      // const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
+      // data.message = await lit.blobToB64(encrypted.encryptedFile)
+      // data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
+      // data.lit_access_conditions = JSON.stringify(_accessControlConditions)
+      // console.log('✅[POST][Encrypted Message]:', data)
 
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
