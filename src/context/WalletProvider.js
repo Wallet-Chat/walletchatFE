@@ -253,7 +253,7 @@ const WalletProvider = React.memo(({ children }) => {
             .then((response) => response.json())
             .then(async (data) => {
                console.log('✅[POST][Welcome]:', data.msg)
-               console.log('msg log: ', data.msg.includes(_account))
+               console.log('msg log: ', data.msg.toString().includes(_account), _account)
                if (!data.msg.includes(_account)) {
             //above code doesn't see to work
 
