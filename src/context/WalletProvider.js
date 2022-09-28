@@ -252,12 +252,10 @@ const WalletProvider = React.memo(({ children }) => {
             })
             .then((response) => response.json())
             .then(async (data) => {
-               console.log('✅[POST][Welcome]:', data.msg.toString())
-               console.log('msg log: ', data.msg.toString().includes(_account), _account.toString())
-               if (!data.msg.includes(_account)) {
-            //above code doesn't see to work
-
-                  //TODO JWT
+               console.log('✅[POST][Welcome]:', data.msg)
+               //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
+               if (!data.msg.includes(_account.toLocaleLowerCase())) {
+                  //GET JWT
                   fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
                      method: 'GET',
                      headers: {
