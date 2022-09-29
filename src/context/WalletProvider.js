@@ -294,6 +294,39 @@ const WalletProvider = React.memo(({ children }) => {
             })
             .catch((error) => {
                console.error('🚨[POST][Welcome]:', error)
+               //GET JWT
+               fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+                  method: 'GET',
+                  headers: {
+                     'Content-Type': 'application/json',
+                  },
+               })
+               .then((response) => response.json())
+               .then(async (data) => {
+                  console.log('✅[GET][Nonce]:', data)
+                  _nonce = data.Nonce
+                  //console.log('✅[GET][Data.nonce]:', data.Nonce)
+                  //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
+                  const signature = await _signer.signMessage(_nonce)
+                  console.log('✅[INFO][Signature]:', signature)
+
+                  fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                     body: JSON.stringify({ "address": _account, "nonce": _nonce, "sig": signature }),
+                     headers: {
+                     'Content-Type': 'application/json'
+                     },
+                     method: 'POST'
+                  })
+                  .then((response) => response.json())
+                  .then(async (data) => {
+                     localStorage.setItem('jwt', data.access);
+                     console.log('✅[INFO][JWT]:', data.access)
+                  })
+               })
+               .catch((error) => {
+                  console.error('🚨[GET][Nonce]:', error)
+               })
+               //END JWT AUTH sequence
             })
 
             if (network.chainId !== '1') {

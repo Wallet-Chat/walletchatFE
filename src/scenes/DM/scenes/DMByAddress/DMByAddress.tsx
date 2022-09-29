@@ -31,6 +31,7 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
 import lit from "../../../../utils/lit";
+import ScrollToBottom from 'react-scroll-to-bottom';
 
 const DMByAddress = ({
    account,
@@ -525,7 +526,6 @@ const DMByAddress = ({
    return (
       <Flex background="white" height="100vh" flexDirection="column" flex="1">
          {header}
-
          <DottedBackground className="custom-scrollbar">
             {/* {isFetchingChatData && loadedMsgs.length === 0 && (
                <Flex justifyContent="center" alignItems="center" height="100%">
