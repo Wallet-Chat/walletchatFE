@@ -69,7 +69,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                return
             }
             fetch(
-               `https://api.nftport.xyz/v0/nfts/${data.nftaddr}/${data.nftid}?chain=${data.chain}&page_size=1&include=all`,
+               `https://api.nftport.xyz/v0/nfts/${data.nftaddr}/1?chain=${data.chain}&page_size=1&include=all`,
                {
                   method: 'GET',
                   headers: {
