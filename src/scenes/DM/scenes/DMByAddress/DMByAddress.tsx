@@ -33,6 +33,19 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 import lit from "../../../../utils/lit";
 import ScrollToBottom from 'react-scroll-to-bottom';
 
+// function atBottom(ele) {
+//    var sh = ele.scrollHeight;
+//    var st = ele.scrollTop;
+//    var ht = ele.offsetHeight;
+//    if(ht==0) {
+//        return true;
+//    }
+//    if(st == sh - ht)
+//        {return true;} 
+//    else 
+//        {return false;}
+// }
+
 const DMByAddress = ({
    account,
    web3,
@@ -45,6 +58,7 @@ const DMByAddress = ({
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
    const [name, setName] = useState()
+   const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
    const [isSendingMessage, setIsSendingMessage] = useState(false)
@@ -52,9 +66,34 @@ const DMByAddress = ({
    const [chatData, setChatData] = useState<MessageType[]>(
       new Array<MessageType>()
    )
+   const [encryptedChatData, setEncChatData] = useState<MessageType[]>(
+      new Array<MessageType>()
+   )
    const [isFetchingChatData, setIsFetchingChatData] = useState(false)
 
    const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
+
+   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+
+   useEffect(() => {
+      console.log('useEffect scroll')
+      // Scroll to bottom of chat if user sends a message
+      if (scrollToBottomRef?.current) {
+         
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollToBottomRef.current;
+      if (scrollTop + clientHeight === scrollHeight) {
+        console.log("reached bottom: st, ch, SH", scrollTop, clientHeight, scrollHeight);
+        scrollToBottomRef.current.scrollIntoView()
+      }
+
+         // if(scrollToBottomRef.current.scrollHeight - scrollToBottomRef.current.scrollTop === scrollToBottomRef.current.clientHeight) {
+         //    console.log('At bottom, scrolling...')
+         //    scrollToBottomRef.current.scrollIntoView()
+         // }
+         //setSentMsg(false)
+      }
+   }, [loadedMsgs])
 
    useEffect(() => {
       if (toAddr) {
@@ -110,24 +149,25 @@ const DMByAddress = ({
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            if (equal(data, chatData) === false) {
+            if (equal(data, encryptedChatData) === false) {
                console.log('✅[GET][Chat items]:', data)
+               setEncChatData(data)
 
                //START LIT ENCRYPTION
-               // const replica = JSON.parse(JSON.stringify(data));
-               // // Get data from LIT and replace the message with the decrypted text
-               // for (let i = 0; i < replica.length; i++) {
-               //    if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-               //       const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+               const replica = JSON.parse(JSON.stringify(data));
+               // Get data from LIT and replace the message with the decrypted text
+               for (let i = 0; i < replica.length; i++) {
+                  if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+                     const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
                      
-               //       console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-               //       const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-               //       replica[i].message = rawmsg.decryptedFile.toString()
-               //    }
-               // }
-               // setChatData(replica)
+                     console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                     const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                     replica[i].message = rawmsg.decryptedFile.toString()
+                  }
+               }
+               setChatData(replica)
                //END LIT ENCRYPTION
-               setChatData(data)  //use when not using encryption
+               //setChatData(data)  //use when not using encryption
             }
          })
          .catch((error) => {
@@ -256,6 +296,7 @@ const DMByAddress = ({
    )
 
    const sendMessage = async () => {
+      setSentMsg(true)
       console.log('sendMessage')
       if (msgInput.length <= 0) return
 
@@ -289,43 +330,43 @@ const DMByAddress = ({
          null
       )
 
-      data.message = msgInputCopy
-      // const _accessControlConditions = [
-      //    {
-      //      contractAddress: '',
-      //      standardContractType: '',
-      //      chain: 'ethereum',
-      //      method: '',
-      //      parameters: [
-      //        ':userAddress',
-      //      ],
-      //      returnValueTest: {
-      //        comparator: '=',
-      //        value: data.toAddr
-      //      }
-      //    },
-      //    {"operator": "or"},
-      //    {
-      //      contractAddress: '',
-      //      standardContractType: '',
-      //      chain: 'ethereum',
-      //      method: '',
-      //      parameters: [
-      //        ':userAddress',
-      //      ],
-      //      returnValueTest: {
-      //        comparator: '=',
-      //        value: data.fromAddr
-      //      }
-      //    }
-      //  ]     
+      //data.message = msgInputCopy
+      const _accessControlConditions = [
+         {
+           contractAddress: '',
+           standardContractType: '',
+           chain: 'ethereum',
+           method: '',
+           parameters: [
+             ':userAddress',
+           ],
+           returnValueTest: {
+             comparator: '=',
+             value: data.toAddr
+           }
+         },
+         {"operator": "or"},
+         {
+           contractAddress: '',
+           standardContractType: '',
+           chain: 'ethereum',
+           method: '',
+           parameters: [
+             ':userAddress',
+           ],
+           returnValueTest: {
+             comparator: '=',
+             value: data.fromAddr
+           }
+         }
+       ]     
 
-      // console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
-      // const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
-      // data.message = await lit.blobToB64(encrypted.encryptedFile)
-      // data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-      // data.lit_access_conditions = JSON.stringify(_accessControlConditions)
-      // console.log('✅[POST][Encrypted Message]:', data)
+      console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
+      const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
+      data.message = await lit.blobToB64(encrypted.encryptedFile)
+      data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
+      data.lit_access_conditions = JSON.stringify(_accessControlConditions)
+      console.log('✅[POST][Encrypted Message]:', data)
 
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
@@ -340,7 +381,7 @@ const DMByAddress = ({
          .then((response) => response.json())
          .then((data) => {
             console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
-            getChatData()
+            //getChatData()
          })
          .catch((error) => {
             console.error(
@@ -546,6 +587,11 @@ const DMByAddress = ({
                </Flex>
             )}
             {renderedMessages}
+            <Box
+               float="left"
+               style={{ clear: 'both' }}
+               ref={scrollToBottomRef}
+            ></Box>
          </DottedBackground>
 
          <Flex>
