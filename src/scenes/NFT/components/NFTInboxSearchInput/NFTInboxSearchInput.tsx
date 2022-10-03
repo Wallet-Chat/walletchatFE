@@ -80,7 +80,7 @@ export default function NFTInboxSearchInput() {
       }
       setIsFetchingPolygon(true)
       fetch(
-         `https://api.nftport.xyz/v0/nfts/${address}?chain=polygon&page_size=1&include=all`,
+         `https://api.nftport.xyz/v0/nfts/${address}/1?chain=polygon&page_size=1&include=all`,
          {
             method: 'GET',
             headers: {

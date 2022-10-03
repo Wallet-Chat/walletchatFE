@@ -207,7 +207,7 @@ import {
              return
           }
           fetch(
-             `https://api.nftport.xyz/v0/nfts/${nftContractAddr}?chain=${chain}&page_size=1&include=all`,
+             `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/1?chain=${chain}&page_size=1&include=all`,
              {
                 method: 'GET',
                 headers: {
