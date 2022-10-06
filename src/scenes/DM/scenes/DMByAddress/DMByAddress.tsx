@@ -70,6 +70,8 @@ const DMByAddress = ({
             .then((response) => {
                console.log('✅[GET][Name]:', response)
                if (response[0]?.name) setName(response[0].name)
+               //if name changes we reset local storage to ensure data refresh
+               setChatData(new Array<MessageType>())
             })
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
@@ -97,8 +99,16 @@ const DMByAddress = ({
       }
       setIsFetchingChatData(true)
       //console.log(`getall_chatitems/${account}/${toAddr}`)
+
+      let lastTimeMsg = "2006-01-02T15:04:05.000Z"
+      if (chatData.length > 0) {
+          lastTimeMsg = chatData[chatData.length - 1].timestamp
+          //console.log('✅[INFO][Trying to get messages after time: ]:', lastTimeMsg)
+          //console.log('✅[INFO][Trying to get messages after ID: ]:', chatData[chatData.length - 1].id)
+      } 
+      lastTimeMsg = encodeURIComponent(lastTimeMsg)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
          {
             method: 'GET',
             credentials: "include",
@@ -110,8 +120,15 @@ const DMByAddress = ({
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            if (equal(data, chatData) === false) {
-               console.log('✅[GET][Chat items]:', data)
+            if (chatData.length > 0) {
+               if (data.length > 0) {
+                  let allChats = chatData.concat(data)
+                  setChatData(allChats)
+                  console.log('✅[GET][New Chat items]:', data)
+               }
+            } else {
+            //if (equal(data, chatData) === false) {
+               console.log('✅[GET][All Chat items]:', data)
 
                //START LIT ENCRYPTION
                // const replica = JSON.parse(JSON.stringify(data));
