@@ -112,8 +112,8 @@ const DMByAddress = ({
                if (response[0]?.name) setName(response[0].name)
 
                //load chat data from localStorage to chatData
-               setChatData(localStorage["dmData_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + toAddr.toLowerCase()]) : [])
-               setEncChatData(localStorage["dmDataEnc_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + toAddr.toLowerCase()]) : [])
+               setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
+               setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
             })
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
@@ -171,8 +171,7 @@ const DMByAddress = ({
             if (chatData.length > 0) {
                if (data.length > 0) {
                   //START LIT ENCRYPTION
-                  console.log('**********[setting ENCRYPTED local storage for]:', toAddr, data)
-                  localStorage["dmDataEnc_" + toAddr.toLowerCase()] = JSON.stringify(encryptedChatData.concat(data))
+                  localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(encryptedChatData.concat(data))
                   setEncChatData(encryptedChatData.concat(data))
 
                   const replica = JSON.parse(JSON.stringify(data));
@@ -181,7 +180,7 @@ const DMByAddress = ({
                      if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
                         const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
                         
-                        console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        //console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
                         const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
                         replica[i].message = rawmsg.decryptedFile.toString()
                      }
@@ -189,16 +188,14 @@ const DMByAddress = ({
                   //END LIT ENCRYPTION
                   let allChats = chatData.concat(replica)
                   setChatData(allChats)
-                  console.log('**********[setting local storage for]:', toAddr, JSON.stringify(allChats))
-                  localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(allChats) //store so when user switches views, data is ready
+                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(allChats) //store so when user switches views, data is ready
                   console.log('✅[GET][New Chat items]:', data)
                }
             } else {
                if (equal(data, encryptedChatData) === false) {
                   console.log('✅[GET][Chat items]:', data)
                   //START LIT ENCRYPTION
-                  console.log('**********[setting ENCRYPTED ALLLLLL local storage for]:', toAddr)
-                  localStorage["dmDataEnc_" + toAddr.toLowerCase()] = JSON.stringify(data)
+                  localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data)
                   setEncChatData(data)
 
                   const replica = JSON.parse(JSON.stringify(data));
@@ -213,8 +210,7 @@ const DMByAddress = ({
                      }
                   }
                   setChatData(replica)
-                  console.log('**********[setting ALL local storage for]:', toAddr, JSON.stringify(replica))
-                  localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(replica) 
+                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(replica) 
                   //END LIT ENCRYPTION
                   //setChatData(data)  //use when not using encryption
                }
