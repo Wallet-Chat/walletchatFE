@@ -2,6 +2,9 @@ import React, { useCallback, useEffect } from 'react'
 import equal from 'fast-deep-equal/es6'
 import { useWallet } from './WalletProvider'
 
+//import { get } from  "../services/api"
+import { setCookie } from '../helpers'  
+
 export const UnreadCountContext = React.createContext()
 export const useUnreadCount = () => React.useContext(UnreadCountContext)
 
@@ -33,6 +36,8 @@ const UnreadCountProvider = React.memo(({ children }) => {
             .then((data) => {
                if (!equal(data, unreadCount)) {
                   console.log('✅[GET][Unread Count]:', data)
+                  let total_cnt = Object.values(data).reduce((a, b) => a + b);
+                  setCookie("_wallet_chat_msg_cnt",total_cnt,1)
                   setUnreadCount(data)
                   if (typeof data === 'object') {
                      setTotalUnreadCount(data?.dm + data?.nft + data?.community)
