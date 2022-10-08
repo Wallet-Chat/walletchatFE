@@ -141,7 +141,7 @@ const DMByAddress = ({
       }
       setIsFetchingChatData(true)
 
-      console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
+      //console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
       if (toAddr != prevAddr){
          setPrevAddr(toAddr)
          return //skip the account transition glitch

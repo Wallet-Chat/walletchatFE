@@ -289,9 +289,7 @@ const ChatMessage = ({
                {msg.position === 'right' &&
                   (msg.read === true || msg.read === false) && (
                      <span className="read-status">
-                        {msg.isFetching ? (
-                           <Spinner size="xs" />
-                        ) : msg.read ? (
+                        {msg.read ? (
                            <IconChecks size={15} />
                         ) : (
                            <IconCheck size={15} />
