@@ -38,6 +38,8 @@ const UnreadCountProvider = React.memo(({ children }) => {
                   console.log('✅[GET][Unread Count]:', data)
                   let total_cnt = Object.values(data).reduce((a, b) => a + b);
                   setCookie("_wallet_chat_msg_cnt",total_cnt,1)
+                  // Send a string to the parent window.
+                  parent.postMessage(total_cnt, "https://mpdemo-eight.vercel.app/");
                   setUnreadCount(data)
                   if (typeof data === 'object') {
                      setTotalUnreadCount(data?.dm + data?.nft + data?.community)
