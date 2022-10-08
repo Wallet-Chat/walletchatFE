@@ -58,6 +58,7 @@ const DMByAddress = ({
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
    const [name, setName] = useState()
+   const [prevAddr, setPrevAddr] = useState<string>('')
    const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
@@ -109,6 +110,10 @@ const DMByAddress = ({
             .then((response) => {
                console.log('✅[GET][Name]:', response)
                if (response[0]?.name) setName(response[0].name)
+
+               //load chat data from localStorage to chatData
+               setChatData(localStorage["dmData_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + toAddr.toLowerCase()]) : [])
+               setEncChatData(localStorage["dmDataEnc_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + toAddr.toLowerCase()]) : [])
             })
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
@@ -135,9 +140,23 @@ const DMByAddress = ({
          return
       }
       setIsFetchingChatData(true)
-      //console.log(`getall_chatitems/${account}/${toAddr}`)
+
+      console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
+      if (toAddr != prevAddr){
+         setPrevAddr(toAddr)
+         return //skip the account transition glitch
+      }
+      setPrevAddr(toAddr)
+
+      let lastTimeMsg = "2006-01-02T15:04:05.000Z"
+      if (chatData.length > 0) {
+          lastTimeMsg = chatData[chatData.length - 1].timestamp
+          //console.log('✅[INFO][Trying to get messages after time: ]:', lastTimeMsg)
+          //console.log('✅[INFO][Trying to get messages after ID: ]:', chatData[chatData.length - 1].id)
+      } 
+      lastTimeMsg = encodeURIComponent(lastTimeMsg)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
          {
             method: 'GET',
             credentials: "include",
@@ -149,25 +168,56 @@ const DMByAddress = ({
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            if (equal(data, encryptedChatData) === false) {
-               console.log('✅[GET][Chat items]:', data)
-               setEncChatData(data)
+            if (chatData.length > 0) {
+               if (data.length > 0) {
+                  //START LIT ENCRYPTION
+                  console.log('**********[setting ENCRYPTED local storage for]:', toAddr, data)
+                  localStorage["dmDataEnc_" + toAddr.toLowerCase()] = JSON.stringify(encryptedChatData.concat(data))
+                  setEncChatData(encryptedChatData.concat(data))
 
-               //START LIT ENCRYPTION
-               const replica = JSON.parse(JSON.stringify(data));
-               // Get data from LIT and replace the message with the decrypted text
-               for (let i = 0; i < replica.length; i++) {
-                  if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-                     const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
-                     
-                     console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                     const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                     replica[i].message = rawmsg.decryptedFile.toString()
+                  const replica = JSON.parse(JSON.stringify(data));
+                  // Get data from LIT and replace the message with the decrypted text
+                  for (let i = 0; i < replica.length; i++) {
+                     if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+                        const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+                        
+                        console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        replica[i].message = rawmsg.decryptedFile.toString()
+                     }
                   }
+                  //END LIT ENCRYPTION
+                  let allChats = chatData.concat(replica)
+                  setChatData(allChats)
+                  console.log('**********[setting local storage for]:', toAddr, JSON.stringify(allChats))
+                  localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(allChats) //store so when user switches views, data is ready
+                  console.log('✅[GET][New Chat items]:', data)
                }
-               setChatData(replica)
-               //END LIT ENCRYPTION
-               //setChatData(data)  //use when not using encryption
+            } else {
+               if (equal(data, encryptedChatData) === false) {
+                  console.log('✅[GET][Chat items]:', data)
+                  //START LIT ENCRYPTION
+                  console.log('**********[setting ENCRYPTED ALLLLLL local storage for]:', toAddr)
+                  localStorage["dmDataEnc_" + toAddr.toLowerCase()] = JSON.stringify(data)
+                  setEncChatData(data)
+
+                  const replica = JSON.parse(JSON.stringify(data));
+                  // Get data from LIT and replace the message with the decrypted text
+                  for (let i = 0; i < replica.length; i++) {
+                     if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+                        const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+                        
+                        console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        replica[i].message = rawmsg.decryptedFile.toString()
+                     }
+                  }
+                  setChatData(replica)
+                  console.log('**********[setting ALL local storage for]:', toAddr, JSON.stringify(replica))
+                  localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(replica) 
+                  //END LIT ENCRYPTION
+                  //setChatData(data)  //use when not using encryption
+               }
             }
          })
          .catch((error) => {
