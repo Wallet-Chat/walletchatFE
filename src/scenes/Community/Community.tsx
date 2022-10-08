@@ -66,6 +66,8 @@ const Inbox = ({
       setIsFetchingInboxData(true)
       get(`/get_inbox/${account}`)
          .then((data: InboxItemType[]) => {
+            console.log(`/get_inbox/${account}`)
+            console.log(data)
             if (data === null) {
                setInboxData([])
                localStorage.setItem('inbox', JSON.stringify([]))

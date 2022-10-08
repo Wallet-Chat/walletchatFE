@@ -2,7 +2,7 @@
 
 const base_url = process.env.REACT_APP_REST_API || ""
 
-const non_versioned_api = ["sigin","users"]
+const non_versioned_api = ["signin","users"]
 
 const is_versioned_api = (relative_url: string) => {
     for(let i = 0 ;i < non_versioned_api.length; i++){
