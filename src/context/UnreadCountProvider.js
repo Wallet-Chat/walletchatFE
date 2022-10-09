@@ -37,7 +37,6 @@ const UnreadCountProvider = React.memo(({ children }) => {
                if (!equal(data, unreadCount)) {
                   console.log('✅[GET][unread Count]:', data)
                   let total_cnt = Object.values(data).reduce((a, b) => a + b);
-                  setCookie("_wallet_chat_msg_cnt",total_cnt,1)
                   // Send a string to the parent window.
                   window.parent.postMessage(total_cnt, "*");
                   setUnreadCount(data)
