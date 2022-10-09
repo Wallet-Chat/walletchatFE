@@ -121,9 +121,9 @@ const DMByAddress = ({
          console.log('Recipient address is not available')
          return
       }
-      setIsFetchingChatData(true)
+      //setIsFetchingChatData(true)
 
-      console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
+      //console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
       if (toAddr != prevAddr){
          setPrevAddr(toAddr)
          return //skip the account transition glitch
