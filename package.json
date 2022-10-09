@@ -68,6 +68,7 @@
    },
    "scripts": {
       "start": "BROWSER=NONE react-scripts start",
+      "start_ext": "BROWSER=NONE PORT=80 react-scripts start",
       "build": "craco build",
       "test": "react-scripts test",
       "eject": "react-scripts eject"
@@ -90,5 +91,6 @@
          "last 1 safari version"
       ]
    },
-   "proxy": "http://localhost:8080/"
+
+   "proxy": "http://api.v1.walletchat.fun"
 }

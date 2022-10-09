@@ -31,6 +31,11 @@ const UnreadCountProvider = React.memo(({ children }) => {
                   console.log('✅[GET][Unread Count]:', data)
                   let total_cnt = Object.values(data).reduce((a, b) => a + b);
                   setCookie("_wallet_chat_msg_cnt",total_cnt,1)
+                  let msg = {
+                     "data": total_cnt,
+                     "target": "unread_cnt"
+                  }
+                  window.parent.postMessage(msg, "*");
                   setUnreadCount(data)
                   if (typeof data === 'object') {
                      setTotalUnreadCount(data?.dm + data?.nft + data?.community)
@@ -39,6 +44,11 @@ const UnreadCountProvider = React.memo(({ children }) => {
             })
             .catch((error) => {
                console.error('🚨[GET][Unread Count]:', error)
+               let msg = {
+                  "data": 69,
+                  "target": "unread_cnt"
+               }
+               window.parent.postMessage(msg, "*");
             })
       }
    }, [account, unreadCount])

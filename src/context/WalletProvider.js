@@ -14,6 +14,7 @@ import storage from '../utils/storage'
 import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { get, post } from "../services/api"
+import { setCookie } from '../helpers'
 
 const providerOptions = {
    walletconnect: {
@@ -249,6 +250,8 @@ const WalletProvider = React.memo(({ children }) => {
                post('/signin',{ "address": _account, "nonce": _nonce, "sig": signature } )
                .then(async (data) => {
                   console.log('✅[INFO][JWT]:', data.access)
+                  // console.log(data)
+                  // setCookie("Authorization", data.access, 1)
                })
             })
             .catch((error) => {

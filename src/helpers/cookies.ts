@@ -4,6 +4,9 @@ function setCookie(cname: string, cvalue: any, exdays: number) {
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     let expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    console.log("Cookies now")
+    console.log(document.cookie)
+
 }
 
 function getCookie(cname: string) {

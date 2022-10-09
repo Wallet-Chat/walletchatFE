@@ -77,6 +77,7 @@ const form_url = (relative_url: string) => {
         final_url += `/${process.env.REACT_APP_API_VERSION}`
     }
     final_url += relative_url; //has the slash infront
+    console.log(`final_url: ${final_url}`)
     return final_url
 }
 
