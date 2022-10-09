@@ -17,7 +17,8 @@ import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 import lit from "../../utils/lit";
 
-const localStorageInbox = localStorage.getItem('inbox')
+// const localStorageInbox = localStorage.getItem('inbox_' + account)
+// const localStorageInboxEnc = localStorage.getItem('inboxEnc_ ' + account)
 
 const Inbox = ({
    account,
@@ -29,7 +30,7 @@ const Inbox = ({
    isAuthenticated: boolean
 }) => {
    const [inboxData, setInboxData] = useState<InboxItemType[]>(
-      localStorageInbox ? JSON.parse(localStorageInbox) : []
+      localStorage['inbox_' + account] ? JSON.parse(localStorage['inbox_' + account]) : []
    )
    const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
    const [dms, setDms] = useState<InboxItemType[]>()
@@ -80,7 +81,7 @@ const Inbox = ({
          .then(async (data: InboxItemType[]) => {
             if (data === null) {
                setInboxData([])
-               localStorage.setItem('inbox', JSON.stringify([]))
+               localStorage['inbox_' + account] = JSON.stringify([])
             } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data)
 
@@ -98,7 +99,7 @@ const Inbox = ({
                //    }
                // setInboxData(replica)
                setInboxData(data)
-               localStorage.setItem('inbox', JSON.stringify(data))
+               localStorage['inbox_' + account] = JSON.stringify(data)
             }
             setIsFetchingInboxData(false)
          })

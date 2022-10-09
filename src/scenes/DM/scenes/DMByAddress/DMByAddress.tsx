@@ -45,6 +45,8 @@ const DMByAddress = ({
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
    const [name, setName] = useState()
+   const [prevAddr, setPrevAddr] = useState<string>('')
+   const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
    const [isSendingMessage, setIsSendingMessage] = useState(false)
@@ -55,6 +57,28 @@ const DMByAddress = ({
    const [isFetchingChatData, setIsFetchingChatData] = useState(false)
 
    const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
+
+   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+
+   useEffect(() => {
+      console.log('useEffect scroll')
+      // Scroll to bottom of chat if user sends a message
+      if (scrollToBottomRef?.current) {
+         
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollToBottomRef.current;
+      if (scrollTop + clientHeight === scrollHeight) {
+        console.log("reached bottom: st, ch, SH", scrollTop, clientHeight, scrollHeight);
+        scrollToBottomRef.current.scrollIntoView()
+      }
+
+         // if(scrollToBottomRef.current.scrollHeight - scrollToBottomRef.current.scrollTop === scrollToBottomRef.current.clientHeight) {
+         //    console.log('At bottom, scrolling...')
+         //    scrollToBottomRef.current.scrollIntoView()
+         // }
+         //setSentMsg(false)
+      }
+   }, [loadedMsgs])
 
    useEffect(() => {
       if (toAddr) {
@@ -70,8 +94,8 @@ const DMByAddress = ({
             .then((response) => {
                console.log('✅[GET][Name]:', response)
                if (response[0]?.name) setName(response[0].name)
-               //if name changes we reset local storage to ensure data refresh
-               setChatData(new Array<MessageType>())
+               //load chat data from localStorage to chatData
+               setChatData(localStorage["dmData_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + toAddr.toLowerCase()]) : [])
             })
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
@@ -98,7 +122,13 @@ const DMByAddress = ({
          return
       }
       setIsFetchingChatData(true)
-      //console.log(`getall_chatitems/${account}/${toAddr}`)
+
+      console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
+      if (toAddr != prevAddr){
+         setPrevAddr(toAddr)
+         return //skip the account transition glitch
+      }
+      setPrevAddr(toAddr)
 
       let lastTimeMsg = "2006-01-02T15:04:05.000Z"
       if (chatData.length > 0) {
@@ -124,6 +154,8 @@ const DMByAddress = ({
                if (data.length > 0) {
                   let allChats = chatData.concat(data)
                   setChatData(allChats)
+                  console.log('**********[setting local storage for]:', toAddr, JSON.stringify(allChats))
+                  localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(allChats) //store so when user switches views, data is ready
                   console.log('✅[GET][New Chat items]:', data)
                }
             } else {
@@ -143,6 +175,8 @@ const DMByAddress = ({
                //    }
                // }
                // setChatData(replica)
+                  console.log('**********[setting ALL local storage for]:', toAddr, JSON.stringify(data))
+                  localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(data) 
                //END LIT ENCRYPTION
                setChatData(data)  //use when not using encryption
             }
@@ -273,6 +307,7 @@ const DMByAddress = ({
    )
 
    const sendMessage = async () => {
+      setSentMsg(true)
       console.log('sendMessage')
       if (msgInput.length <= 0) return
 
@@ -357,7 +392,7 @@ const DMByAddress = ({
          .then((response) => response.json())
          .then((data) => {
             console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
-            getChatData()
+            //getChatData()
          })
          .catch((error) => {
             console.error(
@@ -563,6 +598,11 @@ const DMByAddress = ({
                </Flex>
             )}
             {renderedMessages}
+            <Box
+               float="left"
+               style={{ clear: 'both' }}
+               ref={scrollToBottomRef}
+            ></Box>
          </DottedBackground>
 
          <Flex>
