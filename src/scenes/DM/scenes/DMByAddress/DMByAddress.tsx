@@ -175,7 +175,7 @@ const DMByAddress = ({
                // }
                // setChatData(replica)
                   //console.log('**********[setting ALL local storage for]:', toAddr, JSON.stringify(data))
-                  localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(data) 
+                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data) 
                //END LIT ENCRYPTION
                setChatData(data)  //use when not using encryption
             }
