@@ -2,8 +2,6 @@ import React, { useCallback, useEffect } from 'react'
 import equal from 'fast-deep-equal/es6'
 import { useWallet } from './WalletProvider'
 
-//import { get } from  "../services/api"  
-
 export const UnreadCountContext = React.createContext()
 export const useUnreadCount = () => React.useContext(UnreadCountContext)
 
@@ -53,7 +51,7 @@ const UnreadCountProvider = React.memo(({ children }) => {
                }
             })
             .catch((error) => {
-               console.error('🚨[GET][unread Count]:', error)
+               console.error('🚨[GET][Unread Count]:', error)
             })
       }
    }, [account, unreadCount])

@@ -254,7 +254,6 @@ const WalletProvider = React.memo(({ children }) => {
             .then(async (data) => {
                console.log('✅[POST][Welcome]:', data.msg)
                //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
-               console.log('REST_API: ', `${process.env.REACT_APP_REST_API}`)
                if (!data.msg.includes(_account.toLocaleLowerCase())) {
                   //GET JWT
                   fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
