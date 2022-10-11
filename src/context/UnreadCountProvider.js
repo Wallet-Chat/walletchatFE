@@ -32,7 +32,18 @@ const UnreadCountProvider = React.memo(({ children }) => {
             .then((response) => response.json())
             .then((data) => {
                if (!equal(data, unreadCount)) {
-                  console.log('✅[GET][Unread Count]:', data)
+                  console.log('✅[GET][unread Count]:', data)
+                  //let total_cnt = Object.values(data).reduce((a, b) => a + b);
+                  //for now we only have DMs in widget so only sent DM unread count
+                  let total_cnt = data.dm
+                  
+                  //send message to parent for notifications when using widget
+                  let msg = {
+                     "data": total_cnt,
+                     "target": "unread_cnt"
+                  }
+                  window.parent.postMessage(msg, "*");
+
                   setUnreadCount(data)
                   if (typeof data === 'object') {
                      setTotalUnreadCount(data?.dm + data?.nft + data?.community)

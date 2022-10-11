@@ -33,19 +33,6 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 import lit from "../../../../utils/lit";
 import ScrollToBottom from 'react-scroll-to-bottom';
 
-// function atBottom(ele) {
-//    var sh = ele.scrollHeight;
-//    var st = ele.scrollTop;
-//    var ht = ele.offsetHeight;
-//    if(ht==0) {
-//        return true;
-//    }
-//    if(st == sh - ht)
-//        {return true;} 
-//    else 
-//        {return false;}
-// }
-
 const DMByAddress = ({
    account,
    web3,
@@ -220,6 +207,44 @@ const DMByAddress = ({
             console.error('🚨[GET][Chat items]:', error)
             setIsFetchingChatData(false)
          })
+         //since we are only loading new messages, we need to update read status async and even after we aren't get new messages
+         //in the case its a while before a user reads the message
+         fetch(
+            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`,
+            {
+               method: 'GET',
+               credentials: "include",
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               },
+            }
+         )
+            .then((response) => response.json())
+            .then(async (data: Int32Array[]) => {
+               let localRead = localStorage["dmReadIDs_" + toAddr.toLowerCase()]
+               if (localRead != data) {
+                  if (data.length > 0) {
+                     let localData = JSON.parse(localStorage["dmData_" + toAddr.toLowerCase()])
+                     for (let j = 0; j < localData.length; j++) {
+                        for (let i = 0; i < data.length; i++) {
+                           if (localData[j].Id == data[i]) {
+                              localData[j].read = true
+                              break
+                           }
+                        }
+                     }
+                     setChatData(localData)
+                     localStorage["dmReadIDs_" + toAddr.toLowerCase()] = data
+                     localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
+                     console.log('✅[GET][Updated Read Items]:', data)
+                  }
+               }
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Update Read items]:', error)
+               setIsFetchingChatData(false)
+            })
    }, [account, chatData, isAuthenticated, toAddr])
 
    useEffect(() => {
