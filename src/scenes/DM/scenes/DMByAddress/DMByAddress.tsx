@@ -222,10 +222,10 @@ const DMByAddress = ({
          )
             .then((response) => response.json())
             .then(async (data: Int32Array[]) => {
-               let localRead = localStorage["dmReadIDs_" + toAddr.toLowerCase()]
+               let localRead = localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()]
                if (localRead != data) {
                   if (data.length > 0) {
-                     let localData = JSON.parse(localStorage["dmData_" + toAddr.toLowerCase()])
+                     let localData = JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()])
                      for (let j = 0; j < localData.length; j++) {
                         for (let i = 0; i < data.length; i++) {
                            if (localData[j].Id == data[i]) {
@@ -235,8 +235,8 @@ const DMByAddress = ({
                         }
                      }
                      setChatData(localData)
-                     localStorage["dmReadIDs_" + toAddr.toLowerCase()] = data
-                     localStorage["dmData_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
+                     localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
+                     localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
                      console.log('✅[GET][Updated Read Items]:', data)
                   }
                }
