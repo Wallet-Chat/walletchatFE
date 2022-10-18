@@ -20,7 +20,6 @@ import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
 import { MessageType, MessageUIType } from '../../../../types/Message'
-// import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
