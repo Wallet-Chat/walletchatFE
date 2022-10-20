@@ -13,6 +13,7 @@ import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
 import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
+import { SiweMessage } from 'siwe'
 
 const providerOptions = {
    walletconnect: {
@@ -268,11 +269,41 @@ const WalletProvider = React.memo(({ children }) => {
                      _nonce = data.Nonce
                      //console.log('✅[GET][Data.nonce]:', data.Nonce)
                      //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
-                     const signature = await _signer.signMessage(_nonce)
-                     console.log('✅[INFO][Signature]:', signature)
+
+                     //SIWE and setup LIT authSig struct
+                     const domain = "walletchat.fun";
+                     const origin = "https://walletchat.fun";
+                     const statement =
+                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+                     
+                     const siweMessage = new SiweMessage({
+                       domain,
+                       address: _account,
+                       statement,
+                       uri: origin,
+                       version: "1",
+                       chainId: "1",
+                       nonce: _nonce,
+                     });
+                     
+                     const messageToSign = siweMessage.prepareMessage();
+                     const signature = await _signer.signMessage(messageToSign); 
+                     console.log("signature", signature);                  
+                     const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     
+                     const authSig = {
+                       sig: signature,
+                       derivedVia: "web3.eth.personal.sign",
+                       signedMessage: messageToSign,
+                       address: recoveredAddress.toLocaleLowerCase(),
+                     };
+                     //end SIWE and authSig
+
+                     //const signature = await _signer.signMessage(_nonce)
+                     console.log('✅[INFO][AuthSig]:', authSig)
 
                      fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                        body: JSON.stringify({ "address": _account, "nonce": _nonce, "sig": signature }),
+                        body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
                         headers: {
                         'Content-Type': 'application/json'
                         },
@@ -281,6 +312,8 @@ const WalletProvider = React.memo(({ children }) => {
                      .then((response) => response.json())
                      .then(async (data) => {
                         localStorage.setItem('jwt', data.access);
+                        localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                        localStorage.setItem('lit-web3-provider', _provider.connection.url);
                         console.log('✅[INFO][JWT]:', data.access)
                      })
                   })
@@ -307,11 +340,40 @@ const WalletProvider = React.memo(({ children }) => {
                   _nonce = data.Nonce
                   //console.log('✅[GET][Data.nonce]:', data.Nonce)
                   //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
-                  const signature = await _signer.signMessage(_nonce)
+
+                  //SIWE and setup LIT authSig struct
+                  const domain = "walletchat.fun";
+                     const origin = "https://walletchat.fun";
+                     const statement =
+                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+                     
+                     const _siweMessage = new SiweMessage({
+                       domain,
+                       address: _account,
+                       statement,
+                       uri: origin,
+                       version: "1",
+                       chainId: "1",
+                       nonce: _nonce,
+                     });
+                     
+                     const messageToSign = _siweMessage.prepareMessage();
+                     const signature = await _signer.signMessage(messageToSign); 
+                     //console.log("signature", signature);                  
+                     const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     
+                     const authSig = {
+                       sig: signature,
+                       derivedVia: "web3.eth.personal.sign",
+                       signedMessage: messageToSign,
+                       address: recoveredAddress.toLocaleLowerCase(),
+                     };
+                     //end SIWE and authSig
+                  //const signature = await _signer.signMessage(_nonce)
                   console.log('✅[INFO][Signature]:', signature)
 
                   fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                     body: JSON.stringify({ "address": _account, "nonce": _nonce, "sig": signature }),
+                     body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
                      headers: {
                      'Content-Type': 'application/json'
                      },
@@ -320,7 +382,12 @@ const WalletProvider = React.memo(({ children }) => {
                   .then((response) => response.json())
                   .then(async (data) => {
                      localStorage.setItem('jwt', data.access);
+                     localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                     localStorage.setItem('lit-web3-provider', _provider.connection.url);
                      console.log('✅[INFO][JWT]:', data.access)
+                  })
+                  .catch((error) => {
+                     console.error('🚨[GET][Sign-In Failed]:', error)
                   })
                })
                .catch((error) => {

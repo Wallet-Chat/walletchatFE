@@ -44,7 +44,7 @@ class Lit {
   litNodeClient
 
   async connect() {
-    console.log("conneting to LIT")
+    console.log("connecting to LIT")
     await client.connect()
     this.litNodeClient = client
   }
