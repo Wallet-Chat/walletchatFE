@@ -100,6 +100,8 @@ const WalletProvider = React.memo(({ children }) => {
             })
             storage.set('inbox', [])
             console.log('[account changes]: ', getNormalizeAddress(accounts))
+            // TODO: how can we refresh data loaded without manual refresh?
+            window.location.reload();  
          }
 
          const handleChainChanged = (chainId) => {
@@ -210,8 +212,12 @@ const WalletProvider = React.memo(({ children }) => {
    }
 
    const walletRequestPermissions = async () => {
-      if (provider) {
-         await provider.request({
+      const instance = await web3Modal.connect()
+            setWeb3ModalProvider(instance)
+            let _provider = new ethers.providers.Web3Provider(instance)
+            let _account = await _provider.getSigner().getAddress()
+
+         await _provider.provider.request({
             method: 'wallet_requestPermissions',
             params: [
                {
@@ -219,7 +225,6 @@ const WalletProvider = React.memo(({ children }) => {
                },
             ],
          })
-      }
    }
 
    const connectWallet = async () => {

@@ -63,7 +63,7 @@ export default function Sidebar() {
 
    const { metadata } = nftData?.nft || {}
 
-   const { disconnectWallet, name, account, walletRequestPermissions } =
+   const {disconnectWallet, name, account, walletRequestPermissions } =
       useWallet()
 
    useEffect(() => {
@@ -347,7 +347,7 @@ export default function Sidebar() {
                         Sign out
                      </MenuItem>
                   </MenuGroup>
-                  {isMobileView && (
+                  {/* {isMobileView && ( */}
                      <>
                         <MenuDivider />
                         <MenuItem
@@ -364,7 +364,25 @@ export default function Sidebar() {
                            </Text>
                         </MenuItem>
                      </>
-                  )}
+                  {/* )} */}
+                  {/* {!isMobileView && window == window.parent && (
+                     <>
+                        <MenuDivider />
+                        <MenuItem
+                           onClick={() => walletRequestPermissions()}
+                           icon={
+                              <Box>
+                                 <IconSwitchHorizontal stroke="1.5" />
+                              </Box>
+                           }
+                        >
+                           Connect more
+                           <Text fontSize="sm" color="darkgray.400">
+                              Switch active account using MetaMask
+                           </Text>
+                        </MenuItem>
+                     </>
+                  )} */}
                   <MenuDivider borderColor="lightgray.500" />
                   <MenuGroup>
                      <MenuItem
