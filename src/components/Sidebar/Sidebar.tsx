@@ -44,6 +44,7 @@ import { useUnreadCount } from '../../context/UnreadCountProvider'
 import IconDM from '../../images/icon-dm.svg'
 import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
+import { isChromeExtension } from '../../helpers/chrome'
 
 interface URLChangedEvent extends Event {
    detail?: string
@@ -67,24 +68,26 @@ export default function Sidebar() {
       useWallet()
 
    useEffect(() => {
-      const queryInfo = { active: true, lastFocusedWindow: true }
-      chrome.tabs &&
-         chrome.tabs.query(queryInfo, (tabs) => {
-            const url = tabs[0].url
-            setUrl(url)
-         })
+      if (isChromeExtension()) {
+         const queryInfo = { active: true, lastFocusedWindow: true }
+         chrome.tabs &&
+            chrome.tabs.query(queryInfo, (tabs) => {
+               const url = tabs[0].url
+               setUrl(url)
+            })
 
-      const updateURL = (e: URLChangedEvent) => {
-         if (e.detail && e.detail !== url) {
-            // if incoming and existing url are the same, do nothing
-            setUrl(e.detail)
+         const updateURL = (e: URLChangedEvent) => {
+            if (e.detail && e.detail !== url) {
+               // if incoming and existing url are the same, do nothing
+               setUrl(e.detail)
+            }
          }
-      }
 
-      window.addEventListener('urlChangedEvent', updateURL)
+         window.addEventListener('urlChangedEvent', updateURL)
 
-      return () => {
-         window.removeEventListener('urlChangedEvent', updateURL)
+         return () => {
+            window.removeEventListener('urlChangedEvent', updateURL)
+         }
       }
    }, [])
 
