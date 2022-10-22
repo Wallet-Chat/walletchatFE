@@ -24,6 +24,7 @@ import {
    IconLogout,
    IconMessagePlus,
    IconPencil,
+   IconBell,
    IconSwitchHorizontal,
 } from '@tabler/icons'
 import Blockies from 'react-blockies'
@@ -344,7 +345,7 @@ export default function Sidebar() {
                         to="/me/enter-email"
                         icon={
                            <Box>
-                              <IconPencil stroke="1.5" />
+                              <IconBell stroke="1.5" />
                            </Box>
                         }
                         _hover={{ textDecoration: 'none' }}

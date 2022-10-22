@@ -95,7 +95,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
                 console.error('🚨[PUT][Name]:', error)
                 toast({
                   title: 'Error',
-                  description: `Name Not Updated - Ensure you own this ENS address`,
+                  description: `Name Not Updated - Ensure you own this ENS address!`,
                   status: 'error',
                   position: 'top',
                   duration: 2000,
