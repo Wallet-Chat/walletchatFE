@@ -340,6 +340,18 @@ export default function Sidebar() {
                         Change name
                      </MenuItem>
                      <MenuItem
+                        as={NavLink}
+                        to="/me/enter-email"
+                        icon={
+                           <Box>
+                              <IconPencil stroke="1.5" />
+                           </Box>
+                        }
+                        _hover={{ textDecoration: 'none' }}
+                     >
+                        Notifications
+                     </MenuItem>
+                     <MenuItem
                         onClick={() => disconnectWallet()}
                         icon={
                            <Box>
