@@ -365,13 +365,13 @@ const WalletProvider = React.memo(({ children }) => {
                      const messageToSign = _siweMessage.prepareMessage();
                      const signature = await _signer.signMessage(messageToSign); 
                      //console.log("signature", signature);                  
-                     const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     //const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
                      
                      const authSig = {
                        sig: signature,
                        derivedVia: "web3.eth.personal.sign",
                        signedMessage: messageToSign,
-                       address: recoveredAddress.toLocaleLowerCase(),
+                       address: _account.toLocaleLowerCase(),
                      };
                      //end SIWE and authSig
                   //const signature = await _signer.signMessage(_nonce)
