@@ -14,6 +14,8 @@ export interface InboxItemType {
     toaddr?: string
     sender_name?: string
     chain?: string
+    encrypted_sym_lit_key?: string
+    lit_access_conditions?: string
 
     nftaddr?: string | null,
     nftid?: string | null,

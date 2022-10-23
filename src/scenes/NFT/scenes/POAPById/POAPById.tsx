@@ -44,11 +44,13 @@ const POAPById = ({ account }: { account: string }) => {
          return
       }
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_bookmarks/${account}/POAP_${poapId}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/POAP_${poapId}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
          }
       )
@@ -64,10 +66,12 @@ const POAPById = ({ account }: { account: string }) => {
 
    const joinGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify({
             walletaddr: account,
@@ -89,10 +93,12 @@ const POAPById = ({ account }: { account: string }) => {
 
    const leaveGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify({
             walletaddr: account,

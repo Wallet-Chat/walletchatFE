@@ -24,6 +24,7 @@ import { useWallet } from './context/WalletProvider'
 import { useIsMobileView } from './context/IsMobileViewProvider'
 import EnterName from './scenes/Me/scenes/EnterName'
 import ChangeName from './scenes/Me/scenes/ChangeName'
+import EnterEmail from './scenes/Me/scenes/EnterEmail'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -224,6 +225,7 @@ export const App = () => {
                         }
                      />
                      <Route path="/me/change-name" element={<ChangeName />} />
+                     <Route path="/me/enter-email" element={<EnterEmail account={account} />} />
                      <Route
                         path="/nft"
                         element={

@@ -27,11 +27,13 @@ const NFTTweets = ({
    const getTwitterInfo = async (nftContractAddr: string) => {
       setIsFetchingTweets(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_twitter/${nftContractAddr}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter/${nftContractAddr}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
          }
       )

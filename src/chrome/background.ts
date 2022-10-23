@@ -113,10 +113,12 @@ function startAlarm() {
 async function getInboxCount(account: string) {
    console.log('[background.ts] getInboxCount', account)
    if (account) {
-      fetch(` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${account}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${account}`, {
          method: 'GET',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
       })
          .then((response) => response.json())

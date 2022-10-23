@@ -65,10 +65,12 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
 
          setIsFetching(true)
 
-          fetch(` ${process.env.REACT_APP_REST_API}/name`, {
-             method: 'PUT',
+          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
+             method: 'POST',
+             credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
              },
              body: JSON.stringify({
                 name: values.name,
@@ -77,20 +79,28 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
           })
              .then((response) => response.json())
              .then((response) => {
-                console.log('✅[PUT][Name]:', response)
-                globalSetName(name)
-                toast({
+               console.log('✅[PUT][Name]:', response)
+               globalSetName(name)
+               toast({
                   title: 'Success',
                   description: `Name's updated to ${name}`,
                   status: 'success',
                   position: 'top',
                   duration: 2000,
                   isClosable: true,
-                })
-                setName("")
+               })
+               setName("")
              })
              .catch((error) => {
                 console.error('🚨[PUT][Name]:', error)
+                toast({
+                  title: 'Error',
+                  description: `Name Not Updated - Ensure you own this ENS address!`,
+                  status: 'error',
+                  position: 'top',
+                  duration: 2000,
+                  isClosable: true,
+               })
              }).then(() => {
                setIsFetching(false)
              })

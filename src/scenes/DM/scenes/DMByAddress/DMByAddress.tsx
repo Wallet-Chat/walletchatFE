@@ -20,7 +20,6 @@ import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
 import { MessageType, MessageUIType } from '../../../../types/Message'
-// import { reverseENSLookup } from '../../helpers/ens'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
@@ -30,6 +29,8 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
+import lit from "../../../../utils/lit";
+import ScrollToBottom from 'react-scroll-to-bottom';
 
 const DMByAddress = ({
    account,
@@ -43,6 +44,8 @@ const DMByAddress = ({
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
    const [name, setName] = useState()
+   const [prevAddr, setPrevAddr] = useState<string>('')
+   const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
    const [isSendingMessage, setIsSendingMessage] = useState(false)
@@ -54,18 +57,44 @@ const DMByAddress = ({
 
    const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
 
+   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+
+   useEffect(() => {
+      console.log('useEffect scroll')
+      // Scroll to bottom of chat if user sends a message
+      if (scrollToBottomRef?.current) {
+         
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollToBottomRef.current;
+      if (scrollTop + clientHeight === scrollHeight) {
+        console.log("reached bottom: st, ch, SH", scrollTop, clientHeight, scrollHeight);
+        scrollToBottomRef.current.scrollIntoView()
+      }
+
+         // if(scrollToBottomRef.current.scrollHeight - scrollToBottomRef.current.scrollTop === scrollToBottomRef.current.clientHeight) {
+         //    console.log('At bottom, scrolling...')
+         //    scrollToBottomRef.current.scrollIntoView()
+         // }
+         //setSentMsg(false)
+      }
+   }, [loadedMsgs])
+
    useEffect(() => {
       if (toAddr) {
-         fetch(` ${process.env.REACT_APP_REST_API}/name/${toAddr}`, {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
          })
             .then((response) => response.json())
             .then((response) => {
                console.log('✅[GET][Name]:', response)
                if (response[0]?.name) setName(response[0].name)
+               //load chat data from localStorage to chatData
+               setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
             })
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
@@ -92,27 +121,107 @@ const DMByAddress = ({
          return
       }
       setIsFetchingChatData(true)
-      //console.log(`getall_chatitems/${account}/${toAddr}`)
+
+      //console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
+      if (toAddr != prevAddr){
+         setPrevAddr(toAddr)
+         return //skip the account transition glitch
+      }
+      setPrevAddr(toAddr)
+
+      let lastTimeMsg = "2006-01-02T15:04:05.000Z"
+      if (chatData.length > 0) {
+          lastTimeMsg = chatData[chatData.length - 1].timestamp
+          //console.log('✅[INFO][Trying to get messages after time: ]:', lastTimeMsg)
+          //console.log('✅[INFO][Trying to get messages after ID: ]:', chatData[chatData.length - 1].id)
+      } 
+      lastTimeMsg = encodeURIComponent(lastTimeMsg)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/getall_chatitems/${account}/${toAddr}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
          }
       )
          .then((response) => response.json())
          .then(async (data: MessageType[]) => {
-            if (equal(data, chatData) === false) {
-               console.log('✅[GET][Chat items]:', data)
-               setChatData(data)
+            if (chatData.length > 0) {
+               if (data.length > 0) {
+                  let allChats = chatData.concat(data)
+                  setChatData(allChats)
+                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(allChats) //store so when user switches views, data is ready
+                  console.log('✅[GET][New Chat items]:', data)
+               }
+            } else {
+            //if (equal(data, chatData) === false) {
+               console.log('✅[GET][All Chat items]:', data)
+
+               //START LIT ENCRYPTION
+               // const replica = JSON.parse(JSON.stringify(data));
+               // // Get data from LIT and replace the message with the decrypted text
+               // for (let i = 0; i < replica.length; i++) {
+               //    if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+               //       const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+                     
+               //       console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+               //       const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+               //       replica[i].message = rawmsg.decryptedFile.toString()
+               //    }
+               // }
+               // setChatData(replica)
+                  //console.log('**********[setting ALL local storage for]:', toAddr, JSON.stringify(data))
+                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data) 
+               //END LIT ENCRYPTION
+               setChatData(data)  //use when not using encryption
             }
          })
          .catch((error) => {
             console.error('🚨[GET][Chat items]:', error)
             setIsFetchingChatData(false)
          })
+
+         //since we are only loading new messages, we need to update read status async and even after we aren't get new messages
+         //in the case its a while before a user reads the message
+         fetch(
+            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`,
+            {
+               method: 'GET',
+               credentials: "include",
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               },
+            }
+         )
+            .then((response) => response.json())
+            .then(async (data: Int32Array[]) => {
+               let localRead = localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()]
+               if (localRead != data) {
+                  if (data.length > 0) {
+                     let localData = JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()])
+                     for (let j = 0; j < localData.length; j++) {
+                        for (let i = 0; i < data.length; i++) {
+                           if (localData[j].Id == data[i]) {
+                              localData[j].read = true
+                              break
+                           }
+                        }
+                     }
+                     setChatData(localData)
+                     localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
+                     localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
+                     console.log('✅[GET][Updated Read Items]:', data)
+                  }
+               }
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Update Read items]:', error)
+               setIsFetchingChatData(false)
+            })
    }, [account, chatData, isAuthenticated, toAddr])
 
    useEffect(() => {
@@ -234,7 +343,8 @@ const DMByAddress = ({
       [loadedMsgs]
    )
 
-   const sendMessage = useCallback(() => {
+   const sendMessage = async () => {
+      setSentMsg(true)
       console.log('sendMessage')
       if (msgInput.length <= 0) return
 
@@ -251,6 +361,8 @@ const DMByAddress = ({
          fromAddr: account.toLocaleLowerCase(),
          toAddr: toAddr.toLocaleLowerCase(),
          timestamp,
+         encrypted_sym_lit_key: "",
+         lit_access_conditions: "",
          read: false,
       }
 
@@ -267,19 +379,57 @@ const DMByAddress = ({
       )
 
       data.message = msgInputCopy
+      // const _accessControlConditions = [
+      //    {
+      //      contractAddress: '',
+      //      standardContractType: '',
+      //      chain: 'ethereum',
+      //      method: '',
+      //      parameters: [
+      //        ':userAddress',
+      //      ],
+      //      returnValueTest: {
+      //        comparator: '=',
+      //        value: data.toAddr
+      //      }
+      //    },
+      //    {"operator": "or"},
+      //    {
+      //      contractAddress: '',
+      //      standardContractType: '',
+      //      chain: 'ethereum',
+      //      method: '',
+      //      parameters: [
+      //        ':userAddress',
+      //      ],
+      //      returnValueTest: {
+      //        comparator: '=',
+      //        value: data.fromAddr
+      //      }
+      //    }
+      //  ]     
+
+      // console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
+      // const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
+      // data.message = await lit.blobToB64(encrypted.encryptedFile)
+      // data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
+      // data.lit_access_conditions = JSON.stringify(_accessControlConditions)
+      // console.log('✅[POST][Encrypted Message]:', data)
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_chatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify(data),
       })
          .then((response) => response.json())
          .then((data) => {
             console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
-            getChatData()
+            //getChatData()
          })
          .catch((error) => {
             console.error(
@@ -298,6 +448,7 @@ const DMByAddress = ({
          } else {
             fetch(`https://api.sleekplan.com/v1/post`, {
                method: 'POST',
+               credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
                   Authorization: `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
@@ -322,7 +473,7 @@ const DMByAddress = ({
                })
          }
       }
-   }, [account, addMessageToUI, getChatData, loadedMsgs, msgInput, toAddr])
+   }
 
    const updateRead = useCallback(
       (data: MessageUIType) => {
@@ -464,7 +615,6 @@ const DMByAddress = ({
    return (
       <Flex background="white" height="100vh" flexDirection="column" flex="1">
          {header}
-
          <DottedBackground className="custom-scrollbar">
             {/* {isFetchingChatData && loadedMsgs.length === 0 && (
                <Flex justifyContent="center" alignItems="center" height="100%">
@@ -485,6 +635,11 @@ const DMByAddress = ({
                </Flex>
             )}
             {renderedMessages}
+            <Box
+               float="left"
+               style={{ clear: 'both' }}
+               ref={scrollToBottomRef}
+            ></Box>
          </DottedBackground>
 
          <Flex>

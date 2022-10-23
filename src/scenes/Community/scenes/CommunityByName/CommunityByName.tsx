@@ -60,11 +60,13 @@ const CommunityByName = ({ account }: { account: string }) => {
             return
          }
          fetch(
-            `${process.env.REACT_APP_REST_API}/community/${community}/${account}`,
+            `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community/${community}/${account}`,
             {
                method: 'GET',
+               credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
                },
             }
          )
@@ -98,10 +100,12 @@ const CommunityByName = ({ account }: { account: string }) => {
    const joinGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/create_bookmark`, {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
             method: 'POST',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
                walletaddr: account,
@@ -125,10 +129,12 @@ const CommunityByName = ({ account }: { account: string }) => {
    const leaveGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/delete_bookmark`, {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
             method: 'POST',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
                walletaddr: account,

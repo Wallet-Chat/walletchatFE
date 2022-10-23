@@ -104,10 +104,12 @@ const NFTInbox = ({
          return
       }
       setIsFetchingInboxData(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/get_inbox/${account}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
          method: 'GET',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
       })
          .then((response) => response.json())

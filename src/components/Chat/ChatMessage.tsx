@@ -196,11 +196,13 @@ const ChatMessage = ({
    const setMessageAsRead = useCallback(() => {
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
+            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
             {
                method: 'PUT',
+               credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
                },
                body: JSON.stringify({
                   ...msg,
@@ -287,9 +289,7 @@ const ChatMessage = ({
                {msg.position === 'right' &&
                   (msg.read === true || msg.read === false) && (
                      <span className="read-status">
-                        {msg.isFetching ? (
-                           <Spinner size="xs" />
-                        ) : msg.read ? (
+                        {msg.read ? (
                            <IconChecks size={15} />
                         ) : (
                            <IconCheck size={15} />

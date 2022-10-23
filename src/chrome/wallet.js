@@ -51,11 +51,13 @@ export default function WalletAccount(address) {
             // console.log(`[getInboxCount][${address}`)
 
             fetch(
-                ` ${process.env.REACT_APP_REST_API}/get_unread_cnt/${address}`,
+                ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${address}`,
                 {
                     method: 'GET',
+                    credentials: "include",
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
                     },
                 }
             )
