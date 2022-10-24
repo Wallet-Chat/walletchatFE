@@ -135,7 +135,7 @@ const Inbox = ({
             pos="sticky"
             top="0"
             background="white"
-            zIndex="sticky"
+            zIndex="0"
          >
             <Flex justifyContent="space-between" mb={2}>
                <Heading size="lg">Wallet-to-wallet chat</Heading>
