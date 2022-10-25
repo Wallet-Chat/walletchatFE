@@ -225,7 +225,7 @@ export default function Sidebar() {
                </>
             )}
 
-            {name !== null && window == window.parent && (
+            {name !== null && window === window.parent && (
                <>
                <LinkElem to={'/dm'}>
                   {/* <Box className="popup-text">Chat</Box> */}

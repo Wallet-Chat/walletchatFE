@@ -88,7 +88,8 @@ const Inbox = ({
                localStorage['inbox_' + account] = JSON.stringify([])
             } else if (equal(encryptedChatData, data) !== true) {
                console.log('✅[GET][Inbox]:', data)
-               setEncChatData(data)
+               //setEncChatData(data)
+               localStorage['inboxEnc_' + account] = JSON.stringify(data)
 
                const replica = JSON.parse(JSON.stringify(data));
                // Get data from LIT and replace the message with the decrypted text
@@ -100,11 +101,11 @@ const Inbox = ({
                      const blob = lit.b64toBlob(replica[i].message)
                      const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
                      replica[i].message = rawmsg.decryptedFile.toString()
-                     }
                   }
+               }
                setInboxData(replica)
                //setInboxData(data)
-               localStorage['inbox_' + account] = JSON.stringify(data)
+               localStorage['inbox_' + account] = JSON.stringify(replica)
             }
             setIsFetchingInboxData(false)
          })
