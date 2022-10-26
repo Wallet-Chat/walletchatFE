@@ -110,7 +110,6 @@ const Inbox = ({
             pos="sticky"
             top="0"
             background="white"
-            zIndex="sticky"
          >
             <Flex justifyContent="space-between" mb={2}>
                <Heading size="lg">Communities</Heading>

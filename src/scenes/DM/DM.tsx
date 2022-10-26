@@ -86,7 +86,7 @@ const Inbox = ({
             if (data === null) {
                setInboxData([])
                localStorage['inbox_' + account] = JSON.stringify([])
-            } else if (equal(encryptedChatData, data) !== true) {
+            } else if (!localStorage['inboxEnc_' + account] || equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !== true) {
                console.log('✅[GET][Inbox]:', data)
                //setEncChatData(data)
                localStorage['inboxEnc_' + account] = JSON.stringify(data)

@@ -155,7 +155,7 @@ export default function Sidebar() {
          py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
          px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
          order={isMobile ? 2 : 0}
-         zIndex="sticky"
+         zIndex="5000"
       >
          <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
             <Popover>
@@ -376,7 +376,7 @@ export default function Sidebar() {
                               </Box>
                            }
                         >
-                           Switch Account
+                           Switch Accounts
                            <Text fontSize="sm" color="darkgray.400">
                               First selected account will be used
                            </Text>
@@ -394,9 +394,9 @@ export default function Sidebar() {
                               </Box>
                            }
                         >
-                           Switch Account
+                           Switch Accounts
                            <Text fontSize="sm" color="darkgray.400">
-                              Switch active account
+                              Switch active account using MetaMask
                            </Text>
                         </MenuItem>
                      </>
