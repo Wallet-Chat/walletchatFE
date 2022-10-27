@@ -20,6 +20,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
        handleSubmit,
        register,
        formState: { errors },
+       setValue
     } = useForm()
  
     const { name: _name, setName: globalSetName, account } = useWallet()
@@ -138,7 +139,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
                          <Button
                             variant="outline"
                             key={i}
-                            onClick={() => item?.name && setName(item.name)}
+                            onClick={() => item?.name && setValue('name',item.name, { shouldTouch: true })}
                             mr="2"
                             mb="2"
                             size="sm"
