@@ -8,6 +8,7 @@ import {
    FormLabel,
    Input,
    Text,
+   useToast,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -21,7 +22,10 @@ const EnterName = ({ account }: { account: string }) => {
       handleSubmit,
       register,
       formState: { errors },
+      setValue
    } = useForm()
+
+   const toast = useToast()
 
    const { setName: globalSetName } = useWallet()
    let navigate = useNavigate()
@@ -64,7 +68,13 @@ const EnterName = ({ account }: { account: string }) => {
       }
    }, [account])
 
+   useEffect(()=>{
+      console.log(errors)
+   },[errors])
+
    const onSubmit = (values: any) => {
+      console.log("onSubmit")
+      console.log(values)
       if (values?.name) {
 
          setIsFetching(true)
@@ -110,14 +120,23 @@ const EnterName = ({ account }: { account: string }) => {
                      value={name}
                      placeholder="Real or anon name"
                      borderColor="black"
+                     
                      {...register('name', {
                         required: true,
+                        onChange:(e: React.ChangeEvent<HTMLInputElement>) =>
+                           {
+                              setName(e.target.value)
+                              // console.log(name)
+                           }
+                        
                      })}
-                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setName(e.target.value)
-                     }
+                     
                   />
-                  <Button variant="black" height="auto" type="submit" isLoading={isFetching}>
+                  <Button variant="black" height="auto" type="submit" isLoading={isFetching} onClick={()=>{
+                     console.log("SUBMIT BTN")
+                     console.log(errors)
+                     console.log(name)
+                  }}>
                      <IconSend size="20" />
                   </Button>
                </Flex>
@@ -128,7 +147,9 @@ const EnterName = ({ account }: { account: string }) => {
                         <Button
                            variant="outline"
                            key={i}
-                           onClick={() => item?.name && setName(item?.name)}
+                           onClick={() => {
+                              setValue('name',item.name, { shouldTouch: true })
+                           }}
                            mr="2"
                            mb="2"
                            size="sm"
@@ -145,7 +166,16 @@ const EnterName = ({ account }: { account: string }) => {
                   You can change it anytime in your settings
                </FormHelperText>
                {errors.name && errors.name.type === 'required' && (
-                  <FormErrorMessage>No blank name please</FormErrorMessage>
+                  // <FormErrorMessage>No blank name please</FormErrorMessage>
+                  
+                  toast({
+                     title: 'FAILED',
+                     description: `No blank name please ${errors.name}`,
+                     status: 'error',
+                     position: 'top',
+                     duration: 2000,
+                     isClosable: true,
+                   })
                )}
             </FormControl>
          </form>
