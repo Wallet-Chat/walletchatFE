@@ -13,6 +13,7 @@ import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
 import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
+import { SiweMessage } from 'siwe'
 
 const providerOptions = {
    walletconnect: {
@@ -99,6 +100,8 @@ const WalletProvider = React.memo(({ children }) => {
             })
             storage.set('inbox', [])
             console.log('[account changes]: ', getNormalizeAddress(accounts))
+            // TODO: how can we refresh data loaded without manual refresh?
+            window.location.reload();  
          }
 
          const handleChainChanged = (chainId) => {
@@ -160,10 +163,12 @@ const WalletProvider = React.memo(({ children }) => {
          return
       }
       setIsFetchingName(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/name/${_account}`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${_account}`, {
          method: 'GET',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
       })
          .then((response) => response.json())
@@ -207,8 +212,12 @@ const WalletProvider = React.memo(({ children }) => {
    }
 
    const walletRequestPermissions = async () => {
-      if (provider) {
-         await provider.request({
+      const instance = await web3Modal.connect()
+            setWeb3ModalProvider(instance)
+            let _provider = new ethers.providers.Web3Provider(instance)
+            let _account = await _provider.getSigner().getAddress()
+
+         await _provider.provider.request({
             method: 'wallet_requestPermissions',
             params: [
                {
@@ -216,13 +225,13 @@ const WalletProvider = React.memo(({ children }) => {
                },
             ],
          })
-      }
    }
 
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
-         let _provider, _account
+         let _provider, _account, _nonce, _signer
+         let _signedIn = false
          let _web3 = new Web3(provider)
 
          if (isChromeExtension()) {
@@ -234,8 +243,163 @@ const WalletProvider = React.memo(({ children }) => {
             setWeb3ModalProvider(instance)
             _provider = new ethers.providers.Web3Provider(instance)
             _account = await _provider.getSigner().getAddress()
+            _signer = await _provider.getSigner()
             const network = await _provider.getNetwork()
             setChainId(network.chainId)
+            const _w3 = new Web3(_provider)
+
+            // check if JWT exists or is timed out:
+            fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
+               method: 'GET',
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               },
+            })
+            .then((response) => response.json())
+            .then(async (data) => {
+               console.log('✅[POST][Welcome]:', data.msg)
+               //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
+               if (!data.msg.includes(_account.toLocaleLowerCase())) {
+                  //GET JWT
+                  fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+                     method: 'GET',
+                     headers: {
+                        'Content-Type': 'application/json',
+                     },
+                  })
+                  .then((response) => response.json())
+                  .then(async (data) => {
+                     console.log('✅[GET][Nonce]:', data)
+                     _nonce = data.Nonce
+                     //console.log('✅[GET][Data.nonce]:', data.Nonce)
+                     //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
+
+                     //SIWE and setup LIT authSig struct
+                     const domain = "walletchat.fun";
+                     const origin = "https://walletchat.fun";
+                     const statement =
+                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+                     
+                     const siweMessage = new SiweMessage({
+                       domain,
+                       address: _account,
+                       statement,
+                       uri: origin,
+                       version: "1",
+                       chainId: "1",
+                       nonce: _nonce,
+                     });
+                     
+                     const messageToSign = siweMessage.prepareMessage();
+                     const signature = await _signer.signMessage(messageToSign); 
+                     console.log("signature", signature);                  
+                     const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     
+                     const authSig = {
+                       sig: signature,
+                       derivedVia: "web3.eth.personal.sign",
+                       signedMessage: messageToSign,
+                       address: recoveredAddress.toLocaleLowerCase(),
+                     };
+                     //end SIWE and authSig
+
+                     //const signature = await _signer.signMessage(_nonce)
+                     console.log('✅[INFO][AuthSig]:', authSig)
+
+                     fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                        body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
+                        headers: {
+                        'Content-Type': 'application/json'
+                        },
+                        method: 'POST'
+                     })
+                     .then((response) => response.json())
+                     .then(async (data) => {
+                        localStorage.setItem('jwt', data.access);
+                        localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                        localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                        console.log('✅[INFO][JWT]:', data.access)
+                     })
+                  })
+                  .catch((error) => {
+                     console.error('🚨[GET][Nonce]:', error)
+                  })
+                  //END JWT AUTH sequence
+
+             //below part of /welcome check for existing token     
+             }
+            })
+            .catch((error) => {
+               console.error('🚨[POST][Welcome]:', error)
+               //GET JWT
+               fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+                  method: 'GET',
+                  headers: {
+                     'Content-Type': 'application/json',
+                  },
+               })
+               .then((response) => response.json())
+               .then(async (data) => {
+                  console.log('✅[GET][Nonce]:', data)
+                  _nonce = data.Nonce
+                  //console.log('✅[GET][Data.nonce]:', data.Nonce)
+                  //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
+
+                  //SIWE and setup LIT authSig struct
+                  const domain = "walletchat.fun";
+                     const origin = "https://walletchat.fun";
+                     const statement =
+                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+                     
+                     const _siweMessage = new SiweMessage({
+                       domain,
+                       address: _account,
+                       statement,
+                       uri: origin,
+                       version: "1",
+                       chainId: "1",
+                       nonce: _nonce,
+                     });
+                     
+                     const messageToSign = _siweMessage.prepareMessage();
+                     const signature = await _signer.signMessage(messageToSign); 
+                     //console.log("signature", signature);                  
+                     //const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     
+                     const authSig = {
+                       sig: signature,
+                       derivedVia: "web3.eth.personal.sign",
+                       signedMessage: messageToSign,
+                       address: _account.toLocaleLowerCase(),
+                     };
+                     //end SIWE and authSig
+                  //const signature = await _signer.signMessage(_nonce)
+                  console.log('✅[INFO][Signature]:', signature)
+
+                  fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                     body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
+                     headers: {
+                     'Content-Type': 'application/json'
+                     },
+                     method: 'POST'
+                  })
+                  .then((response) => response.json())
+                  .then(async (data) => {
+                     localStorage.setItem('jwt', data.access);
+                     localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                     localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                     console.log('✅[INFO][JWT]:', data.access)
+                  })
+                  .catch((error) => {
+                     console.error('🚨[GET][Sign-In Failed]:', error)
+                  })
+               })
+               .catch((error) => {
+                  console.error('🚨[GET][Nonce]:', error)
+               })
+               //END JWT AUTH sequence
+            })
 
             if (network.chainId !== '1') {
                // check if the chain to connect to is installed

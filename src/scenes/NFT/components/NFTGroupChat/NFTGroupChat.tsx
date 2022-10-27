@@ -48,11 +48,13 @@ const NFTGroupChat = ({
       // setIsFetchingMessages(true)
 
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/get_groupchatitems/${nftContractAddr}/${account}`,
+         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_groupchatitems/${nftContractAddr}/${account}`,
          {
             method: 'GET',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
          }
       )
@@ -102,10 +104,12 @@ const NFTGroupChat = ({
       data.message = msgInputCopy
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/create_groupchatitem`, {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_groupchatitem`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify(data),
       })

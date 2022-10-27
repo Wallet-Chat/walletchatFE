@@ -24,6 +24,7 @@ import {
    IconLogout,
    IconMessagePlus,
    IconPencil,
+   IconBell,
    IconSwitchHorizontal,
 } from '@tabler/icons'
 import Blockies from 'react-blockies'
@@ -44,6 +45,7 @@ import { useUnreadCount } from '../../context/UnreadCountProvider'
 import IconDM from '../../images/icon-dm.svg'
 import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
+import { isChromeExtension } from '../../helpers/chrome'
 
 interface URLChangedEvent extends Event {
    detail?: string
@@ -63,28 +65,30 @@ export default function Sidebar() {
 
    const { metadata } = nftData?.nft || {}
 
-   const { disconnectWallet, name, account, walletRequestPermissions } =
+   const {disconnectWallet, name, account, walletRequestPermissions } =
       useWallet()
 
    useEffect(() => {
-      const queryInfo = { active: true, lastFocusedWindow: true }
-      chrome.tabs &&
-         chrome.tabs.query(queryInfo, (tabs) => {
-            const url = tabs[0].url
-            setUrl(url)
-         })
+      if (isChromeExtension()) {
+         const queryInfo = { active: true, lastFocusedWindow: true }
+         chrome.tabs &&
+            chrome.tabs.query(queryInfo, (tabs) => {
+               const url = tabs[0].url
+               setUrl(url)
+            })
 
-      const updateURL = (e: URLChangedEvent) => {
-         if (e.detail && e.detail !== url) {
-            // if incoming and existing url are the same, do nothing
-            setUrl(e.detail)
+         const updateURL = (e: URLChangedEvent) => {
+            if (e.detail && e.detail !== url) {
+               // if incoming and existing url are the same, do nothing
+               setUrl(e.detail)
+            }
          }
-      }
 
-      window.addEventListener('urlChangedEvent', updateURL)
+         window.addEventListener('urlChangedEvent', updateURL)
 
-      return () => {
-         window.removeEventListener('urlChangedEvent', updateURL)
+         return () => {
+            window.removeEventListener('urlChangedEvent', updateURL)
+         }
       }
    }, [])
 
@@ -151,6 +155,7 @@ export default function Sidebar() {
          py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
          px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
          order={isMobile ? 2 : 0}
+         zIndex="5000"
       >
          <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
             <Popover>
@@ -183,7 +188,7 @@ export default function Sidebar() {
                            />
                         </CLink>
                         <CLink
-                           href="https://discord.gg/walletchat"
+                           href="http://discord.gg/S47CDmDtdf"
                            target="_blank"
                         >
                            <Image
@@ -221,7 +226,7 @@ export default function Sidebar() {
                </>
             )}
 
-            {name !== null && window == window.parent && (
+            {name !== null && window === window.parent && (
                <>
                <LinkElem to={'/dm'}>
                   {/* <Box className="popup-text">Chat</Box> */}
@@ -338,6 +343,18 @@ export default function Sidebar() {
                         Change name
                      </MenuItem>
                      <MenuItem
+                        as={NavLink}
+                        to="/me/enter-email"
+                        icon={
+                           <Box>
+                              <IconBell stroke="1.5" />
+                           </Box>
+                        }
+                        _hover={{ textDecoration: 'none' }}
+                     >
+                        Notifications
+                     </MenuItem>
+                     <MenuItem
                         onClick={() => disconnectWallet()}
                         icon={
                            <Box>
@@ -348,7 +365,7 @@ export default function Sidebar() {
                         Sign out
                      </MenuItem>
                   </MenuGroup>
-                  {isMobileView && (
+                  {/* {isMobileView && ( */}
                      <>
                         <MenuDivider />
                         <MenuItem
@@ -359,13 +376,31 @@ export default function Sidebar() {
                               </Box>
                            }
                         >
-                           Connect more
+                           Switch Accounts
+                           <Text fontSize="sm" color="darkgray.400">
+                              First selected account will be used
+                           </Text>
+                        </MenuItem>
+                     </>
+                  {/* )} */}
+                  {/* {!isMobileView && window == window.parent && (
+                     <>
+                        <MenuDivider />
+                        <MenuItem
+                           onClick={() => walletRequestPermissions()}
+                           icon={
+                              <Box>
+                                 <IconSwitchHorizontal stroke="1.5" />
+                              </Box>
+                           }
+                        >
+                           Switch Accounts
                            <Text fontSize="sm" color="darkgray.400">
                               Switch active account using MetaMask
                            </Text>
                         </MenuItem>
                      </>
-                  )}
+                  )} */}
                   <MenuDivider borderColor="lightgray.500" />
                   <MenuGroup>
                      <MenuItem

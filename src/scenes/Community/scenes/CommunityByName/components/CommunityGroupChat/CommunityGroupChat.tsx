@@ -127,10 +127,12 @@ const CommunityGroupChat = ({
 
       setIsSendingMessage(true)
 
-      fetch(`${process.env.REACT_APP_REST_API}/community`, {
+      fetch(`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community`, {
          method: 'POST',
+         credentials: "include",
          headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify(data),
       })

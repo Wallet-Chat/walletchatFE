@@ -79,10 +79,12 @@ const EnterName = ({ account }: { account: string }) => {
 
          setIsFetching(true)
 
-         fetch(` ${process.env.REACT_APP_REST_API}/name`, {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
             method: 'POST',
+            credentials: "include",
             headers: {
                'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
                name: values.name,
