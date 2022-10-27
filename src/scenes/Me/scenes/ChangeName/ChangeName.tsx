@@ -81,10 +81,10 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
              .then((response) => response.json())
              .then((response) => {
                console.log('✅[PUT][Name]:', response)
-               globalSetName(name)
+               globalSetName(values.name)
                toast({
                   title: 'Success',
-                  description: `Name's updated to ${name}`,
+                  description: `Name's updated to ${values.name}`,
                   status: 'success',
                   position: 'top',
                   duration: 2000,
