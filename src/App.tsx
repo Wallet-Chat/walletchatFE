@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IconX } from '@tabler/icons'
-import { Route, Routes, Navigate } from 'react-router-dom'
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import {
    Button,
    Box,
@@ -33,6 +33,7 @@ import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
+   const location = useLocation();
    const [btnClicks, setBtnClicks] = useState(0)
 
    const {
@@ -44,7 +45,14 @@ export const App = () => {
       account,
       web3,
       error,
+      setRedirectUrl
    } = useWallet()
+   useEffect(() => {
+      const currentPath = location.pathname;
+      console.log(`currentPath: ${currentPath}`)
+      setRedirectUrl(currentPath)
+      const searchParams = new URLSearchParams(location.search);
+   }, [location]);
 
    const { isMobileView } = useIsMobileView()
 
@@ -66,6 +74,9 @@ export const App = () => {
          </Button>
       </Flex>
    )
+   console.log(`App.tsx`)
+   console.log(`isAuthenticated: ${isAuthenticated}`)
+   console.log(location)
 
    const inbox = (
       <Inbox account={account} web3={web3} isAuthenticated={isAuthenticated} />

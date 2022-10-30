@@ -72,6 +72,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [isAuthenticated, setAuthenticated] = useState(false)
    const [appLoading, setAppLoading] = useState(false)
    const [error, setError] = useState()
+   const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -478,6 +479,8 @@ const WalletProvider = React.memo(({ children }) => {
             web3,
             provider,
             error,
+            redirectUrl,
+            setRedirectUrl
          }}
       >
          {children}
