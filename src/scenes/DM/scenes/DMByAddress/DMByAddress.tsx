@@ -62,6 +62,8 @@ const DMByAddress = ({
 
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
+   let semaphore = false;
+
    useEffect(() => {
       console.log('useEffect scroll')
       // Scroll to bottom of chat if user sends a message
@@ -125,22 +127,27 @@ const DMByAddress = ({
          console.log('Recipient address is not available')
          return
       }
+      if (semaphore){
+         console.log('preventing re-entrant calls if fetching is slow (happens at statup with decryption sometimes)')
+         return
+      }
       setIsFetchingChatData(true)
 
       //console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
       if (toAddr != prevAddr){
          setPrevAddr(toAddr)
+         setIsFetchingChatData(false)
          return //skip the account transition glitch
       }
       setPrevAddr(toAddr)
+      semaphore = true;
 
       let lastTimeMsg = "2006-01-02T15:04:05.000Z"
       if (chatData.length > 0) {
           lastTimeMsg = chatData[chatData.length - 1].timestamp
-          //console.log('✅[INFO][Trying to get messages after time: ]:', lastTimeMsg)
-          //console.log('✅[INFO][Trying to get messages after ID: ]:', chatData[chatData.length - 1].id)
       } 
       lastTimeMsg = encodeURIComponent(lastTimeMsg)
+
       fetch(
          ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
          {
@@ -190,7 +197,7 @@ const DMByAddress = ({
                      if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
                         const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
                         
-                        console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        //console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
                         const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
                         replica[i].message = rawmsg.decryptedFile.toString()
                      }
@@ -201,10 +208,12 @@ const DMByAddress = ({
                   //setChatData(data)  //use when not using encryption
                }
             }
+            semaphore = false;
          })
          .catch((error) => {
             console.error('🚨[GET][Chat items]:', error)
             setIsFetchingChatData(false)
+            semaphore = false;
          })
          //since we are only loading new messages, we need to update read status async and even after we aren't get new messages
          //in the case its a while before a user reads the message
@@ -219,34 +228,34 @@ const DMByAddress = ({
                },
             }
          )
-            .then((response) => response.json())
-            .then(async (data: Int32Array[]) => {
-               let localRead = localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()]
-               if (localRead != data) {
-                  if (data.length > 0) {
-                     let localData = localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]
-                     if (localData) {
-                        localData = JSON.parse(localData)
-                        for (let j = 0; j < localData.length; j++) {
-                           for (let i = 0; i < data.length; i++) {
-                              if (localData[j].Id == data[i]) {
-                                 localData[j].read = true
-                                 break
-                              }
+         .then((response) => response.json())
+         .then(async (data: Int32Array[]) => {
+            let localRead = localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()]
+            if (localRead != data) {
+               if (data.length > 0) {
+                  let localData = localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]
+                  if (localData) {
+                     localData = JSON.parse(localData)
+                     for (let j = 0; j < localData.length; j++) {
+                        for (let i = 0; i < data.length; i++) {
+                           if (localData[j].Id == data[i]) {
+                              localData[j].read = true
+                              break
                            }
                         }
-                        setChatData(localData)
-                        localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
-                        localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
-                        console.log('✅[GET][Updated Read Items]:', data)
                      }
+                     setChatData(localData)
+                     localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
+                     localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
+                     console.log('✅[GET][Updated Read Items]:', data)
                   }
                }
-            })
-            .catch((error) => {
-               console.error('🚨[GET][Update Read items]:', error)
-               setIsFetchingChatData(false)
-            })
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Update Read items]:', error)
+            setIsFetchingChatData(false)
+         })
    }, [account, chatData, isAuthenticated, toAddr])
 
    useEffect(() => {
