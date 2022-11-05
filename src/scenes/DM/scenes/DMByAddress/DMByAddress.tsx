@@ -656,6 +656,19 @@ const DMByAddress = ({
          {header}
          <DottedBackground className="custom-scrollbar">
             {isFetchingChatData && loadedMsgs.length === 0 && (
+               <Flex
+                  justifyContent="center"
+                  alignItems="center"
+                  borderRadius="lg"
+                  background="green.200"
+                  p={4}
+               >
+                  <Box fontSize="md">
+                     Decrypting Your Messages, Please Wait and Do Not Refresh 😊
+                  </Box>
+               </Flex>
+            )}
+            {isFetchingChatData && loadedMsgs.length === 0 && (
                <Flex justifyContent="center" alignItems="center" height="100%">
                   <Spinner />
                </Flex>
