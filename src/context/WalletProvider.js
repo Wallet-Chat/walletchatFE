@@ -14,6 +14,7 @@ import storage from '../utils/storage'
 import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
+import Lit from '../utils/lit'
 
 const providerOptions = {
    walletconnect: {
@@ -320,6 +321,7 @@ const WalletProvider = React.memo(({ children }) => {
                         localStorage.setItem('jwt', data.access);
                         localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                         localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                        Lit.connect()
                         console.log('✅[INFO][JWT]:', data.access)
                      })
                   })
