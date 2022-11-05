@@ -321,7 +321,6 @@ const WalletProvider = React.memo(({ children }) => {
                         localStorage.setItem('jwt', data.access);
                         localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                         localStorage.setItem('lit-web3-provider', _provider.connection.url);
-                        Lit.connect()
                         console.log('✅[INFO][JWT]:', data.access)
                      })
                   })

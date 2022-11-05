@@ -50,10 +50,9 @@ class Lit {
   }
 
   async encryptString(str, accessControlConditions) {
-    //removing auto-connect so if the user takes a while to sign-in with wallet we don't get 100 prompts from this
-    // if (!this.litNodeClient) {
-    //   await this.connect()
-    // }
+    if (!this.litNodeClient) {
+      await this.connect()
+    }
     const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
     const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(str)
 
@@ -71,10 +70,9 @@ class Lit {
   }
 
   async decryptString(encryptedStr, encryptedSymmetricKey, accessControlConditionz) {
-     //removing auto-connect so if the user takes a while to sign-in with wallet we don't get 100 prompts from this
-    // if (!this.litNodeClient) {
-    //   await this.connect()
-    // }
+    if (!this.litNodeClient) {
+      await this.connect()
+    }
     const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
     const symmetricKey = await this.litNodeClient.getEncryptionKey({
       accessControlConditions: accessControlConditionz,
