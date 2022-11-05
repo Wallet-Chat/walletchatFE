@@ -1,4 +1,5 @@
 import { ChromeMessage, Sender } from '../types/ChromeTypes'
+import { isChromeExtension } from '../helpers/chrome'
 type MessageResponse = (response?: any) => void
 const validateSender = (
    message: ChromeMessage,
@@ -23,7 +24,9 @@ const main = () => {
    /**
     * Fired when a message is sent from either an extension process or a content script.
     */
-   chrome.runtime.onMessage.addListener(messagesFromReactAppListener)
+   if (isChromeExtension()) {
+      chrome.runtime.onMessage.addListener(messagesFromReactAppListener)
+   }
 
    // SetTerminal to run every 5 seconds (5000 ms), setTimeout to run just on
    setTimeout(myMainFunction, 5000); 

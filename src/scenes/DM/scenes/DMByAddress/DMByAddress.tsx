@@ -4,6 +4,7 @@ import {
    Button,
    Flex,
    Text,
+   Spinner,
    Link as CLink,
 } from '@chakra-ui/react'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -63,6 +64,7 @@ const DMByAddress = ({
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
    let semaphore = false;
+   //let isFetchingDataFirstTime = true;
 
    useEffect(() => {
       console.log('useEffect scroll')
@@ -137,6 +139,8 @@ const DMByAddress = ({
       if (toAddr != prevAddr){
          setPrevAddr(toAddr)
          setIsFetchingChatData(false)
+         const temp = [] as MessageUIType[]
+         setLoadedMsgs(temp)
          return //skip the account transition glitch
       }
       setPrevAddr(toAddr)
@@ -630,6 +634,7 @@ const DMByAddress = ({
    }, [copiedAddr, copyToClipboard, name, toAddr])
 
    const renderedMessages = useMemo(() => {
+      //isFetchingDataFirstTime = false;
       return loadedMsgs.map((msg: MessageUIType, i) => {
          if (msg && msg.message) {
             return (
@@ -650,11 +655,11 @@ const DMByAddress = ({
       <Flex background="white" height="100vh" flexDirection="column" flex="1">
          {header}
          <DottedBackground className="custom-scrollbar">
-            {/* {isFetchingChatData && loadedMsgs.length === 0 && (
+            {isFetchingChatData && loadedMsgs.length === 0 && (
                <Flex justifyContent="center" alignItems="center" height="100%">
                   <Spinner />
                </Flex>
-            )} */}
+            )}
             {toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19' && (
                <Flex
                   justifyContent="center"

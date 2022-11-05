@@ -41,6 +41,8 @@ const Inbox = ({
    const [communities, setCommunities] = useState<InboxItemType[]>()
    const { unreadCount } = useUnreadCount()
 
+   let semaphore = false;
+
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
@@ -58,6 +60,14 @@ const Inbox = ({
       getInboxData()
    }, [isAuthenticated, account])
 
+   // useEffect(() => {
+   //    let isMounted = true;               // note mutable flag
+   //    someAsyncOperation().then(data => {
+   //      if (isMounted) setState(data);    // add conditional check
+   //    })
+   //    return () => { isMounted = false }; // cleanup toggles value, if unmounted
+   //  }, []); 
+
    const getInboxData = () => {
       // GET request to get off-chain data for RX user
       if (!process.env.REACT_APP_REST_API) {
@@ -72,7 +82,12 @@ const Inbox = ({
          console.log('Not authenticated')
          return
       }
+      if (semaphore) {
+         //console.log('Don't perform re-entrant call')
+         return
+      }
       setIsFetchingInboxData(true)
+      semaphore = true;
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
          method: 'GET',
          credentials: "include",
@@ -108,10 +123,12 @@ const Inbox = ({
                localStorage['inbox_' + account] = JSON.stringify(replica)
             }
             setIsFetchingInboxData(false)
+            semaphore = false;
          })
          .catch((error) => {
             console.error('🚨[GET][Inbox]:', error)
             setIsFetchingInboxData(false)
+            semaphore = false;
          })
    }
 

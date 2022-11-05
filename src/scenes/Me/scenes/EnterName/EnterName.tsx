@@ -74,7 +74,7 @@ const EnterName = ({ account }: { account: string }) => {
 
    const onSubmit = (values: any) => {
       console.log("onSubmit")
-      console.log(values)
+      console.log("Values are: ", values)
       if (values?.name) {
 
          setIsFetching(true)
