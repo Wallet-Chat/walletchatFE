@@ -224,19 +224,22 @@ const DMByAddress = ({
                let localRead = localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()]
                if (localRead != data) {
                   if (data.length > 0) {
-                     let localData = JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()])
-                     for (let j = 0; j < localData.length; j++) {
-                        for (let i = 0; i < data.length; i++) {
-                           if (localData[j].Id == data[i]) {
-                              localData[j].read = true
-                              break
+                     let localData = localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]
+                     if (localData) {
+                        localData = JSON.parse(localData)
+                        for (let j = 0; j < localData.length; j++) {
+                           for (let i = 0; i < data.length; i++) {
+                              if (localData[j].Id == data[i]) {
+                                 localData[j].read = true
+                                 break
+                              }
                            }
                         }
+                        setChatData(localData)
+                        localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
+                        localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
+                        console.log('✅[GET][Updated Read Items]:', data)
                      }
-                     setChatData(localData)
-                     localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
-                     localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
-                     console.log('✅[GET][Updated Read Items]:', data)
                   }
                }
             })
