@@ -132,9 +132,9 @@ const Inbox = ({
          })
    }
 
-   // if (isFetchingInboxData && inboxData.length === 0) {
-   //    return <InboxListLoadingSkeleton />
-   // }
+   if (isFetchingInboxData && inboxData.length === 0) {
+      return <InboxListLoadingSkeleton />
+   }
 
    return (
       <Box

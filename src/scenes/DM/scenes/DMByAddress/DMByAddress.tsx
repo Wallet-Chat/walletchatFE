@@ -44,7 +44,7 @@ const DMByAddress = ({
 }) => {
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
-   const [name, setName] = useState()
+   const [name, setName] = useState<string>('')
    const [prevAddr, setPrevAddr] = useState<string>('')
    const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
@@ -88,6 +88,10 @@ const DMByAddress = ({
 
    useEffect(() => {
       if (toAddr) {
+         //load chat data from localStorage to chatData
+         setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
+         setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
+
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`, {
             method: 'GET',
             credentials: "include",
@@ -100,10 +104,7 @@ const DMByAddress = ({
             .then((response) => {
                console.log('✅[GET][Name]:', response)
                if (response[0]?.name) setName(response[0].name)
-
-               //load chat data from localStorage to chatData
-               setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
-               setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
+               else setName('User Not Yet Joined')
             })
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
@@ -212,6 +213,7 @@ const DMByAddress = ({
                   //setChatData(data)  //use when not using encryption
                }
             }
+            setIsFetchingChatData(false)
             semaphore = false;
          })
          .catch((error) => {

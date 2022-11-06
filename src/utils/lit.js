@@ -49,6 +49,12 @@ class Lit {
     this.litNodeClient = client
   }
 
+  async connectManual() {
+    if (!this.litNodeClient) {
+      await this.connect()
+    }
+  }
+
   async encryptString(str, accessControlConditions) {
     if (!this.litNodeClient) {
       await this.connect()

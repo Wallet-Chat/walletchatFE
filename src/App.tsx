@@ -74,9 +74,6 @@ export const App = () => {
          </Button>
       </Flex>
    )
-   console.log(`App.tsx`)
-   console.log(`isAuthenticated: ${isAuthenticated}`)
-   console.log(location)
 
    const inbox = (
       <Inbox account={account} web3={web3} isAuthenticated={isAuthenticated} />
