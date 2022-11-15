@@ -255,6 +255,26 @@ export const App = () => {
                         }
                      />
                      <Route
+                        path="/nft_error"
+                        element={
+                           <Flex>
+                              {nftInbox}
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       You must own at least one NFT from the Searched Collection 
+                                    </Tag>
+                                 </Flex>
+                              )}
+                           </Flex>
+                        }
+                     />
+                     <Route
                         path="/nft/poap/:poapId"
                         element={
                            <Flex>

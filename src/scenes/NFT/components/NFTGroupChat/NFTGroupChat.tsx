@@ -1,6 +1,7 @@
 import { Box, Divider, Flex, Tag } from '@chakra-ui/react'
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import equal from 'fast-deep-equal/es6'
+import { useNavigate } from 'react-router-dom'
 
 import { getFormattedDate } from '../../../../helpers/date'
 import { GroupMessageType, MessageUIType } from '../../../../types/Message'
@@ -21,7 +22,7 @@ const NFTGroupChat = ({
    const [isSendingMessage, setIsSendingMessage] = useState(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-
+   let navigate = useNavigate()
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
    useEffect(() => {
@@ -67,6 +68,7 @@ const NFTGroupChat = ({
          })
          .catch((error) => {
             console.error('🚨[GET][NFT][Group Chat Messages By Addr]:', error)
+            navigate(`/nft_error`)
          })
       // .finally(() => setIsFetchingMessages(false))
    }
