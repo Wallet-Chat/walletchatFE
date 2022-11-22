@@ -17,7 +17,7 @@ import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 
-const EnterEmail = ({ account }: { account: string }) => {
+const ChangeEmail = ({ account }: { account: string }) => {
    const {
       handleSubmit,
       register,
@@ -27,13 +27,9 @@ const EnterEmail = ({ account }: { account: string }) => {
    let navigate = useNavigate()
    const toast = useToast()
 
-   const {setEmail: globalSetEmail} = useWallet()
+   const { email: _email, setEmail: globalSetEmail } = useWallet()
    const [email, setEmail] = useState('')
    const [isFetching, setIsFetching] = useState(false)
-
-   const handleCancel = () => {
-      navigate('/community/walletchat')
-  };
 
    const onSubmit = (values: any) => {
       if (values?.email) {
@@ -63,8 +59,8 @@ const EnterEmail = ({ account }: { account: string }) => {
                   duration: 2000,
                   isClosable: true,
                 })
-               globalSetEmail(email)
-               navigate('/community/walletchat')
+               globalSetEmail(values.email)
+               navigate('/dm')
             })
             .catch((error) => {
                console.error('🚨[POST][Email]:', error)
@@ -83,7 +79,8 @@ const EnterEmail = ({ account }: { account: string }) => {
                <br />
             </Text>
             <FormControl>
-               <FormLabel fontSize="2xl">Enter email to receive notifications for new DMs (optional)</FormLabel>
+               <FormLabel fontSize="2xl">Enter email to receive notifications for new messages</FormLabel>
+               <Text color="darkgray.300" fontSize="md" mb={1}>Current email: <b>{_email}</b></Text>
                <Flex>
                   <Input
                      type="text"
@@ -101,9 +98,6 @@ const EnterEmail = ({ account }: { account: string }) => {
                   <Button variant="black" height="auto" type="submit" isLoading={isFetching}>
                      <IconSend size="20" />
                   </Button>
-                  <Button variant="black" height="auto" type="submit" onClick={handleCancel}>
-                     ❌
-                  </Button>
                </Flex>
                <FormHelperText>
                   You can change it anytime in your settings
@@ -117,4 +111,4 @@ const EnterEmail = ({ account }: { account: string }) => {
    )
 }
 
-export default EnterEmail
+export default ChangeEmail

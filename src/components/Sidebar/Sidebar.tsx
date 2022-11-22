@@ -344,7 +344,7 @@ export default function Sidebar() {
                      </MenuItem>
                      <MenuItem
                         as={NavLink}
-                        to="/me/enter-email"
+                        to="/me/change-email"
                         icon={
                            <Box>
                               <IconBell stroke="1.5" />

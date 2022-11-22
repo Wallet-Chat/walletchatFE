@@ -25,6 +25,7 @@ import { useIsMobileView } from './context/IsMobileViewProvider'
 import EnterName from './scenes/Me/scenes/EnterName'
 import ChangeName from './scenes/Me/scenes/ChangeName'
 import EnterEmail from './scenes/Me/scenes/EnterEmail'
+import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -232,8 +233,9 @@ export const App = () => {
                            </Flex>
                         }
                      />
-                     <Route path="/me/change-name" element={<ChangeName />} />
                      <Route path="/me/enter-email" element={<EnterEmail account={account} />} />
+                     <Route path="/me/change-name" element={<ChangeName />} />
+                     <Route path="/me/change-email" element={<ChangeEmail account={account} />} />
                      <Route
                         path="/nft"
                         element={

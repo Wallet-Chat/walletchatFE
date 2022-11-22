@@ -95,7 +95,7 @@ const EnterName = ({ account }: { account: string }) => {
             .then((response) => {
                console.log('✅[POST][Name]:', response)
                globalSetName(name)
-               navigate(redirectUrl)
+               navigate('/me/enter-email')
             })
             .catch((error) => {
                console.error('🚨[POST][Name]:', error)

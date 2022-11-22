@@ -66,6 +66,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [web3ModalProvider, setWeb3ModalProvider] = useState()
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
+   const [email, setEmail] = useState(null)
    const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
    const [accounts, setAccounts] = useState(null)
@@ -96,7 +97,9 @@ const WalletProvider = React.memo(({ children }) => {
             console.log('handleAccountsChanged', accounts)
             setAccount(getNormalizeAddress(accounts))
             setName(null)
+            setEmail(null)
             getName(accounts[0])
+            getEmail(accounts[0])
             storage.set('current-address', {
                address: getNormalizeAddress(accounts),
             })
@@ -184,6 +187,39 @@ const WalletProvider = React.memo(({ children }) => {
          })
          .catch((error) => {
             console.error('🚨[GET][Name]:', error)
+         })
+         .then(() => {
+            setIsFetchingName(false)
+         })
+   }
+
+   const getEmail = (_account) => {
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!_account) {
+         console.log('No account connected')
+         return
+      }
+      setIsFetchingName(true)
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_settings/${_account}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Email]:', data)
+            if (data[0]?.email) {
+               setEmail(data[0].email)
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Email]:', error)
          })
          .then(() => {
             setIsFetchingName(false)
@@ -425,6 +461,7 @@ const WalletProvider = React.memo(({ children }) => {
             // setChainId(chainId)
             setAuthenticated(true)
             getName(_account)
+            getEmail(_account)
             setWeb3(_web3)
 
             if (isChromeExtension()) {
@@ -471,7 +508,9 @@ const WalletProvider = React.memo(({ children }) => {
       <WalletContext.Provider
          value={{
             name,
+            email,
             setName,
+            setEmail,
             isFetchingName,
             account,
             accounts,
