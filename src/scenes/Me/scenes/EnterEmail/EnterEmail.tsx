@@ -111,6 +111,25 @@ const EnterEmail = ({ account }: { account: string }) => {
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>
                )}
+               <Flex>
+                  <Input
+                     type="checkbox"
+                     size="lg"
+                     borderColor="black"
+                     {...register('email', {
+                        required: true,
+                     })}
+                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setEmail(e.target.value)
+                     }
+                  />
+                  <Button variant="black" height="auto" type="submit" isLoading={isFetching}>
+                     <IconSend size="20" />
+                  </Button>
+                  <Button variant="black" height="auto" type="submit" onClick={handleCancel}>
+                     ❌
+                  </Button>
+               </Flex>
             </FormControl>
          </form>
       </Box>

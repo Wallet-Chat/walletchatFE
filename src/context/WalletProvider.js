@@ -67,6 +67,8 @@ const WalletProvider = React.memo(({ children }) => {
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
    const [email, setEmail] = useState(null)
+   const [notifyDM, setNotifyDM] = useState(null)
+   const [notify24, setNotify24] = useState(null)
    const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
    const [accounts, setAccounts] = useState(null)
@@ -98,8 +100,10 @@ const WalletProvider = React.memo(({ children }) => {
             setAccount(getNormalizeAddress(accounts))
             setName(null)
             setEmail(null)
+            setNotifyDM(null)
+            setNotify24(null)
             getName(accounts[0])
-            getEmail(accounts[0])
+            getSettings(accounts[0])
             storage.set('current-address', {
                address: getNormalizeAddress(accounts),
             })
@@ -193,7 +197,7 @@ const WalletProvider = React.memo(({ children }) => {
          })
    }
 
-   const getEmail = (_account) => {
+   const getSettings = (_account) => {
       if (!process.env.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
          return
@@ -213,13 +217,19 @@ const WalletProvider = React.memo(({ children }) => {
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅[GET][Email]:', data)
+            console.log('✅[GET][Settings]:', data)
             if (data[0]?.email) {
                setEmail(data[0].email)
             }
+            if (data[0]?.notifydm) {
+               setNotifyDM(data[0].notifydm)
+            }
+            if (data[0]?.notify24) {
+               setNotify24(data[0].notify24)
+            }
          })
          .catch((error) => {
-            console.error('🚨[GET][Email]:', error)
+            console.error('🚨[GET][Setting]:', error)
          })
          .then(() => {
             setIsFetchingName(false)
@@ -461,7 +471,7 @@ const WalletProvider = React.memo(({ children }) => {
             // setChainId(chainId)
             setAuthenticated(true)
             getName(_account)
-            getEmail(_account)
+            getSettings(_account)
             setWeb3(_web3)
 
             if (isChromeExtension()) {
@@ -509,8 +519,12 @@ const WalletProvider = React.memo(({ children }) => {
          value={{
             name,
             email,
+            notifyDM,
+            notify24,
             setName,
             setEmail,
+            setNotifyDM,
+            setNotify24,
             isFetchingName,
             account,
             accounts,

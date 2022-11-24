@@ -1,12 +1,14 @@
 import {
    Box,
    Button,
+   Checkbox,
    Flex,
    FormControl,
    FormErrorMessage,
    FormHelperText,
    FormLabel,
    Input,
+   Stack,
    Text,
    toast,
    useToast,
@@ -28,8 +30,77 @@ const ChangeEmail = ({ account }: { account: string }) => {
    const toast = useToast()
 
    const { email: _email, setEmail: globalSetEmail } = useWallet()
+   const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
+   const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
    const [email, setEmail] = useState('')
    const [isFetching, setIsFetching] = useState(false)
+   const [checkedItems, setCheckedItems] = useState([_notifyDM, _notify24])
+
+   const handleChangeOne = (checked: boolean) => {
+      setCheckedItems([checked, checkedItems[1]])
+
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
+         method: 'POST',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+         body: JSON.stringify({
+            notifydm: checked.toString(), 
+            walletaddr: account,
+         }),
+      })
+         .then((response) => response.json())
+         .then((response) => {
+            console.log('✅[POST][NotifyDM]:', response)
+            toast({
+               title: 'Success',
+               description: `Notifications updated!`,
+               status: 'success',
+               position: 'top',
+               duration: 2000,
+               isClosable: true,
+             })
+             globalSetNotifyDM(checked)
+         })
+         .catch((error) => {
+            console.error('🚨[POST][NotifyDM]:', error)
+         })
+   };
+
+   const handleChangeTwo = (checked: boolean) => {
+      setCheckedItems([checkedItems[0], checked])
+
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
+         method: 'POST',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+         body: JSON.stringify({
+            notify24: checked.toString(), 
+            walletaddr: account,
+         }),
+      })
+         .then((response) => response.json())
+         .then((response) => {
+            console.log('✅[POST][Notify24]:', response)
+            toast({
+               title: 'Success',
+               description: `Notifications updated!`,
+               status: 'success',
+               position: 'top',
+               duration: 2000,
+               isClosable: true,
+             })
+            globalSetNotify24(checked)
+         })
+         .catch((error) => {
+            console.error('🚨[POST][Notify24]:', error)
+         })
+   };
 
    const onSubmit = (values: any) => {
       if (values?.email) {
@@ -44,7 +115,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
-               email: values.email,
+               email: values.email, 
                walletaddr: account,
             }),
          })
@@ -105,6 +176,22 @@ const ChangeEmail = ({ account }: { account: string }) => {
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>
                )}
+            <Stack pl={0} mt={6} spacing={2}>
+            <Checkbox
+               size="lg"
+               isChecked={_notifyDM}
+               onChange={(e) => handleChangeOne(e.target.checked)}
+            >
+               Receive an email for every incoming DM 
+            </Checkbox>
+            <Checkbox
+               size="lg"
+               isChecked={_notify24}
+               onChange={(e) => handleChangeTwo(e.target.checked)}
+            >
+               Receive notifications summary email every 24 hours (DM, NFT, Community)
+            </Checkbox>
+            </Stack>
             </FormControl>
          </form>
       </Box>
