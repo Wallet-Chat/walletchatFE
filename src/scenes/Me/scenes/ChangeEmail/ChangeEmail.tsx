@@ -32,12 +32,20 @@ const ChangeEmail = ({ account }: { account: string }) => {
    const { email: _email, setEmail: globalSetEmail } = useWallet()
    const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
    const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
+   var dmBool = (_notifyDM === 'true')
+   var dailyBool = (_notify24 === 'true')
    const [email, setEmail] = useState('')
+   const [notifyDM, setNotifyDM] = useState('')
+   const [notify24, setNotify24] = useState('')
    const [isFetching, setIsFetching] = useState(false)
-   const [checkedItems, setCheckedItems] = useState([_notifyDM, _notify24])
+   //const [checkedItems, setCheckedItems] = useState([dmBool, dailyBool])
+   // console.log('--[handleChange - DM]:', dmBool)
+   // console.log('--[handleChange - 24]:', dailyBool)
 
    const handleChangeOne = (checked: boolean) => {
-      setCheckedItems([checked, checkedItems[1]])
+      //setCheckedItems([checked, checkedItems[1]])
+      globalSetNotifyDM(checked.toString())
+      setNotifyDM(checked.toString())
 
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
@@ -62,7 +70,6 @@ const ChangeEmail = ({ account }: { account: string }) => {
                duration: 2000,
                isClosable: true,
              })
-             globalSetNotifyDM(checked)
          })
          .catch((error) => {
             console.error('🚨[POST][NotifyDM]:', error)
@@ -70,7 +77,9 @@ const ChangeEmail = ({ account }: { account: string }) => {
    };
 
    const handleChangeTwo = (checked: boolean) => {
-      setCheckedItems([checkedItems[0], checked])
+      //setCheckedItems([checkedItems[0], checked])
+      setNotify24(checked.toString())
+      globalSetNotify24(checked.toString())
 
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
@@ -95,7 +104,6 @@ const ChangeEmail = ({ account }: { account: string }) => {
                duration: 2000,
                isClosable: true,
              })
-            globalSetNotify24(checked)
          })
          .catch((error) => {
             console.error('🚨[POST][Notify24]:', error)
@@ -179,14 +187,14 @@ const ChangeEmail = ({ account }: { account: string }) => {
             <Stack pl={0} mt={6} spacing={2}>
             <Checkbox
                size="lg"
-               isChecked={_notifyDM}
+               isChecked={dmBool}
                onChange={(e) => handleChangeOne(e.target.checked)}
             >
                Receive an email for every incoming DM 
             </Checkbox>
             <Checkbox
                size="lg"
-               isChecked={_notify24}
+               isChecked={dailyBool}
                onChange={(e) => handleChangeTwo(e.target.checked)}
             >
                Receive notifications summary email every 24 hours (DM, NFT, Community)

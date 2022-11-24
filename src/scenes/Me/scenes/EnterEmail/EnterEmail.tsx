@@ -1,12 +1,14 @@
 import {
    Box,
    Button,
+   Checkbox,
    Flex,
    FormControl,
    FormErrorMessage,
    FormHelperText,
    FormLabel,
    Input,
+   Stack,
    Text,
    toast,
    useToast,
@@ -28,9 +30,86 @@ const EnterEmail = ({ account }: { account: string }) => {
    const toast = useToast()
 
    const {setEmail: globalSetEmail} = useWallet()
+   const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
+   const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
+   var dmBool = (_notifyDM === 'true')
+   var dailyBool = (_notify24 === 'true')
    const [email, setEmail] = useState('')
+   const [notifyDM, setNotifyDM] = useState('')
+   const [notify24, setNotify24] = useState('')
    const [isFetching, setIsFetching] = useState(false)
+   //const [checkedItems, setCheckedItems] = useState([dmBool, dailyBool])
+   // console.log('--[handleChange - DM]:', dmBool)
+   // console.log('--[handleChange - 24]:', dailyBool)
 
+   const handleChangeOne = (checked: boolean) => {
+      //setCheckedItems([checked, checkedItems[1]])
+      globalSetNotifyDM(checked.toString())
+      setNotifyDM(checked.toString())
+
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
+         method: 'POST',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+         body: JSON.stringify({
+            notifydm: checked.toString(), 
+            walletaddr: account,
+         }),
+      })
+         .then((response) => response.json())
+         .then((response) => {
+            console.log('✅[POST][NotifyDM]:', response)
+            toast({
+               title: 'Success',
+               description: `Notifications updated!`,
+               status: 'success',
+               position: 'top',
+               duration: 2000,
+               isClosable: true,
+             })
+         })
+         .catch((error) => {
+            console.error('🚨[POST][NotifyDM]:', error)
+         })
+   };
+
+   const handleChangeTwo = (checked: boolean) => {
+      //setCheckedItems([checkedItems[0], checked])
+      setNotify24(checked.toString())
+      globalSetNotify24(checked.toString())
+
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
+         method: 'POST',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+         body: JSON.stringify({
+            notify24: checked.toString(), 
+            walletaddr: account,
+         }),
+      })
+         .then((response) => response.json())
+         .then((response) => {
+            console.log('✅[POST][Notify24]:', response)
+            toast({
+               title: 'Success',
+               description: `Notifications updated!`,
+               status: 'success',
+               position: 'top',
+               duration: 2000,
+               isClosable: true,
+             })
+         })
+         .catch((error) => {
+            console.error('🚨[POST][Notify24]:', error)
+         })
+   };
+   
    const handleCancel = () => {
       navigate('/community/walletchat')
   };
@@ -83,7 +162,7 @@ const EnterEmail = ({ account }: { account: string }) => {
                <br />
             </Text>
             <FormControl>
-               <FormLabel fontSize="2xl">Enter email to receive notifications for new DMs (optional)</FormLabel>
+               <FormLabel fontSize="2xl">Enter email to receive notifications (optional)</FormLabel>
                <Flex>
                   <Input
                      type="text"
@@ -111,25 +190,22 @@ const EnterEmail = ({ account }: { account: string }) => {
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>
                )}
-               <Flex>
-                  <Input
-                     type="checkbox"
-                     size="lg"
-                     borderColor="black"
-                     {...register('email', {
-                        required: true,
-                     })}
-                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setEmail(e.target.value)
-                     }
-                  />
-                  <Button variant="black" height="auto" type="submit" isLoading={isFetching}>
-                     <IconSend size="20" />
-                  </Button>
-                  <Button variant="black" height="auto" type="submit" onClick={handleCancel}>
-                     ❌
-                  </Button>
-               </Flex>
+	        <Stack pl={0} mt={6} spacing={2}>
+            <Checkbox
+               size="lg"
+               isChecked={dmBool}
+               onChange={(e) => handleChangeOne(e.target.checked)}
+            >
+               Receive an email for every incoming DM 
+            </Checkbox>
+            <Checkbox
+               size="lg"
+               isChecked={dailyBool}
+               onChange={(e) => handleChangeTwo(e.target.checked)}
+            >
+               Receive notifications summary email every 24 hours (DM, NFT, Community)
+            </Checkbox>
+            </Stack>
             </FormControl>
          </form>
       </Box>

@@ -219,12 +219,15 @@ const WalletProvider = React.memo(({ children }) => {
          .then((data) => {
             console.log('✅[GET][Settings]:', data)
             if (data[0]?.email) {
+               console.log('-[Email]:', data[0].email)
                setEmail(data[0].email)
             }
             if (data[0]?.notifydm) {
+               console.log('-[notifydm]:', data[0].notifydm)
                setNotifyDM(data[0].notifydm)
             }
             if (data[0]?.notify24) {
+               console.log('-[notify24]:', data[0].notify24)
                setNotify24(data[0].notify24)
             }
          })
