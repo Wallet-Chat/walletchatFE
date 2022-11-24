@@ -9,6 +9,7 @@ import { isMobile } from 'react-device-detect'
 import { Link } from 'react-router-dom'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
+import { useDispatch, useSelector } from "react-redux";
 
 import { InboxItemType } from '../../types/InboxItem'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
@@ -30,6 +31,7 @@ const Inbox = ({
    web3: Web3
    isAuthenticated: boolean
 }) => {
+   const dispatch = useDispatch();
    const [inboxData, setInboxData] = useState<InboxItemType[]>(
       localStorage['inbox_' + account] ? JSON.parse(localStorage['inbox_' + account]) : []
    )
@@ -86,6 +88,13 @@ const Inbox = ({
          //console.log('Don't perform re-entrant call')
          return
       }
+
+
+      // dispatch()
+
+
+
+
       setIsFetchingInboxData(true)
       semaphore = true;
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {

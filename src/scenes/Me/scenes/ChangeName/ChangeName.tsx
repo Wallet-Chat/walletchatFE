@@ -14,6 +14,7 @@ import {
  import { IconSend } from '@tabler/icons'
  import { useWallet } from '../../../../context/WalletProvider'
 import OpenSeaNFT from '../../../../types/OpenSea/NFT'
+import { fetchOwnedENS } from '@/services/dataFetch/user'
 
  const ChangeName = () => {
     const {
@@ -36,16 +37,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
              console.log('Missing OpenSea API Key')
              return
           }
-          fetch(
-             `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
-             {
-                method: 'GET',
-                headers: {
-                   Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
-                },
-             }
-          )
-             .then((response) => response.json())
+          fetchOwnedENS(account)
              .then((result) => {
                 console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
                 if (result?.assets?.length > 0) {
