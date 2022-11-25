@@ -38,9 +38,6 @@ const EnterEmail = ({ account }: { account: string }) => {
    const [notifyDM, setNotifyDM] = useState('')
    const [notify24, setNotify24] = useState('')
    const [isFetching, setIsFetching] = useState(false)
-   //const [checkedItems, setCheckedItems] = useState([dmBool, dailyBool])
-   // console.log('--[handleChange - DM]:', dmBool)
-   // console.log('--[handleChange - 24]:', dailyBool)
 
    const handleChangeOne = (checked: boolean) => {
       //setCheckedItems([checked, checkedItems[1]])

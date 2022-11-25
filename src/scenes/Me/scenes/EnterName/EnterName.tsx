@@ -1,4 +1,5 @@
 import {
+   Alert,
    Box,
    Button,
    Flex,
@@ -75,6 +76,18 @@ const EnterName = ({ account }: { account: string }) => {
    const onSubmit = (values: any) => {
       console.log("onSubmit")
       console.log("Values are: ", values)
+      if(!localStorage.getItem('jwt')) {
+         toast({
+            title: 'Error',
+            description: `You must sign the message pending in your wallet before setting name!`,
+            status: 'error',
+            position: 'top',
+            duration: 2000,
+            isClosable: true,
+         })
+         return
+      }
+
       if (values?.name) {
 
          setIsFetching(true)
@@ -98,6 +111,14 @@ const EnterName = ({ account }: { account: string }) => {
                navigate('/me/enter-email')
             })
             .catch((error) => {
+               toast({
+                  title: 'Error',
+                  description: `Name Not Updated - Ensure you own this ENS address and have signed in with your wallet`,
+                  status: 'error',
+                  position: 'top',
+                  duration: 2000,
+                  isClosable: true,
+               })
                console.error('🚨[POST][Name]:', error)
             })
             .then(() => {
@@ -168,8 +189,7 @@ const EnterName = ({ account }: { account: string }) => {
                   You can change it anytime in your settings
                </FormHelperText>
                {errors.name && errors.name.type === 'required' && (
-                  // <FormErrorMessage>No blank name please</FormErrorMessage>
-                  
+                  // <FormErrorMessage>No blank name please</FormErrorMessage>                
                   toast({
                      title: 'FAILED',
                      description: `No blank name please ${errors.name}`,
@@ -180,6 +200,9 @@ const EnterName = ({ account }: { account: string }) => {
                    })
                )}
             </FormControl>
+            <Alert status="success" variant="solid" mt={4}>
+                  You must sign the pending message in your connected wallet prior to setting name
+            </Alert>
          </form>
       </Box>
    )
