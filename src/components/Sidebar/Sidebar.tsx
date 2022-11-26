@@ -332,10 +332,11 @@ export default function Sidebar() {
                <MenuButton as={AccountInfo}>
                   {account && (
                      <>
-                        {pfpData != '' && (
+                        {pfpData && (
                            <Image
                               src={pfpData}
                               height="45px"
+                              width="45px"
                               borderRadius="var(--chakra-radii-xl)"
                            />
                         )}
