@@ -234,6 +234,7 @@ const CommunityGroupChat = ({
                         key={`${msg.message}${msg.timestamp}${i}`}
                         context="communities"
                         account={account}
+                        pfpImage=''
                         msg={msg}
                      />
                   )

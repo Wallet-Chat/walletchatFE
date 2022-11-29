@@ -4,6 +4,7 @@ import {
    Button,
    Flex,
    Text,
+   Image,
    Spinner,
    Link as CLink,
 } from '@chakra-ui/react'
@@ -45,6 +46,8 @@ const DMByAddress = ({
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
    const [name, setName] = useState<string>('')
+   const [pfpDataToAddr, setPfpDataToAddr] = useState<string>()
+   const [pfpDataFromAddr, setPfpDataFromAddr] = useState<string>()
    const [prevAddr, setPrevAddr] = useState<string>('')
    const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
@@ -87,7 +90,51 @@ const DMByAddress = ({
    }, [loadedMsgs])
 
    useEffect(() => {
+      if(!pfpDataFromAddr) {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${account}`, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+            .then((response) => response.json())
+            .then((response) => {
+               console.log('✅[GET][Image FromAddr]:', response)
+               if (response[0]?.base64data) setPfpDataFromAddr(response[0].base64data)
+               else {
+                  setPfpDataFromAddr('')
+                  console.log('cleared from PFP')
+               }
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Image FromAddr]:', error)
+            })
+      }
+
       if (toAddr) {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${toAddr}`, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+            .then((response) => response.json())
+            .then((response) => {
+               console.log('✅[GET][Image]:', response)
+               if (response[0]?.base64data) setPfpDataToAddr(response[0].base64data)
+               else {
+                  setPfpDataToAddr('')
+                  console.log('cleared to PFP')
+               }
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Image]:', error)
+            })
+
          //load chat data from localStorage to chatData
          setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
          setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
@@ -109,7 +156,7 @@ const DMByAddress = ({
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
             })
-      }
+         }
    }, [toAddr])
 
    const getChatData = useCallback(() => {
@@ -564,9 +611,18 @@ const DMByAddress = ({
             {toAddr && (
                <Flex alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center">
+                  {pfpDataToAddr ? (
+                           <Image
+                              src={pfpDataToAddr}
+                              height="40px"
+                              width="40px"
+                              borderRadius="var(--chakra-radii-xl)"
+                           />
+                           ) : (
                      <BlockieWrapper>
                         <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
                      </BlockieWrapper>
+                  )}
                      <Box ml={2}>
                         {name ? (
                            <Box>
@@ -639,15 +695,29 @@ const DMByAddress = ({
       //isFetchingDataFirstTime = false;
       return loadedMsgs.map((msg: MessageUIType, i) => {
          if (msg && msg.message) {
-            return (
-               <ChatMessage
-                  key={i}
-                  context="dms"
-                  account={account}
-                  msg={msg}
-                  updateRead={updateRead}
-               />
-            )
+            if (msg.toAddr?.toLocaleLowerCase() === account.toLocaleLowerCase()) {
+               return (
+                  <ChatMessage
+                     key={i}
+                     context="dms"
+                     account={account}
+                     msg={msg}
+                     pfpImage={pfpDataToAddr}
+                     updateRead={updateRead}
+                  />
+               )
+            } else {
+               return (
+                  <ChatMessage
+                     key={i}
+                     context="dms"
+                     account={account}
+                     msg={msg}
+                     pfpImage={pfpDataFromAddr}
+                     updateRead={updateRead}
+                  />
+               )
+            }
          }
          return null
       })

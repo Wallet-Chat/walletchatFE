@@ -121,11 +121,13 @@ const ChatMessage = ({
    context,
    account,
    msg,
+   pfpImage,
    updateRead,
 }: {
    context: 'dms' | 'nfts' | 'communities'
    account: string | undefined
    msg: MessageUIType
+   pfpImage: string | undefined
    updateRead?: (data: MessageUIType) => void
 }) => {
    const [nftData, setNftData] = useState<NFT>()
@@ -252,12 +254,21 @@ const ChatMessage = ({
          >
             {msg.fromAddr && (
                <UserProfileContextMenu address={msg.fromAddr}>
+                  {pfpImage ? (
+                     <Image
+                        src={pfpImage}
+                        height="40px"
+                        width="40px"
+                        borderRadius="var(--chakra-radii-xl)"
+                     />
+                     ) : (
                   <BlockieWrapper>
                      <Blockies
                         seed={msg.fromAddr.toLocaleLowerCase()}
                         scale={4}
                      />
                   </BlockieWrapper>
+                  )}
                </UserProfileContextMenu>
             )}
          </Box>
