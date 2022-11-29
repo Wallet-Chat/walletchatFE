@@ -2,14 +2,15 @@ import { AnyAction } from 'redux'
 
 import {
     SET_EMAIL,
-    SET_NAME
+    SET_NAME,
+    FETCH_NAME
 } from "./action";
 
 
 const initState = {
-    email: "john.doe@johndoe.com",
-    name: "John Doe",
-    loading: false,
+    email: null,
+    name: null,
+    fetching: false,
     error: false,
 };
 
@@ -20,16 +21,19 @@ export const userReducer = (store = initState, { action, payload }: AnyAction) =
             return {
                 ...store,
                 email: payload,
-                loading: false,
                 error: false,
             };
         case SET_NAME:
             return {
                 ...store,
                 name: payload,
-                loading: false,
                 error: false,
             };
+        case FETCH_NAME:
+            return {
+                ...store,
+                fetching: payload,
+            }
         default:
             return store;
     }

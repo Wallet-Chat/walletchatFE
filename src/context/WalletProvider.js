@@ -16,6 +16,11 @@ import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
 import Lit from '../utils/lit'
 
+
+import { useDispatch, useSelector } from "react-redux";
+import { authUser } from "@/redux/Auth/action"
+import * as userAction from '@/redux/User/action' 
+
 const providerOptions = {
    walletconnect: {
       package: WalletConnectProvider, // required
@@ -62,11 +67,16 @@ export function withWallet(Component) {
 }
 
 const WalletProvider = React.memo(({ children }) => {
+   const dispatch = useDispatch();
+   const { email, name, fetching, error } = useSelector(
+      (store) => store.user
+    );
+
    const [provider, setProvider] = useState()
    const [web3ModalProvider, setWeb3ModalProvider] = useState()
    const [chainId, setChainId] = useState(null)
-   const [name, setName] = useState(null)
-   const [email, setEmail] = useState(null)
+   // const [name, setName] = useState(null)
+   // const [email, setEmail] = useState(null)
    const [notifyDM, setNotifyDM] = useState(null)
    const [notify24, setNotify24] = useState(null)
    const [isFetchingName, setIsFetchingName] = useState(true)
@@ -75,7 +85,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [web3, setWeb3] = useState(null)
    const [isAuthenticated, setAuthenticated] = useState(false)
    const [appLoading, setAppLoading] = useState(false)
-   const [error, setError] = useState()
+   // const [error, setError] = useState()
    const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
 
    React.useEffect(() => {
@@ -164,38 +174,10 @@ const WalletProvider = React.memo(({ children }) => {
       }
    }, [web3ModalProvider])
 
-   const getName = (_account) => {
-      if (!process.env.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
-         return
-      }
-      if (!_account) {
-         console.log('No account connected')
-         return
-      }
-      setIsFetchingName(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${_account}`, {
-         method: 'GET',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-         },
-      })
-         .then((response) => response.json())
-         .then((data) => {
-            console.log('✅[GET][Name]:', data)
-            if (data[0]?.name) {
-               setName(data[0].name)
-            }
-         })
-         .catch((error) => {
-            console.error('🚨[GET][Name]:', error)
-         })
-         .then(() => {
-            setIsFetchingName(false)
-         })
-   }
+   // const getName = (_account) => {
+   //    // setIsFetchingName(true)
+   //    dispatch(userAction.getNameDispatch())
+   // }
 
    const getSettings = (_account) => {
       if (!process.env.REACT_APP_REST_API) {
@@ -471,9 +453,11 @@ const WalletProvider = React.memo(({ children }) => {
          if (_account) {
             setAppLoading(true)
             setAccount(_account)
+            authUser(_account)
+
             // setChainId(chainId)
             setAuthenticated(true)
-            getName(_account)
+            dispatch(userAction.getNameDispatch())
             getSettings(_account)
             setWeb3(_web3)
 

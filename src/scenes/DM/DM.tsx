@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
 import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "@/redux/store"
 
 import { InboxItemType } from '../../types/InboxItem'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
@@ -18,6 +19,7 @@ import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 import lit from "../../utils/lit";
 import WalletAccount from '../../chrome/wallet'
+import { getChatMessages } from '@/redux/ChatMsgs/action'
 
 // const localStorageInbox = localStorage.getItem('inbox_' + account)
 // const localStorageInboxEnc = localStorage.getItem('inboxEnc_ ' + account)
@@ -31,6 +33,7 @@ const Inbox = ({
    web3: Web3
    isAuthenticated: boolean
 }) => {
+   const { messages } = useSelector((store: IRootState) => store.chatting);
    const dispatch = useDispatch();
    const [inboxData, setInboxData] = useState<InboxItemType[]>(
       localStorage['inbox_' + account] ? JSON.parse(localStorage['inbox_' + account]) : []
@@ -90,8 +93,6 @@ const Inbox = ({
       }
 
 
-      // dispatch()
-
 
 
 
@@ -120,7 +121,6 @@ const Inbox = ({
                for (let i = 0; i < replica.length; i++) {
                   if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
                      const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
-                     
                      console.log('✅[POST][Decrypt GetInbox Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
                      const blob = lit.b64toBlob(replica[i].message)
                      const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
