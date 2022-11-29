@@ -21,6 +21,7 @@ const get = async(relative_url: string) => {
         credentials: "include",
         headers: {
            'Content-Type': 'application/json',
+           Authorization: `Bearer ${localStorage.getItem('jwt')}`,
            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
         }
      })
@@ -36,6 +37,7 @@ const put = async(relative_url: string, body: any) => {
         credentials: "include",
         headers: {
            'Content-Type': 'application/json',
+           Authorization: `Bearer ${localStorage.getItem('jwt')}`,
            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
         },
         body: JSON.stringify(body),
@@ -52,6 +54,7 @@ const post = async(relative_url: string, body: any) => {
         credentials: "include",
         headers: {
            'Content-Type': 'application/json',
+           Authorization: `Bearer ${localStorage.getItem('jwt')}`,
            //Authorization: `Bearer ${process.env.REACT_APP_JWT}`,
         },
         body: JSON.stringify(body),
