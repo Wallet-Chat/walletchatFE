@@ -372,7 +372,7 @@ const WalletProvider = React.memo(({ children }) => {
                         localStorage.setItem('jwt', data.access)
                         localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
                         localStorage.setItem('lit-web3-provider', _provider.connection.url)
-                        Lit.connectManual(network.chainId)
+                        Lit.connectManual()
                         console.log('✅[INFO][JWT]:', data.access)
                      })
                   })
@@ -443,7 +443,7 @@ const WalletProvider = React.memo(({ children }) => {
                      localStorage.setItem('jwt', data.access);
                      localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      localStorage.setItem('lit-web3-provider', _provider.connection.url);
-                     Lit.connectManual(network.chainId)
+                     Lit.connectManual()
                      console.log('✅[INFO][JWT]:', data.access)
                   })
                   .catch((error) => {
