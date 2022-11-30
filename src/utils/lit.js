@@ -1,7 +1,7 @@
 import * as LitJsSdk from "lit-js-sdk";
 
 const client = new LitJsSdk.LitNodeClient()
-const chain = 'ethereum'
+let chain = 'ethereum'
 
 /** 
  * Access control for a wallet with > 0.00001 ETH
@@ -49,7 +49,8 @@ class Lit {
     this.litNodeClient = client
   }
 
-  async connectManual() {
+  async connectManual(chainInput) {
+    chain = chainInput
     if (!this.litNodeClient) {
       await this.connect()
     }

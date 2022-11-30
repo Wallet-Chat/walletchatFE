@@ -2,6 +2,7 @@ import {
    Alert,
    Box,
    Button,
+   Divider,
    Flex,
    FormControl,
    FormErrorMessage,
@@ -192,12 +193,29 @@ const EnterName = ({ account }: { account: string }) => {
     const onSubmitPFP = (values: any) => {
    }
    return (
-      <Box p={6} pt={16} background="white" width="100%">
-         <form onSubmit={handleSubmit(onSubmit)}>
+         <Box p={6} pt={16} background="white" width="100%">
             <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-               Hey there!
-               <br />A warm welcome to the WalletChat Community!
+               Welcome to the WalletChat Community!
             </Text>
+            <Divider
+            orientation="horizontal"
+            height="15px"
+            d="inline-block"
+            verticalAlign="middle"
+            />
+            <form onSubmit={onSubmitPFP}>
+               <FormControl>
+               <FormLabel fontSize="xl">Upload your PFP (optional)</FormLabel>
+               <input type='file' onChange={(e) => upload(e)} name='img' />   
+            </FormControl>
+         </form>
+         <Divider
+            orientation="horizontal"
+            height="15px"
+            d="inline-block"
+            verticalAlign="middle"
+         />
+         <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl>
                <FormLabel fontSize="2xl">What's your name?</FormLabel>
                <Flex>
@@ -267,13 +285,7 @@ const EnterName = ({ account }: { account: string }) => {
             <Alert status="success" variant="solid" mt={4}>
                   You must sign the pending message in your connected wallet prior to setting name
             </Alert>
- 	    </form>
-          <form onSubmit={onSubmitPFP}>
-            <FormControl>
-            <FormLabel fontSize="xl">Upload your PFP</FormLabel>
-	         <input type='file' onChange={(e) => upload(e)} name='img' />   
-            </FormControl>
-         </form>
+ 	    </form> 
       </Box>
    )
 }

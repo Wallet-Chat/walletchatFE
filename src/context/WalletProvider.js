@@ -340,7 +340,7 @@ const WalletProvider = React.memo(({ children }) => {
                        statement,
                        uri: origin,
                        version: "1",
-                       chainId: "1",
+                       chainId: network.chainId,
                        nonce: _nonce,
                      });
                      
@@ -372,7 +372,7 @@ const WalletProvider = React.memo(({ children }) => {
                         localStorage.setItem('jwt', data.access)
                         localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
                         localStorage.setItem('lit-web3-provider', _provider.connection.url)
-                        Lit.connectManual()
+                        Lit.connectManual(network.chainId)
                         console.log('✅[INFO][JWT]:', data.access)
                      })
                   })
@@ -412,7 +412,7 @@ const WalletProvider = React.memo(({ children }) => {
                        statement,
                        uri: origin,
                        version: "1",
-                       chainId: "1",
+                       chainId: network.chainId,
                        nonce: _nonce,
                      });
                      
@@ -443,6 +443,7 @@ const WalletProvider = React.memo(({ children }) => {
                      localStorage.setItem('jwt', data.access);
                      localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                     Lit.connectManual(network.chainId)
                      console.log('✅[INFO][JWT]:', data.access)
                   })
                   .catch((error) => {
@@ -455,15 +456,15 @@ const WalletProvider = React.memo(({ children }) => {
                //END JWT AUTH sequence
             })
 
-            if (network.chainId !== '1') {
-               // check if the chain to connect to is installed
-               await _provider.provider.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: _web3.utils.toHex(1) }], // chainId must be in hexadecimal numbers
-               }).then(() => {
-                  setChainId(1)
-               })
-            }
+            // if (network.chainId !== '1') {
+            //    // check if the chain to connect to is installed
+            //    await _provider.provider.request({
+            //       method: 'wallet_switchEthereumChain',
+            //       params: [{ chainId: _web3.utils.toHex(1) }], // chainId must be in hexadecimal numbers
+            //    }).then(() => {
+            //       setChainId(1)
+            //    })
+            // }
          }
 
          setProvider(_provider)

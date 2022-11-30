@@ -1,6 +1,7 @@
 import {
     Box,
     Button,
+    Divider,
     Flex,
     FormControl,
     FormErrorMessage,
@@ -180,6 +181,18 @@ import {
  
     return (
        <Box p={6} pt={16} background="white" width="100%" height="100vh">
+          <form onSubmit={onSubmitPFP}>
+            <FormControl>
+            <FormLabel fontSize="xl">Upload your PFP</FormLabel>
+	         <input type='file' onChange={(e) => upload(e)} name='img' />   
+            </FormControl>
+        </form>
+        <Divider
+               orientation="horizontal"
+               height="15px"
+               d="inline-block"
+               verticalAlign="middle"
+          />
           <form onSubmit={handleSubmit(onSubmit)}>
              <FormControl>
                 <FormLabel fontSize="xl">Change your name</FormLabel>
@@ -227,12 +240,6 @@ import {
                 )}
              </FormControl>
           </form>
-          <form onSubmit={onSubmitPFP}>
-            <FormControl>
-            <FormLabel fontSize="xl">Upload your PFP</FormLabel>
-	         <input type='file' onChange={(e) => upload(e)} name='img' />   
-            </FormControl>
-        </form>
        </Box>
     )
  }
