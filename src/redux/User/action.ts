@@ -42,7 +42,7 @@ const fetchName = async () => {
     if (!userAddr){
         console.log('No account connected')
         return null
-    }
+    }333333
     try {
         return await get(`name/${userAddr}`);
     } catch (e) {

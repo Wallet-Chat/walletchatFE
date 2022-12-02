@@ -21,8 +21,7 @@ export const setWallet = (payload: any) => ({type: SET_WALLET_ADDR, payload}  as
 
 
 
-export const getUserWallet = () => async (dispatch: Dispatch) => {
-    dispatch(getWallet())
+export const getUserWallet = () => {
     return store.getState().auth.userAddr
 }
 
