@@ -122,8 +122,9 @@ export default function MyNFTs({ account }: { account: string }) {
          fetch(`https://api.poap.tech/actions/scan/${account}`, {
             method: 'GET',
             headers: {
-               Authorization: process.env.REACT_APP_POAP_API_KEY,
-            },
+               accept: 'application/json',
+               'X-API-Key': process.env.REACT_APP_POAP_API_KEY,
+             },
          })
             .then((response) => response.json())
             .then((result: POAP[]) => {
