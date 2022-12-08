@@ -60,6 +60,11 @@ export interface SettingsType {
    publickey: string
 }
 
+export interface PfpType {
+   walletaddr: string
+   imageB64: string
+}
+
 export interface EncryptedMsgBlock {
    to: Encrypted
    from: Encrypted

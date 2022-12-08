@@ -448,6 +448,7 @@ const DMByAddress = ({
          fromAddr: account.toLocaleLowerCase(),
          toAddr: toAddr.toLocaleLowerCase(),
          timestamp,
+         nftid: "0",
          encrypted_sym_lit_key: "",
          lit_access_conditions: "",
          read: false,

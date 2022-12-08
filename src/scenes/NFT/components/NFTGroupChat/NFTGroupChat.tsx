@@ -4,7 +4,7 @@ import equal from 'fast-deep-equal/es6'
 import { useNavigate } from 'react-router-dom'
 
 import { getFormattedDate } from '../../../../helpers/date'
-import { GroupMessageType, MessageUIType } from '../../../../types/Message'
+import { GroupMessageType, MessageUIType, PfpType } from '../../../../types/Message'
 import generateItems from '../../helpers/generateGroupedByDays'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
@@ -22,6 +22,7 @@ const NFTGroupChat = ({
    const [isSendingMessage, setIsSendingMessage] = useState(false)
    const [chatData, setChatData] = useState<GroupMessageType[]>([])
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+   const [userPfpImage, setUserPfpImage] = useState<PfpType[]>([])
    let navigate = useNavigate()
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
