@@ -530,7 +530,7 @@ const DMByAddress = ({
             setIsSendingMessage(false)
          })
 
-      if (toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19') {
+      if (toAddr.toLocaleLowerCase() === '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()) {
          if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
             console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
          } else {
