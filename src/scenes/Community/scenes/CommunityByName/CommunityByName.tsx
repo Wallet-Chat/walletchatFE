@@ -208,7 +208,7 @@ const CommunityByName = ({ account }: { account: string }) => {
                      {communityData?.discord && (
                         <Tooltip label="Discord">
                         <Link
-                           href={`https://www.discord.com/channels/${communityData.discord}`}
+                           href={`https://www.discord.gg/${communityData.discord}`}
                            target="_blank"
                            d="inline-block"
                            verticalAlign="middle"
