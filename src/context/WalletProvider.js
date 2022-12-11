@@ -317,8 +317,9 @@ const WalletProvider = React.memo(({ children }) => {
                      .then((response) => response.json())
                      .then(async (data) => {
                         localStorage.setItem('jwt', data.access);
-                        localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
-                        localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                        //Used for LIT encryption authSign parameter
+                        //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                        //localStorage.setItem('lit-web3-provider', _provider.connection.url);
                         console.log('✅[INFO][JWT]:', data.access)
                      })
                   })
@@ -387,8 +388,9 @@ const WalletProvider = React.memo(({ children }) => {
                   .then((response) => response.json())
                   .then(async (data) => {
                      localStorage.setItem('jwt', data.access);
-                     localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
-                     localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                     //Used for LIT encryption authSign parameter
+                     // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                     // localStorage.setItem('lit-web3-provider', _provider.connection.url);
                      console.log('✅[INFO][JWT]:', data.access)
                   })
                   .catch((error) => {
