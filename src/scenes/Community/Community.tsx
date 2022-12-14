@@ -2,9 +2,11 @@ import {
    Box,
    Heading,
    Flex,
+   Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
+import { Link } from 'react-router-dom'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
 
@@ -113,6 +115,18 @@ const Inbox = ({
          >
             <Flex justifyContent="space-between" mb={2}>
                <Heading size="lg">Communities</Heading>
+               <Button
+                  as={Link}
+                  to="/community/new"
+                  size="sm"
+                  variant="outline"
+                  _hover={{
+                     textDecoration: 'none',
+                     backgroundColor: 'var(--chakra-colors-lightgray-300)',
+                  }}
+               >
+                  + New
+               </Button>
             </Flex>
             {/* <InboxSearchInput /> */}
          </Box>
