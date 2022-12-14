@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IconX } from '@tabler/icons'
-import { Route, Routes, Navigate } from 'react-router-dom'
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import {
    Button,
    Box,
@@ -25,6 +25,8 @@ import { useIsMobileView } from './context/IsMobileViewProvider'
 import EnterName from './scenes/Me/scenes/EnterName'
 import ChangeName from './scenes/Me/scenes/ChangeName'
 import EnterEmail from './scenes/Me/scenes/EnterEmail'
+import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
+import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -33,6 +35,7 @@ import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
+   const location = useLocation();
    const [btnClicks, setBtnClicks] = useState(0)
 
    const {
@@ -44,7 +47,13 @@ export const App = () => {
       account,
       web3,
       error,
+      setRedirectUrl
    } = useWallet()
+   useEffect(() => {
+      const currentPath = location.pathname;
+      console.log(`currentPath: ${currentPath}`)
+      setRedirectUrl(currentPath)
+   }, [location]);
 
    const { isMobileView } = useIsMobileView()
 
@@ -224,8 +233,10 @@ export const App = () => {
                            </Flex>
                         }
                      />
-                     <Route path="/me/change-name" element={<ChangeName />} />
                      <Route path="/me/enter-email" element={<EnterEmail account={account} />} />
+                     <Route path="/me/change-name" element={<ChangeName />} />
+                     <Route path="/me/change-email" element={<ChangeEmail account={account} />} />
+                     <Route path="/me/verify-email" element={<VerifyEmail account={account} />} />
                      <Route
                         path="/nft"
                         element={
@@ -240,6 +251,26 @@ export const App = () => {
                                  >
                                     <Tag background="white">
                                        Explore NFT groups
+                                    </Tag>
+                                 </Flex>
+                              )}
+                           </Flex>
+                        }
+                     />
+                     <Route
+                        path="/nft_error"
+                        element={
+                           <Flex>
+                              {nftInbox}
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       You must own at least one NFT from the Searched Collection 
                                     </Tag>
                                  </Flex>
                               )}

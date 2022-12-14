@@ -4,6 +4,8 @@ import {
    Button,
    Flex,
    Text,
+   Image,
+   Spinner,
    Link as CLink,
 } from '@chakra-ui/react'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -43,7 +45,9 @@ const DMByAddress = ({
 }) => {
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
-   const [name, setName] = useState()
+   const [name, setName] = useState<string>('')
+   const [pfpDataToAddr, setPfpDataToAddr] = useState<string>()
+   const [pfpDataFromAddr, setPfpDataFromAddr] = useState<string>()
    const [prevAddr, setPrevAddr] = useState<string>('')
    const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
@@ -61,6 +65,8 @@ const DMByAddress = ({
    const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
 
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
+   let semaphore = false;
+   //let isFetchingDataFirstTime = true;
 
    useEffect(() => {
       console.log('useEffect scroll')
@@ -83,7 +89,52 @@ const DMByAddress = ({
    }, [loadedMsgs])
 
    useEffect(() => {
+      if(!pfpDataFromAddr) {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${account}`, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+            .then((response) => response.json())
+            .then((response) => {
+               console.log('✅[GET][Image FromAddr]:', response)
+               if (response[0]?.base64data) setPfpDataFromAddr(response[0].base64data)
+               else {
+                  setPfpDataFromAddr('')
+                  console.log('cleared from PFP')
+               }
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Image FromAddr]:', error)
+            })
+      }
       if (toAddr) {
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${toAddr}`, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+            .then((response) => response.json())
+            .then((response) => {
+               console.log('✅[GET][Image]:', response)
+               if (response[0]?.base64data) setPfpDataToAddr(response[0].base64data)
+               else {
+                  setPfpDataToAddr('')
+                  console.log('cleared to PFP')
+               }
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Image]:', error)
+            })
+         //load chat data from localStorage to chatData
+         setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
+         setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`, {
             method: 'GET',
             credentials: "include",
@@ -96,10 +147,7 @@ const DMByAddress = ({
             .then((response) => {
                console.log('✅[GET][Name]:', response)
                if (response[0]?.name) setName(response[0].name)
-
-               //load chat data from localStorage to chatData
-               setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
-               setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
+               else setName('User Not Yet Joined')
             })
             .catch((error) => {
                console.error('🚨[GET][Name]:', error)
@@ -125,20 +173,26 @@ const DMByAddress = ({
          console.log('Recipient address is not available')
          return
       }
+      if (semaphore){
+         console.log('preventing re-entrant calls if fetching is slow (happens at statup with decryption sometimes)')
+         return
+      }
       setIsFetchingChatData(true)
 
       //console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
       if (toAddr != prevAddr){
          setPrevAddr(toAddr)
+         setIsFetchingChatData(false)
+         const temp = [] as MessageUIType[]
+         setLoadedMsgs(temp)
          return //skip the account transition glitch
       }
       setPrevAddr(toAddr)
+      semaphore = true;
 
       let lastTimeMsg = "2006-01-02T15:04:05.000Z"
       if (chatData.length > 0) {
           lastTimeMsg = chatData[chatData.length - 1].timestamp
-          //console.log('✅[INFO][Trying to get messages after time: ]:', lastTimeMsg)
-          //console.log('✅[INFO][Trying to get messages after ID: ]:', chatData[chatData.length - 1].id)
       } 
       lastTimeMsg = encodeURIComponent(lastTimeMsg)
       fetch(
@@ -203,10 +257,13 @@ const DMByAddress = ({
                   localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data) 
                }
             }
+            setIsFetchingChatData(false)
+            semaphore = false;
          })
          .catch((error) => {
             console.error('🚨[GET][Chat items]:', error)
             setIsFetchingChatData(false)
+            semaphore = false;
          })
          //since we are only loading new messages, we need to update read status async and even after we aren't get new messages
          //in the case its a while before a user reads the message
@@ -226,7 +283,9 @@ const DMByAddress = ({
                let localRead = localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()]
                if (localRead != data) {
                   if (data.length > 0) {
-                     let localData = JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()])
+                  let localData = localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]
+                  if (localData) {
+                     localData = JSON.parse(localData)
                      for (let j = 0; j < localData.length; j++) {
                         for (let i = 0; i < data.length; i++) {
                            if (localData[j].Id == data[i]) {
@@ -239,6 +298,7 @@ const DMByAddress = ({
                      localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
                      localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
                      console.log('✅[GET][Updated Read Items]:', data)
+                  }
                   }
                }
             })
@@ -467,7 +527,7 @@ const DMByAddress = ({
             setIsSendingMessage(false)
          })
 
-      if (toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19') {
+      if (toAddr.toLocaleLowerCase() === '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()) {
          if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
             console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
          } else {
@@ -549,9 +609,18 @@ const DMByAddress = ({
             {toAddr && (
                <Flex alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center">
+                  {pfpDataToAddr ? (
+                           <Image
+                              src={pfpDataToAddr}
+                              height="40px"
+                              width="40px"
+                              borderRadius="var(--chakra-radii-xl)"
+                           />
+                           ) : (
                      <BlockieWrapper>
                         <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
                      </BlockieWrapper>
+                  )}
                      <Box ml={2}>
                         {name ? (
                            <Box>
@@ -623,15 +692,29 @@ const DMByAddress = ({
    const renderedMessages = useMemo(() => {
       return loadedMsgs.map((msg: MessageUIType, i) => {
          if (msg && msg.message) {
+            if (msg.toAddr?.toLocaleLowerCase() === account.toLocaleLowerCase()) {
             return (
                <ChatMessage
                   key={i}
                   context="dms"
                   account={account}
                   msg={msg}
+                     pfpImage={pfpDataToAddr}
                   updateRead={updateRead}
                />
             )
+            } else {
+               return (
+                  <ChatMessage
+                     key={i}
+                     context="dms"
+                     account={account}
+                     msg={msg}
+                     pfpImage={pfpDataFromAddr}
+                     updateRead={updateRead}
+                  />
+               )
+            }
          }
          return null
       })
@@ -641,11 +724,24 @@ const DMByAddress = ({
       <Flex background="white" height="100vh" flexDirection="column" flex="1">
          {header}
          <DottedBackground className="custom-scrollbar">
-            {/* {isFetchingChatData && loadedMsgs.length === 0 && (
+            {isFetchingChatData && loadedMsgs.length === 0 && (
+               <Flex
+                  justifyContent="center"
+                  alignItems="center"
+                  borderRadius="lg"
+                  background="green.200"
+                  p={4}
+               >
+                  <Box fontSize="md">
+                     Loading Your Messages, Please Wait and Do Not Refresh 😊
+                  </Box>
+               </Flex>
+            )}
+            {isFetchingChatData && loadedMsgs.length === 0 && (
                <Flex justifyContent="center" alignItems="center" height="100%">
                   <Spinner />
                </Flex>
-            )} */}
+            )}
             {toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19' && (
                <Flex
                   justifyContent="center"

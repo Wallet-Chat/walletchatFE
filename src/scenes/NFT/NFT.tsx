@@ -23,8 +23,6 @@ import NFTInboxSearchInput from './components/NFTInboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 
-const _inbox = localStorage.getItem('inbox')
-const localStorageInbox = _inbox ? JSON.parse(_inbox) : []
 
 const NFTInbox = ({
    account,
@@ -35,6 +33,7 @@ const NFTInbox = ({
    web3: Web3
    isAuthenticated: boolean
 }) => {
+   const localStorageInbox = localStorage['inbox_' + account] ? JSON.parse(localStorage['inbox_' + account]) : []
    const [inboxData, setInboxData] = useState<InboxItemType[]>(localStorageInbox)
    const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
    const [nfts, setNfts] = useState<InboxItemType[]>()
@@ -116,11 +115,11 @@ const NFTInbox = ({
          .then((data: InboxItemType[]) => {
             if (data === null) {
                setInboxData([])
-               localStorage.setItem('inbox', JSON.stringify([]))
+               localStorage['inbox_' + account] = JSON.stringify([])
             } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data, inboxData, equal(inboxData, data))
                setInboxData(data)
-               localStorage.setItem('inbox', JSON.stringify(data))
+               localStorage['inbox_' + account] =  JSON.stringify(data)
             }
             setIsFetchingInboxData(false)
          })

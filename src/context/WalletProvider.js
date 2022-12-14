@@ -14,6 +14,7 @@ import storage from '../utils/storage'
 import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
+import Lit from '../utils/lit'
 
 const providerOptions = {
    walletconnect: {
@@ -65,6 +66,9 @@ const WalletProvider = React.memo(({ children }) => {
    const [web3ModalProvider, setWeb3ModalProvider] = useState()
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
+   const [email, setEmail] = useState(null)
+   const [notifyDM, setNotifyDM] = useState(null)
+   const [notify24, setNotify24] = useState(null)
    const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
    const [accounts, setAccounts] = useState(null)
@@ -72,6 +76,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [isAuthenticated, setAuthenticated] = useState(false)
    const [appLoading, setAppLoading] = useState(false)
    const [error, setError] = useState()
+   const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -94,14 +99,19 @@ const WalletProvider = React.memo(({ children }) => {
             console.log('handleAccountsChanged', accounts)
             setAccount(getNormalizeAddress(accounts))
             setName(null)
+            setEmail(null)
+            setNotifyDM(null)
+            setNotify24(null)
             getName(accounts[0])
+            getSettings(accounts[0])
             storage.set('current-address', {
                address: getNormalizeAddress(accounts),
             })
-            storage.set('inbox', [])
             console.log('[account changes]: ', getNormalizeAddress(accounts))
+            if (!isChromeExtension()) {
             // TODO: how can we refresh data loaded without manual refresh?
             window.location.reload();  
+            }
          }
 
          const handleChainChanged = (chainId) => {
@@ -116,7 +126,6 @@ const WalletProvider = React.memo(({ children }) => {
 
          const handleDisconnect = () => {
             console.log('[disconnected]')
-            storage.set('inbox', [])
             disconnectWallet()
          }
 
@@ -180,6 +189,47 @@ const WalletProvider = React.memo(({ children }) => {
          })
          .catch((error) => {
             console.error('🚨[GET][Name]:', error)
+         })
+         .then(() => {
+            setIsFetchingName(false)
+         })
+   }
+   const getSettings = (_account) => {
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!_account) {
+         console.log('No account connected')
+         return
+      }
+      setIsFetchingName(true)
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_settings/${_account}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Settings]:', data)
+            if (data[0]?.email) {
+               console.log('-[Email]:', data[0].email)
+               setEmail(data[0].email)
+            }
+            if (data[0]?.notifydm) {
+               console.log('-[notifydm]:', data[0].notifydm)
+               setNotifyDM(data[0].notifydm)
+            }
+            if (data[0]?.notify24) {
+               console.log('-[notify24]:', data[0].notify24)
+               setNotify24(data[0].notify24)
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Setting]:', error)
          })
          .then(() => {
             setIsFetchingName(false)
@@ -287,7 +337,7 @@ const WalletProvider = React.memo(({ children }) => {
                        statement,
                        uri: origin,
                        version: "1",
-                       chainId: "1",
+                       chainId: network.chainId,
                        nonce: _nonce,
                      });
                      
@@ -359,7 +409,7 @@ const WalletProvider = React.memo(({ children }) => {
                        statement,
                        uri: origin,
                        version: "1",
-                       chainId: "1",
+                       chainId: network.chainId,
                        nonce: _nonce,
                      });
                      
@@ -403,15 +453,15 @@ const WalletProvider = React.memo(({ children }) => {
                //END JWT AUTH sequence
             })
 
-            if (network.chainId !== '1') {
+            // if (network.chainId !== '1') {
                // check if the chain to connect to is installed
-               await _provider.provider.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: _web3.utils.toHex(1) }], // chainId must be in hexadecimal numbers
-               }).then(() => {
-                  setChainId(1)
-               })
-            }
+            //    await _provider.provider.request({
+            //       method: 'wallet_switchEthereumChain',
+            //       params: [{ chainId: _web3.utils.toHex(1) }], // chainId must be in hexadecimal numbers
+            //    }).then(() => {
+            //       setChainId(1)
+            //    })
+            // }
          }
 
          setProvider(_provider)
@@ -422,6 +472,7 @@ const WalletProvider = React.memo(({ children }) => {
             // setChainId(chainId)
             setAuthenticated(true)
             getName(_account)
+            getSettings(_account)
             setWeb3(_web3)
 
             if (isChromeExtension()) {
@@ -442,9 +493,10 @@ const WalletProvider = React.memo(({ children }) => {
    }
 
    const disconnectWallet = async () => {
-      console.log('disconnectWallet')
+      console.log('** disconnectWallet **')
       try {
-         if (isChromeExtension) {
+         if (isChromeExtension()) {
+            console.log('Disconnect Wallet Chrome Extension True')
             storage.set('metamask-connected', { connected: false })
          } else {
             console.log(web3ModalProvider.close)
@@ -453,6 +505,13 @@ const WalletProvider = React.memo(({ children }) => {
                await web3Modal.clearCachedProvider()
                setProvider(null)
             }
+            console.log('Deleting Login LocalStorage Items')
+            localStorage.removeItem('jwt')
+            localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
+            localStorage.removeItem('metamask-connected')
+            localStorage.removeItem('lit-auth-signature')
+            localStorage.removeItem('lit-web3-provider')
+            localStorage.removeItem('current-address')
          }
          storage.set('current-address', { address: null })
          setAccount(null)
@@ -468,7 +527,13 @@ const WalletProvider = React.memo(({ children }) => {
       <WalletContext.Provider
          value={{
             name,
+            email,
+            notifyDM,
+            notify24,
             setName,
+            setEmail,
+            setNotifyDM,
+            setNotify24,
             isFetchingName,
             account,
             accounts,
@@ -480,6 +545,8 @@ const WalletProvider = React.memo(({ children }) => {
             web3,
             provider,
             error,
+            redirectUrl,
+            setRedirectUrl
          }}
       >
          {children}

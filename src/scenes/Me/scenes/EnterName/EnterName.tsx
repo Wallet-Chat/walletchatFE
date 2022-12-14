@@ -1,6 +1,8 @@
 import {
+   Alert,
    Box,
    Button,
+   Divider,
    Flex,
    FormControl,
    FormErrorMessage,
@@ -10,12 +12,13 @@ import {
    Text,
    useToast,
 } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 import OpenSeaNFT from '../../../../types/OpenSea/NFT'
+ import Resizer from "react-image-file-resizer";
 
 const EnterName = ({ account }: { account: string }) => {
    const {
@@ -27,13 +30,74 @@ const EnterName = ({ account }: { account: string }) => {
 
    const toast = useToast()
 
-   const { setName: globalSetName } = useWallet()
+   const { setName: globalSetName, redirectUrl } = useWallet()
    let navigate = useNavigate()
 
    const [name, setName] = useState('')
    const [isFetching, setIsFetching] = useState(false)
    const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
 
+    const [file, setFile] = useState('string')
+    const resizeFile = (file: Blob) =>
+      new Promise((resolve) => {
+         Resizer.imageFileResizer(
+            file,
+            64,
+            64,
+            "JPEG",
+            100,
+            0,
+            (uri) => {
+            resolve(uri);
+            },
+            "base64"
+         );
+    });
+   const upload = async (e: ChangeEvent<HTMLInputElement>) => {
+      console.warn(e.target.files)
+      const files = e.target.files
+      if (files && files.length !== 0) {
+         const image = await resizeFile(files[0])
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image`, {
+            method: 'PUT',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+            body: JSON.stringify({
+               base64data: image,
+               addr: account,
+            }),
+         })
+            .then((response) => response.json())
+            .then((response) => {
+              console.log('✅[POST][Image]:', response)
+              toast({
+                 title: 'Success',
+                 description: `PFP updated!`,
+                 status: 'success',
+                 position: 'top',
+                 duration: 2000,
+                 isClosable: true,
+              })
+              setName("")
+            })
+            .catch((error) => {
+               console.error('🚨[POST][Image]:', error)
+               toast({
+                 title: 'Error',
+                 description: `Image Not Updated - Unknown error`,
+                 status: 'error',
+                 position: 'top',
+                 duration: 2000,
+                 isClosable: true,
+              })
+            }).then(() => {
+              setIsFetching(false)
+            })
+      }
+   }
    useEffect(() => {
       const getOwnedENS = () => {
          if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
@@ -74,7 +138,18 @@ const EnterName = ({ account }: { account: string }) => {
 
    const onSubmit = (values: any) => {
       console.log("onSubmit")
-      console.log(values)
+      console.log("Values are: ", values)
+      if(!localStorage.getItem('jwt')) {
+         toast({
+            title: 'Error',
+            description: `You must sign the message pending in your wallet before setting name!`,
+            status: 'error',
+            position: 'top',
+            duration: 2000,
+            isClosable: true,
+         })
+         return
+      }
       if (values?.name) {
 
          setIsFetching(true)
@@ -95,9 +170,17 @@ const EnterName = ({ account }: { account: string }) => {
             .then((response) => {
                console.log('✅[POST][Name]:', response)
                globalSetName(name)
-               navigate('/community/walletchat')
+               navigate('/me/enter-email')
             })
             .catch((error) => {
+               toast({
+                  title: 'Error',
+                  description: `Name Not Updated - Ensure you own this ENS address and have signed in with your wallet`,
+                  status: 'error',
+                  position: 'top',
+                  duration: 2000,
+                  isClosable: true,
+               })
                console.error('🚨[POST][Name]:', error)
             })
             .then(() => {
@@ -106,13 +189,32 @@ const EnterName = ({ account }: { account: string }) => {
       }
    }
 
+    const onSubmitPFP = (values: any) => {
+   }
    return (
       <Box p={6} pt={16} background="white" width="100%">
-         <form onSubmit={handleSubmit(onSubmit)}>
             <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-               Hey there!
-               <br />A warm welcome to the WalletChat Community!
+               Welcome to the WalletChat Community!
             </Text>
+            <Divider
+            orientation="horizontal"
+            height="15px"
+            d="inline-block"
+            verticalAlign="middle"
+            />
+            <form onSubmit={onSubmitPFP}>
+               <FormControl>
+               <FormLabel fontSize="xl">Upload your PFP (optional)</FormLabel>
+               <input type='file' onChange={(e) => upload(e)} name='img' />   
+            </FormControl>
+         </form>
+         <Divider
+            orientation="horizontal"
+            height="15px"
+            d="inline-block"
+            verticalAlign="middle"
+         />
+         <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl>
                <FormLabel fontSize="2xl">What's your name?</FormLabel>
                <Flex>
@@ -180,6 +282,9 @@ const EnterName = ({ account }: { account: string }) => {
                    })
                )}
             </FormControl>
+            <Alert status="success" variant="solid" mt={4}>
+                  You must sign the pending message in your connected wallet prior to setting name
+            </Alert>
          </form>
       </Box>
    )

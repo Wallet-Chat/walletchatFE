@@ -59,6 +59,7 @@ export default function Sidebar() {
    const [chainName, setChainName] = useState('ethereum')
    const [nftData, setNftData] = useState<NFTPortNFT>()
    const [imageUrl, setImageUrl] = useState<string>()
+   const [pfpData, setPfpData] = useState<string>()
    const { unreadCount } = useUnreadCount()
 
    const { isMobileView } = useIsMobileView()
@@ -106,6 +107,9 @@ export default function Sidebar() {
       }
    }, [url])
 
+   useEffect(() => {
+      getImagePFP()
+   }, [account])
    const getNftMetadata = (
       nftContractAddr: string,
       nftId: string,
@@ -142,6 +146,24 @@ export default function Sidebar() {
             }
          })
          .catch((error) => console.log('error', error))
+   }
+   const getImagePFP = () => {
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${account}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+      })
+         .then((response) => response.json())
+         .then((response) => {
+           console.log('✅[GET][Image]:', response)
+           if (response[0]?.base64data) setPfpData(response[0].base64data)
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Image]:', error)
+         })
    }
 
    return (
@@ -308,10 +330,20 @@ export default function Sidebar() {
                <MenuButton as={AccountInfo}>
                   {account && (
                      <>
+                        {pfpData && (
+                           <Image
+                              src={pfpData}
+                              height="45px"
+                              width="45px"
+                              borderRadius="var(--chakra-radii-xl)"
+                           />
+                        )}
+                        {!pfpData && (
                         <Blockies
                            seed={account.toLocaleLowerCase()}
                            scale={4}
                         />
+                        )}
                         {!isMobile && (
                            <span
                               style={{
@@ -340,11 +372,11 @@ export default function Sidebar() {
                         }
                         _hover={{ textDecoration: 'none' }}
                      >
-                        Change name
+                        Change Name or PFP
                      </MenuItem>
                      <MenuItem
                         as={NavLink}
-                        to="/me/enter-email"
+                        to="/me/change-email"
                         icon={
                            <Box>
                               <IconBell stroke="1.5" />

@@ -129,7 +129,8 @@ const POAPById = ({ account }: { account: string }) => {
       fetch(`https://api.poap.tech/events/id/${poapId}`, {
          method: 'GET',
          headers: {
-            Authorization: process.env.REACT_APP_POAP_API_KEY,
+            accept: 'application/json',
+            'X-API-Key': process.env.REACT_APP_POAP_API_KEY,
          },
       })
          .then((response) => response.json())

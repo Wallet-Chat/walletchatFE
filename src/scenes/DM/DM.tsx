@@ -18,8 +18,6 @@ import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSke
 import lit from "../../utils/lit";
 import WalletAccount from '../../chrome/wallet'
 
-// const localStorageInbox = localStorage.getItem('inbox_' + account)
-// const localStorageInboxEnc = localStorage.getItem('inboxEnc_ ' + account)
 
 const Inbox = ({
    account,
@@ -41,6 +39,7 @@ const Inbox = ({
    const [communities, setCommunities] = useState<InboxItemType[]>()
    const { unreadCount } = useUnreadCount()
 
+   let semaphore = false;
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
@@ -72,7 +71,12 @@ const Inbox = ({
          console.log('Not authenticated')
          return
       }
+      if (semaphore) {
+         //console.log('Don't perform re-entrant call')
+         return
+      }
       setIsFetchingInboxData(true)
+      semaphore = true;
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
          method: 'GET',
          credentials: "include",
@@ -108,10 +112,12 @@ const Inbox = ({
                localStorage['inbox_' + account] = JSON.stringify(data) //replica)
             }
             setIsFetchingInboxData(false)
+            semaphore = false;
          })
          .catch((error) => {
             console.error('🚨[GET][Inbox]:', error)
             setIsFetchingInboxData(false)
+            semaphore = false;
          })
    }
 

@@ -49,11 +49,22 @@ class Lit {
     this.litNodeClient = client
   }
 
+  async connectManual() {
+    if (!this.litNodeClient) {
+      await this.connect()
+    }
+  }
   async encryptString(str, accessControlConditions) {
     if (!this.litNodeClient) {
       await this.connect()
     }
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
+    let authSig = localStorage.getItem("lit-auth-signature");
+    if (!authSig) {
+       authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
+    }
+    else {
+      authSig = JSON.parse(authSig);
+    }
     const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(str)
 
     const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
@@ -73,7 +84,12 @@ class Lit {
     if (!this.litNodeClient) {
       await this.connect()
     }
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
+    let authSig = localStorage.getItem("lit-auth-signature");
+    if (!authSig) {
+     authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
+    } else {
+      authSig = JSON.parse(authSig);
+    }
     const symmetricKey = await this.litNodeClient.getEncryptionKey({
       accessControlConditions: accessControlConditionz,
       toDecrypt: encryptedSymmetricKey,
@@ -85,9 +101,9 @@ class Lit {
       symmetricKey
     );
     // eslint-disable-next-line no-console
-    console.log({
-      decryptedFile
-    })
+    // console.log({
+    //   decryptedFile
+    // })
     return { decryptedFile }
   }
 
