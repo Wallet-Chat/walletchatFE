@@ -2,6 +2,7 @@ import {
    Box,
    Button,
    Checkbox,
+   Divider,
    Flex,
    FormControl,
    FormErrorMessage,
@@ -154,6 +155,28 @@ const ChangeEmail = ({ account }: { account: string }) => {
                 Notification Settings
                <br />
             </Text>
+            <Stack pl={0} mt={6} spacing={2}>
+            <Checkbox
+               size="lg"
+               isChecked={dmBool}
+               onChange={(e) => handleChangeOne(e.target.checked)}
+            >
+               Receive an email for every incoming DM 
+            </Checkbox>
+            <Checkbox
+               size="lg"
+               isChecked={dailyBool}
+               onChange={(e) => handleChangeTwo(e.target.checked)}
+            >
+               Receive notifications summary email every 24 hours (DM, NFT, Community)
+            </Checkbox>
+            </Stack>
+            <Divider
+               orientation="horizontal"
+               height="15px"
+               d="inline-block"
+               verticalAlign="middle"
+          />
             <FormControl>
                <FormLabel fontSize="2xl">Enter email to receive notifications for new messages</FormLabel>
                <Text color="darkgray.300" fontSize="md" mb={1}>Current email: <b>{_email}</b></Text>
@@ -181,22 +204,6 @@ const ChangeEmail = ({ account }: { account: string }) => {
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>
                )}
-            <Stack pl={0} mt={6} spacing={2}>
-            <Checkbox
-               size="lg"
-               isChecked={dmBool}
-               onChange={(e) => handleChangeOne(e.target.checked)}
-            >
-               Receive an email for every incoming DM 
-            </Checkbox>
-            <Checkbox
-               size="lg"
-               isChecked={dailyBool}
-               onChange={(e) => handleChangeTwo(e.target.checked)}
-            >
-               Receive notifications summary email every 24 hours (DM, NFT, Community)
-            </Checkbox>
-            </Stack>
             </FormControl>
          </form>
       </Box>

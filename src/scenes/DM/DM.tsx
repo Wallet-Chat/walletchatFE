@@ -18,8 +18,6 @@ import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSke
 import lit from "../../utils/lit";
 import WalletAccount from '../../chrome/wallet'
 
-// const localStorageInbox = localStorage.getItem('inbox_' + account)
-// const localStorageInboxEnc = localStorage.getItem('inboxEnc_ ' + account)
 
 const Inbox = ({
    account,
@@ -60,13 +58,6 @@ const Inbox = ({
       getInboxData()
    }, [isAuthenticated, account])
 
-   // useEffect(() => {
-   //    let isMounted = true;               // note mutable flag
-   //    someAsyncOperation().then(data => {
-   //      if (isMounted) setState(data);    // add conditional check
-   //    })
-   //    return () => { isMounted = false }; // cleanup toggles value, if unmounted
-   //  }, []); 
 
    const getInboxData = () => {
       // GET request to get off-chain data for RX user

@@ -693,7 +693,6 @@ const DMByAddress = ({
    }, [copiedAddr, copyToClipboard, name, toAddr])
 
    const renderedMessages = useMemo(() => {
-      //isFetchingDataFirstTime = false;
       return loadedMsgs.map((msg: MessageUIType, i) => {
          if (msg && msg.message) {
             if (msg.toAddr?.toLocaleLowerCase() === account.toLocaleLowerCase()) {
