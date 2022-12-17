@@ -621,9 +621,9 @@ const DMByAddress = ({
             {toAddr && (
                <Flex alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center">
-                  {pfpDataToAddr ? (
+                  {localStorage.getItem('pfpData_' + toAddr) != null ? (
                            <Image
-                              src={localStorage['pfpData_' + toAddr.toLocaleLowerCase()]}
+                              src={localStorage['pfpData_' + toAddr]}
                               height="40px"
                               width="40px"
                               borderRadius="var(--chakra-radii-xl)"
