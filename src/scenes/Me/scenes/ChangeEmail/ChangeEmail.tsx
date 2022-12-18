@@ -138,7 +138,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
                   isClosable: true,
                 })
                globalSetEmail(values.email)
-               navigate('/dm')
+               navigate('/me/verify-email')
             })
             .catch((error) => {
                console.error('🚨[POST][Email]:', error)

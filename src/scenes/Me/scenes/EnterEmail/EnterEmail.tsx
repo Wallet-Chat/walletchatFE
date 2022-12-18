@@ -142,7 +142,7 @@ const EnterEmail = ({ account }: { account: string }) => {
                   isClosable: true,
                 })
                globalSetEmail(email)
-               navigate('/community/walletchat')
+               navigate('/me/verify-email')
             })
             .catch((error) => {
                console.error('🚨[POST][Email]:', error)

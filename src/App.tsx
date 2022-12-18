@@ -134,7 +134,7 @@ export const App = () => {
                   </Button>
                   {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>
-                        Check the MetaMask extension to continue
+                        Check the your wallet for signature prompt to continue
                      </Alert>
                   )}
                   {error && (
