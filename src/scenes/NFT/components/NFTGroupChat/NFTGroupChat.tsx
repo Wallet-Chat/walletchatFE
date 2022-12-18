@@ -95,6 +95,12 @@ const NFTGroupChat = ({
          timestamp,
       }
 
+      //tezos is case sensitive, ETH was not (some people had issues copy/pasting eth addresses as lower case)
+      if (account.startsWith('tz')) {
+         data.fromaddr = account
+         data.nftaddr = nftContractAddr
+      }
+
       addMessageToUI(
          msgInputCopy,
          account,
