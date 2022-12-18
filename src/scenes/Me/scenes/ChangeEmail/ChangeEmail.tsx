@@ -1,4 +1,5 @@
 import {
+   Alert,
    Box,
    Button,
    Checkbox,
@@ -201,6 +202,9 @@ const ChangeEmail = ({ account }: { account: string }) => {
                <FormHelperText>
                   You can change it anytime in your settings
                </FormHelperText>
+               <Alert status="info" variant="solid" mt={4}>
+                  You must verify your email before you will receive notifications, please check your inbox
+               </Alert>
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>
                )}

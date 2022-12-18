@@ -42,6 +42,7 @@ export const App = () => {
       appLoading,
       isAuthenticated,
       connectWallet,
+      connectWalletTezos,
       name,
       isFetchingName,
       account,
@@ -130,11 +131,21 @@ export const App = () => {
                      }}
                      size="lg"
                   >
-                     Sign in using wallet
+                     Sign-in with Ethereum
+                  </Button>
+                  <Button
+                     variant="black"
+                     onClick={() => {
+                        setBtnClicks(btnClicks + 1)
+                        connectWalletTezos()
+                     }}
+                     size="lg"
+                  >
+                     Sign-in with Tezos
                   </Button>
                   {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>
-                        Check the MetaMask extension to continue
+                        Check the your wallet for signature prompt to continue
                      </Alert>
                   )}
                   {error && (

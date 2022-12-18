@@ -158,7 +158,7 @@ export default function Sidebar() {
       })
          .then((response) => response.json())
          .then((response) => {
-           console.log('✅[GET][Image]:', response)
+           console.log('✅[GET][Image Sidebar]:', response)
            if (response[0]?.base64data) setPfpData(response[0].base64data)
          })
          .catch((error) => {

@@ -100,8 +100,11 @@ const DMByAddress = ({
          })
             .then((response) => response.json())
             .then((response) => {
-               console.log('✅[GET][Image FromAddr]:', response)
-               if (response[0]?.base64data) setPfpDataFromAddr(response[0].base64data)
+               console.log('✅[GET][Image FromAddr]:', account, response)
+               if (response[0]?.base64data) {
+                  setPfpDataFromAddr(response[0].base64data)
+                  localStorage['pfpData_' + account] = response[0].base64data
+               }
                else {
                   setPfpDataFromAddr('')
                   console.log('cleared from PFP')
@@ -112,6 +115,7 @@ const DMByAddress = ({
             })
       }
       if (toAddr) {
+         if (localStorage.getItem("'pfpData_' + account") === null) {
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${toAddr}`, {
             method: 'GET',
             credentials: "include",
@@ -122,8 +126,11 @@ const DMByAddress = ({
          })
             .then((response) => response.json())
             .then((response) => {
-               console.log('✅[GET][Image]:', response)
-               if (response[0]?.base64data) setPfpDataToAddr(response[0].base64data)
+                  console.log('✅[GET][Image ToAddr]:', toAddr, response)
+                  if (response[0]?.base64data) {
+                     setPfpDataToAddr(response[0].base64data)
+                     localStorage['pfpData_' + toAddr] = response[0].base64data
+                  }
                else {
                   setPfpDataToAddr('')
                   console.log('cleared to PFP')
@@ -132,6 +139,7 @@ const DMByAddress = ({
             .catch((error) => {
                console.error('🚨[GET][Image]:', error)
             })
+         }
          //load chat data from localStorage to chatData
          setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
          setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
@@ -185,6 +193,7 @@ const DMByAddress = ({
          setIsFetchingChatData(false)
          const temp = [] as MessageUIType[]
          setLoadedMsgs(temp)
+         setPfpDataToAddr('')
          return //skip the account transition glitch
       }
       setPrevAddr(toAddr)
@@ -609,9 +618,9 @@ const DMByAddress = ({
             {toAddr && (
                <Flex alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center">
-                  {pfpDataToAddr ? (
+                  {localStorage.getItem('pfpData_' + toAddr) != null ? (
                            <Image
-                              src={pfpDataToAddr}
+                              src={localStorage['pfpData_' + toAddr]}
                               height="40px"
                               width="40px"
                               borderRadius="var(--chakra-radii-xl)"
@@ -699,7 +708,7 @@ const DMByAddress = ({
                   context="dms"
                   account={account}
                   msg={msg}
-                     pfpImage={pfpDataToAddr}
+                     pfpImage={localStorage['pfpData_' + msg.fromAddr]}
                   updateRead={updateRead}
                />
             )

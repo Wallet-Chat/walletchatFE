@@ -45,6 +45,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
    const { email: _email, setEmail: globalSetEmail } = useWallet()
    const [isFetching, setIsFetching] = useState(false)
    const [fetchError, setFetchError] = useState(false)
+   const [isVerifySuccess, setIsVerifySuccess] = useState(false)
    const callVerifyEmail = () => {
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/verify_email/${verificationemail}/${verificationcode}`, {
          method: 'GET',
@@ -57,20 +58,14 @@ const VerifyEmail = ({ account }: { account: string }) => {
          .then((response) => response.json())
          .then((response) => {
             console.log('✅[Get][VerifyEmail]:', response)
-            toast({
-               title: 'Success',
-               description: `Email Verified!`,
-               status: 'success',
-               position: 'top',
-               duration: 2000,
-               isClosable: true,
-             })
              setFetchError(false)
-             navigate('/dm')
+             setIsVerifySuccess(true)
+             navigate('/me/verify-email')
          })
          .catch((error) => {
             console.error('🚨[GET][Verify Email]:', error)
             setFetchError(true)
+            navigate('/me/verify-email')
             // toast({
             //    title: 'Error',
             //    description: `Verification Failed!`,
@@ -97,16 +92,9 @@ const VerifyEmail = ({ account }: { account: string }) => {
             .then((response) => response.json())
             .then((response) => {
                console.log('✅[GET][Verify Email]:', response)
-               toast({
-                  title: 'Success',
-                  description: `Email verified!`,
-                  status: 'success',
-                  position: 'top',
-                  duration: 2000,
-                  isClosable: true,
-                })
-                setFetchError(true)
-               navigate('/dm')
+                setFetchError(false)
+                setIsVerifySuccess(true)
+                navigate('/me/verify-email')
             })
             .catch((error) => {
                console.error('🚨[GET][Verify Email]:', error)
@@ -119,6 +107,8 @@ const VerifyEmail = ({ account }: { account: string }) => {
                //    isClosable: true,
                //  })
                setFetchError(true)
+               setIsVerifySuccess(false)
+               navigate('/me/verify-email')
             })
             .then(() => {
                setIsFetching(false)
@@ -129,7 +119,24 @@ const VerifyEmail = ({ account }: { account: string }) => {
    const urlParams = new URLSearchParams(location.search);
    verificationcode = urlParams.get('code')
    verificationemail = urlParams.get('email')
-   if (verificationcode === null) {
+   if (isVerifySuccess) {
+      return (
+      <Box p={6} pt={16} background="white" width="100%">
+            <form>
+               <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                  Verify Email Success
+                  <br />
+               </Text>
+            </form>
+               <Alert status="success" variant="solid" mt={4}>
+                  Email verification succeeded!  You are now eligible to recieve notifications.  
+               </Alert>
+               <Alert status="success" variant="solid" mt={4}>
+                  You may close this page and return to ApeCoinStaking.io / NF3.exchange or continue to chat here in the full web app.
+               </Alert>        
+         </Box>  
+      )
+   } else if (verificationcode === null) {
       return (
          <Box p={6} pt={16} background="white" width="100%">
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -169,7 +176,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
    } else {
       return (
       <Box p={6} pt={16} background="white" width="100%">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form>
                <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
                   Verify Email
                   <br />

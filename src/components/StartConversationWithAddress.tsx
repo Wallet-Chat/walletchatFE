@@ -43,12 +43,24 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
       }
    }
 
+   const checkTezos = async (address: string) => {
+      console.log("checking Tezos address")
+      //TODO: validate Tezos address (public key hash)
+      setResolvedAddr(address)
+   }
+
    useEffect(() => {
-      const delayDebounceFn = setTimeout(() => {
-        checkENS(toAddr)
-      }, 800)
-  
-      return () => clearTimeout(delayDebounceFn)
+      if (toAddr.startsWith("tz")) {
+         const delayDebounceFn = setTimeout(() => {
+            checkTezos(toAddr)
+          }, 800)
+          return () => clearTimeout(delayDebounceFn)
+      } else {
+          const delayDebounceFn = setTimeout(() => {
+            checkENS(toAddr)
+          }, 800)
+          return () => clearTimeout(delayDebounceFn)
+      }
     }, [toAddr])
 
    return (
@@ -66,7 +78,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                })}
                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setToAddr(e.target.value)}
             />
-            {web3.utils.isAddress(toAddr) && (
+            {web3 != null && web3.utils.isAddress(toAddr) && (
                <Link to={`/dm/${toAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
@@ -97,6 +109,24 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                   as={Button}
                >
                   <Blockies seed={resolvedAddr.toLocaleLowerCase()} scale={3} />
+                  <Text fontWeight="bold" fontSize="md" ml={2}>
+                     {toAddr}{" "}({truncateAddress(resolvedAddr)})
+                  </Text>
+               </Flex>
+               </Link>
+            )}
+            {toAddr.startsWith("tz") && resolvedAddr && !isResolvingENS && (
+               <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
+               <Flex
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  p={3}
+                  background="lightgray.300"
+                  borderRadius="md"
+                  mt={2}
+                  as={Button}
+               >
+                  <Blockies seed={resolvedAddr} scale={3} />
                   <Text fontWeight="bold" fontSize="md" ml={2}>
                      {toAddr}{" "}({truncateAddress(resolvedAddr)})
                   </Text>

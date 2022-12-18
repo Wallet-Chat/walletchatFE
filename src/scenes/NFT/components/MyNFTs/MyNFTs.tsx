@@ -16,6 +16,8 @@ import MyNFTPOAP from './components/MyNFTPOAP'
 import { chains } from '../../../../constants'
 import ChainFilters from '../../../../components/ChainFilters'
 import MyNFTSkeleton from './components/MyNFTSkeleton'
+import TzktNFT from '../../../../types/Tzkt/NFT'
+import { tezosTztkToGeneralNFTType } from '../../../../types/Tzkt/NFT'
 
 export default function MyNFTs({ account }: { account: string }) {
    // NFTs
@@ -48,6 +50,44 @@ export default function MyNFTs({ account }: { account: string }) {
 
          if (!isFetchingNFTs) setIsFetchingNFTs(true)
 
+         if (account.startsWith("tz")) {
+            await Promise.all([
+               fetch(
+                  `https://api.tzkt.io/v1/tokens/balances?account=${account}`,
+                  {
+                     method: 'GET',
+                     headers: {
+                        //Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+                     },
+                  }
+               ).then((res) => res.json()),
+            ])
+               .then(tezosData => {
+                  console.log(
+                     `✅[GET][NFTs] ${account}:`,
+                     tezosData
+                  )
+                  let transformed: NFT[] = []
+                  if (tezosData?.length > 0) {
+                     transformed = transformed.concat(
+                        tezosData[0]
+                           .filter((nft: TzktNFT) => nft.token.metadata.name || nft.token.metadata.displayUri)
+                           .map((nft: TzktNFT) => {
+                              const _nft = tezosTztkToGeneralNFTType(nft)
+                              return {
+                                 ..._nft,
+                                 chain_id: 'tezos',
+                              }
+                           })
+                     )
+                  }
+                  setNfts(transformed)
+               })
+               .finally(() => {
+                  setIsFetchingNFTs(false)
+               })
+               .catch((error) => console.log(`🚨[GET][NFTs] ${account}`, error))
+         } else {
          await Promise.all([
             fetch(
                `https://api.nftport.xyz/v0/accounts/${account}?chain=polygon`,
@@ -105,6 +145,7 @@ export default function MyNFTs({ account }: { account: string }) {
                setIsFetchingNFTs(false)
             })
             .catch((error) => console.log(`🚨[GET][NFTs] ${account}`, error))
+         }
             
       }
       const fetchPoaps = async () => {
@@ -191,7 +232,7 @@ export default function MyNFTs({ account }: { account: string }) {
                      <Text color="darkgray.100" fontSize="md">No NFTs found</Text>
                   </Box>
                )}
-               {filteredPoaps.map((poap, i) => (
+               {filteredPoaps.length > 0 && filteredPoaps.map((poap, i) => (
                   <Box mb={4} mr={4} key={i}>
                      <MyNFTPOAP key={i} poap={poap} />
                   </Box>

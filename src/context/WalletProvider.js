@@ -15,6 +15,9 @@ import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
 import Lit from '../utils/lit'
+//import { TempleWallet } from "@temple-wallet/dapp";
+import { DAppClient } from '@airgap/beacon-sdk'
+import * as siwt from '@stakenow/siwt'
 
 const providerOptions = {
    walletconnect: {
@@ -261,22 +264,6 @@ const WalletProvider = React.memo(({ children }) => {
       return false
    }
 
-   const walletRequestPermissions = async () => {
-      const instance = await web3Modal.connect()
-            setWeb3ModalProvider(instance)
-            let _provider = new ethers.providers.Web3Provider(instance)
-            let _account = await _provider.getSigner().getAddress()
-
-         await _provider.provider.request({
-            method: 'wallet_requestPermissions',
-            params: [
-               {
-                  eth_accounts: {},
-               },
-            ],
-         })
-   }
-
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
@@ -492,6 +479,176 @@ const WalletProvider = React.memo(({ children }) => {
       }
    }
 
+   const walletRequestPermissions = async () => {
+      const instance = await web3Modal.connect()
+            setWeb3ModalProvider(instance)
+            let _provider = new ethers.providers.Web3Provider(instance)
+            let _account = await _provider.getSigner().getAddress()
+
+         await _provider.provider.request({
+            method: 'wallet_requestPermissions',
+            params: [
+               {
+                  eth_accounts: {},
+               },
+            ],
+         })
+   }
+
+   const connectWalletTezos = async () => {
+      console.log('connectWallet Tezos')
+      try {
+         let _provider, _account, _accountPubKey, _nonce, _signer
+         let _signedIn = false
+         const dAppClient = new DAppClient({ name: 'WalletChat' })
+
+         // request wallet permissions with Beacon dAppClient
+         // Check if we are connected. If not, do a permission request first.
+         const activeAccount = await dAppClient.getActiveAccount();
+         if (!activeAccount) {
+            const permissions = await dAppClient.requestPermissions();
+            console.log("New Tezos Connection:", permissions.address.publicKey, permissions.network);
+            _accountPubKey = permissions.accountInfo.publicKey;
+            _account = permissions.address;
+            setChainId(permissions.network)
+            setProvider(permissions)
+         } else {
+            _accountPubKey = activeAccount.publicKey;
+            _account= activeAccount.address;
+            setChainId(activeAccount.network)
+            setProvider(activeAccount)
+            console.log("Tezos Connection:", _accountPubKey, activeAccount.network);
+         }
+         console.log('Tezos Wallet Address: ', _account)
+         console.log('Tezos Wallet Public Key: ', _accountPubKey)
+
+         // check if JWT exists or is timed out:
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+         .then((response) => response.json())
+         .then(async (data) => {
+            console.log('✅[POST][Welcome]:', data.msg)
+            //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
+            if (!data.msg.includes(_account.toLocaleLowerCase())) {
+               //GET JWT
+               fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+                  method: 'GET',
+                  headers: {
+                     'Content-Type': 'application/json',
+                  },
+               })
+               .then((response) => response.json())
+               .then(async (data) => {
+                  console.log('✅[GET][Nonce]:', data)
+                  _nonce = data.Nonce
+                  //console.log('✅[GET][Data.nonce]:', data.Nonce)
+
+                  // create the message to be signed
+                  const messagePayload = siwt.createMessagePayload({
+                     dappUrl: 'https://walletchat.fun',
+                     nonce: _nonce,
+                     pkh: _account,
+                  })
+                  // request the signature
+                  const signedPayload = await dAppClient.requestSignPayload(messagePayload)
+
+                  fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                     body: JSON.stringify({ "address": _accountPubKey, "nonce": _nonce, "msg": messagePayload.payload, "sig": signedPayload.signature }),
+                     headers: {
+                     'Content-Type': 'application/json'
+                     },
+                     method: 'POST'
+                  })
+                  .then((response) => response.json())
+                  .then(async (data) => {
+                     localStorage.setItem('jwt', data.access);
+                     //Used for LIT encryption authSign parameter
+                     //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                     //localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                     console.log('✅[INFO][JWT]:', data.access)
+                  })
+               })
+               .catch((error) => {
+                  console.error('🚨[GET][Nonce]:', error)
+               })
+               //END JWT AUTH sequence
+
+            //below part of /welcome check for existing token     
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[POST][Welcome]:', error)
+            //GET JWT
+            fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+               method: 'GET',
+               headers: {
+                  'Content-Type': 'application/json',
+               },
+            })
+            .then((response) => response.json())
+            .then(async (data) => {
+               console.log('✅[GET][Nonce]:', data)
+               _nonce = data.Nonce
+               //console.log('✅[GET][Data.nonce]:', data.Nonce)
+               //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
+
+               // create the message to be signed
+               const messagePayload = siwt.createMessagePayload({
+                  dappUrl: 'walletchat.fun',
+                  nonce: _nonce,
+                  pkh: _account,
+               })
+               const signedPayload = await dAppClient.requestSignPayload(messagePayload)
+
+               fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                  body: JSON.stringify({ "address": _accountPubKey, "nonce": _nonce, "msg": messagePayload.payload, "sig": signedPayload.signature }),
+                  headers: {
+                     'Content-Type': 'application/json'
+                  },
+                  method: 'POST'
+               })
+               .then((response) => response.json())
+               .then(async (data) => {
+                  localStorage.setItem('jwt', data.access);
+                  //Used for LIT encryption authSign parameter
+                  // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                  // localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                  console.log('✅[INFO][JWT]:', data.access)
+               })
+               .catch((error) => {
+                  console.error('🚨[GET][Sign-In Failed]:', error)
+               })
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Nonce]:', error)
+            })
+            //END JWT AUTH sequence
+         })
+
+         if (_account) {
+            setAppLoading(true)
+            setAccount(_account)
+            setChainId(chainId)
+            setAuthenticated(true)
+            getName(_account)
+            getSettings(_account)
+            //setWeb3(_web3)
+         }
+      } catch (error) {
+         console.log('🚨connectWallet', error)
+         if (error.message === "User Rejected") {
+            setError("Your permission is needed to continue. Please try signing in again.")
+         }
+      } finally {
+         setAppLoading(false)
+      }
+   }
+
    const disconnectWallet = async () => {
       console.log('** disconnectWallet **')
       try {
@@ -499,18 +656,20 @@ const WalletProvider = React.memo(({ children }) => {
             console.log('Disconnect Wallet Chrome Extension True')
             storage.set('metamask-connected', { connected: false })
          } else {
-            console.log(web3ModalProvider.close)
-            if (web3ModalProvider.close) {
-               await web3ModalProvider.close()
-               await web3Modal.clearCachedProvider()
-               setProvider(null)
+            if (web3 != null) {
+               console.log(web3ModalProvider.close)
+               if (web3ModalProvider.close) {
+                  await web3ModalProvider.close()
+                  await web3Modal.clearCachedProvider()
+                  setProvider(null)
+               }
             }
             console.log('Deleting Login LocalStorage Items')
             localStorage.removeItem('jwt')
             localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
             localStorage.removeItem('metamask-connected')
-            localStorage.removeItem('lit-auth-signature')
-            localStorage.removeItem('lit-web3-provider')
+            // localStorage.removeItem('lit-auth-signature')
+            // localStorage.removeItem('lit-web3-provider')
             localStorage.removeItem('current-address')
          }
          storage.set('current-address', { address: null })
@@ -540,6 +699,7 @@ const WalletProvider = React.memo(({ children }) => {
             walletRequestPermissions,
             disconnectWallet,
             connectWallet,
+            connectWalletTezos,
             isAuthenticated,
             appLoading,
             web3,

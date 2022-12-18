@@ -35,6 +35,10 @@ export default function NFTInboxSearchInput() {
    const ref = useRef(null)
 
    const fetchNFTContractDetails = async (address: string) => {
+      if (web3 == null) {
+         return
+      }
+
       if (!web3.utils.isAddress(address)) {
          console.log('Invalid contract address')
          return
