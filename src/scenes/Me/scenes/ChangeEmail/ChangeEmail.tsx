@@ -89,7 +89,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
          },
          body: JSON.stringify({
             notify24: checked.toString(), 
-            walletaddr: account,
+            walletaddr: account
          }),
       })
          .then((response) => response.json())
@@ -110,6 +110,8 @@ const ChangeEmail = ({ account }: { account: string }) => {
    };
 
    const onSubmit = (values: any) => {
+      console.log("updating settings from 1: ", document.referrer);
+      console.log("updating settings from 2: ", document.domain);
       if (values?.email) {
 
          setIsFetching(true)
@@ -124,6 +126,8 @@ const ChangeEmail = ({ account }: { account: string }) => {
             body: JSON.stringify({
                email: values.email, 
                walletaddr: account,
+               signupsite: document.referrer,
+               domain: document.domain
             }),
          })
             .then((response) => response.json())
