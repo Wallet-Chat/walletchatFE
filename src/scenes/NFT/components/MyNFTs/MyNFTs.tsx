@@ -77,6 +77,9 @@ export default function MyNFTs({ account }: { account: string }) {
                               return {
                                  ..._nft,
                                  chain_id: 'tezos',
+                                 image: _nft?.image?.includes('ipfs://')
+                              ? convertIpfsUriToUrl(_nft.image)
+                              : _nft.image,
                               }
                            })
                      )

@@ -63,13 +63,13 @@ export interface Token {
 export function tezosTztkToGeneralNFTType(data: TzktNFT) : GeneralNFT {
    return {
      name: data?.token.metadata.name,
-     image: data?.token.metadata.displayUri || data?.token.metadata?.image,
+     image: data?.token?.metadata?.displayUri || data?.token.metadata?.image,
      description: data?.token.metadata?.description,
      token_id: data?.token.tokenId,
      attributes: data?.token.metadata?.attributes,
      collection: {
-      name: data?.token.metadata.name,
-      image: data?.token.metadata.displayUri || data?.token.metadata?.image,
+      name: data?.token?.metadata.name,
+      image: data?.token?.metadata.displayUri || data?.token?.metadata?.image,
       contract_address: data?.token.contract.address
      }
    }
