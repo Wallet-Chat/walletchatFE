@@ -171,9 +171,12 @@ export default function MyNFTs({ account }: { account: string }) {
             },
          })
             .then((response) => response.json())
-            .then((result: POAP[]) => {
+            .then((result) => {
                console.log(`✅[GET][POAPs] ${account}:`, result)
-               setPoaps(result)
+               
+               if (result.statusCode != 400){
+                  setPoaps(result)
+               }
             })
             .finally(() => {
                setIsFetchingPOAPs(false)
@@ -203,11 +206,13 @@ export default function MyNFTs({ account }: { account: string }) {
 
          const _allowedChainNames = chainFilters.map((c) => chains[c]?.slug)
 
-         const _newFilteredPoaps = poaps.filter(
-            (d) => d?.chain && _allowedChainNames.includes(d.chain)
-         )
-         if (!equal(_newFilteredPoaps, filteredPoaps))
-            setFilteredPoaps(_newFilteredPoaps)
+         if (poaps != null) {
+            const _newFilteredPoaps = poaps.filter(
+               (d) => d?.chain && _allowedChainNames.includes(d.chain)
+            )
+            if (!equal(_newFilteredPoaps, filteredPoaps))
+               setFilteredPoaps(_newFilteredPoaps)
+         }
       } else {
          setNfts([])
          setPoaps([])
