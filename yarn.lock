@@ -4420,6 +4420,19 @@
     bignumber.js "^9.1.0"
     rxjs "^6.6.3"
 
+"@taquito/tzip16@^15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@taquito/tzip16/-/tzip16-15.0.0.tgz#d36ad5999bae6f09469f3d1434e6c1af760a3923"
+  integrity sha512-3Wcg2hcFZfrmQY5OjLA/jWUrrbBrCGVsO5/7jX8LP7E3i850I2cVGyG+5tNM591v2RqhGXqVGqVIIp9AtUREVA==
+  dependencies:
+    "@taquito/http-utils" "^15.0.0"
+    "@taquito/michelson-encoder" "^15.0.0"
+    "@taquito/rpc" "^15.0.0"
+    "@taquito/taquito" "^15.0.0"
+    "@taquito/utils" "^15.0.0"
+    bignumber.js "^9.1.0"
+    crypto-js "^4.1.1"
+
 "@taquito/utils@^12.0.3", "@taquito/utils@^12.1.0":
   version "12.1.1"
   resolved "https://registry.yarnpkg.com/@taquito/utils/-/utils-12.1.1.tgz#c19008dea05c5146463ab58015ac145fb79c23cb"
@@ -4499,6 +4512,53 @@
   integrity sha512-IR0iWbFkgd56Bu5ZI/ej8yQwrkCv8Qydx6RzwbKz9faXazR/+5tvYKsZQgyXJiwgpcva127YO6JcWy7YlCfofQ==
   dependencies:
     "@babel/runtime" "^7.12.5"
+
+"@tezos-domains/core@^1.22.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@tezos-domains/core/-/core-1.22.0.tgz#7b00d2da344177b2c82d5469cb5088eb03093987"
+  integrity sha512-g/ZUfjqT3l5Cb5cRLQ2C2HPnEYc3gCQeFVyfS0v2KWfu3FxmKb7WG0GEyW17KUhapGQi25HxM2PsRmgFov0k2A==
+  dependencies:
+    idna-uts46-hx "^3.3.0"
+
+"@tezos-domains/manager@^1.22.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@tezos-domains/manager/-/manager-1.22.0.tgz#bebbcb28fb2e7281875ad4357ed6c9bd857f4244"
+  integrity sha512-i/K3GX731GSitN/BL3+5JykI1Fh5F8XtfzH0B3ilei2LTVamZDXYCPVbPmC31wj0wB9S81NIHjEQ/yEuJ5q77w==
+  dependencies:
+    "@tezos-domains/core" "^1.22.0"
+    "@tezos-domains/taquito" "^1.22.0"
+    "@types/sha.js" "^2.4.0"
+    bignumber.js "^9.1.0"
+    sha.js "^2.4.11"
+
+"@tezos-domains/resolver@^1.22.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@tezos-domains/resolver/-/resolver-1.22.0.tgz#ee8026e133b29b7e2c18957a79792f51d2e8ee24"
+  integrity sha512-X1w1wVLablxmG9aeFcACmLYrDSURFUK/yffL8vTl6xmwmvaRhSHkFKUBGWXFiVwCicqagGo1cvrosrcXMZeT4Q==
+  dependencies:
+    "@tezos-domains/core" "^1.22.0"
+    node-cache "^5.1.2"
+
+"@tezos-domains/taquito-client@^1.22.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@tezos-domains/taquito-client/-/taquito-client-1.22.0.tgz#97f2ac1bafe75c599ce5a0acf616352ed59ea3ef"
+  integrity sha512-WK9wuBCCDXTzfx//DV2Q5yKWGvAitdl+yaWIMIKQ0YBhXbODNDw8HxJLDno+BrlF+0JZ8h+R2NLCN4cpkQBvWg==
+  dependencies:
+    "@tezos-domains/core" "^1.22.0"
+    "@tezos-domains/manager" "^1.22.0"
+    "@tezos-domains/resolver" "^1.22.0"
+    "@tezos-domains/taquito" "^1.22.0"
+    bignumber.js "^9.1.0"
+    node-cache "^5.1.2"
+
+"@tezos-domains/taquito@^1.22.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@tezos-domains/taquito/-/taquito-1.22.0.tgz#46206884c6ad6e817924f8abd4a9130e6bf93a41"
+  integrity sha512-YJkSBVOfvQXZqWg9qQxdTBe7ZsyE3Kb0JpyQV4lXrof/IgyQHyN3MhrE/X62GanrSnGPCl5cZLAtqJEcTW4b+A==
+  dependencies:
+    "@tezos-domains/core" "^1.22.0"
+    bignumber.js "^9.1.0"
+    node-cache "^5.1.2"
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -4857,6 +4917,13 @@
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/@types/secp256k1/-/secp256k1-4.0.3.tgz#1b8e55d8e00f08ee7220b4d59a6abe89c37a901c"
   integrity sha512-Da66lEIFeIz9ltsdMZcpQvmrmmoqrfju8pm1BH8WbYjZSwUgCwXLb9C+9XYogwBITnbsSaMdVPb2ekf7TV+03w==
+  dependencies:
+    "@types/node" "*"
+
+"@types/sha.js@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@types/sha.js/-/sha.js-2.4.0.tgz#bce682ef860b40f419d024fa08600c3b8d24bb01"
+  integrity sha512-amxKgPy6WJTKuw8mpUwjX2BSxuBtBmZfRwIUDIuPJKNwGN8CWDli8JTg5ONTWOtcTkHIstvT7oAhhYXqEjStHQ==
   dependencies:
     "@types/node" "*"
 
@@ -7123,7 +7190,7 @@ clone-response@^1.0.2:
   dependencies:
     mimic-response "^1.0.0"
 
-clone@^2.0.0, clone@^2.1.1:
+clone@2.x, clone@^2.0.0, clone@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
   integrity sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==
@@ -7592,6 +7659,11 @@ crypto-browserify@3.12.0, crypto-browserify@^3.11.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
+
+crypto-js@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 crypto-random-string@^1.0.0:
   version "1.0.0"
@@ -10675,6 +10747,13 @@ idna-uts46-hx@^2.3.1:
   dependencies:
     punycode "2.1.0"
 
+idna-uts46-hx@^3.3.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/idna-uts46-hx/-/idna-uts46-hx-3.5.0.tgz#fad856b480bce4ff7477e7e0a42b5a39a8a4bcdc"
+  integrity sha512-0gMFl+zjvA8ZOohPQmLiWcd2Ad60AB9oKzqvLucEC5TyDzHl5mIB6ralW6h8BayVRm4ZmAVYnlI1pCYD2O7lBw==
+  dependencies:
+    punycode "^2.1.1"
+
 ieee754@^1.1.13, ieee754@^1.1.4, ieee754@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
@@ -13342,6 +13421,13 @@ node-addon-api@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
   integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
+
+node-cache@^5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/node-cache/-/node-cache-5.1.2.tgz#f264dc2ccad0a780e76253a694e9fd0ed19c398d"
+  integrity sha512-t1QzWwnk4sjLWaQAS8CHgOJ+RAfmHpxFWmc36IWTiWHQfs0w5JDMBS1b1ZxQteo0vVVuWJvIUKHDkkeK7vIGCg==
+  dependencies:
+    clone "2.x"
 
 node-domexception@^1.0.0:
   version "1.0.0"
@@ -16391,7 +16477,7 @@ setprototypeof@1.2.0:
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.2.0.tgz#66c9a24a73f9fc28cbe66b09fed3d33dcaf1b424"
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
 
-sha.js@^2.4.0, sha.js@^2.4.8:
+sha.js@^2.4.0, sha.js@^2.4.11, sha.js@^2.4.8:
   version "2.4.11"
   resolved "https://registry.yarnpkg.com/sha.js/-/sha.js-2.4.11.tgz#37a5cf0b81ecbc6943de109ba2960d1b26584ae7"
   integrity sha512-QMEp5B7cftE7APOjk5Y6xgrbWu+WkLVQwk8JNjZ8nKRciZaByEW6MubieAiToS7+dwvrjGhH8jRXz3MVd0AYqQ==

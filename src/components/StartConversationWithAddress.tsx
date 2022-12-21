@@ -16,6 +16,9 @@ import { truncateAddress } from '../helpers/truncateString'
 import { IconArrowRight } from '@tabler/icons'
 import { useWallet } from '../context/WalletProvider'
 import { addressIsValid } from '../helpers/address'
+import { TezosToolkit } from '@taquito/taquito';
+import { TaquitoTezosDomainsClient } from '@tezos-domains/taquito-client';
+import { Tzip16Module } from '@taquito/tzip16';
 
 const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    const [toAddr, setToAddr] = useState<string>('')
@@ -44,9 +47,17 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    }
 
    const checkTezos = async (address: string) => {
-      console.log("checking Tezos address")
-      //TODO: validate Tezos address (public key hash)
-      setResolvedAddr(address)
+      if (address.includes(".tez")) {
+         console.log("checking Tezos address")
+         const tezos = new TezosToolkit('https://kathmandunet.smartpy.io');
+         tezos.addExtension(new Tzip16Module());
+         const client = new TaquitoTezosDomainsClient({ tezos, network: 'kathmandunet', caching: { enabled: true } });
+     
+         const _addr = await client.resolver.resolveNameToAddress(address);
+     
+         console.log(address);
+         setResolvedAddr(_addr)
+      }
    }
 
    useEffect(() => {

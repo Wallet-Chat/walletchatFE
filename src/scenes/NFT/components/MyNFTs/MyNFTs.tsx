@@ -74,6 +74,10 @@ export default function MyNFTs({ account }: { account: string }) {
                            .filter((nft: TzktNFT) => nft.token.metadata.name || nft.token.metadata.displayUri)
                            .map((nft: TzktNFT) => {
                               const _nft = tezosTztkToGeneralNFTType(nft)
+                              //Tezos Domains has no image metata, at least none from TzKT.io
+                              if (_nft.collection && _nft.collection.contract_address == "KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS"){
+                                 _nft.image = "https://walletchat-pfp-storage.sgp1.digitaloceanspaces.com/TezosDomains.png"
+                              }
                               return {
                                  ..._nft,
                                  chain_id: 'tezos',

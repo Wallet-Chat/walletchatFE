@@ -245,6 +245,7 @@ import {
           console.log('Missing contract address')
           return
        }
+       //TODO: Tezos NFT Stats Fetch
        fetch(
           `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
           {

@@ -13,6 +13,9 @@ import Blockies from 'react-blockies'
 import { useWallet } from '../../../../context/WalletProvider'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import useOnClickOutside from '../../../../hooks/useOnClickOutside'
+import { TezosToolkit } from '@taquito/taquito';
+import { TaquitoTezosDomainsClient } from '@tezos-domains/taquito-client';
+import { Tzip16Module } from '@taquito/tzip16';
 
 export default function InboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -35,9 +38,29 @@ export default function InboxSearchInput() {
       }
    }
 
+   const checkTezos = async (address: string) => {
+      if (address.endsWith('.tez')) {
+         setIsResolvingENS(true)
+         
+         console.log("checking Tezos address")
+         const tezos = new TezosToolkit('https://kathmandunet.smartpy.io');
+         tezos.addExtension(new Tzip16Module());
+         const client = new TaquitoTezosDomainsClient({ tezos, network: 'kathmandunet', caching: { enabled: true } });
+     
+         const _addr = await client.resolver.resolveNameToAddress(address);
+
+         if (_addr) {
+            setResolvedAddr(_addr)
+            setIsSuggestionListOpen(true)
+         }
+         setIsResolvingENS(false)
+      }
+   }
+
    useEffect(() => {
       const delayDebounceFn = setTimeout(() => {
          checkENS(toAddr)
+         checkTezos(toAddr)
       }, 800)
 
       return () => clearTimeout(delayDebounceFn)
