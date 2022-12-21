@@ -107,7 +107,6 @@ const EnterName = ({ account }: { account: string }) => {
          if (account) {
             console.log('No account detected')
          }
-         //TODO: Tezos get all .tez domains owned by this address
          fetch(
             `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
             {
@@ -129,7 +128,12 @@ const EnterName = ({ account }: { account: string }) => {
             )
       }
       if (account) {
-         getOwnedENS()
+         if(account.startsWith("tz")) {
+            //TODO: Tezos get all .tez domains owned by this address
+            //getOwnedTEZ()
+         } else {
+            getOwnedENS()
+         }
       }
    }, [account])
 

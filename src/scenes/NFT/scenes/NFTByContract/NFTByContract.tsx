@@ -57,14 +57,22 @@ import {
     const [tweetCount, setTweetCount] = useState<number>(0)
  
     useEffect(() => {
-       getNftMetadata()
-       getNftStatistics()
+       if (account.startsWith("tz")) {
+         //Get Tezos NFT Stats
+       } else {
+         getNftMetadata()
+         getNftStatistics()
+       }
        getJoinStatus()
     }, [nftContractAddr])
  
     useEffect(() => {
        const interval = setInterval(() => {
-          getNftStatistics()
+         if (account.startsWith("tz")) {
+            //Get Tezos NFT Stats
+         } else {
+           getNftStatistics()
+         }
        }, 60000 * 10) // every 10 mins
  
        return () => {
@@ -245,7 +253,6 @@ import {
           console.log('Missing contract address')
           return
        }
-       //TODO: Tezos NFT Stats Fetch
        fetch(
           `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
           {
