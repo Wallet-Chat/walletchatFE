@@ -245,29 +245,25 @@ import {
           console.log('Missing contract address')
           return
        }
-
-       if (account.startsWith("tz")) {
-         //Get Tezos NFT Stats
-      } else {
-         fetch(
-            `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
-            {
-               method: 'GET',
-               headers: {
-                  Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
-               },
-            }
-         )
-            .then((response) => response.json())
-            .then((result) => {
-               console.log('✅[GET][NFT Statistics]:', result)
-               // console.log(JSON.stringify(result, null, 2))
-               if (result && result.statistics) {
-                  setNftStatistics(result.statistics)
-               }
-            })
-            .catch((error) => console.log('error', error))
-         }
+       //TODO: Tezos NFT Stats Fetch
+       fetch(
+          `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
+          {
+             method: 'GET',
+             headers: {
+                Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+             },
+          }
+       )
+          .then((response) => response.json())
+          .then((result) => {
+             console.log('✅[GET][NFT Statistics]:', result)
+             // console.log(JSON.stringify(result, null, 2))
+             if (result && result.statistics) {
+                setNftStatistics(result.statistics)
+             }
+          })
+          .catch((error) => console.log('error', error))
     }
  
     return (
