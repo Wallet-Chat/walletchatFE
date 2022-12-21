@@ -133,7 +133,7 @@ export const App = () => {
                   >
                      Sign-in with Ethereum
                   </Button>
-                  
+                  &nbsp;&nbsp;&nbsp; 
                   <Button
                      variant="black"
                      onClick={() => {
