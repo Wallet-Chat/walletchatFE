@@ -164,6 +164,9 @@ export default function MyNFTs({ account }: { account: string }) {
             console.log('No account connected')
             return
          }
+         if (account.startsWith("tz")) {
+            return
+         }
 
          setIsFetchingPOAPs(true)
 

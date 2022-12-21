@@ -107,26 +107,29 @@ const EnterName = ({ account }: { account: string }) => {
          if (account) {
             console.log('No account detected')
          }
-         //TODO: Tezos get all .tez domains owned by this address
-         fetch(
-            `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
-            {
-               method: 'GET',
-               headers: {
-                  Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
-               },
-            }
-         )
-            .then((response) => response.json())
-            .then((result) => {
-               console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
-               if (result?.assets?.length > 0) {
-                  setOwnedENS(result.assets)
+         if(account.startsWith("tz")) {
+            //TODO: Tezos get all .tez domains owned by this address
+         } else {
+            fetch(
+               `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
+               {
+                  method: 'GET',
+                  headers: {
+                     Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                  },
                }
-            })
-            .catch((error) =>
-               console.log(`🚨[GET][ENS Owned by ${account}`, error)
             )
+               .then((response) => response.json())
+               .then((result) => {
+                  console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
+                  if (result?.assets?.length > 0) {
+                     setOwnedENS(result.assets)
+                  }
+               })
+               .catch((error) =>
+                  console.log(`🚨[GET][ENS Owned by ${account}`, error)
+               )
+         }
       }
       if (account) {
          getOwnedENS()
