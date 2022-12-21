@@ -49,9 +49,9 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    const checkTezos = async (address: string) => {
       if (address.includes(".tez")) {
          console.log("checking Tezos address")
-         const tezos = new TezosToolkit('https://kathmandunet.smartpy.io');
+         const tezos = new TezosToolkit('https://mainnet.smartpy.io');
          tezos.addExtension(new Tzip16Module());
-         const client = new TaquitoTezosDomainsClient({ tezos, network: 'kathmandunet', caching: { enabled: true } });
+         const client = new TaquitoTezosDomainsClient({ tezos, network: 'mainnet', caching: { enabled: true } });
      
          const _addr = await client.resolver.resolveNameToAddress(address);
      
@@ -83,7 +83,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter ENS or address (0x...) here"
+               placeholder="Enter ENS/TEZ or address (0x..., tz...) here"
                {...register('toAddr', {
                   validate: (val) => addressIsValid(web3, val),
                })}

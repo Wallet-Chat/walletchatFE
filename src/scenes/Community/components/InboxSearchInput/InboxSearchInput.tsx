@@ -43,9 +43,9 @@ export default function InboxSearchInput() {
          setIsResolvingENS(true)
          
          console.log("checking Tezos address")
-         const tezos = new TezosToolkit('https://kathmandunet.smartpy.io');
+         const tezos = new TezosToolkit('https://mainnet.smartpy.io');
          tezos.addExtension(new Tzip16Module());
-         const client = new TaquitoTezosDomainsClient({ tezos, network: 'kathmandunet', caching: { enabled: true } });
+         const client = new TaquitoTezosDomainsClient({ tezos, network: 'mainnet', caching: { enabled: true } });
      
          const _addr = await client.resolver.resolveNameToAddress(address);
 
@@ -88,7 +88,7 @@ export default function InboxSearchInput() {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter ENS or address (0x.. or .eth) to chat"
+               placeholder="Enter ENS/TEZ or address (0x..., tz...) here"
                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setToAddr(e.target.value)
                }
