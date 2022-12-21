@@ -81,6 +81,9 @@ export default function InboxSearchInput() {
          suggestedAddress = resolvedAddr
       }
    }
+   if (toAddr.endsWith('.tez') && resolvedAddr && !isResolvingENS) {
+      suggestedAddress = resolvedAddr
+   }
 
    return (
       <Box position={'relative'} ref={ref}>
@@ -154,6 +157,8 @@ export default function InboxSearchInput() {
                               ? toAddr
                               : truncateAddress(toAddr)}{' '}
                            {toAddr.endsWith('.eth') &&
+                              `(${truncateAddress(suggestedAddress)})`}
+                           {toAddr.endsWith('.tez') &&
                               `(${truncateAddress(suggestedAddress)})`}
                         </Text>
                      </Flex>

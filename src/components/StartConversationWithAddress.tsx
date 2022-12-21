@@ -61,7 +61,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    }
 
    useEffect(() => {
-      if (toAddr.startsWith("tz")) {
+      if (toAddr.endsWith(".tez")) {
          const delayDebounceFn = setTimeout(() => {
             checkTezos(toAddr)
           }, 800)
@@ -126,7 +126,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                </Flex>
                </Link>
             )}
-            {toAddr.startsWith("tz") && resolvedAddr && !isResolvingENS && (
+            {toAddr.includes(".tez") && resolvedAddr && !isResolvingENS && (
                <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
