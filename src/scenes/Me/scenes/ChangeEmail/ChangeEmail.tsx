@@ -37,14 +37,11 @@ const ChangeEmail = ({ account }: { account: string }) => {
    var dmBool = (_notifyDM === 'true')
    var dailyBool = (_notify24 === 'true')
    const [email, setEmail] = useState('')
-   const [notifyDM, setNotifyDM] = useState('')
-   const [notify24, setNotify24] = useState('')
    const [isFetching, setIsFetching] = useState(false)
 
    const handleChangeOne = (checked: boolean) => {
       //setCheckedItems([checked, checkedItems[1]])
       globalSetNotifyDM(checked.toString())
-      setNotifyDM(checked.toString())
 
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
@@ -77,7 +74,6 @@ const ChangeEmail = ({ account }: { account: string }) => {
 
    const handleChangeTwo = (checked: boolean) => {
       //setCheckedItems([checkedItems[0], checked])
-      setNotify24(checked.toString())
       globalSetNotify24(checked.toString())
 
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
@@ -89,7 +85,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
          },
          body: JSON.stringify({
             notify24: checked.toString(), 
-            walletaddr: account
+            walletaddr: account,
          }),
       })
          .then((response) => response.json())
@@ -110,8 +106,6 @@ const ChangeEmail = ({ account }: { account: string }) => {
    };
 
    const onSubmit = (values: any) => {
-      console.log("updating settings from 1: ", document.referrer);
-      console.log("updating settings from 2: ", document.domain);
       if (values?.email) {
 
          setIsFetching(true)
@@ -207,7 +201,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
                   You can change it anytime in your settings
                </FormHelperText>
                <Alert status="info" variant="solid" mt={4}>
-                  You must verify your email before you will receive notifications, please check your inbox
+                  You must verify your email again if changed here
                </Alert>
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>

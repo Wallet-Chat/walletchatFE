@@ -15,6 +15,7 @@ import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
 import Lit from '../utils/lit'
+import { useNavigate } from 'react-router-dom'
 
 const providerOptions = {
    walletconnect: {
@@ -77,6 +78,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [appLoading, setAppLoading] = useState(false)
    const [error, setError] = useState()
    const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
+   let navigate = useNavigate()
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -513,12 +515,15 @@ const WalletProvider = React.memo(({ children }) => {
             localStorage.removeItem('lit-auth-signature')
             localStorage.removeItem('lit-web3-provider')
             localStorage.removeItem('current-address')
+            localStorage.removeItem('@sequence.connectedSites')
+            localStorage.removeItem('@sequence.session')
          }
          storage.set('current-address', { address: null })
          setAccount(null)
          setChainId(null)
          setAuthenticated(false)
          setWeb3(null)
+         navigate('/')
       } catch (e) {
          console.log(e)
       }
