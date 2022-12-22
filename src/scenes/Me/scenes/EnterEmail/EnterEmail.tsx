@@ -37,13 +37,11 @@ const EnterEmail = ({ account }: { account: string }) => {
    var dmBool = (_notifyDM === 'true')
    var dailyBool = (_notify24 === 'true')
    const [email, setEmail] = useState('')
-   const [notifyDM, setNotifyDM] = useState('')
-   const [notify24, setNotify24] = useState('')
    const [isFetching, setIsFetching] = useState(false)
    const handleChangeOne = (checked: boolean) => {
       //setCheckedItems([checked, checkedItems[1]])
       globalSetNotifyDM(checked.toString())
-      setNotifyDM(checked.toString())
+
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
          credentials: "include",
@@ -74,7 +72,6 @@ const EnterEmail = ({ account }: { account: string }) => {
    };
    const handleChangeTwo = (checked: boolean) => {
       //setCheckedItems([checkedItems[0], checked])
-      setNotify24(checked.toString())
       globalSetNotify24(checked.toString())
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
@@ -123,6 +120,10 @@ const EnterEmail = ({ account }: { account: string }) => {
             body: JSON.stringify({
                email: values.email,
                walletaddr: account,
+               notify24: _notify24,
+               notifyDM: _notifyDM,
+               signupsite: document.referrer,
+               domain: document.domain
             }),
          })
             .then((response) => response.json())
@@ -137,7 +138,7 @@ const EnterEmail = ({ account }: { account: string }) => {
                   isClosable: true,
                 })
                globalSetEmail(email)
-               navigate('/community/walletchat')
+               navigate('/me/verify-email')
             })
             .catch((error) => {
                console.error('🚨[POST][Email]:', error)
@@ -148,6 +149,9 @@ const EnterEmail = ({ account }: { account: string }) => {
       }
    }
 
+   //default to users getting notifications - better than if they forget to look can always opt-out
+   globalSetNotify24('true')
+   globalSetNotifyDM('true')
    return (
       <Box p={6} pt={16} background="white" width="100%">
          <form onSubmit={handleSubmit(onSubmit)}>

@@ -18,6 +18,7 @@ import Lit from '../utils/lit'
 //import { TempleWallet } from "@temple-wallet/dapp";
 import { DAppClient } from '@airgap/beacon-sdk'
 import * as siwt from '@stakenow/siwt'
+import { useNavigate } from 'react-router-dom'
 
 const providerOptions = {
    walletconnect: {
@@ -80,6 +81,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [appLoading, setAppLoading] = useState(false)
    const [error, setError] = useState()
    const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
+   let navigate = useNavigate()
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -679,6 +681,7 @@ const WalletProvider = React.memo(({ children }) => {
          setChainId(null)
          setAuthenticated(false)
          setWeb3(null)
+         navigate('/')
       } catch (e) {
          console.log(e)
       }
