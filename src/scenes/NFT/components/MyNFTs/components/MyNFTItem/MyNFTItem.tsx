@@ -4,15 +4,21 @@ import { Link as RLink } from 'react-router-dom'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import NFT from '../../../../../../types/NFT'
 import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg'
+import IconTzkt from '../../../../../../images/icon-products/icon-tzkt.png'
 import { chains } from '../../../../../../constants'
 
 export default function MyNFTItem({ nft }: { nft: NFT }) {
-   let chain, blockExplorerUrl, chainLogo, chainName
+   let chain, blockExplorerUrl, chainLogo, chainName, explorerLogo
    if (nft?.chain_id) {
       chain = chains[nft.chain_id]
       blockExplorerUrl = nft.chain_id && chain?.block_explorer_url
       chainLogo = chain?.logo
       chainName = chain?.name
+   }
+   if (chainName == "Tezos") {
+      explorerLogo = IconTzkt
+   } else {
+      explorerLogo = IconEtherscan
    }
 
    return (
@@ -80,7 +86,7 @@ export default function MyNFTItem({ nft }: { nft: NFT }) {
                         )}
                         <Image
                            verticalAlign="middle"
-                           src={IconEtherscan}
+                           src={explorerLogo}
                            width="15px"
                            height="15px"
                            mr={1}

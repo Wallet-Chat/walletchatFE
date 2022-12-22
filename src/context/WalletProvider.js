@@ -671,6 +671,8 @@ const WalletProvider = React.memo(({ children }) => {
             // localStorage.removeItem('lit-auth-signature')
             // localStorage.removeItem('lit-web3-provider')
             localStorage.removeItem('current-address')
+            localStorage.removeItem('@sequence.connectedSites')
+            localStorage.removeItem('@sequence.session')
          }
          storage.set('current-address', { address: null })
          setAccount(null)

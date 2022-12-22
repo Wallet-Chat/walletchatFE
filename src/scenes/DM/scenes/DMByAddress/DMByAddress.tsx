@@ -49,6 +49,7 @@ const DMByAddress = ({
    const [pfpDataToAddr, setPfpDataToAddr] = useState<string>()
    const [pfpDataFromAddr, setPfpDataFromAddr] = useState<string>()
    const [prevAddr, setPrevAddr] = useState<string>('')
+   const [scanToolLink, setScanToolLink] = useState<string>('')
    const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
    const [msgInput, setMsgInput] = useState<string>('')
@@ -89,6 +90,13 @@ const DMByAddress = ({
    }, [loadedMsgs])
 
    useEffect(() => {
+      //set scan tool link
+      if (toAddr.startsWith("tz")) {
+         setScanToolLink("https://tzkt.io/")
+      } else {
+         setScanToolLink("https://etherscan.io/address/")
+      }
+
       if(!pfpDataFromAddr) {
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${account}`, {
             method: 'GET',
@@ -679,7 +687,7 @@ const DMByAddress = ({
                         </Button>
                      )}
                      <Button
-                        href={`https://etherscan.io/address/${toAddr}`}
+                        href={`${scanToolLink}${toAddr}`}
                         target="_blank"
                         as={CLink}
                         size="xs"

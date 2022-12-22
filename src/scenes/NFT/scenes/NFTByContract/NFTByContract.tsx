@@ -34,14 +34,18 @@ import {
  import NFTStatisticsType from '../../../../types/NFTPort/NFTStatistics'
  import { useHover } from '../../../../helpers/useHover'
  import IconEtherscan from '../../../../images/icon-products/icon-etherscan-mono.svg'
+ import IconTzkt from '../../../../images/icon-products/icon-tzkt.png'
  import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
  import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
+ import IconTezos from '../../../../images/icon-chains/icon-tezos.svg'
  import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
  import { nFormatter } from '../../../../helpers/number'
  import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
  import OpenSeaNFTCollection, { openseaToGeneralNFTCollectionType } from '../../../../types/OpenSea/NFTCollection'
  import NFTPortNFTCollection, { nftPortToGeneralNFTCollectionType } from '../../../../types/NFTPort/NFTCollection'
+ import TzktNFTCollection, { tzktToGeneralNFTCollectionType } from '../../../../types/Tzkt/NFTCollection'
  import NFTCollection from '../../../../types/NFTCollection'
+import { resourceLimits } from 'worker_threads'
  
  const NFTByContract = ({ account }: { account: string }) => {
     let { nftContractAddr = '', chain = '' } = useParams()
@@ -58,6 +62,7 @@ import {
  
     useEffect(() => {
        if (account.startsWith("tz")) {
+         getNftMetadataTezos()
          //Get Tezos NFT Stats
        } else {
          getNftMetadata()
@@ -243,6 +248,39 @@ import {
              .catch((error) => console.log(`🚨[GET][NFT]:`, error))
        }
     }
+
+    const getNftMetadataTezos = () => {
+      if (!nftContractAddr) {
+         console.log('Missing Tezos contract address')
+         return
+      }
+      if (chain === 'tezos') {
+        fetch(
+           `https://api.tzkt.io/v1/tokens/balances?account=${account}`,
+           {
+              method: 'GET'
+           }
+        )
+           .then((response) => response.json())
+           .then((result) => {
+              console.log('✅[GET][Tezos NFT]:', result)
+              let matchingNFT = 0;
+              for (let i = 0; i < result.length; i++ ) {
+                 if (result[i].token.contract.address == nftContractAddr) {
+                    matchingNFT = i
+                 }
+              }
+              if (result.length > 0) {
+               const _transformed = tzktToGeneralNFTCollectionType(result[matchingNFT])
+               setNftData({
+                  ..._transformed,
+                  image_url: _transformed?.image_url?.includes('ipfs://') ? convertIpfsUriToUrl(_transformed?.image_url) : _transformed?.image_url,
+               })
+              }
+           })
+           .catch((error) => console.log(`🚨[GET][Tezos NFT]:`, error))
+     }
+   }
  
     const getNftStatistics = () => {
        if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
@@ -299,7 +337,7 @@ import {
                          >
                             {nftData.name}
                          </Heading>
-                         <Tooltip label="OpenSea Verified">
+                         {/* <Tooltip label="OpenSea Verified">
                             <Box>
                                <IconCircleCheck
                                   stroke="2"
@@ -307,7 +345,7 @@ import {
                                   fill="var(--chakra-colors-success-600)"
                                />
                             </Box>
-                         </Tooltip>
+                         </Tooltip> */}
                          <Button
                             ml={2}
                             size="xs"
@@ -434,6 +472,19 @@ import {
                             />
                          </Tooltip>
                       )}
+                      {chain === 'tezos' && (
+                         <Tooltip label="Tezos chain">
+                            <Image
+                               src={IconTezos}
+                               alt="Tezos chain"
+                               width="24px"
+                               height="24px"
+                               d="inline-block"
+                               verticalAlign="middle"
+                               p={0.5}
+                            />
+                         </Tooltip>
+                      )}
                       {nftData?.external_url && (
                          <Tooltip label="Visit website">
                             <Link
@@ -485,7 +536,7 @@ import {
                             </Link>
                          </Tooltip>
                       )}
-                      {nftData?.contract_address && (
+                      {nftData?.contract_address && nftData.contract_address.startsWith("0x") &&  (
                          <Tooltip label="Etherscan">
                             <Link
                                href={`https://etherscan.io/address/${nftData.contract_address}`}
@@ -496,6 +547,25 @@ import {
                             >
                                <Image
                                   src={IconEtherscan}
+                                  alt=""
+                                  height="21px"
+                                  width="21px"
+                                  padding="2px"
+                               />
+                            </Link>
+                         </Tooltip>
+                      )}
+                      {nftData?.contract_address && nftData.contract_address.startsWith("KT") && (
+                         <Tooltip label="Tzkt">
+                            <Link
+                               href={`https://tzkt.io/${nftData.contract_address}`}
+                               target="_blank"
+                               d="inline-block"
+                               verticalAlign="middle"
+                               mr={1}
+                            >
+                               <Image
+                                  src={IconTzkt}
                                   alt=""
                                   height="21px"
                                   width="21px"
