@@ -256,6 +256,7 @@ import { resourceLimits } from 'worker_threads'
       }
       if (chain === 'tezos') {
         fetch(
+           //https://api.tzkt.io/v1/accounts/${nftContractAddr}?metadata=true
            `https://api.tzkt.io/v1/tokens/balances?account=${account}`,
            {
               method: 'GET'

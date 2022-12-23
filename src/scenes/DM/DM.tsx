@@ -94,7 +94,7 @@ const Inbox = ({
                console.log('✅[GET][Inbox]:', data)
                //setEncChatData(data)
                localStorage['inboxEnc_' + account] = JSON.stringify(data)
-
+ 
                // const replica = JSON.parse(JSON.stringify(data));
                // // Get data from LIT and replace the message with the decrypted text
                // for (let i = 0; i < replica.length; i++) {

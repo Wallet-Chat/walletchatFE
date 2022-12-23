@@ -41,6 +41,7 @@ const NFTInbox = ({
    const [tabIndex, setTabIndex] = useState(0)
    const { unreadCount } = useUnreadCount()
 
+   let semaphore = false;
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
@@ -102,7 +103,12 @@ const NFTInbox = ({
          console.log('Not authenticated')
          return
       }
+      if (semaphore) {
+         //console.log('Don't perform re-entrant call')
+         return
+      }
       setIsFetchingInboxData(true)
+      semaphore = true;
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
          method: 'GET',
          credentials: "include",
@@ -119,13 +125,15 @@ const NFTInbox = ({
             } else if (equal(inboxData, data) !== true) {
                console.log('✅[GET][Inbox]:', data, inboxData, equal(inboxData, data))
                setInboxData(data)
-               localStorage['inbox_' + account] =  JSON.stringify(data)
+               localStorage['inbox_' + account] = JSON.stringify(data) //replica)
             }
             setIsFetchingInboxData(false)
+            semaphore = false;
          })
          .catch((error) => {
             console.error('🚨[GET][Inbox]:', error)
             setIsFetchingInboxData(false)
+            semaphore = false;
          })
    }
 
