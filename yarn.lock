@@ -8025,9 +8025,9 @@ detect-port-alt@1.1.6:
     debug "^2.6.0"
 
 did-jwt@^6.0.0:
-  version "6.10.1"
-  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-6.10.1.tgz#40966b86b18759b771186d9274fc211af2f64d7c"
-  integrity sha512-YJOvkuPKKX364ooAFNxZPcz/KBLRwLhRABQVQlVEqOjygsCkplNFB3UL97UqZ7Y3cAG6Jh5jKoAC4xFSm+h0qw==
+  version "6.11.0"
+  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-6.11.0.tgz#19191a2a0c8bd513d6383afe94456ae84e0fa5bd"
+  integrity sha512-/qyYzo8v/xjwyt5x3tbknjQ2L15J1JzB+0cQK5/2SgnoOoclOmtEgZoRaxG1B73VMOgyZQYLBytRT4COUVhcpw==
   dependencies:
     "@stablelib/ed25519" "^1.0.2"
     "@stablelib/random" "^1.0.1"
@@ -17512,9 +17512,9 @@ type-fest@^0.8.1:
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
 
 type-fest@^3.2.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-3.3.0.tgz#3378c9664eecfd1eb4f0522b13cb0630bc1ec044"
-  integrity sha512-gezeeOIZyQLGW5uuCeEnXF1aXmtt2afKspXz3YqoOcZ3l/YMJq1pujvgT+cz/Nw1O/7q/kSav5fihJHsC/AOUg==
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-3.4.0.tgz#64a35b7748ab4a96b3e0c324475ea66643c5f9df"
+  integrity sha512-PEPg6RHlB9cFwoTMNENNrQFL0cXX04voWr2UPwQBJ3pVs7Mt8Y1oLWdUeMdGEwZE8HFFlujq8gS9enmyiQ8pLg==
 
 type-is@~1.6.18:
   version "1.6.18"

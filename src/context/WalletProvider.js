@@ -15,6 +15,7 @@ import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
 import Lit from '../utils/lit'
+import { useNavigate } from 'react-router-dom'
 
 const providerOptions = {
    walletconnect: {
@@ -77,6 +78,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [appLoading, setAppLoading] = useState(false)
    const [error, setError] = useState()
    const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
+   let navigate = useNavigate()
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -107,7 +109,6 @@ const WalletProvider = React.memo(({ children }) => {
             storage.set('current-address', {
                address: getNormalizeAddress(accounts),
             })
-            storage.set('inbox', [])
             console.log('[account changes]: ', getNormalizeAddress(accounts))
             if (!isChromeExtension()) {
                // TODO: how can we refresh data loaded without manual refresh?
@@ -127,7 +128,6 @@ const WalletProvider = React.memo(({ children }) => {
 
          const handleDisconnect = () => {
             console.log('[disconnected]')
-            storage.set('inbox', [])
             disconnectWallet()
          }
 
@@ -496,9 +496,10 @@ const WalletProvider = React.memo(({ children }) => {
    }
 
    const disconnectWallet = async () => {
-      console.log('disconnectWallet')
+      console.log('** disconnectWallet **')
       try {
-         if (isChromeExtension) {
+         if (isChromeExtension()) {
+            console.log('Disconnect Wallet Chrome Extension True')
             storage.set('metamask-connected', { connected: false })
          } else {
             console.log(web3ModalProvider.close)
@@ -507,12 +508,22 @@ const WalletProvider = React.memo(({ children }) => {
                await web3Modal.clearCachedProvider()
                setProvider(null)
             }
+            console.log('Deleting Login LocalStorage Items')
+            localStorage.removeItem('jwt')
+            localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
+            localStorage.removeItem('metamask-connected')
+            localStorage.removeItem('lit-auth-signature')
+            localStorage.removeItem('lit-web3-provider')
+            localStorage.removeItem('current-address')
+            localStorage.removeItem('@sequence.connectedSites')
+            localStorage.removeItem('@sequence.session')
          }
          storage.set('current-address', { address: null })
          setAccount(null)
          setChainId(null)
          setAuthenticated(false)
          setWeb3(null)
+         navigate('/')
       } catch (e) {
          console.log(e)
       }

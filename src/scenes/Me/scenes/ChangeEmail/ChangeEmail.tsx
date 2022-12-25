@@ -1,7 +1,9 @@
 import {
+   Alert,
    Box,
    Button,
    Checkbox,
+   Divider,
    Flex,
    FormControl,
    FormErrorMessage,
@@ -35,14 +37,11 @@ const ChangeEmail = ({ account }: { account: string }) => {
    var dmBool = (_notifyDM === 'true')
    var dailyBool = (_notify24 === 'true')
    const [email, setEmail] = useState('')
-   const [notifyDM, setNotifyDM] = useState('')
-   const [notify24, setNotify24] = useState('')
    const [isFetching, setIsFetching] = useState(false)
 
    const handleChangeOne = (checked: boolean) => {
       //setCheckedItems([checked, checkedItems[1]])
       globalSetNotifyDM(checked.toString())
-      setNotifyDM(checked.toString())
 
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
@@ -75,7 +74,6 @@ const ChangeEmail = ({ account }: { account: string }) => {
 
    const handleChangeTwo = (checked: boolean) => {
       //setCheckedItems([checkedItems[0], checked])
-      setNotify24(checked.toString())
       globalSetNotify24(checked.toString())
 
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
@@ -122,6 +120,8 @@ const ChangeEmail = ({ account }: { account: string }) => {
             body: JSON.stringify({
                email: values.email, 
                walletaddr: account,
+               signupsite: document.referrer,
+               domain: document.domain
             }),
          })
             .then((response) => response.json())
@@ -136,7 +136,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
                   isClosable: true,
                 })
                globalSetEmail(values.email)
-               navigate('/dm')
+               navigate('/me/verify-email')
             })
             .catch((error) => {
                console.error('🚨[POST][Email]:', error)
@@ -154,6 +154,28 @@ const ChangeEmail = ({ account }: { account: string }) => {
                 Notification Settings
                <br />
             </Text>
+            <Stack pl={0} mt={6} spacing={2}>
+            <Checkbox
+               size="lg"
+               isChecked={dmBool}
+               onChange={(e) => handleChangeOne(e.target.checked)}
+            >
+               Receive an email for every incoming DM 
+            </Checkbox>
+            <Checkbox
+               size="lg"
+               isChecked={dailyBool}
+               onChange={(e) => handleChangeTwo(e.target.checked)}
+            >
+               Receive notifications summary email every 24 hours (DM, NFT, Community)
+            </Checkbox>
+            </Stack>
+            <Divider
+               orientation="horizontal"
+               height="15px"
+               d="inline-block"
+               verticalAlign="middle"
+          />
             <FormControl>
                <FormLabel fontSize="2xl">Enter email to receive notifications for new messages</FormLabel>
                <Text color="darkgray.300" fontSize="md" mb={1}>Current email: <b>{_email}</b></Text>
@@ -178,25 +200,12 @@ const ChangeEmail = ({ account }: { account: string }) => {
                <FormHelperText>
                   You can change it anytime in your settings
                </FormHelperText>
+               <Alert status="info" variant="solid" mt={4}>
+                  You must verify your email again if changed here
+               </Alert>
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>
                )}
-            <Stack pl={0} mt={6} spacing={2}>
-            <Checkbox
-               size="lg"
-               isChecked={dmBool}
-               onChange={(e) => handleChangeOne(e.target.checked)}
-            >
-               Receive an email for every incoming DM 
-            </Checkbox>
-            <Checkbox
-               size="lg"
-               isChecked={dailyBool}
-               onChange={(e) => handleChangeTwo(e.target.checked)}
-            >
-               Receive notifications summary email every 24 hours (DM, NFT, Community)
-            </Checkbox>
-            </Stack>
             </FormControl>
          </form>
       </Box>

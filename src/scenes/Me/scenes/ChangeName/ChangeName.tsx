@@ -101,9 +101,9 @@ const ChangeName = () => {
       new Promise((resolve) => {
          Resizer.imageFileResizer(
             file,
-            64,
-            64,
-            "JPEG",
+            256,
+            256,
+            "PNG",
             100,
             0,
             (uri) => {
@@ -136,11 +136,12 @@ const ChangeName = () => {
                url: url,
                w: img.width,
                h: img.height,
+               aspect: img.width / img.height
             })
-   
+
             setCropModalOpen(true)
          }
-         
+
       }
    }
 
@@ -290,8 +291,114 @@ const ChangeName = () => {
       }
    }
 
-   const onSubmitPFP = (values: any) => {
+   const onSubmitPFP = (e: any) => {
+      console.log(e)
+      // const image = await resizeFile(files[0])
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d"); 
+      var img = new Image();
+      let scaleRatio = imgToUpload.h / modalDim.h
+      let imgHeight = modalDim.h
+      let imgWidth = modalDim.h // * imgToUpload.aspect
+      console.log(`imgHeight: ${imgHeight}, imgWidth: ${imgWidth}`)
+      console.log(`scaleRatio: ${scaleRatio} `)
 
+      console.log(pfpPos)
+      console.log(modalDim)
+      console.log(imgToUpload)
+      let cWidth = 480
+      let cHeight = 480
+      canvas.width = cWidth
+      canvas.height = cHeight
+      img.onload = () => {
+         ctx?.drawImage(img,Math.abs(pfpPos.x) * scaleRatio,Math.abs(pfpPos.y) * scaleRatio,imgWidth * scaleRatio,imgHeight * scaleRatio,0,0,cWidth,cHeight);  //
+         var dataurl = canvas.toDataURL("image/png");
+         // const link = document.createElement('a');  (For debug purposes to check output file)
+         // link.download = 'test_crop.png';
+         // link.href = dataurl;
+         // link.click();
+         // link.remove();
+         // setImgToUpload({...imgToUpload, url:dataurl})
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/imagepfp`, {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               },
+               body: JSON.stringify({
+                  base64data: dataurl,
+                  addr: account,
+               })
+            }
+         )
+         .then((response) => response.json())
+         .then((response) => {
+                  console.log('✅[POST][Image]:', response)
+                  toast({
+                     title: 'Success',
+                     description: `PFP updated!`,
+                     status: 'success',
+                     position: 'top',
+                     duration: 2000,
+                     isClosable: true,
+                  })
+                  setName("")
+               })
+               .catch((error) => {
+                  console.error('🚨[POST][Image]:', error)
+                  toast({
+                     title: 'Error',
+                     description: `Image Not Updated - Unknown error`,
+                     status: 'error',
+                     position: 'top',
+                     duration: 2000,
+                     isClosable: true,
+                  })
+               }).then(() => {
+                  setIsFetching(false)
+         })
+      }
+      img.src = imgToUpload.url
+
+         // fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/imagepfp`, {
+         //    method: 'PUT',
+         //    credentials: "include",
+         //    headers: {
+         //       'Content-Type': 'application/json',
+         //       Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         //    },
+         //    body: JSON.stringify({
+         //       base64data: image,
+         //       addr: account,
+         //    }),
+         // })
+         //    .then((response) => response.json())
+         //    .then((response) => {
+         //       console.log('✅[POST][Image]:', response)
+         //       toast({
+         //          title: 'Success',
+         //          description: `PFP updated!`,
+         //          status: 'success',
+         //          position: 'top',
+         //          duration: 2000,
+         //          isClosable: true,
+         //       })
+         //       setName("")
+         //    })
+         //    .catch((error) => {
+         //       console.error('🚨[POST][Image]:', error)
+         //       toast({
+         //          title: 'Error',
+         //          description: `Image Not Updated - Unknown error`,
+         //          status: 'error',
+         //          position: 'top',
+         //          duration: 2000,
+         //          isClosable: true,
+         //       })
+         //    }).then(() => {
+         //       setIsFetching(false)
+         //    })
+      
    }
 
    const onCloseModal = () => {
@@ -334,13 +441,35 @@ const ChangeName = () => {
          x: dragX,
          y: dragY
       })
+
    }
 
    const handleDragEnd = (e: React.MouseEvent<HTMLDivElement>) => {
       console.log("handleDragEnd")
       setPreviewGrab(false)
-      let dragX = e.pageX, dragY = e.pageY;
-      console.log("X: " + dragX + " Y: " + dragY)
+      // let dragX = e.pageX, dragY = e.pageY;
+      // console.log("X: " + dragX + " Y: " + dragY)
+      
+      console.log(pfpPos)
+      console.log(modalDim)
+      console.log(imgToUpload)
+      let imgHeight = modalDim.h - modalDim.h
+      let imgWidth = modalDim.h * imgToUpload.aspect - Math.min(modalDim.w, modalDim.maxW);
+      console.log(`imgHeight: ${imgHeight}, imgWidth: ${imgWidth} `)
+      let offsetPfpPos = pfpPos
+      
+      if(Math.abs(pfpPos.x) > imgWidth){
+         offsetPfpPos.x = -imgWidth;
+      } else if (pfpPos.x > 0){
+         offsetPfpPos.x = 0
+      }
+
+      if(pfpPos.y > imgHeight) {
+         offsetPfpPos.y = imgHeight
+      } else if (pfpPos.y < imgHeight){
+         offsetPfpPos.y = imgHeight
+      }
+      setPfpPos(offsetPfpPos)
    }
 
    return (
@@ -464,23 +593,29 @@ const ChangeName = () => {
                      color: "skyblue",
                      filter: `saturate(${isSaveHover ? 2.85 : 1})`,
                      cursor: "pointer",
-                     transition: "filter 0.5s"
-                  }} onMouseOver={() => { setSaveHover(true) }} onMouseLeave={() => { setSaveHover(false) }}>Save</span>
+                     transition: "filter 0.5s",
+                     pointerEvents: isFetching?"none":"auto"
+                  }} 
+                  onMouseOver={() => { setSaveHover(true) }} 
+                  onMouseLeave={() => { setSaveHover(false) }}
+                  onClick={onSubmitPFP}
+                  >Save</span>
                   <span>Crop</span>
                   <IconButton onClick={onCloseModal} icon={<AiOutlineClose />} aria-label={'Close'} />
                </ModalHeader>
                <ModalBody p={0} position={'relative'} zIndex={99999}
                   overflow={"hidden"}
-                  onMouseDown={handleDragStart} onMouseUp={handleDragEnd}
+                  onMouseDown={handleDragStart} 
+                  onMouseUp={handleDragEnd}
                   onMouseMove={handleImgGrab}
                   cursor={isPreviewGrab ? "grabbing" : "grab"}>
-                  <Box 
-                     height={"100%"} 
-                     width={"100%"} 
+                  <Box
+                     height={modalDim.h}
+                     width={imgToUpload.aspect * modalDim.h}
                      backgroundPosition={"center center"}
                      backgroundRepeat={"no-repeat"}
                      backgroundSize={"cover"}
-                     backgroundImage={imgToUpload.url} 
+                     backgroundImage={imgToUpload.url}
                      transform={`translate3d(${pfpPos.x}px, ${pfpPos.y}px, 0px) scale(1)`} ></Box>
                   <Box id="grid" position={'absolute'} height="100%" width={'100%'} top={0} left={0}>
                      <Box position={'relative'} height="100%" width={'100%'}>

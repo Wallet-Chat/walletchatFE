@@ -218,7 +218,7 @@ const EnterName = ({ account }: { account: string }) => {
    }
 
    return (
-      <Box p={6} pt={16} background="white" width="100%">
+      <Box p={6} pt={16} background="white" width="100%" overflow={"hidden"}>
          <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
             Welcome to the WalletChat Community!
          </Text>
