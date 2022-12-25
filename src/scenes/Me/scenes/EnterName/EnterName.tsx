@@ -9,6 +9,13 @@ import {
    FormHelperText,
    FormLabel,
    Input,
+   Modal,
+   ModalBody,
+   ModalCloseButton,
+   ModalContent,
+   ModalFooter,
+   ModalHeader,
+   ModalOverlay,
    Text,
    useToast,
 } from '@chakra-ui/react'
@@ -18,7 +25,7 @@ import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 import OpenSeaNFT from '../../../../types/OpenSea/NFT'
- import Resizer from "react-image-file-resizer";
+import Resizer from "react-image-file-resizer";
 
 const EnterName = ({ account }: { account: string }) => {
    const {
@@ -34,25 +41,38 @@ const EnterName = ({ account }: { account: string }) => {
    let navigate = useNavigate()
 
    const [name, setName] = useState('')
+   const [isCropModalOpen, setCropModalOpen] = useState(false)
+   const [imgToUpload, setImgToUpload] = useState<File | null>(null)
    const [isFetching, setIsFetching] = useState(false)
    const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
 
-    const [file, setFile] = useState('string')
-    const resizeFile = (file: Blob) =>
+   const [file, setFile] = useState('string')
+   const resizeFile = (file: Blob) =>
       new Promise((resolve) => {
          Resizer.imageFileResizer(
             file,
             64,
             64,
-            "JPEG",
+            "WEBP",
             100,
             0,
             (uri) => {
-            resolve(uri);
+               resolve(uri);
             },
             "base64"
          );
-    });
+      });
+
+   const localUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+      console.log(`localUpload`)
+      console.warn(e.target.files)
+      const files = e.target.files
+      if (files && files.length !== 0) {
+         setImgToUpload(files[0])
+         setCropModalOpen(true)
+      }
+   }
+
    const upload = async (e: ChangeEvent<HTMLInputElement>) => {
       console.warn(e.target.files)
       const files = e.target.files
@@ -72,29 +92,29 @@ const EnterName = ({ account }: { account: string }) => {
          })
             .then((response) => response.json())
             .then((response) => {
-              console.log('✅[POST][Image]:', response)
-              toast({
-                 title: 'Success',
-                 description: `PFP updated!`,
-                 status: 'success',
-                 position: 'top',
-                 duration: 2000,
-                 isClosable: true,
-              })
-              setName("")
+               console.log('✅[POST][Image]:', response)
+               toast({
+                  title: 'Success',
+                  description: `PFP updated!`,
+                  status: 'success',
+                  position: 'top',
+                  duration: 2000,
+                  isClosable: true,
+               })
+               setName("")
             })
             .catch((error) => {
                console.error('🚨[POST][Image]:', error)
                toast({
-                 title: 'Error',
-                 description: `Image Not Updated - Unknown error`,
-                 status: 'error',
-                 position: 'top',
-                 duration: 2000,
-                 isClosable: true,
-              })
+                  title: 'Error',
+                  description: `Image Not Updated - Unknown error`,
+                  status: 'error',
+                  position: 'top',
+                  duration: 2000,
+                  isClosable: true,
+               })
             }).then(() => {
-              setIsFetching(false)
+               setIsFetching(false)
             })
       }
    }
@@ -132,14 +152,14 @@ const EnterName = ({ account }: { account: string }) => {
       }
    }, [account])
 
-   useEffect(()=>{
+   useEffect(() => {
       console.log(errors)
-   },[errors])
+   }, [errors])
 
    const onSubmit = (values: any) => {
       console.log("onSubmit")
       console.log("Values are: ", values)
-      if(!localStorage.getItem('jwt')) {
+      if (!localStorage.getItem('jwt')) {
          toast({
             title: 'Error',
             description: `You must sign the message pending in your wallet before setting name!`,
@@ -190,23 +210,28 @@ const EnterName = ({ account }: { account: string }) => {
       }
    }
 
-    const onSubmitPFP = (values: any) => {
+   const onSubmitPFP = (values: any) => {
    }
+
+   const onCloseModal = () => {
+      setCropModalOpen(false);
+   }
+
    return (
-         <Box p={6} pt={16} background="white" width="100%">
-            <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-               Welcome to the WalletChat Community!
-            </Text>
-            <Divider
+      <Box p={6} pt={16} background="white" width="100%">
+         <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+            Welcome to the WalletChat Community!
+         </Text>
+         <Divider
             orientation="horizontal"
             height="15px"
             d="inline-block"
             verticalAlign="middle"
-            />
-            <form onSubmit={onSubmitPFP}>
-               <FormControl>
+         />
+         <form onSubmit={onSubmitPFP}>
+            <FormControl>
                <FormLabel fontSize="xl">Upload your PFP (optional)</FormLabel>
-               <input type='file' onChange={(e) => upload(e)} name='img' />   
+               <input type='file' onChange={(e) => localUpload(e)} name='img' />
             </FormControl>
          </form>
          <Divider
@@ -225,19 +250,18 @@ const EnterName = ({ account }: { account: string }) => {
                      value={name}
                      placeholder="Real or anon name"
                      borderColor="black"
-                     
+
                      {...register('name', {
                         required: true,
-                        onChange:(e: React.ChangeEvent<HTMLInputElement>) =>
-                           {
-                              setName(e.target.value)
-                              // console.log(name)
-                           }
-                        
+                        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                           setName(e.target.value)
+                           // console.log(name)
+                        }
+
                      })}
-                     
+
                   />
-                  <Button variant="black" height="auto" type="submit" isLoading={isFetching} onClick={()=>{
+                  <Button variant="black" height="auto" type="submit" isLoading={isFetching} onClick={() => {
                      console.log("SUBMIT BTN")
                      console.log(errors)
                      console.log(name)
@@ -246,27 +270,27 @@ const EnterName = ({ account }: { account: string }) => {
                   </Button>
                </Flex>
                {ownedENS.length > 0 && (
-               <Box mt={2}>
-                  {ownedENS.map((item:OpenSeaNFT, i) =>
-                     (item?.name && item?.name !== "Unknown ENS name") ? (
-                        <Button
-                           variant="outline"
-                           key={i}
-                           onClick={() => {
-                              setValue('name',item.name, { shouldTouch: true })
-                           }}
-                           mr="2"
-                           mb="2"
-                           size="sm"
-                        >
-                           {item.name}
-                        </Button>
-                     ) : (
-                        ''
-                     )
-                  )}
-               </Box>
-            )}
+                  <Box mt={2}>
+                     {ownedENS.map((item: OpenSeaNFT, i) =>
+                        (item?.name && item?.name !== "Unknown ENS name") ? (
+                           <Button
+                              variant="outline"
+                              key={i}
+                              onClick={() => {
+                                 setValue('name', item.name, { shouldTouch: true })
+                              }}
+                              mr="2"
+                              mb="2"
+                              size="sm"
+                           >
+                              {item.name}
+                           </Button>
+                        ) : (
+                           ''
+                        )
+                     )}
+                  </Box>
+               )}
                <FormHelperText>
                   You can change it anytime in your settings
                </FormHelperText>
@@ -279,13 +303,30 @@ const EnterName = ({ account }: { account: string }) => {
                      position: 'top',
                      duration: 2000,
                      isClosable: true,
-                   })
+                  })
                )}
             </FormControl>
             <Alert status="success" variant="solid" mt={4}>
-                  You must sign the pending message in your connected wallet prior to setting name
+               You must sign the pending message in your connected wallet prior to setting name
             </Alert>
- 	    </form> 
+         </form>
+         <Modal isOpen={isCropModalOpen} onClose={onCloseModal}>
+            <ModalOverlay />
+            <ModalContent>
+               <ModalHeader>Create your account</ModalHeader>
+               <ModalCloseButton />
+               <ModalBody pb={6}>
+                  Test
+               </ModalBody>
+
+               <ModalFooter>
+                  <Button colorScheme='blue' mr={3}>
+                     Save
+                  </Button>
+                  <Button onClick={onCloseModal}>Cancel</Button>
+               </ModalFooter>
+            </ModalContent>
+         </Modal>
       </Box>
    )
 }

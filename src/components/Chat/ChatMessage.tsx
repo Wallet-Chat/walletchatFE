@@ -255,8 +255,14 @@ const ChatMessage = ({
             {msg.fromAddr && (
                <UserProfileContextMenu address={msg.fromAddr}>
                   {pfpImage ? (
-                     <Image
-                        src={pfpImage}
+                     <Box
+                        style={{ 
+                           backgroundImage: `url(${pfpImage})`,
+                           backgroundPosition: `center`,
+                           backgroundRepeat: `no-repeat`,
+                           backgroundSize: `cover`
+                         }}
+                        // src={pfpImage}
                         height="40px"
                         width="40px"
                         borderRadius="var(--chakra-radii-xl)"
