@@ -54,7 +54,7 @@ export const chains: ChainObjectType = {
         symbol: "NEAR",
         name: "NEAR",
         slug: "NEAR",
-        block_explorer_url: "https://explorer.near.org/" ,
+        block_explorer_url: "https://nearscan.org/accounts/", //"https://explorer.near.org/" ,
         logo: "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI0LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCA5MC4xIDkwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA5MC4xIDkwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxwYXRoIGQ9Ik03Mi4yLDQuNkw1My40LDMyLjVjLTEuMywxLjksMS4yLDQuMiwzLDIuNkw3NC45LDE5YzAuNS0wLjQsMS4yLTAuMSwxLjIsMC42djUwLjNjMCwwLjctMC45LDEtMS4zLDAuNWwtNTYtNjcKCUMxNywxLjIsMTQuNCwwLDExLjUsMGgtMkM0LjMsMCwwLDQuMywwLDkuNnY3MC44QzAsODUuNyw0LjMsOTAsOS42LDkwYzMuMywwLDYuNC0xLjcsOC4yLTQuNmwxOC44LTI3LjljMS4zLTEuOS0xLjItNC4yLTMtMi42CglsLTE4LjUsMTZjLTAuNSwwLjQtMS4yLDAuMS0xLjItMC42VjIwLjFjMC0wLjcsMC45LTEsMS4zLTAuNWw1Niw2N2MxLjgsMi4yLDQuNSwzLjQsNy4zLDMuNGgyYzUuMywwLDkuNi00LjMsOS42LTkuNlY5LjYKCWMwLTUuMy00LjMtOS42LTkuNi05LjZDNzcuMSwwLDc0LDEuNyw3Mi4yLDQuNnoiLz4KPC9zdmc+Cg=="
     },
     // "43114": {

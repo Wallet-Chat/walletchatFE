@@ -5,7 +5,7 @@ import { truncateAddress } from '../../../../../../helpers/truncateString'
 import NFT from '../../../../../../types/NFT'
 import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg'
 import IconTzkt from '../../../../../../images/icon-products/icon-tzkt.png'
-import IconNEAR from '../../../../../../images/icon-chains/icon-near.svg'
+import IconsNearScan from '../../../../../../images/icon-products/icon-nearscan.png'
 import { chains } from '../../../../../../constants'
 
 export default function MyNFTItem({ nft }: { nft: NFT }) {
@@ -19,7 +19,7 @@ export default function MyNFTItem({ nft }: { nft: NFT }) {
    if (chainName == "Tezos") {
       explorerLogo = IconTzkt
    } else if (chainName == "NEAR") {
-      explorerLogo = IconNEAR
+      explorerLogo = IconsNearScan
    } else {
       explorerLogo = IconEtherscan
    }

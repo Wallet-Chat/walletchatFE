@@ -275,7 +275,9 @@ export default function MyNFTs({ account }: { account: string }) {
             .catch((error) => console.log(error))
       }
       fetchAllNfts()
-      fetchPoaps()
+      if (!account.endsWith(".near") && !account.endsWith(".testnet") && !account.startsWith("tz")) {
+         fetchPoaps()
+      }
    }, [account])
 
    useEffect(() => {
