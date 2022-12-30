@@ -38,6 +38,7 @@ import {
  import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
  import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
  import IconTezos from '../../../../images/icon-chains/icon-tezos.svg'
+ import IconNEAR from '../../../../images/icon-chains/icon-near.svg'
  import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
  import { nFormatter } from '../../../../helpers/number'
  import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
@@ -64,7 +65,10 @@ import { resourceLimits } from 'worker_threads'
        if (account.startsWith("tz")) {
          getNftMetadataTezos()
          //Get Tezos NFT Stats
-       } else {
+       } else if (account.endsWith(".near") || account.endsWith(".testnet")) { //or exact 64 chars and no 0x - for non-named accounts?
+         getNftMetadataNEAR()
+         
+       }else {
          getNftMetadata()
          getNftStatistics()
        }
@@ -248,6 +252,40 @@ import { resourceLimits } from 'worker_threads'
              .catch((error) => console.log(`🚨[GET][NFT]:`, error))
        }
     }
+    
+    const getNftMetadataNEAR = () => {
+      if (!nftContractAddr) {
+         console.log('Missing NEAR contract address')
+         return
+      }
+      if (chain === 'NEAR') {
+        fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT`, {
+              method: 'GET',
+              headers: {
+               accept: 'application/json',
+               'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY ? process.env.REACT_APP_PAGODA_API_KEY : "",
+            },
+         })
+           .then((response) => response.json())
+           .then((result) => {
+              console.log('✅[GET][NEAR NFT]:', result)
+              let matchingNFT = 0;
+              for (let i = 0; i < result.length; i++ ) {
+                 if (result[i].token.contract.address == nftContractAddr) {
+                    matchingNFT = i
+                 }
+              }
+              if (result.length > 0) {
+               const _transformed = tzktToGeneralNFTCollectionType(result[matchingNFT])
+               setNftData({
+                  ..._transformed,
+                  image_url: _transformed?.image_url?.includes('ipfs://') ? convertIpfsUriToUrl(_transformed?.image_url) : _transformed?.image_url,
+               })
+              }
+           })
+           .catch((error) => console.log(`🚨[GET][NEAR NFT]:`, error))
+     }
+   }
 
     const getNftMetadataTezos = () => {
       if (!nftContractAddr) {
@@ -465,6 +503,19 @@ import { resourceLimits } from 'worker_threads'
                             <Image
                                src={IconPolygon}
                                alt="Polygon chain"
+                               width="24px"
+                               height="24px"
+                               d="inline-block"
+                               verticalAlign="middle"
+                               p={0.5}
+                            />
+                         </Tooltip>
+                      )}
+                     {chain === 'NEAR' && (
+                         <Tooltip label="NEAR chain">
+                            <Image
+                               src={IconNEAR}
+                               alt="NEAR chain"
                                width="24px"
                                height="24px"
                                d="inline-block"

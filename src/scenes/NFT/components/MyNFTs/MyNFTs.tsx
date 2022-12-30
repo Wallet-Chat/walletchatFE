@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
 
-import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
+import { convertIpfsUriToUrl, convertNearIpfsUriToUrl } from '../../../../helpers/ipfs'
 import MyNFTItem from './components/MyNFTItem'
 import { NFTPortNFT } from '../../../../types/NFTPort/NFT'
 import OpenSeaNFT, {
@@ -17,7 +17,11 @@ import { chains } from '../../../../constants'
 import ChainFilters from '../../../../components/ChainFilters'
 import MyNFTSkeleton from './components/MyNFTSkeleton'
 import TzktNFT from '../../../../types/Tzkt/NFT'
+import { NearContractNftSearch, NearNftContracts, NftCount } from '../../../../types/NEAR/NFT'
+import NearNFT from '../../../../types/NEAR/NFT'
 import { tezosTztkToGeneralNFTType } from '../../../../types/Tzkt/NFT'
+import { nearPagodaToGeneralNFTType } from '../../../../types/NEAR/NFT'
+import NFTPortNFTCollection from '../../../../types/NFTPort/NFTCollection'
 
 export default function MyNFTs({ account }: { account: string }) {
    // NFTs
@@ -32,6 +36,50 @@ export default function MyNFTs({ account }: { account: string }) {
 
    // Filters
    const [chainFilters, setChainFilters] = useState<Array<string>>([''])
+
+   //this is to fetch individual NFT data, maybe not needed since we don't do this for other blockchains yet
+   const fetchNearNFT = async (contract: string) => {
+      await Promise.all([
+         fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT/${contract}`, {
+            method: 'GET',
+            headers: {
+            accept: 'application/json',
+            'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY ? process.env.REACT_APP_PAGODA_API_KEY : "",
+         }}).then((res) => res.json()),
+      ])
+         .then((nearData) => {
+            console.log(`✅[GET][NEAR NFT by contract] ${account} ${contract}:`, nearData)
+            let contractSearchData: NearContractNftSearch = nearData[0]
+            //console.log(`[contractSearchData] ${account} ${contract}:`, contractSearchData)       
+            let transformed: NFT[] = []
+            if (contractSearchData.nfts.length > 0) {
+               transformed = transformed.concat(
+                  contractSearchData.nfts
+                     .filter((nft: NearNFT) => nft.metadata?.title || "")
+                     .map((nft: NearNFT) => {
+                        const _nft = nearPagodaToGeneralNFTType(nft)
+                        if (_nft.collection?.contract_address) { _nft.collection.contract_address = contract }
+                        if (_nft.collection?.image) { _nft.collection.image = contractSearchData.contract_metadata.icon }
+                        //if (_nft?.image && contractSearchData.contract_metadata.icon.startsWith("data")) { _nft.image = contractSearchData.contract_metadata.icon }
+                        return {
+                           ..._nft,
+                           chain_id: 'NEAR',
+                           //NEAR has some SVGs returned as part of the data - need to test
+                           image: _nft?.image ? _nft.image.startsWith("data") ? _nft.image : convertNearIpfsUriToUrl(_nft.image) : ""
+                        }
+                     })
+               )
+            }
+            // console.log(`[transformed] ${account} ${contract}:`, transformed)
+            // let temp: NFT[] = nfts.concat(nfts, transformed)
+            // console.log(`[nfts] ${account} ${contract}:`, temp)
+            setNfts(nfts => [...nfts, ...transformed])
+         })
+         .finally(() => {
+            setIsFetchingNFTs(false)
+         })
+         .catch((error) => console.log(`🚨[GET][NEAR NFT by contract] ${account} ${contract}`, error))
+   }
 
    useEffect(() => {
       const fetchAllNfts = async () => {
@@ -64,7 +112,7 @@ export default function MyNFTs({ account }: { account: string }) {
             ])
                .then(tezosData => {
                   console.log(
-                     `✅[GET][NFTs] ${account}:`,
+                     `✅[GET][Tezos NFTs] ${account}:`,
                      tezosData
                   )
                   let transformed: NFT[] = []
@@ -93,7 +141,46 @@ export default function MyNFTs({ account }: { account: string }) {
                .finally(() => {
                   setIsFetchingNFTs(false)
                })
-               .catch((error) => console.log(`🚨[GET][NFTs] ${account}`, error))
+               .catch((error) => console.log(`🚨[GET][Tezos NFTs] ${account}`, error))
+         } else if (account.endsWith(".near") || account.endsWith(".testnet")) {
+            //when using Pagoda, we first just get a count of NFTs per contract (NearNftContracts type)
+            let ownedNftContracts: string[] = [];
+            await Promise.all([
+               fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT`, {
+                  method: 'GET',
+                  headers: {
+                   accept: 'application/json',
+                   'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY ? process.env.REACT_APP_PAGODA_API_KEY : "",
+                }}).then((res) => res.json()),
+            ])
+               .then((returnedNftContracts) => {
+                  console.log(`✅[GET][NEAR NFTs] ${account}:`, returnedNftContracts)
+                  let transformed: NearNftContracts[] = []
+                  if (returnedNftContracts?.length > 0) {
+                     transformed = 
+                     returnedNftContracts
+                        .filter((contracts: NearNftContracts) => contracts.nft_counts
+                        .map((count: NftCount) => {
+                           const _contract = count.contract_account_id
+                           return {
+                              _contract,
+                           }
+                        })
+                     )
+                  }
+                  //console.log("transformed: ", transformed)
+                  for (let i=0; i<transformed[0].nft_counts.length; i++) {
+                     ownedNftContracts.push(transformed[0].nft_counts[i].contract_account_id)
+                  }
+               })
+               .finally(() => {
+                  setIsFetchingNFTs(false)
+               })
+               .catch((error) => console.log(`🚨[GET][NEAR NFTs] ${account}`, error))
+
+               setNfts([])
+               console.log(`***[FETCH][NEAR NFTs for each owned NFT] ${account}`)
+               ownedNftContracts.forEach(fetchNearNFT)
          } else {
          await Promise.all([
             fetch(

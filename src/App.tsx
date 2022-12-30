@@ -10,6 +10,7 @@ import {
    Spinner,
    Alert,
    Tag,
+   HStack,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 
@@ -43,6 +44,7 @@ export const App = () => {
       isAuthenticated,
       connectWallet,
       connectWalletTezos,
+      connectWalletNEAR,
       name,
       isFetchingName,
       account,
@@ -123,27 +125,38 @@ export const App = () => {
                   <Heading size="2xl" mb={8}>
                      Login to start chatting
                   </Heading>
-                  <Button
-                     variant="black"
-                     onClick={() => {
-                        setBtnClicks(btnClicks + 1)
-                        connectWallet()
-                     }}
-                     size="lg"
-                  >
-                     Sign-in with Ethereum
-                  </Button>
-                  &nbsp;&nbsp;&nbsp; 
-                  <Button
-                     variant="black"
-                     onClick={() => {
-                        setBtnClicks(btnClicks + 1)
-                        connectWalletTezos()
-                     }}
-                     size="lg"
-                  >
-                     Sign-in with Tezos
-                  </Button>
+                  <HStack>
+                     <Button
+                        variant="black"
+                        onClick={() => {
+                           setBtnClicks(btnClicks + 1)
+                           connectWallet()
+                        }}
+                        size="lg"
+                     >
+                        Sign-in with Ethereum
+                     </Button>
+                     <Button
+                        variant="black"
+                        onClick={() => {
+                           setBtnClicks(btnClicks + 1)
+                           connectWalletTezos()
+                        }}
+                        size="lg"
+                     >
+                        Sign-in with Tezos
+                     </Button>
+                     <Button
+                        variant="black"
+                        onClick={() => {
+                           setBtnClicks(btnClicks + 1)
+                           connectWalletNEAR()
+                        }}
+                        size="lg"
+                     >
+                        Sign-in with NEAR
+                     </Button>
+                  </HStack>
                   {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>
                         Check the your wallet for signature prompt to continue

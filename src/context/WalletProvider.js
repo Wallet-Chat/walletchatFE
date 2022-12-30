@@ -15,10 +15,25 @@ import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
 import Lit from '../utils/lit'
-//import { TempleWallet } from "@temple-wallet/dapp";
+
 import { DAppClient } from '@airgap/beacon-sdk'
 import * as siwt from '@stakenow/siwt'
 import { useNavigate } from 'react-router-dom'
+//NEAR wallet helpers
+import { keyStores } from 'near-api-js';
+// wallet selector UI
+import '@near-wallet-selector/modal-ui/styles.css';
+import { setupModal } from '@near-wallet-selector/modal-ui';
+import LedgerIconUrl from '@near-wallet-selector/ledger/assets/ledger-icon.png';
+import MyNearIconUrl from '@near-wallet-selector/my-near-wallet/assets/my-near-wallet-icon.png';
+// near wallet selector options
+import { setupWalletSelector } from '@near-wallet-selector/core';
+import { setupLedger } from '@near-wallet-selector/ledger';
+import { setupMyNearWallet } from '@near-wallet-selector/my-near-wallet';
+const THIRTY_TGAS = '30000000000000';
+const NO_DEPOSIT = '0';
+
+//end NEAR wallet imports/declarations
 
 const providerOptions = {
    walletconnect: {
@@ -52,6 +67,12 @@ const web3Modal = new Web3Modal({
    cacheProvider: true, // optional
    providerOptions, // required
 })
+
+function toHexString(byteArray) {
+   return Array.from(byteArray, function(byte) {
+     return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+   }).join('')
+ }
 
 export const WalletContext = React.createContext()
 export const useWallet = () => React.useContext(WalletContext)
@@ -651,6 +672,162 @@ const WalletProvider = React.memo(({ children }) => {
       }
    }
 
+   const connectWalletNEAR = async () => {
+      console.log('connectWallet NEAR')
+      try {
+         let _provider, _account, _accountPubKey, _nonce, _signer, _localKey, _wallet
+         let _signedIn = false
+         //let _network = "testnet"
+         let _network = "mainnet"
+
+         const selector = await setupWalletSelector({
+            network: _network, //this.network,
+            modules: [setupMyNearWallet({ iconUrl: MyNearIconUrl }),
+            setupLedger({ iconUrl: LedgerIconUrl })],
+          });
+          
+          const description = 'Please select a wallet to sign in.';
+          //const modal = setupModal(selector, { contractId: "dev-1672109335952-72949654416365", description });
+          const modal = setupModal(selector, { contractId: "walletchat.near", description });
+          modal.show();
+         //console.log("NEAR user login: ", currentUser)
+
+         _signedIn = selector.isSignedIn()
+
+         if (_signedIn) {
+            //_wallet = await selector.wallet()
+            _account = selector.store.getState().accounts[0].accountId
+      
+            const keyStore = new keyStores.BrowserLocalStorageKeyStore()
+            _localKey = await keyStore.getKey(_network, _account)
+            _accountPubKey = _localKey.getPublicKey()
+         }
+
+         // check if JWT exists or is timed out:
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+         .then((response) => response.json())
+         .then(async (data) => {
+            console.log('✅[POST][Welcome]:', data.msg)
+            //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
+            if (!data.msg.includes(_account)) {
+               //GET JWT
+               fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+                  method: 'GET',
+                  headers: {
+                     'Content-Type': 'application/json',
+                  },
+               })
+               .then((response) => response.json())
+               .then(async (data) => {
+                  console.log('✅[GET][Nonce]:', data)
+                  _nonce = data.Nonce
+                  //console.log('✅[GET][Data.nonce]:', data.Nonce)
+
+                  const origin = "https://walletchat.fun";
+                  const statement =
+                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+                  // MyNearWallet                   
+                  const messageToSign = origin + "\r\n" + statement + "\r\n" + _account + "\r\n" + _network + "\r\n" + _nonce;
+                  const signature = _localKey.sign(Buffer.from(messageToSign));
+                  console.log("verify NEAR ")
+                
+                  fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                     body: JSON.stringify({ "name": _account, "address": toHexString(_accountPubKey.data), "nonce": _nonce, "msg": messageToSign, "sig": toHexString(signature.signature) }),
+                     headers: {
+                     'Content-Type': 'application/json'
+                     },
+                     method: 'POST'
+                  })
+                  .then((response) => response.json())
+                  .then(async (data) => {
+                     localStorage.setItem('jwt', data.access);
+                     //Used for LIT encryption authSign parameter
+                     //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                     //localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                     console.log('✅[INFO][JWT]:', data.access)
+                  })
+               })
+               .catch((error) => {
+                  console.error('🚨[GET][Nonce]:', error)
+               })
+               //END JWT AUTH sequence
+
+            //below part of /welcome check for existing token     
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[POST][Welcome]:', error)
+            //GET JWT
+            fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+               method: 'GET',
+               headers: {
+                  'Content-Type': 'application/json',
+               },
+            })
+            .then((response) => response.json())
+            .then(async (data) => {
+               console.log('✅[GET][Nonce]:', data)
+               _nonce = data.Nonce
+
+               const origin = "https://walletchat.fun";
+               const statement =
+                    "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+               // MyNearWallet
+               const messageToSign = origin + "\r\n" + statement + "\r\n" + _account + "\r\n" + _network + "\r\n" + _nonce;
+               const signature = _localKey.sign(Buffer.from(messageToSign));
+               console.log("verify NEAR ")
+             
+               fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                  body: JSON.stringify({ "name": _account, "address": toHexString(_accountPubKey.data), "nonce": _nonce, "msg": messageToSign, "sig": toHexString(signature.signature) }),
+                  headers: {
+                     'Content-Type': 'application/json'
+                  },
+                  method: 'POST'
+               })
+               .then((response) => response.json())
+               .then(async (data) => {
+                  localStorage.setItem('jwt', data.access);
+                  //Used for LIT encryption authSign parameter
+                  // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                  // localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                  console.log('✅[INFO][JWT]:', data.access)
+               })
+               .catch((error) => {
+                  console.error('🚨[GET][Sign-In Failed]:', error)
+               })
+            })
+            .catch((error) => {
+               console.error('🚨[GET][Nonce]:', error)
+            })
+            //END JWT AUTH sequence
+         })
+
+         if (_account) {
+            setAppLoading(true)
+            setAccount(_account)
+            setChainId(chainId)
+            setAuthenticated(true)
+            getName(_account)
+            getSettings(_account)
+            //setWeb3(_web3)
+         }
+      } catch (error) {
+         console.log('🚨connectWallet', error)
+         if (error.message === "User Rejected") {
+            setError("Your permission is needed to continue. Please try signing in again.")
+         }
+      } finally {
+         setAppLoading(false)
+      }
+   }
+   //end NEAR wallet sign-in
+
    const disconnectWallet = async () => {
       console.log('** disconnectWallet **')
       try {
@@ -705,6 +882,7 @@ const WalletProvider = React.memo(({ children }) => {
             disconnectWallet,
             connectWallet,
             connectWalletTezos,
+            connectWalletNEAR,
             isAuthenticated,
             appLoading,
             web3,
