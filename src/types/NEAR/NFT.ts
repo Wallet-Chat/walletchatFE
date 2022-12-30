@@ -24,6 +24,15 @@ export interface NearContractNftSearch {
       block_height: string;
 }
 
+export interface ReferenceJSON {
+      description: string;
+      collection: string;
+      collection_id: string;
+      creator_id: string;
+      attributes: any[];
+      mime_type: string;
+  }
+
 //get NFTs by accountID gets you just the summary by contract on Pagoda (first query top level result)
 //https://near-mainnet.api.pagoda.co/eapi/v1/accounts/{account_id}/NFT/
 export interface NearNftContracts {

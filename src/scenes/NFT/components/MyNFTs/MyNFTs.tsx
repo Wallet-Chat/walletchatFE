@@ -17,7 +17,7 @@ import { chains } from '../../../../constants'
 import ChainFilters from '../../../../components/ChainFilters'
 import MyNFTSkeleton from './components/MyNFTSkeleton'
 import TzktNFT from '../../../../types/Tzkt/NFT'
-import { NearContractNftSearch, NearNftContracts, NftCount } from '../../../../types/NEAR/NFT'
+import { NearContractNftSearch, NearNftContracts, NftCount, ReferenceJSON } from '../../../../types/NEAR/NFT'
 import NearNFT from '../../../../types/NEAR/NFT'
 import { tezosTztkToGeneralNFTType } from '../../../../types/Tzkt/NFT'
 import { nearPagodaToGeneralNFTType } from '../../../../types/NEAR/NFT'
@@ -32,53 +32,63 @@ export default function MyNFTs({ account }: { account: string }) {
    // POAPs
    const [poaps, setPoaps] = useState<POAP[]>([])
    const [filteredPoaps, setFilteredPoaps] = useState<POAP[]>([])
-   const [isFetchingPOAPs, setIsFetchingPOAPs] = useState(true)
+   const [isFetchingPOAPs, setIsFetchingPOAPs] = useState(false)
 
    // Filters
    const [chainFilters, setChainFilters] = useState<Array<string>>([''])
 
    //this is to fetch individual NFT data, maybe not needed since we don't do this for other blockchains yet
    const fetchNearNFT = async (contract: string) => {
-      await Promise.all([
-         fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT/${contract}`, {
+      try {
+         const nearData = await fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT/${contract}`, {
             method: 'GET',
             headers: {
-            accept: 'application/json',
-            'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY ? process.env.REACT_APP_PAGODA_API_KEY : "",
-         }}).then((res) => res.json()),
-      ])
-         .then((nearData) => {
-            console.log(`✅[GET][NEAR NFT by contract] ${account} ${contract}:`, nearData)
-            let contractSearchData: NearContractNftSearch = nearData[0]
-            //console.log(`[contractSearchData] ${account} ${contract}:`, contractSearchData)       
-            let transformed: NFT[] = []
-            if (contractSearchData.nfts.length > 0) {
-               transformed = transformed.concat(
-                  contractSearchData.nfts
-                     .filter((nft: NearNFT) => nft.metadata?.title || "")
-                     .map((nft: NearNFT) => {
-                        const _nft = nearPagodaToGeneralNFTType(nft)
-                        if (_nft.collection?.contract_address) { _nft.collection.contract_address = contract }
-                        if (_nft.collection?.image) { _nft.collection.image = contractSearchData.contract_metadata.icon }
-                        //if (_nft?.image && contractSearchData.contract_metadata.icon.startsWith("data")) { _nft.image = contractSearchData.contract_metadata.icon }
-                        return {
-                           ..._nft,
-                           chain_id: 'NEAR',
-                           //NEAR has some SVGs returned as part of the data - need to test
-                           image: _nft?.image ? _nft.image.startsWith("data") ? _nft.image : convertNearIpfsUriToUrl(_nft.image) : ""
-                        }
-                     })
-               )
+               accept: 'application/json',
+               'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY ? process.env.REACT_APP_PAGODA_API_KEY : "",
             }
-            // console.log(`[transformed] ${account} ${contract}:`, transformed)
-            // let temp: NFT[] = nfts.concat(nfts, transformed)
-            // console.log(`[nfts] ${account} ${contract}:`, temp)
-            setNfts(nfts => [...nfts, ...transformed])
          })
-         .finally(() => {
-            setIsFetchingNFTs(false)
-         })
-         .catch((error) => console.log(`🚨[GET][NEAR NFT by contract] ${account} ${contract}`, error))
+         const nearDataJSON = await nearData.json()
+         console.log(`✅[GET][NEAR NFT by contract] ${account} ${contract}:`, nearDataJSON)
+         let contractSearchData: NearContractNftSearch = nearDataJSON
+         //console.log(`[contractSearchData] ${account} ${contract}:`, contractSearchData)       
+         let transformed: NFT[] = []
+         if (contractSearchData.nfts.length > 0) {          
+               let nftDataForDisplay = contractSearchData.nfts
+                  .filter((nft: NearNFT) => nft.metadata?.title || "")
+                  .map(async (nft: NearNFT) => {
+                     const _nft = nearPagodaToGeneralNFTType(nft)
+                     if (_nft.collection?.contract_address) { _nft.collection.contract_address = contract }
+                     if (_nft.collection?.image) { _nft.collection.image = contractSearchData.contract_metadata.icon }
+                     //if (_nft?.image && contractSearchData.contract_metadata.icon.startsWith("data")) { _nft.image = contractSearchData.contract_metadata.icon }
+                     
+                     //NEAR NFTs have collection details in an IPFS json blob (but some just have a filename with no reference...)
+                     if (nft.metadata.reference && !nft.metadata.reference.includes(".")) {
+                        await fetch(convertNearIpfsUriToUrl(nft.metadata.reference), {
+                           method: 'GET',
+                           }).then((res) => res.json())
+                           .then((collectionData) => {
+                              console.log(`✅[GET][NEAR NFT collection details] ${account} ${contract}:`, collectionData)
+
+                              let collectionDetails: ReferenceJSON = collectionData
+                              if (_nft.collection?.name) { _nft.collection.name = collectionDetails.collection}
+                              if (_nft.description) { _nft.description = collectionDetails.description}
+                           })
+                     }
+                     
+                     return {
+                        ..._nft,
+                        chain_id: 'NEAR',
+                        //NEAR has some SVGs returned as part of the data - need to test
+                        image: _nft?.image ? _nft.image.startsWith("data") ? _nft.image : convertNearIpfsUriToUrl(_nft.image) : ""
+                     }
+                  })
+                  transformed = transformed.concat(await Promise.all(nftDataForDisplay))
+         }
+         console.log(`[transformed] ${account} ${contract}:`, transformed)
+         setNfts(nfts => [...nfts, ...transformed])
+         setIsFetchingNFTs(false)
+         }
+         catch (e) { console.log(`🚨[GET][NEAR NFT by contract] ${account} ${contract}`, e)}
    }
 
    useEffect(() => {
@@ -180,7 +190,7 @@ export default function MyNFTs({ account }: { account: string }) {
 
                setNfts([])
                console.log(`***[FETCH][NEAR NFTs for each owned NFT] ${account}`)
-               ownedNftContracts.forEach(fetchNearNFT)
+               ownedNftContracts.forEach(await fetchNearNFT)
          } else {
          await Promise.all([
             fetch(
