@@ -61,7 +61,7 @@ export default function InboxSearchInput() {
       if (address.endsWith('.near') || address.endsWith('.testnet')) {
          setIsResolvingENS(true)
          
-         console.log("checking Near address")
+         console.log("checking NEAR address")
          //TODO:
          // const tezos = new TezosToolkit('https://mainnet.smartpy.io');
          // tezos.addExtension(new Tzip16Module());
