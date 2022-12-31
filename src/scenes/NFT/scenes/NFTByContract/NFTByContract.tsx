@@ -266,7 +266,7 @@ import { nearToGeneralNFTCollectionType } from '../../../../types/NEAR/NFTCollec
       if (!process.env.REACT_APP_PAGODA_API_KEY) {
          console.log('Missing PAGODA API key')
          return
-      }
+      } else { console.log ("testing kevin: ", process.env.REACT_APP_PAGODA_API_KEY) }
       const nearData = fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT/${nftContractAddr}`, {
             method: 'GET',
             headers: {
