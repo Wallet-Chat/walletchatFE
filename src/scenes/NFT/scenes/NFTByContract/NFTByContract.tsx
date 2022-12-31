@@ -271,7 +271,7 @@ import { nearToGeneralNFTCollectionType } from '../../../../types/NEAR/NFTCollec
             method: 'GET',
             headers: {
             accept: 'application/json',
-            'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY
+            'X-API-Key': "8fe2ce13-9371-476d-bb5b-f060e7e1b98c"
          },
       })
          .then((response) => response.json())
