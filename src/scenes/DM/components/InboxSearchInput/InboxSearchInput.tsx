@@ -62,6 +62,7 @@ export default function InboxSearchInput() {
          setIsResolvingENS(true)
          
          console.log("checking Near address")
+         //TODO:
          // const tezos = new TezosToolkit('https://mainnet.smartpy.io');
          // tezos.addExtension(new Tzip16Module());
          // const client = new TaquitoTezosDomainsClient({ tezos, network: 'mainnet', caching: { enabled: true } });
