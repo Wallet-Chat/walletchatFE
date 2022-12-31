@@ -321,7 +321,7 @@ export const App = () => {
                         }
                      />
                      <Route
-                        path="/nft/:chain/:nftContractAddr"
+                        path="/nft/:chain/:nftContractAddr_Name"
                         element={
                            <Flex>
                               {!isMobileView && nftInbox}

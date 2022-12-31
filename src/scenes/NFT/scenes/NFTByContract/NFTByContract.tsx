@@ -35,21 +35,26 @@ import {
  import { useHover } from '../../../../helpers/useHover'
  import IconEtherscan from '../../../../images/icon-products/icon-etherscan-mono.svg'
  import IconTzkt from '../../../../images/icon-products/icon-tzkt.png'
+ import IconNearScan from '../../../../images/icon-products/icon-nearscan.png'
  import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
  import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
  import IconTezos from '../../../../images/icon-chains/icon-tezos.svg'
  import IconNEAR from '../../../../images/icon-chains/icon-near.svg'
  import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
  import { nFormatter } from '../../../../helpers/number'
- import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
+ import { convertIpfsUriToUrl, convertNearIpfsUriToUrl } from '../../../../helpers/ipfs'
  import OpenSeaNFTCollection, { openseaToGeneralNFTCollectionType } from '../../../../types/OpenSea/NFTCollection'
  import NFTPortNFTCollection, { nftPortToGeneralNFTCollectionType } from '../../../../types/NFTPort/NFTCollection'
  import TzktNFTCollection, { tzktToGeneralNFTCollectionType } from '../../../../types/Tzkt/NFTCollection'
  import NFTCollection from '../../../../types/NFTCollection'
 import { resourceLimits } from 'worker_threads'
+import { nearToGeneralNFTCollectionType } from '../../../../types/NEAR/NFTCollection'
  
  const NFTByContract = ({ account }: { account: string }) => {
-    let { nftContractAddr = '', chain = '' } = useParams()
+    let { nftContractAddr_Name = '', chain = '' } = useParams()
+    let contractAndName = nftContractAddr_Name.split("_")
+    let nftContractAddr = contractAndName[0]
+    let nftName = contractAndName[1]
  
     const [nftData, setNftData] = useState<NFTCollection>()
     const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
@@ -258,33 +263,35 @@ import { resourceLimits } from 'worker_threads'
          console.log('Missing NEAR contract address')
          return
       }
-      if (chain === 'NEAR') {
-        fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT`, {
-              method: 'GET',
-              headers: {
-               accept: 'application/json',
-               'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY ? process.env.REACT_APP_PAGODA_API_KEY : "",
-            },
-         })
-           .then((response) => response.json())
-           .then((result) => {
-              console.log('✅[GET][NEAR NFT]:', result)
-              let matchingNFT = 0;
-              for (let i = 0; i < result.length; i++ ) {
-                 if (result[i].token.contract.address == nftContractAddr) {
-                    matchingNFT = i
-                 }
-              }
-              if (result.length > 0) {
-               const _transformed = tzktToGeneralNFTCollectionType(result[matchingNFT])
+      const nearData = fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT/${nftContractAddr}`, {
+            method: 'GET',
+            headers: {
+            accept: 'application/json',
+            'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY ? process.env.REACT_APP_PAGODA_API_KEY : "",
+         },
+      })
+         .then((response) => response.json())
+         .then((result) => {
+            console.log('✅[GET][NEAR NFT Metadata]:', result)
+            
+            //TODO we don't have the NFT name/tokenID here
+            //some NFTs are nested within generic marketplace contracts, so we have to find the matching one first:
+            let matchingNFT = 0;
+            for (let i = 0; i < result.nfts.length; i++ ) {
+               if (result.nfts[i].metadata.title.startsWith(nftName)) {  //TODO: ugly hack need improvment
+                  matchingNFT = i
+               }
+            }
+
+            if (result.nfts.length > 0) {
+               const _transformed = nearToGeneralNFTCollectionType(result.nfts[matchingNFT])
                setNftData({
                   ..._transformed,
-                  image_url: _transformed?.image_url?.includes('ipfs://') ? convertIpfsUriToUrl(_transformed?.image_url) : _transformed?.image_url,
+                  image_url: _transformed?.image_url ? _transformed?.image_url?.startsWith("data") ? _transformed?.image_url : convertNearIpfsUriToUrl(_transformed.image_url) : "",
                })
-              }
-           })
-           .catch((error) => console.log(`🚨[GET][NEAR NFT]:`, error))
-     }
+            }
+         })
+         .catch((error) => console.log(`🚨[GET][NEAR NFT Metadata]:`, error))
    }
 
     const getNftMetadataTezos = () => {
@@ -618,6 +625,25 @@ import { resourceLimits } from 'worker_threads'
                             >
                                <Image
                                   src={IconTzkt}
+                                  alt=""
+                                  height="21px"
+                                  width="21px"
+                                  padding="2px"
+                               />
+                            </Link>
+                         </Tooltip>
+                      )}
+                      {nftData?.contract_address && (nftData.contract_address.endsWith(".near") || nftData.contract_address.endsWith(".testnet")) && (
+                         <Tooltip label="Nearscan">
+                            <Link
+                               href={`https://nearscan.org/accounts/${nftData.contract_address}`}
+                               target="_blank"
+                               d="inline-block"
+                               verticalAlign="middle"
+                               mr={1}
+                            >
+                               <Image
+                                  src={IconNearScan}
                                   alt=""
                                   height="21px"
                                   width="21px"

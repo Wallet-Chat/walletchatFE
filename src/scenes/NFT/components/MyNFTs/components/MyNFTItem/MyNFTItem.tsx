@@ -105,7 +105,7 @@ export default function MyNFTItem({ nft }: { nft: NFT }) {
             </Box>
             {chain?.slug && nft?.collection?.contract_address && (
                <RLink
-                  to={`/nft/${chain.slug}/${nft.collection.contract_address}`}
+                  to={`/nft/${chain.slug}/${nft.collection.contract_address}_${nft.name}`}
                   style={{ textDecoration: 'none' }}
                >
                   <Button variant="outline" size="sm" width="100%">
