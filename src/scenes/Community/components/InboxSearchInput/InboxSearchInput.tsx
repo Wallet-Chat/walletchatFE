@@ -27,7 +27,7 @@ export default function InboxSearchInput() {
    const ref = useRef(null)
 
    const checkENS = async (address: string) => {
-      if (address.endsWith('.eth')) {
+      if (address.endsWith('.eth') && web3 != null) {
          setIsResolvingENS(true)
          const _addr = await provider.resolveName(address)
          if (_addr) {
@@ -83,6 +83,8 @@ export default function InboxSearchInput() {
    }
    if (toAddr.endsWith('.tez') && resolvedAddr && !isResolvingENS) {
       suggestedAddress = resolvedAddr
+   } else if ((toAddr.endsWith('.near') || toAddr.endsWith('.testnet')) && !isResolvingENS) {
+      suggestedAddress = toAddr  //for NEAR i'm not sure if we need the pubKey here...
    }
 
    return (
@@ -91,7 +93,7 @@ export default function InboxSearchInput() {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter ENS/TEZ or address (0x..., tz...) here"
+               placeholder="Enter ENS/TEZ/NEAR or (0x..., tz...) here"
                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setToAddr(e.target.value)
                }
@@ -160,6 +162,8 @@ export default function InboxSearchInput() {
                               `(${truncateAddress(suggestedAddress)})`}
                            {toAddr.endsWith('.tez') &&
                               `(${truncateAddress(suggestedAddress)})`}
+                           {(toAddr.endsWith('.near') || toAddr.endsWith('.testnet')) &&
+                              `(${truncateAddress(toAddr)})`}
                         </Text>
                      </Flex>
                   </Link>

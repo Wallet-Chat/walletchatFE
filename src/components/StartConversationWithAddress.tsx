@@ -83,7 +83,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter ENS/TEZ or address (0x..., tz...) here"
+               placeholder="Enter ENS/TEZ/NEAR or (0x..., tz...) here"
                {...register('toAddr', {
                   validate: (val) => addressIsValid(web3, val),
                })}
@@ -140,6 +140,24 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                   <Blockies seed={resolvedAddr} scale={3} />
                   <Text fontWeight="bold" fontSize="md" ml={2}>
                      {toAddr}{" "}({truncateAddress(resolvedAddr)})
+                  </Text>
+               </Flex>
+               </Link>
+            )}
+            {(toAddr.includes(".near") || toAddr.includes(".testnet")) && !isResolvingENS && (
+               <Link to={`/dm/${toAddr}`} style={{ textDecoration: 'none' }}>
+               <Flex
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  p={3}
+                  background="lightgray.300"
+                  borderRadius="md"
+                  mt={2}
+                  as={Button}
+               >
+                  <Blockies seed={toAddr} scale={3} />
+                  <Text fontWeight="bold" fontSize="md" ml={2}>
+                     {toAddr}{" "}({truncateAddress(toAddr)})
                   </Text>
                </Flex>
                </Link>
