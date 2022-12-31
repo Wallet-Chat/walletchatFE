@@ -42,13 +42,13 @@ export default function MyNFTs({ account }: { account: string }) {
       if (!process.env.REACT_APP_PAGODA_API_KEY) {
          console.log('Missing PAGODA API key')
          return
-      } else { console.log ("testing kevin: ", process.env.REACT_APP_PAGODA_API_KEY) }
+      } 
       try {
          const nearData = await fetch(`https://near-mainnet.api.pagoda.co/eapi/v1/accounts/${account}/NFT/${contract}`, {
             method: 'GET',
             headers: {
                accept: 'application/json',
-               'X-API-Key': "8fe2ce13-9371-476d-bb5b-f060e7e1b98c"
+               'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY,
             }
          })
          const nearDataJSON = await nearData.json()
@@ -160,7 +160,7 @@ export default function MyNFTs({ account }: { account: string }) {
             if (!process.env.REACT_APP_PAGODA_API_KEY) {
                console.log('Missing PAGODA API key')
                return
-            } else { console.log ("testing kevin: ", process.env.REACT_APP_PAGODA_API_KEY) }
+            }
             //when using Pagoda, we first just get a count of NFTs per contract (NearNftContracts type)
             let ownedNftContracts: string[] = [];
             await Promise.all([
@@ -168,7 +168,7 @@ export default function MyNFTs({ account }: { account: string }) {
                   method: 'GET',
                   headers: {
                    accept: 'application/json',
-                   'X-API-Key': "8fe2ce13-9371-476d-bb5b-f060e7e1b98c"
+                   'X-API-Key': process.env.REACT_APP_PAGODA_API_KEY,
                 }}).then((res) => res.json()),
             ])
                .then((returnedNftContracts) => {
