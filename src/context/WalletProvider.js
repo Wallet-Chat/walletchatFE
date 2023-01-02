@@ -67,9 +67,10 @@ const WalletProvider = React.memo(({ children }) => {
    const [web3ModalProvider, setWeb3ModalProvider] = useState()
    const [chainId, setChainId] = useState(null)
    const [name, setName] = useState(null)
+   const [btnClicks, setBtnClicks] = useState(0)
    const [email, setEmail] = useState(null)
-   const [notifyDM, setNotifyDM] = useState(null)
-   const [notify24, setNotify24] = useState(null)
+   const [notifyDM, setNotifyDM] = useState('true')
+   const [notify24, setNotify24] = useState('true')
    const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
    const [accounts, setAccounts] = useState(null)
@@ -101,6 +102,7 @@ const WalletProvider = React.memo(({ children }) => {
             console.log('handleAccountsChanged', accounts)
             setAccount(getNormalizeAddress(accounts))
             setName(null)
+            setBtnClicks(null)
             setEmail(null)
             setNotifyDM(null)
             setNotify24(null)
@@ -524,6 +526,7 @@ const WalletProvider = React.memo(({ children }) => {
          setAuthenticated(false)
          setWeb3(null)
          navigate('/')
+         setBtnClicks(0)
       } catch (e) {
          console.log(e)
       }
@@ -552,7 +555,9 @@ const WalletProvider = React.memo(({ children }) => {
             provider,
             error,
             redirectUrl,
-            setRedirectUrl
+            setRedirectUrl,
+            btnClicks,
+            setBtnClicks
          }}
       >
          {children}
