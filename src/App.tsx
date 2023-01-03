@@ -37,7 +37,6 @@ import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
    const location = useLocation();
-   const [btnClicks, setBtnClicks] = useState(0)
 
    const {
       appLoading,
@@ -50,7 +49,9 @@ export const App = () => {
       account,
       web3,
       error,
-      setRedirectUrl
+      setRedirectUrl,
+      btnClicks,
+      setBtnClicks
    } = useWallet()
    useEffect(() => {
       const currentPath = location.pathname;
