@@ -768,7 +768,7 @@ const DMByAddress = ({
                   p={4}
                >
                   <Box fontSize="md">
-                     We welcome all feedback and bug reports. Thank you! 😊
+                     We welcome all feedback and bug reports - Thank you! 😊
                   </Box>
                </Flex>
             )}
