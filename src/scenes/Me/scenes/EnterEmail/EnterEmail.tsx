@@ -149,9 +149,6 @@ const EnterEmail = ({ account }: { account: string }) => {
       }
    }
 
-   //default to users getting notifications - better than if they forget to look can always opt-out
-   globalSetNotify24('true')
-   globalSetNotifyDM('true')
    return (
       <Box p={6} pt={16} background="white" width="100%">
          <form onSubmit={handleSubmit(onSubmit)}>
