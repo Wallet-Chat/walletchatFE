@@ -892,7 +892,9 @@ const WalletProvider = React.memo(({ children }) => {
             provider,
             error,
             redirectUrl,
-            setRedirectUrl
+            setRedirectUrl,
+            btnClicks,
+            setBtnClicks
          }}
       >
          {children}
