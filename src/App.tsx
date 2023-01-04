@@ -11,6 +11,7 @@ import {
    Alert,
    Tag,
    HStack,
+   VStack,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 
@@ -126,7 +127,7 @@ export const App = () => {
                   <Heading size="2xl" mb={8}>
                      Login to start chatting
                   </Heading>
-                  <HStack>
+                  <VStack align="left">
                      <Button
                         variant="black"
                         onClick={() => {
@@ -134,6 +135,7 @@ export const App = () => {
                            connectWallet()
                         }}
                         size="lg"
+                        w='220px'
                      >
                         Sign-in with Ethereum
                      </Button>
@@ -144,6 +146,7 @@ export const App = () => {
                            connectWalletTezos()
                         }}
                         size="lg"
+                        w='220px'
                      >
                         Sign-in with Tezos
                      </Button>
@@ -154,10 +157,11 @@ export const App = () => {
                            connectWalletNEAR()
                         }}
                         size="lg"
+                        w='220px'
                      >
                         Sign-in with NEAR
                      </Button>
-                  </HStack>
+                  </VStack>
                   {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>
                         Check the your wallet for signature prompt to continue
