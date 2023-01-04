@@ -750,7 +750,7 @@ const DMByAddress = ({
                   p={4}
                >
                   <Box fontSize="md">
-                     Loading Your Messages, Please Wait and Do Not Refresh 😊
+                     Loading Your Messages, Please Wait - Do Not Refresh 😊
                   </Box>
                </Flex>
             )}
