@@ -691,7 +691,6 @@ const WalletProvider = React.memo(({ children }) => {
           const description = 'Please select a wallet to sign in.';
           //const modal = setupModal(selector, { contractId: "dev-1672109335952-72949654416365", description });
           const modal = setupModal(selector, { contractId: "walletchat.near", description });
-          modal.show();
          //console.log("NEAR user login: ", currentUser)
 
          _signedIn = selector.isSignedIn()
@@ -703,6 +702,8 @@ const WalletProvider = React.memo(({ children }) => {
             const keyStore = new keyStores.BrowserLocalStorageKeyStore()
             _localKey = await keyStore.getKey(_network, _account)
             _accountPubKey = _localKey.getPublicKey()
+         } else {
+            modal.show();
          }
 
          // check if JWT exists or is timed out:
@@ -854,6 +855,11 @@ const WalletProvider = React.memo(({ children }) => {
             localStorage.removeItem('current-address')
             localStorage.removeItem('@sequence.connectedSites')
             localStorage.removeItem('@sequence.session')
+            localStorage.removeItem('near-wallet-selector:selectedWalletId')
+            localStorage.removeItem('near-wallet-selector:recentlySignedInWallets')
+            localStorage.removeItem('near_app_wallet_auth_key')
+            localStorage.removeItem('near-wallet-selector:contract')
+            //localStorage.removeItem('near-api-js:keystore:'+name+':mainnet')
          }
          storage.set('current-address', { address: null })
          setAccount(null)
