@@ -355,14 +355,21 @@ const WalletProvider = React.memo(({ children }) => {
                      
                      const messageToSign = siweMessage.prepareMessage();
                      const signature = await _signer.signMessage(messageToSign); 
-                     console.log("signature", signature);                  
-                     const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     console.log("signature", signature);
+                     
+                     //const recoveredAddress = 0x0;
+                     //server side checks is anyway, just a double check here with ethers lib
+                     // if (signature.length > 100) { //TODO: need a better way to determine EIP-1271
+                     //    recoveredAddress = _account
+                     // } else {
+                     //    recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     // }
                      
                      const authSig = {
                        sig: signature,
                        derivedVia: "web3.eth.personal.sign",
                        signedMessage: messageToSign,
-                       address: recoveredAddress.toLocaleLowerCase(),
+                       address: _account.toLocaleLowerCase(),
                      };
                      //end SIWE and authSig
 
@@ -370,7 +377,7 @@ const WalletProvider = React.memo(({ children }) => {
                      console.log('✅[INFO][AuthSig]:', authSig)
 
                      fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                        body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
+                        body: JSON.stringify({ "name": network.chainId.toString(), "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
                         headers: {
                         'Content-Type': 'application/json'
                         },
@@ -441,7 +448,7 @@ const WalletProvider = React.memo(({ children }) => {
                   console.log('✅[INFO][Signature]:', signature)
 
                   fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                     body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
+                     body: JSON.stringify({ "name": network.chainId.toString(), "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
                      headers: {
                      'Content-Type': 'application/json'
                      },
