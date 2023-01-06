@@ -49,6 +49,7 @@ import {
  import NFTCollection from '../../../../types/NFTCollection'
 import { resourceLimits } from 'worker_threads'
 import { nearToGeneralNFTCollectionType } from '../../../../types/NEAR/NFTCollection'
+import { getWalletChain } from '../../../../helpers/address'
  
  const NFTByContract = ({ account }: { account: string }) => {
     let { nftContractAddr_Name = '', chain = '' } = useParams()
@@ -70,7 +71,7 @@ import { nearToGeneralNFTCollectionType } from '../../../../types/NEAR/NFTCollec
        if (account.startsWith("tz")) {
          getNftMetadataTezos()
          //Get Tezos NFT Stats
-       } else if (account.endsWith(".near") || account.endsWith(".testnet")) { //or exact 64 chars and no 0x - for non-named accounts?
+       } else if ((getWalletChain(account) == 'near')) { //or exact 64 chars and no 0x - for non-named accounts?
          getNftMetadataNEAR()
          
        }else {

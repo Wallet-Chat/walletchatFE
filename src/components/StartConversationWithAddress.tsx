@@ -15,7 +15,7 @@ import Blockies from 'react-blockies'
 import { truncateAddress } from '../helpers/truncateString'
 import { IconArrowRight } from '@tabler/icons'
 import { useWallet } from '../context/WalletProvider'
-import { addressIsValid } from '../helpers/address'
+import { addressIsValid, getWalletChain } from '../helpers/address'
 import { TezosToolkit } from '@taquito/taquito';
 import { TaquitoTezosDomainsClient } from '@tezos-domains/taquito-client';
 import { Tzip16Module } from '@taquito/tzip16';
@@ -144,7 +144,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                </Flex>
                </Link>
             )}
-            {(toAddr.includes(".near") || toAddr.includes(".testnet")) && !isResolvingENS && (
+            {(getWalletChain(toAddr) == 'near') && !isResolvingENS && (
                <Link to={`/dm/${toAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"

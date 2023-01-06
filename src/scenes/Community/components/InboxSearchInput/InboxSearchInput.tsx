@@ -16,6 +16,7 @@ import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 import { TezosToolkit } from '@taquito/taquito';
 import { TaquitoTezosDomainsClient } from '@tezos-domains/taquito-client';
 import { Tzip16Module } from '@taquito/tzip16';
+import { getWalletChain } from '../../../../helpers/address'
 
 export default function InboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -81,9 +82,9 @@ export default function InboxSearchInput() {
          suggestedAddress = resolvedAddr
       }
    }
-   if (toAddr.endsWith('.tez') && resolvedAddr && !isResolvingENS) {
+   if ((getWalletChain(toAddr) == 'tezos') && resolvedAddr && !isResolvingENS) {
       suggestedAddress = resolvedAddr
-   } else if ((toAddr.endsWith('.near') || toAddr.endsWith('.testnet')) && !isResolvingENS) {
+   } else if ((getWalletChain(toAddr) == 'near') && !isResolvingENS) {
       suggestedAddress = toAddr  //for NEAR i'm not sure if we need the pubKey here...
    }
 
@@ -162,7 +163,7 @@ export default function InboxSearchInput() {
                               `(${truncateAddress(suggestedAddress)})`}
                            {toAddr.endsWith('.tez') &&
                               `(${truncateAddress(suggestedAddress)})`}
-                           {(toAddr.endsWith('.near') || toAddr.endsWith('.testnet')) &&
+                           {((getWalletChain(toAddr) == 'near')) &&
                               `(${truncateAddress(toAddr)})`}
                         </Text>
                      </Flex>
