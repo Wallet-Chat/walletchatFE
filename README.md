@@ -15,11 +15,7 @@ WalletChat is a web app, Widget and browser extension that makes communication e
 
 ### Front-end (this repo)
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-Go to 'Manage Extensions' in Chrome > Load unpacked > select the 'build' folder.<br />
-The extension should now be installed.
+### `yarn run build` - currently yarn is supoorted, npm may not build correctly.
 
 ### Back-end
 
