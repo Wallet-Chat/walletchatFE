@@ -14,7 +14,6 @@ import {
    VStack,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
-//import DelegateCashButton from 'delegatecash-button-react';
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
@@ -140,14 +139,6 @@ export const App = () => {
                      >
                         Sign-in with Ethereum
                      </Button>
-                     {/* <DelegateCashButton
-                        label="Mint"
-                        connectedWallet="0x0000000000000000000000000000000000000001"
-                        rpcUrl="https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
-                        rounded={true}
-                        onButtonClick={(event: { detail: any }) => console.log(event.detail)}
-                        onWalletSelect={(event: { detail: any }) => console.log(event.detail)}
-                     /> */}
                      <Button
                         variant="black"
                         onClick={() => {

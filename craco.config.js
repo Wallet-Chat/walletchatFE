@@ -1,13 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  babel: {
-    presets: ['@babel/preset-react'],
-    // plugins: [],
-    loaderOptions: (babelLoaderOptions, { env, paths }) => {
-      return babelLoaderOptions;
-    },
-  },
    webpack: {
       configure: (webpackConfig, { env, paths }) => {
          return {
