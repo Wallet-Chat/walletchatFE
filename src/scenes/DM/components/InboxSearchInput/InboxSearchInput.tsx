@@ -16,6 +16,7 @@ import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 import { TezosToolkit } from '@taquito/taquito';
 import { TaquitoTezosDomainsClient } from '@tezos-domains/taquito-client';
 import { Tzip16Module } from '@taquito/tzip16';
+import { getWalletChain } from '../../../../helpers/address'
 
 export default function InboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -185,7 +186,7 @@ export default function InboxSearchInput() {
                               `(${truncateAddress(suggestedAddress)})`}
                            {toAddr.endsWith('.tez') &&
                               `(${truncateAddress(suggestedAddress)})`}
-                           {(toAddr.endsWith('.near') || toAddr.endsWith('.testnet')) &&
+                           {((getWalletChain(toAddr) == 'near')) &&
                               `(${truncateAddress(toAddr)})`}
                         </Text>
                      </Flex>

@@ -22,6 +22,7 @@ import NearNFT from '../../../../types/NEAR/NFT'
 import { tezosTztkToGeneralNFTType } from '../../../../types/Tzkt/NFT'
 import { nearPagodaToGeneralNFTType } from '../../../../types/NEAR/NFT'
 import NFTPortNFTCollection from '../../../../types/NFTPort/NFTCollection'
+import { getWalletChain } from '../../../../helpers/address'
 
 export default function MyNFTs({ account }: { account: string }) {
    // NFTs
@@ -156,7 +157,7 @@ export default function MyNFTs({ account }: { account: string }) {
                   setIsFetchingNFTs(false)
                })
                .catch((error) => console.log(`🚨[GET][Tezos NFTs] ${account}`, error))
-         } else if (account.endsWith(".near") || account.endsWith(".testnet")) {
+         } else if ((getWalletChain(account) == 'near')) {
             if (!process.env.REACT_APP_PAGODA_API_KEY) {
                console.log('Missing PAGODA API key')
                return
@@ -293,7 +294,7 @@ export default function MyNFTs({ account }: { account: string }) {
             .catch((error) => console.log(error))
       }
       fetchAllNfts()
-      if (!account.endsWith(".near") && !account.endsWith(".testnet") && !account.startsWith("tz")) {
+      if ((getWalletChain(account) != 'near') && !account.startsWith("tz")) {
          fetchPoaps()
       }
    }, [account])

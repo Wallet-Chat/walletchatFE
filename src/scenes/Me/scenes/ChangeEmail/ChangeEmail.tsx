@@ -198,7 +198,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
                   </Button>
                </Flex>
                <FormHelperText>
-                  You may change it anytime in your settings
+                  You can change it anytime in your settings
                </FormHelperText>
                <Alert status="info" variant="solid" mt={4}>
                   You must verify your email again if changed here
