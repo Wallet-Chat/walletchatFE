@@ -22,6 +22,23 @@ module.exports = {
                ...webpackConfig.optimization,
                runtimeChunk: false,
             },
+            resolve: {
+               extensions: ['.js', '.jsx', '.tsx', '.ts', '.js', '.json'],
+               modules: [ path.resolve(__dirname, 'node_modules'), 
+                          path.resolve(__dirname, 'src'), ],
+               fallback: {
+                 assert: require.resolve('assert/'),
+                 crypto: false,
+                 http: false,
+                 https: false,
+                 os: false,
+                 stream: require.resolve('stream-browserify'),
+                 url: require.resolve('url/'),
+               },
+             },
+            module: { rules: [ { test: /\.(js|jsx)$/, exclude: /node_modules/, use: { loader: 'babel-loader' } }, 
+{ test: /\.(css|scss)$/, use: [ 'style-loader', 'css-loader', 'sass-loader', ] }, 
+{ test: /\.(png|svg|jpg|gif)$/, use: [ 'file-loader', ], }, ] }, 
             plugins: [
                ...webpackConfig.plugins,
                new HtmlWebpackPlugin({

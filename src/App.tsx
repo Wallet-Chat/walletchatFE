@@ -14,6 +14,7 @@ import {
    VStack,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
+// import { EthereumAuthProvider, useViewerConnection } from '@self.id/framework'
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
@@ -35,6 +36,35 @@ import { isChromeExtension } from './helpers/chrome'
 import NFTByContract from './scenes/NFT/scenes/NFTByContract'
 import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
+
+// export function ConnectCeramicButton() {
+//    const [connection, connect, disconnect] = useViewerConnection()
+ 
+//    return connection.status === 'connected' ? (
+//      <button
+//        onClick={() => {
+//          disconnect()
+//        }}>
+//        Disconnect ({connection.selfID.id})
+//      </button>
+//    ) : 'ethereum' in window ? (
+//      <button
+//        disabled={connection.status === 'connecting'}
+//        onClick={async () => {
+//          const accounts = await window.ethereum.request({
+//            method: 'eth_requestAccounts',
+//          })
+//          await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
+//        }}>
+//        Connect
+//      </button>
+//    ) : (
+//      <p>
+//        An injected Ethereum provider such as{' '}
+//        <a href="https://metamask.io/">MetaMask</a> is needed to authenticate.
+//      </p>
+//    )
+//  }
 
 export const App = () => {
    const location = useLocation();
@@ -93,7 +123,6 @@ export const App = () => {
       <Community account={account} web3={web3} isAuthenticated={isAuthenticated} />
    )
 
-
    if (appLoading || !isAuthenticated) {
       return (
          <Flex
@@ -139,6 +168,7 @@ export const App = () => {
                      >
                         Sign-in with Ethereum
                      </Button>
+                     {/* <ConnectCeramicButton /> */}
                      <Button
                         variant="black"
                         onClick={() => {

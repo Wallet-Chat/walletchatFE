@@ -10,6 +10,7 @@ import reportWebVitals from './reportWebVitals'
 import WalletProvider from './context/WalletProvider'
 import UnreadCountProvider from './context/UnreadCountProvider'
 import IsMobileViewProvider from './context/IsMobileViewProvider'
+import { Provider } from '@self.id/framework'
 import { theme } from './theme'
 
 ReactDOM.render(
@@ -20,7 +21,9 @@ ReactDOM.render(
             <WalletProvider>
                <UnreadCountProvider>
                   <ChakraProvider theme={theme}>
-                     <App />
+                     <Provider client={{ ceramic: 'testnet-clay', connectNetwork: 'dev-unstable' }}>
+                        <App />
+                     </Provider>
                   </ChakraProvider>
                </UnreadCountProvider>
             </WalletProvider>
