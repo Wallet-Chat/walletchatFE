@@ -14,6 +14,9 @@ import {
    VStack,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
+import { useCeramicContext } from './context'
+import { authenticateCeramic } from './utils'
+import type { BasicProfile } from "@datamodels/identity-profile-basic";
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
@@ -38,6 +41,10 @@ import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
    const location = useLocation();
+   const clients = useCeramicContext()
+   const { ceramic, composeClient } = clients
+   const [profile, setProfile] = useState<BasicProfile | undefined>()
+   const [loading, setLoading] = useState<boolean>(false)
 
    const {
       appLoading,
@@ -61,6 +68,8 @@ export const App = () => {
    }, [location]);
 
    const { isMobileView } = useIsMobileView()
+
+   
 
    const closeBtn = (
       <Flex textAlign="right" position="fixed" top={0} right={0}>
