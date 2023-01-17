@@ -24,14 +24,14 @@
       "@near-wallet-selector/meteor-wallet": "^7.4.0",
       "@near-wallet-selector/modal-ui": "^7.4.0",
       "@near-wallet-selector/my-near-wallet": "^7.4.0",
-      "@near-wallet-selector/near-wallet": "^7.4.0",
+      "@near-wallet-selector/near-wallet": "^7.5.0",
       "@near-wallet-selector/nearfi": "^7.4.0",
       "@near-wallet-selector/neth": "^7.4.0",
       "@near-wallet-selector/nightly": "^7.4.0",
       "@near-wallet-selector/nightly-connect": "^7.4.0",
       "@near-wallet-selector/opto-wallet": "^7.4.0",
-      "@near-wallet-selector/sender": "^7.4.0",
-      "@near-wallet-selector/wallet-connect": "^7.4.0",
+      "@near-wallet-selector/sender": "^7.5.0",
+      "@near-wallet-selector/wallet-connect": "^7.5.0",
       "@near-wallet-selector/welldone-wallet": "^7.4.0",
       "@stakenow/siwt": "^0.0.6",
       "@tabler/icons": "^1.54.0",
@@ -112,16 +112,9 @@
    "browser": {
       "crypto": false
    },
-   "browserslist": {
-      "production": [
-         ">0.2%",
-         "not dead",
-         "not op_mini all"
-      ],
-      "development": [
-         "last 1 chrome version",
-         "last 1 firefox version",
-         "last 1 safari version"
-      ]
-   }
+   "browserslist": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+   ]
 }
