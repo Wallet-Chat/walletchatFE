@@ -1,11 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-   babel: {
-  plugins: [
-    "@babel/plugin-proposal-logical-assignment-operators"
-  ],
-},
    webpack: {
       configure: (webpackConfig, { env, paths }) => {
          return {
