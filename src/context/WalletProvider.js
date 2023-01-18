@@ -907,19 +907,22 @@ const WalletProvider = React.memo(({ children }) => {
                }
             }
             console.log('Deleting Login LocalStorage Items')
-            localStorage.removeItem('jwt')
-            localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
-            localStorage.removeItem('metamask-connected')
-            // localStorage.removeItem('lit-auth-signature')
-            // localStorage.removeItem('lit-web3-provider')
-            localStorage.removeItem('current-address')
-            localStorage.removeItem('@sequence.connectedSites')
-            localStorage.removeItem('@sequence.session')
-            localStorage.removeItem('near-wallet-selector:selectedWalletId')
-            localStorage.removeItem('near-wallet-selector:recentlySignedInWallets')
-            localStorage.removeItem('near_app_wallet_auth_key')
-            localStorage.removeItem('near-wallet-selector:contract')
-            //localStorage.removeItem('near-api-js:keystore:'+name+':mainnet')
+            localStorage.clear(); //all items
+
+            // TODO: was trying to leave decrypted chat history here, but got complicated as I was adding new wallets/chains.  Revist when stable
+            // localStorage.removeItem('jwt')
+            // localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
+            // localStorage.removeItem('metamask-connected')
+            // // localStorage.removeItem('lit-auth-signature')
+            // // localStorage.removeItem('lit-web3-provider')
+            // localStorage.removeItem('current-address')
+            // localStorage.removeItem('@sequence.connectedSites')
+            // localStorage.removeItem('@sequence.session')
+            // localStorage.removeItem('near-wallet-selector:selectedWalletId')
+            // localStorage.removeItem('near-wallet-selector:recentlySignedInWallets')
+            // localStorage.removeItem('near_app_wallet_auth_key')
+            // localStorage.removeItem('near-wallet-selector:contract')
+            // //localStorage.removeItem('near-api-js:keystore:'+name+':mainnet')
          }
          storage.set('current-address', { address: null })
          setAccount(null)
