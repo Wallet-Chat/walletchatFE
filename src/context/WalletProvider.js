@@ -907,7 +907,7 @@ const WalletProvider = React.memo(({ children }) => {
                }
             }
             console.log('Deleting Login LocalStorage Items')
-            localStorage.clear(); //all items
+            localStorage.clear(); //all items 
 
             // TODO: was trying to leave decrypted chat history here, but got complicated as I was adding new wallets/chains.  Revist when stable
             // localStorage.removeItem('jwt')
@@ -931,6 +931,7 @@ const WalletProvider = React.memo(({ children }) => {
          setWeb3(null)
          navigate('/')
          setBtnClicks(0)
+         window.location.reload(); 
       } catch (e) {
          console.log(e)
       }
