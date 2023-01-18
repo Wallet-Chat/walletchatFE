@@ -695,6 +695,18 @@ const WalletProvider = React.memo(({ children }) => {
          let _signedIn = false
          //let _network = "testnet"
          let _network = "mainnet"
+         
+         const walletConnect = setupWalletConnect({
+            projectId: "91ccd1b54b569a0b3c5a5dd005da0708",
+            metadata: {
+              name: "NEAR Wallet Selector",
+              description: "Walletchat",
+              url: "https://github.com/near/wallet-selector",
+              icons: [WalletConnectIconUrl],
+            },
+            chainId: "near:testnet",
+            //iconUrl: "https://yourdomain.com/yourwallet-icon.png",
+          });
 
          const selector = await setupWalletSelector({
             network: _network, //this.network,
@@ -702,25 +714,39 @@ const WalletProvider = React.memo(({ children }) => {
                       //setupMyNearWallet({ iconUrl: MyNearIconUrl }),
                       setupLedger({ iconUrl: LedgerIconUrl }),
                       setupSender({ iconUrl: SenderIconUrl }),
-                      setupWalletConnect({ iconUrl: WalletConnectIconUrl })]
+                      walletConnect]
           });
           
           const description = 'Please select a wallet to sign in.';
           //const modal = setupModal(selector, { contractId: "dev-1672109335952-72949654416365", description });
           const modal = setupModal(selector, { contractId: "walletchat.near", description });
          //console.log("NEAR user login: ", currentUser)
-
+         
          _signedIn = selector.isSignedIn()
 
+         _accountPubKey = ""
          if (_signedIn) {
-            //_wallet = await selector.wallet()
+            _wallet = await selector.wallet()
             _account = selector.store.getState().accounts[0].accountId
       
-            const keyStore = new keyStores.BrowserLocalStorageKeyStore()
-            _localKey = await keyStore.getKey(_network, _account)
-            _accountPubKey = _localKey.getPublicKey()
+            if (_wallet.type == "browser"){
+               //browser based wallet
+               const keyStore = new keyStores.BrowserLocalStorageKeyStore()
+               _localKey = await keyStore.getKey(_network, _account)
+               _accountPubKey = _localKey.getPublicKey()
+            } if (_wallet.type == "injected") {
+               //injected wallet (like a chrome extension)
+               _account = window.near.getAccountId();
+               const accountObj = window.near.account()
+               _localKey = await accountObj.connection.signer.keyStore.getKey(_network, _account)
+               _accountPubKey = await _localKey.getPublicKey()
+            } else {
+               //Bridge like walletconnect or something 
+               console.log("Not supported yet - please ASK for this feature!")
+            }
          } else {
             modal.show();
+            return
          }
 
          // check if JWT exists or is timed out:
@@ -752,9 +778,17 @@ const WalletProvider = React.memo(({ children }) => {
                   const origin = "https://walletchat.fun";
                   const statement =
                        "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
-                  // MyNearWallet                   
+
                   const messageToSign = origin + "\r\n" + statement + "\r\n" + _account + "\r\n" + _network + "\r\n" + _nonce;
-                  const signature = _localKey.sign(Buffer.from(messageToSign));
+                  let signature = ""
+                  if (_wallet.type == "browser"){
+                     // MyNearWallet                    
+                     signature = _localKey.sign(Buffer.from(messageToSign));
+                  } if (_wallet.type == "injected") { 
+                     signature = _localKey.sign(Buffer.from(messageToSign));
+                  } else {
+                     console.log("WalletConnect Needs Work!")
+                  }
                   console.log("verify NEAR ")
                 
                   fetch(`${process.env.REACT_APP_REST_API}/signin`, {
@@ -800,7 +834,16 @@ const WalletProvider = React.memo(({ children }) => {
                     "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
                // MyNearWallet
                const messageToSign = origin + "\r\n" + statement + "\r\n" + _account + "\r\n" + _network + "\r\n" + _nonce;
-               const signature = _localKey.sign(Buffer.from(messageToSign));
+               
+               let signature = ""
+               if (_wallet.type == "browser"){
+                  // MyNearWallet                    
+                  signature = _localKey.sign(Buffer.from(messageToSign));
+               } if (_wallet.type == "injected") { 
+                  signature = _localKey.sign(Buffer.from(messageToSign));
+               } else {
+                  console.log("WalletConnect Needs Work!")
+               }
                console.log("verify NEAR ")
              
                fetch(`${process.env.REACT_APP_REST_API}/signin`, {
