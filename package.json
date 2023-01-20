@@ -10,13 +10,17 @@
     "@babel/plugin-proposal-logical-assignment-operators": "^7.20.7",
     "@babel/plugin-proposal-optional-chaining": "^7.20.7",
     "@babel/preset-env": "^7.20.2",
+    "@ceramicnetwork/blockchain-utils-linking": "^2.8.0",
     "@ceramicnetwork/common": "^2.16.0",
     "@ceramicnetwork/http-client": "^2.13.0",
     "@chakra-ui/react": "^1.8.6",
     "@coinbase/wallet-sdk": "^3.3.0",
     "@composedb/client": "^0.3.1",
+    "@composedb/devtools": "^0.3.1",
     "@craco/craco": "^6.4.3",
     "@datamodels/identity-profile-basic": "^0.2.0",
+    "@didtools/cacao": "^1.1.0",
+    "@didtools/pkh-ethereum": "^0.0.3",
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.8.1",
     "@ensdomains/ensjs": "^2.1.0",
@@ -121,16 +125,9 @@
   "browser": {
     "crypto": false
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ]
 }
