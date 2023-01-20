@@ -3,7 +3,6 @@ import * as React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 import { ChakraProvider } from '@chakra-ui/react'
-import {CeramicWrapper} from "./context";
 
 import { App } from './App'
 import reportWebVitals from './reportWebVitals'
@@ -12,7 +11,6 @@ import WalletProvider from './context/WalletProvider'
 import UnreadCountProvider from './context/UnreadCountProvider'
 import IsMobileViewProvider from './context/IsMobileViewProvider'
 import { theme } from './theme'
-import './styles/globals.css'
 
 ReactDOM.render(
    <React.StrictMode>
@@ -22,9 +20,7 @@ ReactDOM.render(
             <WalletProvider>
                <UnreadCountProvider>
                   <ChakraProvider theme={theme}>
-                     <CeramicWrapper>
                      <App />
-                     </CeramicWrapper>
                   </ChakraProvider>
                </UnreadCountProvider>
             </WalletProvider>
