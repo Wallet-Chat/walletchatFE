@@ -132,7 +132,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
                   Email verification succeeded!  You are now eligible to recieve notifications.  
                </Alert>
                <Alert status="success" variant="solid" mt={4}>
-                  You may close this page and return to ApeCoinStaking.io / NF3.exchange or continue to chat here in the full web app.
+                  You may close this page or continue to chat here in the full web app.
                </Alert>        
          </Box>  
       )

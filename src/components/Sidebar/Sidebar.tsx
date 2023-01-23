@@ -464,7 +464,7 @@ export default function Sidebar() {
                            />
                         </CLink>
                         <CLink
-                           href="https://discord.com/invite/S47CDmDtdf"
+                           href="http://discord.gg/S47CDmDtdf"
                            target="_blank"
                         >
                            <Image

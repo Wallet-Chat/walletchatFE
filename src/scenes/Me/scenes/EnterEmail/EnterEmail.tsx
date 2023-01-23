@@ -157,9 +157,12 @@ const EnterEmail = ({ account }: { account: string }) => {
       <Box p={6} pt={16} background="white" width="100%">
          <form onSubmit={handleSubmit(onSubmit)}>
             <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-                Notification Settings
+                Optional Notifications
                <br />
             </Text>
+            <Button variant="black" height="auto" type="submit" onClick={handleCancel}>
+               Skip this step for now
+            </Button>
             <FormControl>
             <Stack pl={0} mt={6} spacing={2}>
             <Checkbox
