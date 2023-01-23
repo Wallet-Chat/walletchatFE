@@ -5,6 +5,7 @@ import Web3 from 'web3'
 //import Web3Modal from 'web3modal'
 import Web3Modal from '@0xsequence/web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+//import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 import { sequence } from '0xsequence'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import { getNormalizeAddress } from '.'
@@ -296,10 +297,20 @@ const WalletProvider = React.memo(({ children }) => {
       return false
    }
 
+   function parseJwt (token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+  
+      return JSON.parse(jsonPayload);
+   }
+
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
-         let _provider, _account, _nonce, _signer
+         let _provider, _account, _nonce, _signer, _instance
          let _signedIn = false
          let _web3 = new Web3(provider)
 
@@ -308,9 +319,15 @@ const WalletProvider = React.memo(({ children }) => {
             const _accounts = await getAccountsExtension(provider)
             _account = getNormalizeAddress(_accounts)
          } else {
-            const instance = await web3Modal.connect()
-            setWeb3ModalProvider(instance)
-            _provider = new ethers.providers.Web3Provider(instance)
+            //if we are within an iframe use the parent provider (Requirement for Ledger Live)
+            // if (window !== window.parent) {
+            //    _instance = new IFrameEthereumProvider()
+            // } else {
+               _instance = await web3Modal.connect()
+            // }
+
+            setWeb3ModalProvider(_instance)
+            _provider = new ethers.providers.Web3Provider(_instance);
             _account = await _provider.getSigner().getAddress()
             _signer = await _provider.getSigner()
             const network = await _provider.getNetwork()
@@ -397,6 +414,16 @@ const WalletProvider = React.memo(({ children }) => {
                         //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                         //localStorage.setItem('lit-web3-provider', _provider.connection.url);
                         console.log('✅[INFO][JWT]:', data.access)
+
+                        //if we log in with a full delegate, act as the vault
+                        const walletInJWT = parseJwt(data.access).sub
+                        if (walletInJWT && walletInJWT != _account) {
+                           _account = walletInJWT
+                           console.log('✅[Using Full Delegate Wallet]:', walletInJWT)
+                           setAccount(_account)
+                           getName(_account)
+                           getSettings(_account)
+                        }
                      })
                   })
                   .catch((error) => {
@@ -468,6 +495,16 @@ const WalletProvider = React.memo(({ children }) => {
                      // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      // localStorage.setItem('lit-web3-provider', _provider.connection.url);
                      console.log('✅[INFO][JWT]:', data.access)
+
+                     //if we log in with a full delegate, act as the vault
+                     const walletInJWT = parseJwt(data.access).sub
+                     if (walletInJWT && walletInJWT != _account) {
+                        _account = walletInJWT
+                        console.log('✅[Using Full Delegate Wallet]:', walletInJWT)
+                        setAccount(_account)
+                        getName(_account)
+                        getSettings(_account)
+                     }
                   })
                   .catch((error) => {
                      console.error('🚨[GET][Sign-In Failed]:', error)
