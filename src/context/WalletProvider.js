@@ -417,9 +417,9 @@ const WalletProvider = React.memo(({ children }) => {
 
                         //if we log in with a full delegate, act as the vault
                         const walletInJWT = parseJwt(data.access).sub
-                        if (walletInJWT && walletInJWT != _account) {
+                        if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
+                           console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
                            _account = walletInJWT
-                           console.log('✅[Using Full Delegate Wallet]:', walletInJWT)
                            setAccount(_account)
                            getName(_account)
                            getSettings(_account)
@@ -498,9 +498,9 @@ const WalletProvider = React.memo(({ children }) => {
 
                      //if we log in with a full delegate, act as the vault
                      const walletInJWT = parseJwt(data.access).sub
-                     if (walletInJWT && walletInJWT != _account) {
+                     if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
+                        console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
                         _account = walletInJWT
-                        console.log('✅[Using Full Delegate Wallet]:', walletInJWT)
                         setAccount(_account)
                         getName(_account)
                         getSettings(_account)
