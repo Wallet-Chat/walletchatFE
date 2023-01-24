@@ -1,0 +1,42 @@
+{
+    "id": "walletchat",
+    "name": "WalletChat",
+    "url": "https://dapp-browser.apps.ledger.com",
+    "params": {
+      "dappUrl": "https://app.walletchat.fun",
+      "nanoApp": "WalletChat",
+      "dappName": "WalletChat",
+      "networks": [
+        {
+          "currency": "ethereum",
+          "chainID": 1,
+          "nodeURL": "wss://eth-mainnet.ws.alchemyapi.io/v2/xxx"
+        }
+      ]
+    },
+    "homepageUrl": "https://walletchat.fun",
+    "icon": "https://walletchat-pfp-storage.sgp1.digitaloceanspaces.com/WalletChat.jpg",
+    "platform": "all",
+    "apiVersion": "0.0.1",
+    "manifestVersion": "1",
+    "branch": "stable",
+    "categories": [
+      "nfts",
+      "defi"
+    ],
+     "currencies": [
+      "ethereum"
+    ],
+    "content": {
+      "shortDescription": {
+        "en": "WalletChat: The Web3 Social Layer"
+      },
+      "description": {
+        "en": "WalletChat: The Web3 Social Layer"
+      }
+    },
+    "permissions": [],
+    "domains": [
+      "https://*"
+    ]
+}
