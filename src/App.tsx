@@ -35,6 +35,7 @@ import { isChromeExtension } from './helpers/chrome'
 import NFTByContract from './scenes/NFT/scenes/NFTByContract'
 import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
+import NewCommunity from './scenes/NewCommunity'
 
 export const App = () => {
    const location = useLocation();
@@ -348,6 +349,26 @@ export const App = () => {
                                  >
                                     <Tag background="white">
                                        Select a chat to start messaging
+                                    </Tag>
+                                 </Flex>
+                              )}
+                           </Flex>
+                        }
+                     />
+                     <Route
+                        path="/community/new"
+                        element={
+                           <Flex>
+                              <NewCommunity web3={web3} />
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                    <Tag background="white">
+                                       Create new community group chat
                                     </Tag>
                                  </Flex>
                               )}
