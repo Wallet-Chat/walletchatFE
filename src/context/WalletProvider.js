@@ -5,7 +5,7 @@ import Web3 from 'web3'
 //import Web3Modal from 'web3modal'
 import Web3Modal from '@0xsequence/web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-//import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
+import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 import { sequence } from '0xsequence'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import { getNormalizeAddress } from '.'
@@ -320,11 +320,12 @@ const WalletProvider = React.memo(({ children }) => {
             _account = getNormalizeAddress(_accounts)
          } else {
             //if we are within an iframe use the parent provider (Requirement for Ledger Live)
-            // if (window !== window.parent) {
-            //    _instance = new IFrameEthereumProvider()
-            // } else {
+            if (window !== window.parent) {
+               console.log('USING LEDGER IFRAME PROVIDER')
+               _instance = new IFrameEthereumProvider()
+            } else {
                _instance = await web3Modal.connect()
-            // }
+            }
 
             setWeb3ModalProvider(_instance)
             _provider = new ethers.providers.Web3Provider(_instance);
