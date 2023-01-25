@@ -7,7 +7,7 @@ import Web3Modal from '@0xsequence/web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { sequence } from '0xsequence'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
-import { getNormalizeAddress } from '.'
+import { getNormalizedAddress } from '../utils/address'
 
 import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
@@ -118,24 +118,30 @@ const WalletProvider = React.memo(({ children }) => {
    }, [account])
 
    useEffect(() => {
+      console.log('useEffect: web3modalProvider', web3ModalProvider, web3ModalProvider?.on)
       if (web3ModalProvider?.on) {
          const handleAccountsChanged = (accounts) => {
             console.log('handleAccountsChanged', accounts)
-            setAccount(getNormalizeAddress(accounts))
-            setName(null)
-            setBtnClicks(null)
-            setEmail(null)
-            setNotifyDM(null)
-            setNotify24(null)
-            getName(accounts[0])
-            getSettings(accounts[0])
-            storage.set('active-account', {
-               address: getNormalizeAddress(accounts),
-            })
-            console.log('[account changes]: ', getNormalizeAddress(accounts))
-            if (!isChromeExtension()) {
-               // TODO: how can we refresh data loaded without manual refresh?
-               window.location.reload();  
+            if (accounts?.[0]) {
+               setAccount(getNormalizedAddress(accounts[0]))
+               setName(null)
+               setBtnClicks(null)
+               setEmail(null)
+               setNotifyDM(null)
+               setNotify24(null)
+               getName(accounts[0])
+               getSettings(accounts[0])
+               storage.set('active-account', {
+                  address: getNormalizedAddress(accounts[0]),
+               })
+               console.log(
+                  '[account changes]: ',
+                  getNormalizedAddress(accounts[0])
+               )
+               if (!isChromeExtension()) {
+                  // TODO: how can we refresh data loaded without manual refresh?
+                  window.location.reload()
+               }
             }
          }
 
@@ -307,14 +313,15 @@ const WalletProvider = React.memo(({ children }) => {
       console.log('connectWallet')
       try {
          let _provider, _account, _signer
-         let _signedIn = false
          let _web3 = new Web3(provider)
          setAppLoading(true)
 
          if (isChromeExtension()) {
             _provider = createMetaMaskProvider()
             const _accounts = await getAccountsExtension(provider)
-            _account = getNormalizeAddress(_accounts)
+            if (accounts?.[0]) {
+               _account = getNormalizedAddress(_accounts[0])
+            }
          } else {
             const instance = await web3Modal.connect()
             setWeb3ModalProvider(instance)
@@ -325,35 +332,40 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(network.chainId)
             //const _w3 = new Web3(_provider)
 
+            const localStorageAccount = await storage.get('active-account')
+
             // If last login account has signed in before,
             // (1) retrieve JWT from localStorage, and
             // (2) check whether it has timed out:
-            if (_account === account) {
-               fetch(`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
-                  method: 'GET',
-                  headers: {
-                     'Content-Type': 'application/json',
-                     Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-                  },
-               })
-               .then((response) => response.json())
-               .then(async (data) => {
-                  console.log('✅[POST][Welcome]:', data.msg)
-                  //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
-                  if (!data.msg.includes(_account.toLocaleLowerCase())) {
-                     getSignatureAndJWT(_account, network, _signer, provider)
-                  } else {
+            if (
 
+               getNormalizedAddress(_account) === localStorageAccount?.address
+            ) {
+               fetch(
+                  `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`,
+                  {
+                     method: 'GET',
+                     headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                     },
                   }
-               })
-               .catch((error) => {
-                  console.error('🚨[POST][Welcome]:', error)
-               })
+               )
+                  .then((response) => response.json())
+                  .then(async (data) => {
+                     console.log('✅[POST][Welcome]:', data.msg)
+                     setAccount(_account)
+                  })
+                  .catch((error) => {
+                     console.error('🚨[POST][Welcome]:', error)
+                     getSignatureAndJWT(_account, network, _signer, _provider)
+                  })
             }
             // If a new account is detected,
             // request signature and get JWT
             else {
-               getSignatureAndJWT(_account, network, _signer, provider)
+               const network = await _provider.getNetwork()
+               getSignatureAndJWT(_account, network, _signer, _provider)
             }
 
             // if (network.chainId !== '1') {
@@ -435,6 +447,7 @@ const WalletProvider = React.memo(({ children }) => {
          })
          .then((response) => response.json())
          .then(async (data) => {
+            console.log(provider)
             setAccount(_account)
             localStorage.setItem('jwt', data.access)
             localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
@@ -442,7 +455,7 @@ const WalletProvider = React.memo(({ children }) => {
             Lit.connectManual()
             console.log('✅[POST][SignInJWT]:', data.access)
             storage.set('active-account', {
-               address: getNormalizeAddress(_account),
+               address: getNormalizedAddress(_account),
                jwt: data.access,
             })
          }).catch((error) => {
