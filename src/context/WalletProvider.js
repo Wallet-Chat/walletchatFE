@@ -96,6 +96,27 @@ const WalletProvider = React.memo(({ children }) => {
       connectEagerly()
    }, [web3Modal])
 
+   React.useEffect(() => {
+      console.log('useEffect: [account]')
+      if (account) {
+         setAccount(account)
+         // setChainId(chainId)
+         setAuthenticated(true)
+         getName(account)
+         getSettings(account)
+
+         if (isChromeExtension()) {
+            storage.set('metamask-connected', { connected: true })
+            chrome.storage.local.set({
+               account: account,
+            })
+         }
+         if (appLoading) {
+            setAppLoading(false)
+         }
+      }
+   }, [account])
+
    useEffect(() => {
       if (web3ModalProvider?.on) {
          const handleAccountsChanged = (accounts) => {
@@ -108,7 +129,7 @@ const WalletProvider = React.memo(({ children }) => {
             setNotify24(null)
             getName(accounts[0])
             getSettings(accounts[0])
-            storage.set('current-address', {
+            storage.set('active-account', {
                address: getNormalizeAddress(accounts),
             })
             console.log('[account changes]: ', getNormalizeAddress(accounts))
@@ -285,9 +306,10 @@ const WalletProvider = React.memo(({ children }) => {
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
-         let _provider, _account, _nonce, _signer
+         let _provider, _account, _signer
          let _signedIn = false
          let _web3 = new Web3(provider)
+         setAppLoading(true)
 
          if (isChromeExtension()) {
             _provider = createMetaMaskProvider()
@@ -301,162 +323,38 @@ const WalletProvider = React.memo(({ children }) => {
             _signer = await _provider.getSigner()
             const network = await _provider.getNetwork()
             setChainId(network.chainId)
-            const _w3 = new Web3(_provider)
+            //const _w3 = new Web3(_provider)
 
-            // check if JWT exists or is timed out:
-            fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
-               method: 'GET',
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-               },
-            })
-            .then((response) => response.json())
-            .then(async (data) => {
-               console.log('✅[POST][Welcome]:', data.msg)
-               //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
-               if (!data.msg.includes(_account.toLocaleLowerCase())) {
-                  //GET JWT
-                  fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
-                     method: 'GET',
-                     headers: {
-                        'Content-Type': 'application/json',
-                     },
-                  })
-                  .then((response) => response.json())
-                  .then(async (data) => {
-                     console.log('✅[GET][Nonce]:', data)
-                     _nonce = data.Nonce
-                     //console.log('✅[GET][Data.nonce]:', data.Nonce)
-                     //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
-
-                     //SIWE and setup LIT authSig struct
-                     const domain = "walletchat.fun";
-                     const origin = "https://walletchat.fun";
-                     const statement =
-                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
-                     
-                     const siweMessage = new SiweMessage({
-                       domain,
-                       address: _account,
-                       statement,
-                       uri: origin,
-                       version: "1",
-                       chainId: network.chainId,
-                       nonce: _nonce,
-                     });
-                     
-                     const messageToSign = siweMessage.prepareMessage();
-                     const signature = await _signer.signMessage(messageToSign); 
-                     console.log("signature", signature);                  
-                     const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
-                     
-                     const authSig = {
-                       sig: signature,
-                       derivedVia: "web3.eth.personal.sign",
-                       signedMessage: messageToSign,
-                       address: recoveredAddress.toLocaleLowerCase(),
-                     };
-                     //end SIWE and authSig
-
-                     //const signature = await _signer.signMessage(_nonce)
-                     console.log('✅[INFO][AuthSig]:', authSig)
-
-                     fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                        body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
-                        headers: {
-                        'Content-Type': 'application/json'
-                        },
-                        method: 'POST'
-                     })
-                     .then((response) => response.json())
-                     .then(async (data) => {
-                        localStorage.setItem('jwt', data.access)
-                        localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
-                        localStorage.setItem('lit-web3-provider', _provider.connection.url)
-                        Lit.connectManual()
-                        console.log('✅[INFO][JWT]:', data.access)
-                     })
-                  })
-                  .catch((error) => {
-                     console.error('🚨[GET][Nonce]:', error)
-                  })
-                  //END JWT AUTH sequence
-
-             //below part of /welcome check for existing token     
-             }
-            })
-            .catch((error) => {
-               console.error('🚨[POST][Welcome]:', error)
-               //GET JWT
-               fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+            // If last login account has signed in before,
+            // (1) retrieve JWT from localStorage, and
+            // (2) check whether it has timed out:
+            if (_account === account) {
+               fetch(`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
                   method: 'GET',
                   headers: {
                      'Content-Type': 'application/json',
+                     Authorization: `Bearer ${localStorage.getItem('jwt')}`,
                   },
                })
                .then((response) => response.json())
                .then(async (data) => {
-                  console.log('✅[GET][Nonce]:', data)
-                  _nonce = data.Nonce
-                  //console.log('✅[GET][Data.nonce]:', data.Nonce)
-                  //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
+                  console.log('✅[POST][Welcome]:', data.msg)
+                  //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
+                  if (!data.msg.includes(_account.toLocaleLowerCase())) {
+                     getSignatureAndJWT(_account, network, _signer, provider)
+                  } else {
 
-                  //SIWE and setup LIT authSig struct
-                  const domain = "walletchat.fun";
-                     const origin = "https://walletchat.fun";
-                     const statement =
-                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
-                     
-                     const _siweMessage = new SiweMessage({
-                       domain,
-                       address: _account,
-                       statement,
-                       uri: origin,
-                       version: "1",
-                       chainId: network.chainId,
-                       nonce: _nonce,
-                     });
-                     
-                     const messageToSign = _siweMessage.prepareMessage();
-                     const signature = await _signer.signMessage(messageToSign); 
-                     //console.log("signature", signature);                  
-                     //const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
-                     
-                     const authSig = {
-                       sig: signature,
-                       derivedVia: "web3.eth.personal.sign",
-                       signedMessage: messageToSign,
-                       address: _account.toLocaleLowerCase(),
-                     };
-                     //end SIWE and authSig
-                  //const signature = await _signer.signMessage(_nonce)
-                  console.log('✅[INFO][Signature]:', signature)
-
-                  fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                     body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
-                     headers: {
-                     'Content-Type': 'application/json'
-                     },
-                     method: 'POST'
-                  })
-                  .then((response) => response.json())
-                  .then(async (data) => {
-                     localStorage.setItem('jwt', data.access);
-                     localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
-                     localStorage.setItem('lit-web3-provider', _provider.connection.url);
-                     Lit.connectManual()
-                     console.log('✅[INFO][JWT]:', data.access)
-                  })
-                  .catch((error) => {
-                     console.error('🚨[GET][Sign-In Failed]:', error)
-                  })
+                  }
                })
                .catch((error) => {
-                  console.error('🚨[GET][Nonce]:', error)
+                  console.error('🚨[POST][Welcome]:', error)
                })
-               //END JWT AUTH sequence
-            })
+            }
+            // If a new account is detected,
+            // request signature and get JWT
+            else {
+               getSignatureAndJWT(_account, network, _signer, provider)
+            }
 
             // if (network.chainId !== '1') {
             //    // check if the chain to connect to is installed
@@ -470,31 +368,90 @@ const WalletProvider = React.memo(({ children }) => {
          }
 
          setProvider(_provider)
-
-         if (_account) {
-            setAppLoading(true)
-            setAccount(_account)
-            // setChainId(chainId)
-            setAuthenticated(true)
-            getName(_account)
-            getSettings(_account)
-            setWeb3(_web3)
-
-            if (isChromeExtension()) {
-               storage.set('metamask-connected', { connected: true })
-               chrome.storage.local.set({
-                  account: _account,
-               })
-            }
-         }
+         setWeb3(_web3)
+         
       } catch (error) {
          console.log('🚨connectWallet', error)
          if (error.message === "User Rejected") {
             setError("Your permission is needed to continue. Please try signing in again.")
          }
-      } finally {
          setAppLoading(false)
       }
+   }
+
+   const getSignatureAndJWT = (_account, network, signer, provider) => {
+
+      fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+      .then((response) => response.json())
+      .then(async (data) => {
+         console.log('✅[GET][Nonce]:', data)
+         let _nonce = data.Nonce
+         //console.log('✅[GET][Data.nonce]:', data.Nonce)
+         //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
+
+         //SIWE and setup LIT authSig struct
+         const domain = "walletchat.fun";
+         const origin = "https://walletchat.fun";
+         const statement =
+            "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+         
+         const siweMessage = new SiweMessage({
+            domain,
+            address: _account,
+            statement,
+            uri: origin,
+            version: "1",
+            chainId: network.chainId,
+            nonce: _nonce,
+         });
+         
+         const messageToSign = siweMessage.prepareMessage();
+         const signature = await signer.signMessage(messageToSign); 
+         console.log("signature", signature);                  
+         const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+         
+         const authSig = {
+            sig: signature,
+            derivedVia: "web3.eth.personal.sign",
+            signedMessage: messageToSign,
+            address: recoveredAddress.toLocaleLowerCase(),
+         };
+         //end SIWE and authSig
+
+         //const signature = await _signer.signMessage(_nonce)
+         console.log('✅[INFO][AuthSig]:', authSig)
+
+         fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+            body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            method: 'POST'
+         })
+         .then((response) => response.json())
+         .then(async (data) => {
+            setAccount(_account)
+            localStorage.setItem('jwt', data.access)
+            localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
+            localStorage.setItem('lit-web3-provider', provider.connection.url)
+            Lit.connectManual()
+            console.log('✅[POST][SignInJWT]:', data.access)
+            storage.set('active-account', {
+               address: getNormalizeAddress(_account),
+               jwt: data.access,
+            })
+         }).catch((error) => {
+            console.log('🚨[POST][SignInJWT]:', error)
+         })
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Nonce]:', error)
+      })
    }
 
    const disconnectWallet = async () => {
@@ -516,11 +473,11 @@ const WalletProvider = React.memo(({ children }) => {
             localStorage.removeItem('metamask-connected')
             localStorage.removeItem('lit-auth-signature')
             localStorage.removeItem('lit-web3-provider')
-            localStorage.removeItem('current-address')
             localStorage.removeItem('@sequence.connectedSites')
             localStorage.removeItem('@sequence.session')
+            localStorage.removeItem('current-account-address')
          }
-         storage.set('current-address', { address: null })
+         storage.set('active-account', { address: null })
          setAccount(null)
          setChainId(null)
          setAuthenticated(false)
