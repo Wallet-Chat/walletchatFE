@@ -32,6 +32,12 @@ a {
 .bg-pattern {
     background: #FFF url('./images/bg-pattern.svg') repeat;
 }
+
+.near-wallet-selector-modal {
+  max-width: 200px;
+  max-height: 200px;
+}
+
 .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: var(--chakra-colors-lightgray-600) #FFF;
