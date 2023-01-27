@@ -2,11 +2,13 @@ import {
    Box,
    Heading,
    Flex,
+   Button,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
+import { Link } from 'react-router-dom'
 
 import { InboxItemType } from '../../types/InboxItem'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
@@ -128,21 +130,30 @@ const Inbox = ({
          overflowY="scroll"
          className="custom-scrollbar"
       >
-         <Box
-            px={5}
-            pt={5}
-            pb={3}
-            pos="sticky"
-            top="0"
-            background="white"
-         >
+         <Box px={5} pt={5} pb={3} pos="sticky" top="0" background="white">
             <Flex justifyContent="space-between" mb={2}>
                <Heading size="lg">Communities</Heading>
+               <Button
+                  as={Link}
+                  to="/community/new"
+                  size="sm"
+                  variant="outline"
+                  _hover={{
+                     textDecoration: 'none',
+                     backgroundColor: 'var(--chakra-colors-lightgray-300)',
+                  }}
+               >
+                  + New
+               </Button>
             </Flex>
-            {/* <InboxSearchInput /> */}
          </Box>
 
-         <InboxList context="communities" data={communities} web3={web3} account={account} />
+         <InboxList
+            context="communities"
+            data={communities}
+            web3={web3}
+            account={account}
+         />
       </Box>
    )
 }

@@ -140,7 +140,7 @@ const WalletProvider = React.memo(({ children }) => {
                )
                if (!isChromeExtension()) {
                   // TODO: how can we refresh data loaded without manual refresh?
-                  window.location.reload()
+                  // window.location.reload()
                }
             }
          }
@@ -308,6 +308,16 @@ const WalletProvider = React.memo(({ children }) => {
             ],
          })
    }
+
+   useEffect(() => {
+      async function listenMMAccount() {
+         window.ethereum.on('accountsChanged', async function () {
+            console.log('listenMMAccount', accounts)
+            connectWallet()
+         })
+      }
+      listenMMAccount()
+   }, [])
 
    const connectWallet = async () => {
       console.log('connectWallet')

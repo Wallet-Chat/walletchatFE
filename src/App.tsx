@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { IconX } from '@tabler/icons'
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import {
@@ -29,6 +29,7 @@ import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
+import CreateCommunity from './scenes/Community/scenes/CreateCommunity'
 import { isChromeExtension } from './helpers/chrome'
 import NFTByContract from './scenes/NFT/scenes/NFTByContract'
 import POAPById from './scenes/NFT/scenes/POAPById'
@@ -234,10 +235,19 @@ export const App = () => {
                            </Flex>
                         }
                      />
-                     <Route path="/me/enter-email" element={<EnterEmail account={account} />} />
+                     <Route
+                        path="/me/enter-email"
+                        element={<EnterEmail account={account} />}
+                     />
                      <Route path="/me/change-name" element={<ChangeName />} />
-                     <Route path="/me/change-email" element={<ChangeEmail account={account} />} />
-                     <Route path="/me/verify-email" element={<VerifyEmail account={account} />} />
+                     <Route
+                        path="/me/change-email"
+                        element={<ChangeEmail account={account} />}
+                     />
+                     <Route
+                        path="/me/verify-email"
+                        element={<VerifyEmail account={account} />}
+                     />
                      <Route
                         path="/nft"
                         element={
@@ -271,7 +281,8 @@ export const App = () => {
                                     justifyContent="center"
                                  >
                                     <Tag background="white">
-                                       You must own at least one NFT from the Searched Collection 
+                                       You must own at least one NFT from the
+                                       Searched Collection
                                     </Tag>
                                  </Flex>
                               )}
@@ -326,6 +337,23 @@ export const App = () => {
                         }
                      />
                      <Route
+                        path="/community/new"
+                        element={
+                           <Flex>
+                              <CreateCommunity web3={web3} />
+                              {!isMobileView && (
+                                 <Flex
+                                    background="lightgray.200"
+                                    flex="1"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                 >
+                                 </Flex>
+                              )}
+                           </Flex>
+                        }
+                     />
+                     <Route
                         path="/community/:community"
                         element={
                            <Flex>
@@ -334,10 +362,7 @@ export const App = () => {
                            </Flex>
                         }
                      />
-                     <Route
-                        path="/"
-                        element={<Navigate to="/dm" replace />}
-                     />
+                     <Route path="/" element={<Navigate to="/dm" replace />} />
                      <Route
                         path="/index.html"
                         element={<Navigate to="/dm" replace />}
