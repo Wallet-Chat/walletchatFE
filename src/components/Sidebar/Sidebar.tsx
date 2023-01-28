@@ -33,6 +33,7 @@ import { isMobile } from 'react-device-detect'
 import { IconBrandTwitter } from '@tabler/icons'
 
 import IconDiscord from '../../images/icon-products/icon-discord.svg'
+import IconPrivacy from '../../images/privacy-policy.png'
 import logoThumb from '../../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../../helpers/contract'
 import NFTPortNFT from '../../types/NFTPort/NFT'
@@ -217,6 +218,17 @@ export default function Sidebar() {
                         >
                            <Image
                               src={IconDiscord}
+                              alt=""
+                              height="24px"
+                              width="24px"
+                           />
+                        </CLink>
+                        <CLink
+                           href="https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c"
+                           target="_blank"
+                        >
+                           <Image
+                              src={IconPrivacy}
                               alt=""
                               height="24px"
                               width="24px"
@@ -469,6 +481,17 @@ export default function Sidebar() {
                         >
                            <Image
                               src={IconDiscord}
+                              alt=""
+                              height="24px"
+                              width="24px"
+                           />
+                        </CLink>
+                        <CLink
+                           href="https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c"
+                           target="_blank"
+                        >
+                           <Image
+                              src={IconPrivacy}
                               alt=""
                               height="24px"
                               width="24px"

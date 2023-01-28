@@ -73,6 +73,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [notify24, setNotify24] = useState('true')
    const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
+   const [delegate, setDelegate] = useState(null)
    const [accounts, setAccounts] = useState(null)
    const [web3, setWeb3] = useState(null)
    const [isAuthenticated, setAuthenticated] = useState(false)
@@ -266,6 +267,14 @@ const WalletProvider = React.memo(({ children }) => {
       return false
    }
 
+   function parseJwt (token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+   }
    const walletRequestPermissions = async () => {
       const instance = await web3Modal.connect()
             setWeb3ModalProvider(instance)
@@ -349,13 +358,13 @@ const WalletProvider = React.memo(({ children }) => {
                      const messageToSign = siweMessage.prepareMessage();
                      const signature = await _signer.signMessage(messageToSign); 
                      console.log("signature", signature);                  
-                     const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                     //const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
                      
                      const authSig = {
                        sig: signature,
                        derivedVia: "web3.eth.personal.sign",
                        signedMessage: messageToSign,
-                       address: recoveredAddress.toLocaleLowerCase(),
+                       address: _account.toLocaleLowerCase(),
                      };
                      //end SIWE and authSig
 
@@ -363,7 +372,7 @@ const WalletProvider = React.memo(({ children }) => {
                      console.log('✅[INFO][AuthSig]:', authSig)
 
                      fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                        body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
+                        body: JSON.stringify({ "name": network.chainId.toString(), "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
                         headers: {
                         'Content-Type': 'application/json'
                         },
@@ -372,10 +381,21 @@ const WalletProvider = React.memo(({ children }) => {
                      .then((response) => response.json())
                      .then(async (data) => {
                         localStorage.setItem('jwt', data.access)
+                        //Used for LIT encryption authSign parameter
                         localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
                         localStorage.setItem('lit-web3-provider', _provider.connection.url)
                         Lit.connectManual()
                         console.log('✅[INFO][JWT]:', data.access)
+                        //if we log in with a full delegate, act as the vault
+                        const walletInJWT = parseJwt(data.access).sub
+                        if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
+                           console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                           setDelegate(_account)
+                           _account = walletInJWT
+                           setAccount(_account)
+                           getName(_account)
+                           getSettings(_account)
+                        }
                      })
                   })
                   .catch((error) => {
@@ -434,7 +454,7 @@ const WalletProvider = React.memo(({ children }) => {
                   console.log('✅[INFO][Signature]:', signature)
 
                   fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                     body: JSON.stringify({ "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
+                     body: JSON.stringify({ "name": network.chainId.toString(), "address": _account, "nonce": _nonce, "msg": messageToSign, "sig": signature }),
                      headers: {
                      'Content-Type': 'application/json'
                      },
@@ -443,10 +463,20 @@ const WalletProvider = React.memo(({ children }) => {
                   .then((response) => response.json())
                   .then(async (data) => {
                      localStorage.setItem('jwt', data.access);
+                     //Used for LIT encryption authSign parameter
                      localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      localStorage.setItem('lit-web3-provider', _provider.connection.url);
                      Lit.connectManual()
                      console.log('✅[INFO][JWT]:', data.access)
+                     //if we log in with a full delegate, act as the vault
+                     const walletInJWT = parseJwt(data.access).sub
+                     if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
+                        console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                        _account = walletInJWT
+                        setAccount(_account)
+                        getName(_account)
+                        getSettings(_account)
+                     }
                   })
                   .catch((error) => {
                      console.error('🚨[GET][Sign-In Failed]:', error)
@@ -504,11 +534,13 @@ const WalletProvider = React.memo(({ children }) => {
             console.log('Disconnect Wallet Chrome Extension True')
             storage.set('metamask-connected', { connected: false })
          } else {
+            if (web3 != null) {
             console.log(web3ModalProvider.close)
             if (web3ModalProvider.close) {
                await web3ModalProvider.close()
                await web3Modal.clearCachedProvider()
                setProvider(null)
+               }
             }
             console.log('Deleting Login LocalStorage Items')
             localStorage.removeItem('jwt')
@@ -527,6 +559,7 @@ const WalletProvider = React.memo(({ children }) => {
          setWeb3(null)
          navigate('/')
          setBtnClicks(0)
+         window.location.reload(); 
       } catch (e) {
          console.log(e)
       }
@@ -546,6 +579,7 @@ const WalletProvider = React.memo(({ children }) => {
             isFetchingName,
             account,
             accounts,
+            delegate, //delegateCash wallet with FULL delegation (type 1)
             walletRequestPermissions,
             disconnectWallet,
             connectWallet,

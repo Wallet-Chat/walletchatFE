@@ -136,8 +136,15 @@ const NFTInbox = ({
                      
                      console.log('✅[POST][Decrypt GetInbox Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
                      const blob = lit.b64toBlob(replica[i].message)
-                     const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                     replica[i].message = rawmsg.decryptedFile.toString()
+                     //after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+                     //this is done to support legacy messages (new databases wouldn't need this)
+                     if (replica[i].Id < 2580) {
+                        const rawmsg = await lit.decryptStringOrig(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        replica[i].message = rawmsg.decryptedFile.toString()
+                     } else {
+                        const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        replica[i].message = rawmsg.decryptedFile.toString()
+                     }
                   }
                }
                setInboxData(replica)

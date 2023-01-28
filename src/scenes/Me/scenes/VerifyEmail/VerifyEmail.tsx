@@ -65,6 +65,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
          .catch((error) => {
             console.error('🚨[GET][Verify Email]:', error)
             setFetchError(true)
+            setIsVerifySuccess(false)
             navigate('/me/verify-email')
             // toast({
             //    title: 'Error',
