@@ -140,7 +140,7 @@ export const App = () => {
                      >
                         Sign-in with Ethereum
                      </Button>
-                     <Button
+                     {/* <Button
                         variant="black"
                         onClick={() => {
                            setBtnClicks(btnClicks + 1)
@@ -161,7 +161,7 @@ export const App = () => {
                         w='220px'
                      >
                         Sign-in with NEAR
-                     </Button>
+                     </Button> */}
                   </VStack>
                   {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>

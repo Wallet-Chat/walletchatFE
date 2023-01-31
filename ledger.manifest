@@ -3,7 +3,7 @@
     "name": "WalletChat",
     "url": "https://dapp-browser.apps.ledger.com",
     "params": {
-      "dappUrl": "https://app.walletchat.fun",
+      "dappUrl": "https://ledger.walletchat.fun",
       "nanoApp": "WalletChat",
       "dappName": "WalletChat",
       "networks": [
@@ -32,7 +32,7 @@
         "en": "WalletChat: The Web3 Social Layer"
       },
       "description": {
-        "en": "WalletChat: The Web3 Social Layer"
+        "en": "Message any web3 wallet, from your existing wallet. DApps can also integrate WalletChat messaging for their users, using our simple widget."
       }
     },
     "permissions": [],
