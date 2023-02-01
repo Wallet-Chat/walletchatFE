@@ -154,7 +154,7 @@ export default function Sidebar() {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
          },
       })
          .then((response) => response.json())

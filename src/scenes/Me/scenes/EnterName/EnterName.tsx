@@ -78,7 +78,7 @@ const EnterName = ({ account }: { account: string }) => {
                credentials: 'include',
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
             },
             body: JSON.stringify({
                base64data: image,
@@ -161,7 +161,7 @@ const EnterName = ({ account }: { account: string }) => {
    const onSubmit = (values: any) => {
       console.log('onSubmit')
       console.log('Values are: ', values)
-      if(!localStorage.getItem('jwt')) {
+      if(!localStorage.getItem('jwt_' + account)) {
          toast({
             title: 'Error',
             description: `You must sign the message pending in your wallet before setting name!`,
@@ -183,7 +183,7 @@ const EnterName = ({ account }: { account: string }) => {
                credentials: 'include',
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
             },
             body: JSON.stringify({
                name: values.name,

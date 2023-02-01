@@ -107,7 +107,7 @@ import { getWalletChain } from '../../../../helpers/address'
              credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
              },
           }
        )
@@ -129,7 +129,7 @@ import { getWalletChain } from '../../../../helpers/address'
              credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
              },
              body: JSON.stringify({
                 walletaddr: account,
@@ -158,7 +158,7 @@ import { getWalletChain } from '../../../../helpers/address'
              credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
              },
              body: JSON.stringify({
                 walletaddr: account,
@@ -188,7 +188,7 @@ import { getWalletChain } from '../../../../helpers/address'
                 credentials: "include",
                 headers: {
                    'Content-Type': 'application/json',
-                   Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                   Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
                 },
              }
           )

@@ -213,7 +213,7 @@ const WalletProvider = React.memo(({ children }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
          },
       })
          .then((response) => response.json())
@@ -245,7 +245,7 @@ const WalletProvider = React.memo(({ children }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
          },
       })
          .then((response) => response.json())
@@ -339,7 +339,7 @@ const WalletProvider = React.memo(({ children }) => {
                method: 'GET',
                headers: {
                   'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                  Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
                },
             })
             .then((response) => response.json())
@@ -408,8 +408,7 @@ const WalletProvider = React.memo(({ children }) => {
                         method: 'POST'
                      })
                      .then((response) => response.json())
-                     .then(async (data) => {
-                        localStorage.setItem('jwt', data.access);
+                     .then(async (data) => {             
                         //Used for LIT encryption authSign parameter
                         //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                         //localStorage.setItem('lit-web3-provider', _provider.connection.url);
@@ -424,6 +423,7 @@ const WalletProvider = React.memo(({ children }) => {
                            getName(_account)
                            getSettings(_account)
                         }
+                        localStorage.setItem('jwt_' + _account, data.access);
                      })
                   })
                   .catch((error) => {
@@ -490,7 +490,6 @@ const WalletProvider = React.memo(({ children }) => {
                   })
                   .then((response) => response.json())
                   .then(async (data) => {
-                     localStorage.setItem('jwt', data.access);
                      //Used for LIT encryption authSign parameter
                      // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      // localStorage.setItem('lit-web3-provider', _provider.connection.url);
@@ -505,6 +504,7 @@ const WalletProvider = React.memo(({ children }) => {
                         getName(_account)
                         getSettings(_account)
                      }
+                     localStorage.setItem('jwt_' + _account, data.access);
                   })
                   .catch((error) => {
                      console.error('🚨[GET][Sign-In Failed]:', error)
@@ -603,7 +603,7 @@ const WalletProvider = React.memo(({ children }) => {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
             },
          })
          .then((response) => response.json())
@@ -642,7 +642,7 @@ const WalletProvider = React.memo(({ children }) => {
                   })
                   .then((response) => response.json())
                   .then(async (data) => {
-                     localStorage.setItem('jwt', data.access);
+                     localStorage.setItem('jwt_' + _account, data.access);
                      //Used for LIT encryption authSign parameter
                      //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      //localStorage.setItem('lit-web3-provider', _provider.connection.url);
@@ -690,7 +690,7 @@ const WalletProvider = React.memo(({ children }) => {
                })
                .then((response) => response.json())
                .then(async (data) => {
-                  localStorage.setItem('jwt', data.access);
+                  localStorage.setItem('jwt_' + _account, data.access);
                   //Used for LIT encryption authSign parameter
                   // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                   // localStorage.setItem('lit-web3-provider', _provider.connection.url);
@@ -791,7 +791,7 @@ const WalletProvider = React.memo(({ children }) => {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
             },
          })
          .then((response) => response.json())
@@ -837,7 +837,7 @@ const WalletProvider = React.memo(({ children }) => {
                   })
                   .then((response) => response.json())
                   .then(async (data) => {
-                     localStorage.setItem('jwt', data.access);
+                     localStorage.setItem('jwt_' + _account, data.access);
                      //Used for LIT encryption authSign parameter
                      //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      //localStorage.setItem('lit-web3-provider', _provider.connection.url);
@@ -892,7 +892,7 @@ const WalletProvider = React.memo(({ children }) => {
                })
                .then((response) => response.json())
                .then(async (data) => {
-                  localStorage.setItem('jwt', data.access);
+                  localStorage.setItem('jwt_' + _account, data.access);
                   //Used for LIT encryption authSign parameter
                   // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                   // localStorage.setItem('lit-web3-provider', _provider.connection.url);
@@ -947,7 +947,7 @@ const WalletProvider = React.memo(({ children }) => {
             localStorage.clear(); //all items 
 
             // TODO: was trying to leave decrypted chat history here, but got complicated as I was adding new wallets/chains.  Revist when stable
-            // localStorage.removeItem('jwt')
+            // localStorage.removeItem('jwt_' + account)
             // localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
             // localStorage.removeItem('metamask-connected')
             // // localStorage.removeItem('lit-auth-signature')

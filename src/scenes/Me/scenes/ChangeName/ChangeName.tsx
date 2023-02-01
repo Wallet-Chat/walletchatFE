@@ -70,7 +70,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
             },
             body: JSON.stringify({
                base64data: image,
@@ -147,7 +147,7 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
              credentials: "include",
              headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
              },
              body: JSON.stringify({
                 name: values.name,

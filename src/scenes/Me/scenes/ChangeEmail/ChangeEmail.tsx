@@ -48,7 +48,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
          },
          body: JSON.stringify({
             notifydm: checked.toString(), 
@@ -81,7 +81,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
          },
          body: JSON.stringify({
             notify24: checked.toString(), 
@@ -115,7 +115,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
             },
             body: JSON.stringify({
                email: values.email, 
