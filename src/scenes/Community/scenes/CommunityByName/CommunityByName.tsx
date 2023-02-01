@@ -16,8 +16,8 @@ import {
 } from '@chakra-ui/react'
 import {
    IconBrandTwitter,
-   IconCircleCheck,
 } from '@tabler/icons'
+import pluralize from 'pluralize'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
@@ -40,7 +40,7 @@ const CommunityByName = ({ account }: { account: string }) => {
 
    useEffect(() => {
       getCommunityData()
-   }, [account])
+   }, [account, community])
 
    useEffect(() => {
       // Interval needs to reset else getChatData will use old state
@@ -171,13 +171,20 @@ const CommunityByName = ({ account }: { account: string }) => {
                <Box>
                   {communityData?.name && (
                      <Flex alignItems="center">
-                        <Heading size="md" mr="1" maxWidth={[140, 140, 200, 300]} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+                        <Heading
+                           size="md"
+                           mr="1"
+                           maxWidth={[140, 140, 200, 300]}
+                           overflow="hidden"
+                           textOverflow="ellipsis"
+                           whiteSpace="nowrap"
+                        >
                            {communityData.name}
                         </Heading>
-                        <Tooltip label="OpenSea Verified">
-                        <Box><IconCircleCheck stroke="2" color="white" fill="var(--chakra-colors-success-600)" /></Box></Tooltip>
+                        {/* <Tooltip label="OpenSea Verified">
+                        <Box><IconCircleCheck stroke="2" color="white" fill="var(--chakra-colors-success-600)" /></Box></Tooltip> */}
                         <Button
-                            ml={2}
+                           ml={2}
                            size="xs"
                            variant={joined ? 'black' : 'outline'}
                            isLoading={isFetchingJoining}
@@ -207,39 +214,50 @@ const CommunityByName = ({ account }: { account: string }) => {
                   <Flex alignItems="center">
                      {communityData?.discord && (
                         <Tooltip label="Discord">
-                        <Link
-                           href={`https://www.discord.gg/${communityData.discord}`}
-                           target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
-                           mr={1}
-                        >
-                           <Image src={IconDiscord} alt="" height="24px" width="24px" />
-                        </Link>
-                     </Tooltip>
+                           <Link
+                              href={`https://www.discord.gg/${communityData.discord}`}
+                              target="_blank"
+                              d="inline-block"
+                              verticalAlign="middle"
+                              mr={1}
+                           >
+                              <Image
+                                 src={IconDiscord}
+                                 alt=""
+                                 height="24px"
+                                 width="24px"
+                              />
+                           </Link>
+                        </Tooltip>
                      )}
                      {communityData?.twitter && (
                         <Tooltip label="Twitter">
-                        <Link
-                           href={`https://twitter.com/${communityData?.twitter}`}
-                           target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
-                        >
-                           <IconBrandTwitter stroke={1.5} color="white"
-                              fill="var(--chakra-colors-lightgray-800)" />
-                        </Link>
-                     </Tooltip>
+                           <Link
+                              href={`https://twitter.com/${communityData?.twitter}`}
+                              target="_blank"
+                              d="inline-block"
+                              verticalAlign="middle"
+                           >
+                              <IconBrandTwitter
+                                 stroke={1.5}
+                                 color="white"
+                                 fill="var(--chakra-colors-lightgray-800)"
+                              />
+                           </Link>
+                        </Tooltip>
                      )}
-                     <Divider orientation='vertical' height="12px" mx={2} />
-                  
-                  {communityData?.members && (
-                     <Box>
-                        <Text fontSize="md">{communityData.members} members</Text>
-                     </Box>
-                  )}
+                     <Divider orientation="vertical" height="12px" mx={2} />
+
+                     {communityData?.members && (
+                        <Box>
+                           <Text fontSize="md">
+                              {communityData.members}{' '}
+                              {pluralize('member', communityData?.members)}
+                           </Text>
+                        </Box>
+                     )}
                   </Flex>
-{/* 
+                  {/* 
                   <Box mb={2}>
                      {nftData?.collection?.external_url && (
                         <Tooltip label="Visit website">
@@ -323,13 +341,9 @@ const CommunityByName = ({ account }: { account: string }) => {
             isLazy
          >
             <TabList padding="0 var(--chakra-space-5)">
-               <Tab>
-                  Chat
-               </Tab>
+               <Tab>Chat</Tab>
                {communityData?.tweets && communityData.tweets.length > 0 ? (
-                  <Tab>
-                     Tweets{' '}
-                  </Tab>
+                  <Tab>Tweets </Tab>
                ) : (
                   <></>
                )}
@@ -345,13 +359,13 @@ const CommunityByName = ({ account }: { account: string }) => {
                      account={account}
                      community={community}
                      chatData={communityData?.messages || []}
-                     isFetchingCommunityDataFirstTime={isFetchingCommunityDataFirstTime}
+                     isFetchingCommunityDataFirstTime={
+                        isFetchingCommunityDataFirstTime
+                     }
                   />
                </TabPanel>
                <TabPanel p={5}>
-                  <CommunityTweets
-                     tweets={communityData?.tweets || []}
-                  />
+                  <CommunityTweets tweets={communityData?.tweets || []} />
                </TabPanel>
             </TabPanels>
          </Tabs>
