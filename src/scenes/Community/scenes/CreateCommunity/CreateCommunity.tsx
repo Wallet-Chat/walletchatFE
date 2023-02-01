@@ -16,8 +16,11 @@ import {
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import { isMobile } from 'react-device-detect'
-import { IconArrowRight, IconBrandTwitter, IconChevronLeft } from '@tabler/icons'
-import { slugify } from '../../../../helpers/text'
+import {
+   IconArrowRight,
+   IconBrandTwitter,
+   IconChevronLeft,
+} from '@tabler/icons'
 
 const CreateCommunity = ({ web3 }: { web3: any }) => {
    const [name, setName] = useState<string>('')
@@ -37,13 +40,12 @@ const CreateCommunity = ({ web3 }: { web3: any }) => {
    } = useForm()
 
    const onSubmit = (values: any) => {
-      
-      const slug = values?.name && slugify(values?.name)
+
       let social = []
       if (values.twitter) {
          social.push({
             type: 'twitter',
-            name: values.twitter
+            name: values.twitter,
          })
       }
       if (values.discord) {
@@ -52,29 +54,6 @@ const CreateCommunity = ({ web3 }: { web3: any }) => {
             name: values.discord,
          })
       }
-
-      console.log(
-         'CreateCommunity > onSubmit',
-         JSON.stringify({
-            title: values.name,
-            community: slug,
-            social,
-         }),
-         `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_community`,
-         {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-               'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-            },
-            body: JSON.stringify({
-               title: values?.name,
-               community: slug,
-               social,
-            }),
-         }
-      )
 
       setIsFetching(true)
 
@@ -90,18 +69,16 @@ const CreateCommunity = ({ web3 }: { web3: any }) => {
             credentials: 'include',
             headers: {
                'Content-Type': 'application/json',
-               'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
-               title: values?.name,
-               community: slug,
+               name: values?.name,
                social,
             }),
-         },
+         }
       )
-         .then((response) => response.json())
-         .then((result) => {
-            console.log('✅[POST][Create Community]', result)
+         .then((slug) => {
+            console.log('✅[POST][Create Community]')
             navigate(`/community/${slug}`)
          })
          .catch((error) => {
