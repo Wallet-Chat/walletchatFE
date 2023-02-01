@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
    Box,
    Button,
@@ -17,14 +17,18 @@ import {
 import { useForm } from 'react-hook-form'
 import { isMobile } from 'react-device-detect'
 import { IconArrowRight, IconBrandTwitter, IconChevronLeft } from '@tabler/icons'
-import { useWallet } from '../../../../context/WalletProvider'
+import { slugify } from '../../../../helpers/text'
 
 const CreateCommunity = ({ web3 }: { web3: any }) => {
-   const [community, setCommunity] = useState<string>('')
+   const [name, setName] = useState<string>('')
    const [twitter, setTwitter] = useState<string>('')
    const [twitterActive, setTwitterActive] = useState(false)
    const [discord, setDiscord] = useState<string>('')
    const [discordActive, setDiscordActive] = useState(false)
+
+   const [isFetching, setIsFetching] = useState(false)
+
+   let navigate = useNavigate()
 
    const {
       handleSubmit,
@@ -33,8 +37,98 @@ const CreateCommunity = ({ web3 }: { web3: any }) => {
    } = useForm()
 
    const onSubmit = (values: any) => {
-      console.log('CreateCommunity > onSubmit', values)
+      
+      const slug = values?.name && slugify(values?.name)
+      let social = []
+      if (values.twitter) {
+         social.push({
+            type: 'twitter',
+            name: values.twitter
+         })
+      }
+      if (values.discord) {
+         social.push({
+            type: 'discord',
+            name: values.discord,
+         })
+      }
+
+      console.log(
+         'CreateCommunity > onSubmit',
+         JSON.stringify({
+            title: values.name,
+            community: slug,
+            social,
+         }),
+         `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_community`,
+         {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+            body: JSON.stringify({
+               title: values?.name,
+               community: slug,
+               social,
+            }),
+         }
+      )
+
+      setIsFetching(true)
+
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+
+      fetch(
+         `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_community`,
+         {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+               'Content-Type': 'application/json',
+               'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+            },
+            body: JSON.stringify({
+               title: values?.name,
+               community: slug,
+               social,
+            }),
+         },
+      )
+         .then((response) => response.json())
+         .then((result) => {
+            console.log('✅[POST][Create Community]', result)
+            navigate(`/community/${slug}`)
+         })
+         .catch((error) => {
+            console.error('🚨[POST][Create Community]:', error)
+         })
+         .finally(() => {
+            setIsFetching(false)
+         })
    }
+
+   // const fetchTwitterUser = () => {
+   //    if (twitter) {
+   //       fetch(`https://api.twitter.com/1.1/users/show.json?screen_name=${twitter}`, {
+   //          method: 'GET',
+   //          headers: {
+   //             Authorization: `Bearer ${process.env.TWITTER_BEARER}`,
+   //          },
+   //       })
+   //          .then((response) => response.json())
+   //          .then((result) => {
+   //             console.log(`✅[GET][Twitter User]`, result)
+   //          })
+   //          .catch((error) => {
+   //             console.log(`🚨[GET][NFT Contract][OpenSea]:`, error)
+   //          })
+   //    }
+   // }
 
    return (
       <Box
@@ -73,16 +167,18 @@ const CreateCommunity = ({ web3 }: { web3: any }) => {
                   <FormLabel fontWeight="bold">Name of community</FormLabel>
                   <Input
                      type="text"
-                     value={community}
+                     value={name}
                      placeholder="WalletChat DAO"
+                     {...register('name', {
+                        required: true,
+                     })}
                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setCommunity(e.target.value)
+                        setName(e.target.value)
                      }
                   />
-                  {errors?.community &&
-                     errors?.community.type === 'validate' && (
-                        <FormErrorMessage>Name is not valid</FormErrorMessage>
-                     )}
+                  {errors?.name && errors?.name.type === 'validate' && (
+                     <FormErrorMessage>Name is not valid</FormErrorMessage>
+                  )}
                </FormControl>
                <FormControl mb={5}>
                   <FormLabel>
@@ -98,23 +194,35 @@ const CreateCommunity = ({ web3 }: { web3: any }) => {
                            id="twitter-active"
                            isChecked={twitterActive}
                            onChange={(e) => setTwitterActive(!twitterActive)}
+                           colorScheme="twitter"
                         />
                      </Flex>
                   </FormLabel>
-                  <Input
-                     type="text"
-                     value={twitter}
-                     placeholder="e.g. walletchat"
-                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setTwitter(e.target.value)
-                        if (e.target.value === "") {
-                           setTwitterActive(false)
-                        } else if (!twitterActive) {
-                           setTwitterActive(true)
-                        }
-                     }}
-                     className={!twitterActive ? 'disabled' : ''}
-                  />
+                  <Flex alignItems="center">
+                     <Box color="gray.600" fontSize="md" mr="1">
+                        https://twitter.com/
+                     </Box>
+                     <Input
+                        type="text"
+                        value={twitter}
+                        placeholder="walletchat"
+                        flex="1"
+                        {...register('twitter', {
+                           required: false,
+                        })}
+                        color={twitterActive ? 'inherit' : 'gray.400'}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                           setTwitter(e.target.value)
+                           if (e.target.value === '') {
+                              setTwitterActive(false)
+                           } else if (!twitterActive) {
+                              setTwitterActive(true)
+                           }
+                        }}
+                        // onBlur={() => fetchTwitterUser()}
+                        className={!twitterActive ? 'disabled' : ''}
+                     />
+                  </Flex>
                </FormControl>
                <FormControl mb={5}>
                   <FormLabel>
@@ -138,29 +246,48 @@ const CreateCommunity = ({ web3 }: { web3: any }) => {
                            id="discord-active"
                            isChecked={discordActive}
                            onChange={(e) => setDiscordActive(!discordActive)}
+                           colorScheme="twitter"
                         />
                      </Flex>
                   </FormLabel>
-                  <Input
-                     type="text"
-                     value={discord}
-                     placeholder="e.g. https://discord.gg/walletchat"
-                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setDiscord(e.target.value)
-                        if (e.target.value === "") {
-                           setDiscordActive(false)
-                        } else if (!discordActive) {
-                           setDiscordActive(true)
-                        }
-                     }}
-                  />
+                  <Flex alignItems="center">
+                     <Box color="gray.600" fontSize="md" mr="1">
+                        https://discord.gg/
+                     </Box>
+                     <Input
+                        type="text"
+                        value={discord}
+                        placeholder="walletchat"
+                        color={discordActive ? 'inherit' : 'gray.400'}
+                        flex="1"
+                        {...register('discord', {
+                           required: false,
+                        })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                           setDiscord(e.target.value)
+                           if (e.target.value === '') {
+                              setDiscordActive(false)
+                           } else if (!discordActive) {
+                              setDiscordActive(true)
+                           }
+                        }}
+                     />
+                  </Flex>
                </FormControl>
-               <Button variant="black" type="submit">
-                  Create{' '}
-                  <Text ml={1}>
-                     <IconArrowRight size="16" />
-                  </Text>
-               </Button>
+               <Box textAlign="right">
+                  <Button variant="black" type="submit">
+                     {isFetching ? (
+                        <Spinner />
+                     ) : (
+                        <Flex>
+                           <Box>Create</Box>
+                           <Box ml={1}>
+                              <IconArrowRight size="16" />
+                           </Box>
+                        </Flex>
+                     )}
+                  </Button>
+               </Box>
             </form>
          </Box>
       </Box>
