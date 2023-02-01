@@ -179,7 +179,7 @@ export default function Sidebar() {
          py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
          px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
          order={isMobile ? 2 : 0}
-         zIndex="5000"
+         zIndex="docked"
       >
          <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
             <Popover>

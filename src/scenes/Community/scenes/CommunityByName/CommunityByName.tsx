@@ -6,6 +6,13 @@ import {
    Heading,
    Image,
    Link,
+   Modal,
+   ModalBody,
+   ModalCloseButton,
+   ModalContent,
+   ModalFooter,
+   ModalHeader,
+   ModalOverlay,
    Tab,
    TabList,
    TabPanel,
@@ -13,13 +20,14 @@ import {
    Tabs,
    Text,
    Tooltip,
+   useDisclosure,
 } from '@chakra-ui/react'
 import {
    IconBrandTwitter,
 } from '@tabler/icons'
 import pluralize from 'pluralize'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link as RLink } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
 
 import CommunityGroupChat from './components/CommunityGroupChat'
@@ -37,6 +45,7 @@ const CommunityByName = ({ account }: { account: string }) => {
    const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
    const [isFetchingJoining, setIsFetchingJoining] = useState(false)
 
+   const { isOpen, onOpen, onClose } = useDisclosure()
 
    useEffect(() => {
       getCommunityData()
@@ -157,6 +166,29 @@ const CommunityByName = ({ account }: { account: string }) => {
 
    return (
       <Flex flexDirection="column" background="white" height="100vh" flex="1">
+         <Box p={1} background="gray.900" color="gray.100">
+            <Flex
+               border="1px solid #e2e2e2"
+               borderRadius="sm"
+               justifyContent="space-between"
+               alignItems="center"
+            >
+               <Box
+                  py={0.5}
+                  px={2}
+                  fontSize="xs"
+                  letterSpacing={2}
+                  textTransform="uppercase"
+               >
+                  You are admin
+               </Box>
+               <Box>
+                  <Button onClick={onOpen} variant="white" size="xs">
+                     Manage
+                  </Button>
+               </Box>
+            </Flex>
+         </Box>
          <Flex alignItems="center" px={5} pt={4} pb={2}>
             <Flex alignItems="flex-start" p={2} borderRadius="md">
                {communityData?.logo && (
@@ -369,6 +401,22 @@ const CommunityByName = ({ account }: { account: string }) => {
                </TabPanel>
             </TabPanels>
          </Tabs>
+         <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+               <ModalHeader>Community Info</ModalHeader>
+               <ModalCloseButton />
+               <ModalBody>
+                  test test
+               </ModalBody>
+
+               <ModalFooter>
+                  <Button colorScheme="blue" mr={3} onClick={onClose}>
+                     Close
+                  </Button>
+               </ModalFooter>
+            </ModalContent>
+         </Modal>
       </Flex>
    )
 }
