@@ -185,19 +185,19 @@ const WalletProvider = React.memo(({ children }) => {
             Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
       })
-         .then((response) => response.json())
-         .then((data) => {
-            console.log('✅[GET][Name]:', data)
-            if (data[0]?.name) {
-               setName(data[0].name)
-            }
-         })
-         .catch((error) => {
-            console.error('🚨[GET][Name]:', error)
-         })
-         .then(() => {
-            setIsFetchingName(false)
-         })
+      .then((response) => response.json())
+      .then((data) => {
+         console.log('✅[GET][Name]:', data)
+         if (data[0]?.name) {
+            setName(data[0].name)
+         }
+      })
+      .catch((error) => {
+         console.error('🚨[GET][Name]:', error)
+      })
+      .then(() => {
+         setIsFetchingName(false)
+      })
    }
 
    const getSettings = (_account) => {
@@ -390,12 +390,16 @@ const WalletProvider = React.memo(({ children }) => {
                         const walletInJWT = parseJwt(data.access).sub
                         if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
                            console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
-                           setDelegate(_account)
+                           setDelegate(_account) //not sure this is used anymore
                            _account = walletInJWT
-                           setAccount(_account)
-                           getName(_account)
-                           getSettings(_account)
                         }
+
+                        setAccount(_account)
+                        // setChainId(chainId)
+                        getName(_account)
+                        setAuthenticated(true)
+                        getSettings(_account)
+                        setWeb3(_web3)
                      })
                   })
                   .catch((error) => {
@@ -404,6 +408,13 @@ const WalletProvider = React.memo(({ children }) => {
                   //END JWT AUTH sequence
 
              //below part of /welcome check for existing token     
+             }
+             else {
+                //already logged in
+                console.log('✅[POST][Welcome]:', data.msg)
+                //"Welcome:" + addrnameDB.Name + ":Addr:" + Authuser.Address (backend response)
+                setName(data.msg.toString().split(':')[1])
+                console.log('✅[Name: ]:', name)
              }
             })
             .catch((error) => {
@@ -472,11 +483,16 @@ const WalletProvider = React.memo(({ children }) => {
                      const walletInJWT = parseJwt(data.access).sub
                      if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
                         console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                        setDelegate(_account) //not sure this is used anymore
                         _account = walletInJWT
-                        setAccount(_account)
-                        getName(_account)
-                        getSettings(_account)
                      }
+
+                     setAccount(_account)
+                     // setChainId(chainId)
+                     getName(_account)
+                     setAuthenticated(true)
+                     getSettings(_account)
+                     setWeb3(_web3)
                   })
                   .catch((error) => {
                      console.error('🚨[GET][Sign-In Failed]:', error)
@@ -505,8 +521,8 @@ const WalletProvider = React.memo(({ children }) => {
             setAppLoading(true)
             setAccount(_account)
             // setChainId(chainId)
-            setAuthenticated(true)
             getName(_account)
+            setAuthenticated(true)
             getSettings(_account)
             setWeb3(_web3)
 
