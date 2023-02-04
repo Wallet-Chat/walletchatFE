@@ -48,7 +48,7 @@ const Community = () => {
             }
          />
          <Route
-            path=":community/:contentType?"
+            path=":community/*"
             element={
                <Flex>
                   <CommunityInboxList />

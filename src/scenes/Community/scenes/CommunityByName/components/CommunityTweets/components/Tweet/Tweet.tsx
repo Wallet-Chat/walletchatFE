@@ -7,7 +7,7 @@ const Tweet = ({ data }: { data: TweetType }) => {
    const formattedDate = timeSince(date)
 
    return (
-      <Box mb={3}>
+      <Box mb={3} background="white" borderRadius="md" p={4}>
          <Flex alignItems="flex-start" mb="1">
             {data.user && data.user.profile_image_url && (
                <Box>

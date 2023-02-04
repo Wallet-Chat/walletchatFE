@@ -19,10 +19,10 @@ import {
    useDisclosure,
    useToast,
 } from '@chakra-ui/react'
-import { IconBrandTwitter, IconExternalLink, IconMessageCircle, IconPhoto } from '@tabler/icons'
+import { IconBrandTwitter, IconExternalLink, IconPhoto } from '@tabler/icons'
 import pluralize from 'pluralize'
 import { ChangeEvent, useEffect, useState } from 'react'
-import { useParams, NavLink, Route, Routes } from 'react-router-dom'
+import { useParams, NavLink, Route, Routes, useMatch } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
 
 import CommunityGroupChat from './components/CommunityGroupChat'
@@ -33,12 +33,9 @@ import CommunityType from '../../../../types/Community'
 import Resizer from 'react-image-file-resizer'
 import { useWallet } from '../../../../context/WalletProvider'
 
-const activeStyle = {
-   background: "var(--chakra-colors-gray-200)"
-}
-
 const CommunityByName = () => {
    let { community = '' } = useParams()
+   const match = useMatch('/community/:community/*')
    const { account } = useWallet()
 
    const [communityData, setCommunityData] = useState<CommunityType>()
@@ -274,32 +271,13 @@ const CommunityByName = () => {
 
    return (
       <Flex flexDirection="column" background="white" height="100vh" flex="1">
-         {/* <Box p={1} background="gray.900" color="gray.100">
+         <Flex alignItems="center" px={5} py={2}>
             <Flex
-               border="1px solid #e2e2e2"
-               borderRadius="sm"
                justifyContent="space-between"
+               width="100%"
                alignItems="center"
             >
-               <Box
-                  py={0.5}
-                  px={2}
-                  fontSize="xs"
-                  letterSpacing={2}
-                  textTransform="uppercase"
-               >
-                  You are admin
-               </Box>
-               <Box>
-                  <Button onClick={onOpen} variant="white" size="xs">
-                     Manage
-                  </Button>
-               </Box>
-            </Flex>
-         </Box> */}
-         <Flex alignItems="center" px={5} pt={4} pb={2}>
-            <Flex justifyContent="space-between">
-               <Flex alignItems="flex-start" p={2} borderRadius="md">
+               <Flex alignItems="flex-start" p={2} borderRadius="md" flex="1">
                   <label
                      style={{
                         pointerEvents: isFetchingAvatar ? 'none' : 'auto',
@@ -311,7 +289,7 @@ const CommunityByName = () => {
                         src={
                            isSuccessAvatar ? filePreview : communityData?.logo
                         }
-                        mr={2}
+                        mr={1}
                         cursor="pointer"
                         overflow="hidden"
                         data-group
@@ -371,7 +349,20 @@ const CommunityByName = () => {
                         mr={3}
                      />
                   )}
-                  <Box>
+                  <Button
+                     onClick={onOpen}
+                     display="unset"
+                     textAlign="unset"
+                     height="unset"
+                     py={1}
+                     lineHeight="unset"
+                     flex="1"
+                     background="white"
+                     _hover={{
+                        border: 'none',
+                        background: 'gray.100',
+                     }}
+                  >
                      {communityData?.name && (
                         <Flex alignItems="center">
                            <Heading
@@ -468,27 +459,9 @@ const CommunityByName = () => {
                            </Tooltip>
                         )}
                      </Box> */}
-                  </Box>
+                  </Button>
                </Flex>
                <Flex>
-                  <NavLink
-                     to="./"
-                     relative="path"
-                     style={({ isActive }) => (isActive ? activeStyle : {})}
-                  >
-                     <IconMessageCircle strokeWidth={1.5} />
-                  </NavLink>
-                  {communityData?.tweets && communityData.tweets.length > 0 ? (
-                     <NavLink
-                        to="./tweets"
-                        relative="path"
-                        style={({ isActive }) => (isActive ? activeStyle : {})}
-                     >
-                        <IconBrandTwitter strokeWidth={1.5} />
-                     </NavLink>
-                  ) : (
-                     <></>
-                  )}
                   {communityData?.discord && (
                      <Tooltip
                         label={
@@ -560,11 +533,53 @@ const CommunityByName = () => {
                </Flex>
             </Flex>
          </Flex>
+         <Flex px={6} py={2} background="lightgray.200">
+            <Button
+               as={NavLink}
+               end
+               to={`${match?.pathnameBase}`}
+               relative="path"
+               size="sm"
+               fontWeight="bold"
+               fontSize="md"
+               _hover={{
+                  textDecor: 'none',
+               }}
+               _activeLink={{ background: 'black', color: 'white' }}
+            >
+               <Box px={3} py={1.5}>
+                  Chat
+               </Box>
+            </Button>
+            {communityData?.tweets && communityData.tweets.length > 0 ? (
+               <Button
+                  as={NavLink}
+                  to={`${match?.pathnameBase}/tweets`}
+                  relative="path"
+                  size="sm"
+                  fontWeight="bold"
+                  fontSize="md"
+                  ml={2}
+                  _hover={{
+                     textDecor: 'none',
+                     background: 'lightgray.400',
+                  }}
+                  _activeLink={{ background: 'black', color: 'white' }}
+               >
+                  <Box px={3} py={1.5}>
+                     Tweets
+                  </Box>
+               </Button>
+            ) : (
+               <></>
+            )}
+         </Flex>
          <Box
             display="flex"
             flexDirection="column"
             overflowY="auto"
             flexGrow={1}
+            background="lightgray.200"
          >
             <Box overflowY="auto" className="custom-scrollbar" height="100%">
                <Routes>

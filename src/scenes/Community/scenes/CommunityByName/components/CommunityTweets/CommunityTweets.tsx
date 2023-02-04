@@ -2,9 +2,9 @@ import TweetType from '../../../../../../types/Tweet'
 import Tweet from './components/Tweet'
 import { Box, Divider } from '@chakra-ui/react'
 
-const NFTTweets = ({ tweets }: { tweets: TweetType[] }) => {
+const CommunityTweets = ({ tweets }: { tweets: TweetType[] }) => {
    return (
-      <Box>
+      <Box borderRadius="md" px={6}>
          {tweets ? (
             tweets.map((tweet: TweetType, i) => (
                <>
@@ -19,4 +19,4 @@ const NFTTweets = ({ tweets }: { tweets: TweetType[] }) => {
    )
 }
 
-export default NFTTweets
+export default CommunityTweets
