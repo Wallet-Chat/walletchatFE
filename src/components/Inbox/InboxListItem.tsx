@@ -1,4 +1,4 @@
-import { Box, Flex, Image, Tooltip } from '@chakra-ui/react'
+import { Avatar, Box, Flex, Image, Tooltip } from '@chakra-ui/react'
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -133,7 +133,7 @@ const InboxItem = ({
                         {image ? (
                            <Image src={image} alt="" width="41px" />
                         ) : (
-                           address && (
+                           address ? (
                               <Blockies
                                  seed={
                                     isPoap
@@ -142,6 +142,11 @@ const InboxItem = ({
                                  }
                                  scale={5}
                               />
+                           ) : (
+                              displayName ?
+                              <Avatar
+                                 size="md"
+                                 name={displayName} /> : ""
                            )
                         )}
                      </BlockieWrapper>

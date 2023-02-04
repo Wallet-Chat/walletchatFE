@@ -22,7 +22,6 @@ const CommunityInboxList = () => {
    const [communities, setCommunities] = useState<InboxItemType[]>()
 
    let semaphore = false
-
    useEffect(() => {
       const interval = setInterval(() => {
          getInboxData()
@@ -78,7 +77,8 @@ const CommunityInboxList = () => {
             } else if (
                !localStorage['inboxEnc_' + account] ||
                equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !==
-                  true
+                  true ||
+               !localStorage['inbox_' + account]
             ) {
                console.log('✅[GET][Inbox]:', data)
                //setEncChatData(data)
@@ -122,9 +122,9 @@ const CommunityInboxList = () => {
          })
    }
 
-   if (isFetchingInboxData && inboxData.length === 0) {
-      return <InboxListLoadingSkeleton />
-   }
+   // if (isFetchingInboxData && inboxData.length === 0) {
+   //    return <InboxListLoadingSkeleton />
+   // }
    return (
       <Box
          background="white"
@@ -148,7 +148,7 @@ const CommunityInboxList = () => {
                      backgroundColor: 'var(--chakra-colors-lightgray-300)',
                   }}
                >
-                  + New
+                  + Create
                </Button>
             </Flex>
          </Box>

@@ -22,7 +22,7 @@ import {
 import { IconBrandTwitter, IconExternalLink, IconMessageCircle, IconPhoto } from '@tabler/icons'
 import pluralize from 'pluralize'
 import { ChangeEvent, useEffect, useState } from 'react'
-import { useParams, useLocation, NavLink, Route, Routes } from 'react-router-dom'
+import { useParams, NavLink, Route, Routes } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
 
 import CommunityGroupChat from './components/CommunityGroupChat'
@@ -39,7 +39,6 @@ const activeStyle = {
 
 const CommunityByName = () => {
    let { community = '' } = useParams()
-   const location = useLocation()
    const { account } = useWallet()
 
    const [communityData, setCommunityData] = useState<CommunityType>()
@@ -58,9 +57,6 @@ const CommunityByName = () => {
    const [isFetchingAvatar, setIsFetchingAvatar] = useState(false)
    const [isSuccessAvatar, setIsSuccessAvatar] = useState(false)
    const toast = useToast()
-
-   const pp = useParams()
-   console.log(location, pp)
 
    const resizeFile = (file: Blob) =>
       new Promise((resolve) => {
@@ -502,20 +498,29 @@ const CommunityByName = () => {
                            </Flex>
                         }
                      >
-                        <Link
+                        <Button
+                           as={Link}
                            href={`https://www.discord.gg/${communityData.discord}`}
                            target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
+                           d="flex"
+                           textAlign="center"
+                           p={0}
+                           width="2rem"
+                           minWidth="unset"
+                           height="2rem"
                            mr={1}
+                           borderRadius="50%"
+                           borderWidth={1}
+                           borderColor="gray.300"
+                           background="white"
                         >
                            <Image
                               src={IconDiscord}
                               alt=""
-                              height="24px"
-                              width="24px"
+                              height="22px"
+                              width="22px"
                            />
-                        </Link>
+                        </Button>
                      </Tooltip>
                   )}
                   {communityData?.twitter && (
@@ -527,18 +532,29 @@ const CommunityByName = () => {
                            </Flex>
                         }
                      >
-                        <Link
+                        <Button
+                           as={Link}
                            href={`https://twitter.com/${communityData?.twitter}`}
                            target="_blank"
-                           d="inline-block"
-                           verticalAlign="middle"
+                           d="flex"
+                           textAlign="center"
+                           p={0}
+                           width="2rem"
+                           minWidth="unset"
+                           height="2rem"
+                           mr={1}
+                           borderRadius="50%"
+                           borderWidth={1}
+                           borderColor="gray.300"
+                           background="white"
                         >
                            <IconBrandTwitter
                               stroke={1.5}
-                              color="white"
+                              size="20"
+                              color="transparent"
                               fill="var(--chakra-colors-lightgray-800)"
                            />
-                        </Link>
+                        </Button>
                      </Tooltip>
                   )}
                </Flex>
