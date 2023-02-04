@@ -21,8 +21,10 @@ import {
    IconBrandTwitter,
    IconChevronLeft,
 } from '@tabler/icons'
+import { useWallet } from '../../../../context/WalletProvider'
 
-const CreateCommunity = ({ web3 }: { web3: any }) => {
+const CreateCommunity = () => {
+
    const [name, setName] = useState<string>('')
    const [twitter, setTwitter] = useState<string>('')
    const [twitterActive, setTwitterActive] = useState(false)

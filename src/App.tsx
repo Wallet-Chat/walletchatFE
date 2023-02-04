@@ -29,11 +29,9 @@ import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
-import CreateCommunity from './scenes/Community/scenes/CreateCommunity'
 import { isChromeExtension } from './helpers/chrome'
 import NFTByContract from './scenes/NFT/scenes/NFTByContract'
 import POAPById from './scenes/NFT/scenes/POAPById'
-import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
    const location = useLocation();
@@ -84,10 +82,6 @@ export const App = () => {
 
    const nftInbox = (
       <NFT account={account} web3={web3} isAuthenticated={isAuthenticated} />
-   )
-
-   const communityInbox = (
-      <Community account={account} web3={web3} isAuthenticated={isAuthenticated} />
    )
 
 
@@ -317,50 +311,8 @@ export const App = () => {
                         }
                      />
                      <Route
-                        path="/community"
-                        element={
-                           <Flex>
-                              {communityInbox}
-                              {!isMobileView && (
-                                 <Flex
-                                    background="lightgray.200"
-                                    flex="1"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                 >
-                                    <Tag background="white">
-                                       Select a chat to start messaging
-                                    </Tag>
-                                 </Flex>
-                              )}
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/community/new"
-                        element={
-                           <Flex>
-                              <CreateCommunity web3={web3} />
-                              {!isMobileView && (
-                                 <Flex
-                                    background="lightgray.200"
-                                    flex="1"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                 >
-                                 </Flex>
-                              )}
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/community/:community"
-                        element={
-                           <Flex>
-                              {!isMobileView && communityInbox}
-                              <CommunityByName account={account} />
-                           </Flex>
-                        }
+                        path="community/*"
+                        element={<Community />}
                      />
                      <Route path="/" element={<Navigate to="/dm" replace />} />
                      <Route
