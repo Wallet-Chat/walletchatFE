@@ -69,7 +69,7 @@ const NFTGroupChat = ({
          })
          .catch((error) => {
             console.error('🚨[GET][NFT][Group Chat Messages By Addr]:', error)
-            navigate(`/nft_error`)
+            navigate(`/nft/error`)
          })
       // .finally(() => setIsFetchingMessages(false))
    }

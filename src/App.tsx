@@ -15,7 +15,6 @@ import { isMobile } from 'react-device-detect'
 
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
-import Inbox from './scenes/DM'
 import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar/Sidebar'
 import { useWallet } from './context/WalletProvider'
@@ -25,11 +24,8 @@ import ChangeName from './scenes/Me/scenes/ChangeName'
 import EnterEmail from './scenes/Me/scenes/EnterEmail'
 import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
-import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
-import NFTByContract from './scenes/NFT/scenes/NFTByContract'
-import POAPById from './scenes/NFT/scenes/POAPById'
 import DM from './scenes/DM'
 
 export const App = () => {
@@ -73,10 +69,6 @@ export const App = () => {
             <IconX size={18} color="var(--chakra-colors-darkgray-700)" />
          </Button>
       </Flex>
-   )
-
-   const nftInbox = (
-      <NFT account={account} web3={web3} isAuthenticated={isAuthenticated} />
    )
 
 
@@ -184,75 +176,9 @@ export const App = () => {
                         path="/me/verify-email"
                         element={<VerifyEmail account={account} />}
                      />
-                     <Route
-                        path="/nft"
-                        element={
-                           <Flex>
-                              {nftInbox}
-                              {!isMobileView && (
-                                 <Flex
-                                    background="lightgray.200"
-                                    flex="1"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                 >
-                                    <Tag background="white">
-                                       Explore NFT groups
-                                    </Tag>
-                                 </Flex>
-                              )}
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/nft_error"
-                        element={
-                           <Flex>
-                              {nftInbox}
-                              {!isMobileView && (
-                                 <Flex
-                                    background="lightgray.200"
-                                    flex="1"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                 >
-                                    <Tag background="white">
-                                       You must own at least one NFT from the
-                                       Searched Collection
-                                    </Tag>
-                                 </Flex>
-                              )}
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/nft/poap/:poapId"
-                        element={
-                           <Flex>
-                              {!isMobileView && nftInbox}
-                              <POAPById account={account} />
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/nft/:chain/:nftContractAddr/:nftId"
-                        element={
-                           <Flex>
-                              {!isMobileView && nftInbox}
-                              <NFTByContractAndId account={account} />
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/nft/:chain/:nftContractAddr"
-                        element={
-                           <Flex>
-                              {!isMobileView && nftInbox}
-                              <NFTByContract account={account} />
-                           </Flex>
-                        }
-                     />
+                     
                      <Route path="dm/*" element={<DM />} />
+                     <Route path="nft/*" element={<NFT />} />
                      <Route path="community/*" element={<Community />} />
                      <Route path="/" element={<Navigate to="/dm" replace />} />
                      <Route

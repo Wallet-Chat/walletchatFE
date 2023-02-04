@@ -23,8 +23,9 @@ import { useParams } from 'react-router-dom'
 import NFTGroupChat from '../../components/NFTGroupChat'
 import POAPEvent from '../../../../types/POAP/POAPEvent'
 import { useHover } from '../../../../helpers/useHover'
+import { useWallet } from '../../../../context/WalletProvider'
 
-const POAPById = ({ account }: { account: string }) => {
+const POAPById = () => {
    let { poapId = '' } = useParams()
 
    const [poapEvent, setPoapEvent] = useState<POAPEvent>()
@@ -32,6 +33,7 @@ const POAPById = ({ account }: { account: string }) => {
    const [joined, setJoined] = useState<boolean | null>(null)
    const [isFetchingJoining, setIsFetchingJoining] = useState(false)
    const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
+   const { account } = useWallet()
 
    useEffect(() => {
       getPOAPEvent()

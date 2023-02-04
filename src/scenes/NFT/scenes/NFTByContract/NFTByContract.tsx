@@ -42,9 +42,11 @@ import {
  import OpenSeaNFTCollection, { openseaToGeneralNFTCollectionType } from '../../../../types/OpenSea/NFTCollection'
  import NFTPortNFTCollection, { nftPortToGeneralNFTCollectionType } from '../../../../types/NFTPort/NFTCollection'
  import NFTCollection from '../../../../types/NFTCollection'
+import { useWallet } from '../../../../context/WalletProvider'
  
- const NFTByContract = ({ account }: { account: string }) => {
+ const NFTByContract = () => {
     let { nftContractAddr = '', chain = '' } = useParams()
+    let { account } = useWallet()
  
     const [nftData, setNftData] = useState<NFTCollection>()
     const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()

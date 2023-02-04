@@ -40,12 +40,14 @@ import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import equal from 'fast-deep-equal/es6'
 import { useHover } from '../../../../helpers/useHover'
+import { useWallet } from '../../../../context/WalletProvider'
 
 const tokenType = 'erc721'
 
-const NFTByContractAndId = ({ account }: { account: string }) => {
+const NFTByContractAndId = () => {
    let { nftContractAddr = '', nftId = '', chain = '' } = useParams()
    let [searchParams] = useSearchParams()
+   let { account } = useWallet()
 
    const [nftData, setNftData] = useState<NFT>()
    const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
