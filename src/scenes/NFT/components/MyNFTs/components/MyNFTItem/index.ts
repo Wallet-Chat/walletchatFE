@@ -1,1 +1,1 @@
-export { default } from './MyNFTItem'
+export { default } from './MyNFTItem';

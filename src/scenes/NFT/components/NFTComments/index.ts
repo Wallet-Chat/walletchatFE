@@ -1,1 +1,1 @@
-export { default } from './NFTComments'
+export { default } from './NFTComments';

@@ -1,1 +1,1 @@
-export { default } from './NFTByContract'
+export { default } from './NFTByContract';

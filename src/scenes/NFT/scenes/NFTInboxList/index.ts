@@ -1,1 +1,1 @@
-export { default } from './NFTInboxList'
+export { default } from './NFTInboxList';

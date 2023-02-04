@@ -1,1 +1,1 @@
-export { default } from './CommunityGroupChat'
+export { default } from './CommunityGroupChat';

@@ -92,7 +92,7 @@
 		"build": "craco build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
-      "prepare": "husky install",
+		"format": "prettier --write src/**/*.{ts,tsx,js,jsx}",
 		"configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\""
 	},
 	"eslintConfig": {
@@ -100,8 +100,8 @@
 	},
 	"lint-staged": {
 		"**/*.{js,jsx,ts,tsx}": [
-			"npx prettier --write",
-			"npx eslint --fix"
+			"npx eslint --fix",
+			"npx prettier --write"
 		]
 	},
 	"husky": {

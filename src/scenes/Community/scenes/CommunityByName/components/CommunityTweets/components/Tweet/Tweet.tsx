@@ -67,17 +67,17 @@ const Tweet = ({ data }: { data: TweetType }) => {
 					{data.media &&
 						data.media.media_keys &&
 						data.media.media_keys.length > 0 && (
-						<Box mt={3}>
-							{data.media.media_keys.map((url, i) => (
-								<Image
-									src={url}
-									key={`${url}-${i}`}
-									borderRadius='lg'
-									mb={3}
-								/>
-							))}
-						</Box>
-					)}
+							<Box mt={3}>
+								{data.media.media_keys.map((url, i) => (
+									<Image
+										src={url}
+										key={`${url}-${i}`}
+										borderRadius='lg'
+										mb={3}
+									/>
+								))}
+							</Box>
+						)}
 				</Box>
 			</Flex>
 		</Box>

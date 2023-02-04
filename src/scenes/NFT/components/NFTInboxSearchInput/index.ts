@@ -1,1 +1,1 @@
-export { default } from './NFTInboxSearchInput'
+export { default } from './NFTInboxSearchInput';

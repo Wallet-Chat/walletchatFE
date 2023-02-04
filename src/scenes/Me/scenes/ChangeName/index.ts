@@ -1,1 +1,1 @@
-export { default } from './ChangeName'
+export { default } from './ChangeName';
