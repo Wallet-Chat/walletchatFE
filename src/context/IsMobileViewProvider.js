@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const IsMobileViewContext = React.createContext();
 export const useIsMobileView = () => React.useContext(IsMobileViewContext);
