@@ -33,17 +33,12 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 //import sigUtil from 'eth-sig-util'
 import lit from "../../../../utils/lit";
 import ScrollToBottom from 'react-scroll-to-bottom';
+import { useWallet } from '../../../../context/WalletProvider'
 
-const DMByAddress = ({
-   account,
-   web3,
-   isAuthenticated,
-}: {
-   account: string
-   web3: Web3
-   isAuthenticated: boolean
-}) => {
+const DMByAddress = () => {
    let { address: toAddr = '' } = useParams()
+   let { account, web3, isAuthenticated } = useWallet()
+
    // const [ens, setEns] = useState<string>('')
    const [name, setName] = useState<string>('')
    const [pfpDataToAddr, setPfpDataToAddr] = useState<string>()

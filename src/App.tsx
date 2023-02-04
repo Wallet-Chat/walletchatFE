@@ -16,8 +16,6 @@ import { isMobile } from 'react-device-detect'
 import logoThumb from './images/logo-thumb.svg'
 import './App.scss'
 import Inbox from './scenes/DM'
-import NewConversation from './scenes/NewConversation'
-import Chat from './scenes/DM/scenes/DMByAddress'
 import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar/Sidebar'
 import { useWallet } from './context/WalletProvider'
@@ -32,6 +30,7 @@ import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
 import NFTByContract from './scenes/NFT/scenes/NFTByContract'
 import POAPById from './scenes/NFT/scenes/POAPById'
+import DM from './scenes/DM'
 
 export const App = () => {
    const location = useLocation();
@@ -74,10 +73,6 @@ export const App = () => {
             <IconX size={18} color="var(--chakra-colors-darkgray-700)" />
          </Button>
       </Flex>
-   )
-
-   const inbox = (
-      <Inbox account={account} web3={web3} isAuthenticated={isAuthenticated} />
    )
 
    const nftInbox = (
@@ -177,59 +172,6 @@ export const App = () => {
                <Box flex="1" overflow="hidden" minWidth="1px">
                   <Routes>
                      <Route
-                        path="/dm/new"
-                        element={
-                           <Flex>
-                              <NewConversation web3={web3} />
-                              {!isMobileView && (
-                                 <Flex
-                                    background="lightgray.200"
-                                    flex="1"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                 >
-                                    <Tag background="white">
-                                       Select a chat to start messaging
-                                    </Tag>
-                                 </Flex>
-                              )}
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/dm/:address"
-                        element={
-                           <Flex>
-                              {!isMobileView && inbox}
-                              <Chat
-                                 account={account}
-                                 web3={web3}
-                                 isAuthenticated={isAuthenticated}
-                              />
-                           </Flex>
-                        }
-                     />
-                     <Route
-                        path="/dm"
-                        element={
-                           <Flex>
-                              {inbox}
-                              {!isMobileView && (
-                                 <Flex
-                                    background="lightgray.200"
-                                    flex="1"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                 >
-                                    <Tag background="white">
-                                       Select a chat to start messaging
-                                    </Tag>
-                                 </Flex>
-                              )}
-                           </Flex>
-                        }
-                     />
-                     <Route
                         path="/me/enter-email"
                         element={<EnterEmail account={account} />}
                      />
@@ -310,10 +252,8 @@ export const App = () => {
                            </Flex>
                         }
                      />
-                     <Route
-                        path="community/*"
-                        element={<Community />}
-                     />
+                     <Route path="dm/*" element={<DM />} />
+                     <Route path="community/*" element={<Community />} />
                      <Route path="/" element={<Navigate to="/dm" replace />} />
                      <Route
                         path="/index.html"

@@ -1,7 +1,7 @@
 import { Flex, Tag } from '@chakra-ui/react'
 import { Route, Routes } from 'react-router-dom'
 
-import CreateCommunity from './scenes/CreateCommunity'
+import CreateNewCommunity from './scenes/CreateNewCommunity'
 import { useIsMobileView } from '../../context/IsMobileViewProvider'
 import CommunityInboxList from './scenes/CommunityInboxList'
 import CommunityByName from './scenes/CommunityByName'
@@ -35,7 +35,7 @@ const Community = () => {
             path="new"
             element={
                <Flex>
-                  <CreateCommunity />
+                  <CreateNewCommunity />
                   {!isMobileView && (
                      <Flex
                         background="lightgray.200"

@@ -1,8 +1,12 @@
 import { Flex } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
-import StartConversationWithAddress from '../../components/StartConversationWithAddress'
+import StartConversationWithAddress from '../../../../components/StartConversationWithAddress'
+import { useWallet } from '../../../../context/WalletProvider'
 
-const NewConversation = ({ web3 }: { web3: any }) => {
+const NewConversation = () => {
+
+   const { web3 } = useWallet()
+   
    return (
       <Flex
          px={5}
