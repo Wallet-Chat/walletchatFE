@@ -43,12 +43,15 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
 					console.log('Missing OpenSea API Key')
 					return
 				}
-				fetch(`https://api.opensea.io/api/v1/asset_contract/${data.nftaddr}`, {
-					method: 'GET',
-					headers: {
-						Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
-					},
-				})
+				fetch(
+					`https://api.opensea.io/api/v1/asset_contract/${data.nftaddr}`,
+					{
+						method: 'GET',
+						headers: {
+							Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+						},
+					}
+				)
 					.then((response) => response.json())
 					.then((result: OpenSeaNFTCollection) => {
 						if (result?.collection?.name) {

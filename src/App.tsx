@@ -85,7 +85,12 @@ export const App = () => {
 				{/* <Header /> */}
 				{isChromeExtension() && closeBtn}
 				{appLoading ? (
-					<Flex w='100vw' h='100vh' justifyContent='center' alignItems='center'>
+					<Flex
+						w='100vw'
+						h='100vh'
+						justifyContent='center'
+						alignItems='center'
+					>
 						<Spinner />
 					</Flex>
 				) : (
@@ -148,7 +153,9 @@ export const App = () => {
 		return (
 			<Box>
 				<Flex
-					flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
+					flexDirection={
+						isMobile && !isChromeExtension() ? 'column' : 'row'
+					}
 					minHeight={isMobile ? '100vh' : 'unset'}
 				>
 					{isChromeExtension() && closeBtn}

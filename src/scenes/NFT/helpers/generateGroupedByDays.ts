@@ -18,7 +18,8 @@ function generateItems(messages: MessageUIType[]) {
 	const items = sortedDays.reduce((acc: MessageUIType[], date) => {
 		const sortedMessages = days[date].sort(
 			(x: MessageUIType, y: MessageUIType) =>
-				Date.parse(x.timestamp.toString()) - Date.parse(y.timestamp.toString())
+				Date.parse(x.timestamp.toString()) -
+				Date.parse(y.timestamp.toString())
 		)
 		const daySeparator: MessageUIType = {
 			type: 'day',

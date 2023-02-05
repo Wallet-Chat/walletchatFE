@@ -138,7 +138,9 @@ const ChangeName = () => {
 						setOwnedENS(result.assets)
 					}
 				})
-				.catch((error) => console.log(`🚨[GET][ENS Owned by ${account}`, error))
+				.catch((error) =>
+					console.log(`🚨[GET][ENS Owned by ${account}`, error)
+				)
 		}
 		if (account) {
 			getOwnedENS()

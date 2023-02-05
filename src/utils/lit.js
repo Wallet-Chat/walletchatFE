@@ -65,7 +65,9 @@ class Lit {
 		} else {
 			authSig = JSON.parse(authSig)
 		}
-		const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(str)
+		const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(
+			str
+		)
 
 		const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
 			accessControlConditions: accessControlConditions,

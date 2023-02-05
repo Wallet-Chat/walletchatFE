@@ -138,7 +138,8 @@ const VerifyEmail = ({ account }: { account: string }) => {
 					notifications.
 				</Alert>
 				<Alert status='success' variant='solid' mt={4}>
-					You may close this page or continue to chat here in the full web app.
+					You may close this page or continue to chat here in the full web
+					app.
 				</Alert>
 			</Box>
 		)
@@ -154,7 +155,9 @@ const VerifyEmail = ({ account }: { account: string }) => {
 						<Text color='darkgray.300' fontSize='md' mb={1}>
 							Current email: <b>{_email}</b>
 						</Text>
-						<FormLabel fontSize='2xl'>Enter code to verify email</FormLabel>
+						<FormLabel fontSize='2xl'>
+							Enter code to verify email
+						</FormLabel>
 						<Flex>
 							<Input
 								type='text'
@@ -181,7 +184,8 @@ const VerifyEmail = ({ account }: { account: string }) => {
 				</form>
 				{fetchError && (
 					<Alert status='error' variant='solid' mt={4}>
-						Email Verification Failed! Please Change email again to re-verify!
+						Email Verification Failed! Please Change email again to
+						re-verify!
 					</Alert>
 				)}
 			</Box>
@@ -203,7 +207,8 @@ const VerifyEmail = ({ account }: { account: string }) => {
 				</form>
 				{fetchError && (
 					<Alert status='error' variant='solid' mt={4}>
-						Email Verification Failed! Please Change email again to re-verify!
+						Email Verification Failed! Please Change email again to
+						re-verify!
 					</Alert>
 				)}
 			</Box>

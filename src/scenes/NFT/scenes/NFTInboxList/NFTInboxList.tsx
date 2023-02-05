@@ -30,7 +30,8 @@ const NFTInboxList = () => {
 	const localStorageInbox = localStorage['inbox_' + account]
 		? JSON.parse(localStorage['inbox_' + account])
 		: []
-	const [inboxData, setInboxData] = useState<InboxItemType[]>(localStorageInbox)
+	const [inboxData, setInboxData] =
+		useState<InboxItemType[]>(localStorageInbox)
 	const [isFetchingInboxData, setIsFetchingInboxData] = useState(false)
 	const [nfts, setNfts] = useState<InboxItemType[]>()
 	const [chainFilters, setChainFilters] = useState([''])
@@ -55,7 +56,9 @@ const NFTInboxList = () => {
 			setTabIndex(1)
 		}
 		setNfts(
-			inboxData.filter((d) => d.context_type === 'nft' && !(d.chain === 'none'))
+			inboxData.filter(
+				(d) => d.context_type === 'nft' && !(d.chain === 'none')
+			)
 		)
 	}, [inboxData])
 
@@ -128,7 +131,8 @@ const NFTInboxList = () => {
 					localStorage['inbox_' + account] = JSON.stringify([])
 				} else if (
 					!localStorage['inboxEnc_' + account] ||
-					equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !== true
+					equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !==
+						true
 				) {
 					console.log('✅[GET][Inbox]:', data)
 					//setEncChatData(data)

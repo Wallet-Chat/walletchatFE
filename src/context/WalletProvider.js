@@ -139,7 +139,10 @@ const WalletProvider = React.memo(({ children }) => {
 					storage.set('active-account', {
 						address: getNormalizedAddress(accounts[0]),
 					})
-					console.log('[account changes]: ', getNormalizedAddress(accounts[0]))
+					console.log(
+						'[account changes]: ',
+						getNormalizedAddress(accounts[0])
+					)
 					if (!isChromeExtension()) {
 						// TODO: how can we refresh data loaded without manual refresh?
 						// window.location.reload()
@@ -355,7 +358,9 @@ const WalletProvider = React.memo(({ children }) => {
 				// If last login account has signed in before,
 				// (1) retrieve JWT from localStorage, and
 				// (2) check whether it has timed out:
-				if (getNormalizedAddress(_account) === localStorageAccount?.address) {
+				if (
+					getNormalizedAddress(_account) === localStorageAccount?.address
+				) {
 					fetch(
 						`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`,
 						{
@@ -473,8 +478,14 @@ const WalletProvider = React.memo(({ children }) => {
 						console.log(provider, data)
 						setAccount(_account)
 						localStorage.setItem('jwt', data.access)
-						localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
-						localStorage.setItem('lit-web3-provider', provider.connection.url)
+						localStorage.setItem(
+							'lit-auth-signature',
+							JSON.stringify(authSig)
+						)
+						localStorage.setItem(
+							'lit-web3-provider',
+							provider.connection.url
+						)
 						Lit.connectManual()
 						console.log('✅[POST][SignInJWT]:', data.access)
 						storage.set('active-account', {

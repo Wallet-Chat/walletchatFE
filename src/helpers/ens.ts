@@ -37,7 +37,9 @@ export async function registrantENSLookup(domainName: string) {
 
 	const BigNumber = ethers.BigNumber
 	const utils = ethers.utils
-	const labelHash = utils.keccak256(utils.toUtf8Bytes(domainName.split('.')[0]))
+	const labelHash = utils.keccak256(
+		utils.toUtf8Bytes(domainName.split('.')[0])
+	)
 	const derivedTokenId = BigNumber.from(labelHash).toString()
 
 	const contractABI = require('./ENS.json')

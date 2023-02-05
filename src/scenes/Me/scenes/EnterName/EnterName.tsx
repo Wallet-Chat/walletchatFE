@@ -144,7 +144,9 @@ const EnterName = ({ account }: { account: string }) => {
 						setOwnedENS(result.assets)
 					}
 				})
-				.catch((error) => console.log(`🚨[GET][ENS Owned by ${account}`, error))
+				.catch((error) =>
+					console.log(`🚨[GET][ENS Owned by ${account}`, error)
+				)
 		}
 		if (account) {
 			getOwnedENS()
@@ -323,8 +325,8 @@ const EnterName = ({ account }: { account: string }) => {
 						})}
 				</FormControl>
 				<Alert status='success' variant='solid' mt={4}>
-					You must sign the pending message in your connected wallet prior to
-					setting name
+					You must sign the pending message in your connected wallet prior
+					to setting name
 				</Alert>
 			</form>
 		</Box>

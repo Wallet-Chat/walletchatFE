@@ -181,10 +181,14 @@ const InboxItem = ({
 					</Flex>
 					<Box textAlign='right' flexShrink={0}>
 						{timestamp !== '' && (
-							<Box className='timestamp'>{formatInboxDate(timestamp)}</Box>
+							<Box className='timestamp'>
+								{formatInboxDate(timestamp)}
+							</Box>
 						)}
 						{unread && unread !== 0 ? (
-							<InboxItemNotificationCount>{unread}</InboxItemNotificationCount>
+							<InboxItemNotificationCount>
+								{unread}
+							</InboxItemNotificationCount>
 						) : (
 							''
 						)}

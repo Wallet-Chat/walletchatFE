@@ -233,7 +233,14 @@ const ChatMessage = ({
 		) {
 			setMessageAsRead()
 		}
-	}, [isInViewport, account, context, msg?.read, msg?.toAddr, setMessageAsRead])
+	}, [
+		isInViewport,
+		account,
+		context,
+		msg?.read,
+		msg?.toAddr,
+		setMessageAsRead,
+	])
 
 	return (
 		<Flex
@@ -256,7 +263,10 @@ const ChatMessage = ({
 							/>
 						) : (
 							<BlockieWrapper>
-								<Blockies seed={msg.fromAddr.toLocaleLowerCase()} scale={4} />
+								<Blockies
+									seed={msg.fromAddr.toLocaleLowerCase()}
+									scale={4}
+								/>
 							</BlockieWrapper>
 						)}
 					</UserProfileContextMenu>
@@ -291,7 +301,11 @@ const ChatMessage = ({
 					{msg.position === 'right' &&
 						(msg.read === true || msg.read === false) && (
 							<span className='read-status'>
-								{msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
+								{msg.read ? (
+									<IconChecks size={15} />
+								) : (
+									<IconCheck size={15} />
+								)}
 							</span>
 						)}
 				</Box>
@@ -299,7 +313,9 @@ const ChatMessage = ({
 					<Box mb={1}>
 						{nftData && (
 							<RLink
-								to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${
+								to={`/nft/ethereum/${msg.nftAddr}/${
+									msg.nftId
+								}?recipient=${
 									msg.toAddr === account ? msg.fromAddr : msg.toAddr
 								}`}
 								style={{ textDecoration: 'none' }}

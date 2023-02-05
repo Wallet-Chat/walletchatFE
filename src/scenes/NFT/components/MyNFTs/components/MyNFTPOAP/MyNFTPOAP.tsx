@@ -43,7 +43,11 @@ export default function MyNFTItem({ poap }: { poap: POAP }) {
 					fit='cover'
 					borderRadius='md'
 					fallback={
-						<Box background='lightgray.400' width='100px' height='100px'></Box>
+						<Box
+							background='lightgray.400'
+							width='100px'
+							height='100px'
+						></Box>
 					}
 				/>
 			) : (
@@ -93,7 +97,8 @@ export default function MyNFTItem({ poap }: { poap: POAP }) {
 									alt=''
 								/>
 								<Box verticalAlign='middle' fontSize='sm'>
-									{poapContractAddress && truncateAddress(poapContractAddress)}
+									{poapContractAddress &&
+										truncateAddress(poapContractAddress)}
 								</Box>
 								<Badge>{poap?.tokenId}</Badge>
 							</Flex>

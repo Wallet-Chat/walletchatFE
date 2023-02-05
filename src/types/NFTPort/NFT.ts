@@ -65,14 +65,16 @@ export function nftPortResponseToGeneralNFTType(
 ): GeneralNFT {
 	return {
 		name: data?.nfts?.[0]?.name,
-		image: data?.nfts?.[0]?.cached_file_url || data?.nfts?.[0]?.metadata?.image,
+		image:
+			data?.nfts?.[0]?.cached_file_url || data?.nfts?.[0]?.metadata?.image,
 		description: data?.nfts?.[0]?.metadata?.description,
 		token_id: data?.nfts?.[0]?.token_id,
 		attributes: data?.nfts?.[0]?.metadata?.attributes,
 		collection: {
 			name: data?.nfts?.[0]?.name,
 			image:
-				data?.nfts?.[0]?.cached_file_url || data?.nfts?.[0]?.metadata?.image,
+				data?.nfts?.[0]?.cached_file_url ||
+				data?.nfts?.[0]?.metadata?.image,
 			contract_address: data?.nfts?.[0]?.contract_address,
 		},
 	}

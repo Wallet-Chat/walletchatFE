@@ -62,7 +62,9 @@ const NFTComments = ({
 			.finally(() => setIsFetchingComments(false))
 	}
 
-	const handleCommentKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+	const handleCommentKeyPress = (
+		event: KeyboardEvent<HTMLTextAreaElement>
+	) => {
 		if (event.key === 'Enter') {
 			event.preventDefault()
 			sendComment()
@@ -112,7 +114,11 @@ const NFTComments = ({
 				)
 			})
 			.catch((error) => {
-				console.error('🚨🚨[POST][NFT][Comment]:', error, JSON.stringify(data))
+				console.error(
+					'🚨🚨[POST][NFT][Comment]:',
+					error,
+					JSON.stringify(data)
+				)
 			})
 			.finally(() => setIsPostingComment(false))
 	}

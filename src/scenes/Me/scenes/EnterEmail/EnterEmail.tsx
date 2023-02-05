@@ -190,8 +190,8 @@ const EnterEmail = ({ account }: { account: string }) => {
 							isChecked={dailyBool}
 							onChange={(e) => handleChangeTwo(e.target.checked)}
 						>
-							Receive notifications summary email every 24 hours (DM, NFT,
-							Community)
+							Receive notifications summary email every 24 hours (DM,
+							NFT, Community)
 						</Checkbox>
 					</Stack>
 					<Divider
@@ -238,8 +238,8 @@ const EnterEmail = ({ account }: { account: string }) => {
 						You can change it anytime in your settings
 					</FormHelperText>
 					<Alert status='info' variant='solid' mt={4}>
-						You must verify your email before you will receive notifications,
-						please check your inbox
+						You must verify your email before you will receive
+						notifications, please check your inbox
 					</Alert>
 					{errors.email && errors.email.type === 'required' && (
 						<FormErrorMessage>No blank email please</FormErrorMessage>

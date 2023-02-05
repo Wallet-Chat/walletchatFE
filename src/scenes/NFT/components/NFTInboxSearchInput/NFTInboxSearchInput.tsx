@@ -196,7 +196,10 @@ export default function NFTInboxSearchInput() {
 										height='25px'
 									/>
 								) : (
-									<Blockies seed={toAddr.toLocaleLowerCase()} scale={3} />
+									<Blockies
+										seed={toAddr.toLocaleLowerCase()}
+										scale={3}
+									/>
 								)}
 								<Text fontWeight='bold' fontSize='md' ml={2}>
 									{nft?.name ? nft.name : truncateAddress(toAddr)}{' '}

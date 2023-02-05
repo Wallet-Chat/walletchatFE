@@ -49,12 +49,15 @@ export default function MyNFTs({ account }: { account: string }) {
 			if (!isFetchingNFTs) setIsFetchingNFTs(true)
 
 			await Promise.all([
-				fetch(`https://api.nftport.xyz/v0/accounts/${account}?chain=polygon`, {
-					method: 'GET',
-					headers: {
-						Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
-					},
-				}).then((res) => res.json()),
+				fetch(
+					`https://api.nftport.xyz/v0/accounts/${account}?chain=polygon`,
+					{
+						method: 'GET',
+						headers: {
+							Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+						},
+					}
+				).then((res) => res.json()),
 				fetch(`https://api.opensea.io/api/v1/assets?owner=${account}`, {
 					method: 'GET',
 					headers: {
@@ -63,7 +66,11 @@ export default function MyNFTs({ account }: { account: string }) {
 				}).then((res) => res.json()),
 			])
 				.then(([polygonData, ethereumData]) => {
-					console.log(`✅[GET][NFTs] ${account}:`, polygonData, ethereumData)
+					console.log(
+						`✅[GET][NFTs] ${account}:`,
+						polygonData,
+						ethereumData
+					)
 					let transformed: NFT[] = []
 					if (polygonData?.nfts?.length > 0) {
 						transformed = polygonData.nfts

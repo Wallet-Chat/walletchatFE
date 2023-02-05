@@ -371,15 +371,24 @@ const NFTByContractAndId = () => {
 												mr={2}
 											/>
 										)}
-										<Text fontSize='sm'>{nftData.collection?.name}</Text>
+										<Text fontSize='sm'>
+											{nftData.collection?.name}
+										</Text>
 									</Badge>
 								</CLink>
 							)}
 							{nftStatistics && (
 								<Tooltip
-									label={`${chain && capitalizeFirstLetter(chain)} chain`}
+									label={`${
+										chain && capitalizeFirstLetter(chain)
+									} chain`}
 								>
-									<Badge d='flex' alignItems='center' mr={2} fontSize='sm'>
+									<Badge
+										d='flex'
+										alignItems='center'
+										mr={2}
+										fontSize='sm'
+									>
 										{chain === 'ethereum' && (
 											<Image
 												src={IconEthereum}
@@ -407,7 +416,12 @@ const NFTByContractAndId = () => {
 							)}
 							{nftStatistics && (
 								<Tooltip label='Floor price'>
-									<Badge d='flex' alignItems='center' mr={2} fontSize='sm'>
+									<Badge
+										d='flex'
+										alignItems='center'
+										mr={2}
+										fontSize='sm'
+									>
 										{nftStatistics.floor_price < 0.01
 											? '<0.01'
 											: nftStatistics.floor_price.toFixed(2)}
@@ -513,13 +527,23 @@ const NFTByContractAndId = () => {
 					</Tab>
 				</TabList>
 
-				<TabPanels overflowY='auto' className='custom-scrollbar' height='100%'>
+				<TabPanels
+					overflowY='auto'
+					className='custom-scrollbar'
+					height='100%'
+				>
 					<TabPanel px='0' height='100%' padding='0'>
-						<NFTGroupChat account={account} nftContractAddr={nftContractAddr} />
+						<NFTGroupChat
+							account={account}
+							nftContractAddr={nftContractAddr}
+						/>
 					</TabPanel>
 					{tweetCount && tweetCount !== 0 && (
 						<TabPanel p={5}>
-							<NFTTweets account={account} nftContractAddr={nftContractAddr} />
+							<NFTTweets
+								account={account}
+								nftContractAddr={nftContractAddr}
+							/>
 						</TabPanel>
 					)}
 					<TabPanel px='0' height='100%' padding='0'>

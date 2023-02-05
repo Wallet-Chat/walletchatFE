@@ -255,7 +255,9 @@ const NFTGroupChat = ({
 						background='white'
 						p={4}
 					>
-						<Box fontSize='md'>Be the first to post something here 😉</Box>
+						<Box fontSize='md'>
+							Be the first to post something here 😉
+						</Box>
 					</Flex>
 				)}
 				{renderedMessages}

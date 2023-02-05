@@ -83,7 +83,9 @@ const DMInboxItem = ({
 						</Box>
 					</Flex>
 					<Box textAlign='right' flexShrink={0}>
-						<Box className='timestamp'>{formatInboxDate(data.timestamp)}</Box>
+						<Box className='timestamp'>
+							{formatInboxDate(data.timestamp)}
+						</Box>
 						{data.unread && data.unread !== 0 ? (
 							<InboxItemNotificationCount>
 								{data.unread}

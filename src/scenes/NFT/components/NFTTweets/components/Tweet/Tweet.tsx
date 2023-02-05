@@ -16,7 +16,10 @@ const Tweet = ({ data }: { data: TweetType }) => {
 							target='_blank'
 							color='darkgray.800'
 						>
-							<Avatar name={data.user.name} src={data.user.profile_image_url} />
+							<Avatar
+								name={data.user.name}
+								src={data.user.profile_image_url}
+							/>
 						</Link>
 					</Box>
 				)}
@@ -24,7 +27,11 @@ const Tweet = ({ data }: { data: TweetType }) => {
 					{data.user && (
 						<Box mb={1}>
 							<Flex alignItems='center' flexFlow='row wrap'>
-								<Text fontWeight='bold' fontSize='lg' color='darkgray.800'>
+								<Text
+									fontWeight='bold'
+									fontSize='lg'
+									color='darkgray.800'
+								>
 									<Link
 										href={`https://twitter.com/${data.user.username}`}
 										target='_blank'
@@ -35,7 +42,12 @@ const Tweet = ({ data }: { data: TweetType }) => {
 								</Text>
 								{data.user.username && (
 									<>
-										<Text fontSize='md' ml={1} mr={1} color='darkgray.200'>
+										<Text
+											fontSize='md'
+											ml={1}
+											mr={1}
+											color='darkgray.200'
+										>
 											·
 										</Text>
 										<Link
@@ -50,7 +62,12 @@ const Tweet = ({ data }: { data: TweetType }) => {
 								)}
 								{formattedDate && (
 									<>
-										<Text fontSize='md' ml={1} mr={1} color='darkgray.200'>
+										<Text
+											fontSize='md'
+											ml={1}
+											mr={1}
+											color='darkgray.200'
+										>
 											·
 										</Text>
 										<Text fontSize='md' color='darkgray.200'>

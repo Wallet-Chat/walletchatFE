@@ -272,7 +272,11 @@ const CommunityByName = () => {
 	return (
 		<Flex flexDirection='column' background='white' height='100vh' flex='1'>
 			<Flex alignItems='center' px={5} py={2}>
-				<Flex justifyContent='space-between' width='100%' alignItems='center'>
+				<Flex
+					justifyContent='space-between'
+					width='100%'
+					alignItems='center'
+				>
 					<Flex alignItems='flex-start' p={2} borderRadius='md' flex='1'>
 						<label
 							style={{
@@ -282,7 +286,9 @@ const CommunityByName = () => {
 							<Avatar
 								size='md'
 								name={communityData?.name}
-								src={isSuccessAvatar ? filePreview : communityData?.logo}
+								src={
+									isSuccessAvatar ? filePreview : communityData?.logo
+								}
 								mr={1}
 								cursor='pointer'
 								overflow='hidden'
@@ -325,7 +331,11 @@ const CommunityByName = () => {
 										transform: 'translateY(0)',
 									}}
 								>
-									<IconPhoto color='black' size={20} strokeWidth={1.5} />
+									<IconPhoto
+										color='black'
+										size={20}
+										strokeWidth={1.5}
+									/>
 								</Flex>
 							</Avatar>
 						</label>
@@ -477,7 +487,12 @@ const CommunityByName = () => {
 									borderColor='gray.300'
 									background='white'
 								>
-									<Image src={IconDiscord} alt='' height='22px' width='22px' />
+									<Image
+										src={IconDiscord}
+										alt=''
+										height='22px'
+										width='22px'
+									/>
 								</Button>
 							</Tooltip>
 						)}
@@ -589,7 +604,9 @@ const CommunityByName = () => {
 						/>
 						<Route
 							path='tweets'
-							element={<CommunityTweets tweets={communityData?.tweets || []} />}
+							element={
+								<CommunityTweets tweets={communityData?.tweets || []} />
+							}
 						/>
 					</Routes>
 				</Box>

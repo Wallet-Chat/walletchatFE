@@ -62,7 +62,12 @@ const UserProfileContextMenu = ({
 				>
 					<MenuItem
 						icon={
-							<Image src={IconEtherscan} width='20px' height='20px' alt='' />
+							<Image
+								src={IconEtherscan}
+								width='20px'
+								height='20px'
+								alt=''
+							/>
 						}
 					>
 						<Flex alignItems='center'>
@@ -82,7 +87,14 @@ const UserProfileContextMenu = ({
 					}}
 				>
 					<MenuItem
-						icon={<Image src={IconGemXyz} width='20px' height='20px' alt='' />}
+						icon={
+							<Image
+								src={IconGemXyz}
+								width='20px'
+								height='20px'
+								alt=''
+							/>
+						}
 					>
 						View in Gem.xyz
 					</MenuItem>
@@ -96,7 +108,14 @@ const UserProfileContextMenu = ({
 					}}
 				>
 					<MenuItem
-						icon={<Image src={IconOpenSea} width='20px' height='20px' alt='' />}
+						icon={
+							<Image
+								src={IconOpenSea}
+								width='20px'
+								height='20px'
+								alt=''
+							/>
+						}
 					>
 						View in OpenSea
 					</MenuItem>

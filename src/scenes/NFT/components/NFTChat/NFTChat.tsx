@@ -101,7 +101,9 @@ const NFTChat = ({
 		// })
 	}
 
-	const handleMessageKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+	const handleMessageKeyPress = (
+		event: KeyboardEvent<HTMLTextAreaElement>
+	) => {
 		if (event.key === 'Enter') {
 			event.preventDefault()
 			sendMessage()
@@ -318,10 +320,18 @@ const NFTChat = ({
 				>
 					<Flex alignItems='center'>
 						<BlockieWrapper>
-							<Blockies seed={recipientAddr.toLocaleLowerCase()} scale={4} />
+							<Blockies
+								seed={recipientAddr.toLocaleLowerCase()}
+								scale={4}
+							/>
 						</BlockieWrapper>
 						<Box>
-							<Text ml={2} fontSize='md' fontWeight='bold' color='darkgray.800'>
+							<Text
+								ml={2}
+								fontSize='md'
+								fontWeight='bold'
+								color='darkgray.800'
+							>
 								{truncateAddress(recipientAddr)}
 							</Text>
 							{/* {ens && (

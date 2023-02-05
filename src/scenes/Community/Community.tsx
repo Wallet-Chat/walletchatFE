@@ -23,7 +23,9 @@ const Community = () => {
 								alignItems='center'
 								justifyContent='center'
 							>
-								<Tag background='white'>Select a chat to start messaging</Tag>
+								<Tag background='white'>
+									Select a chat to start messaging
+								</Tag>
 							</Flex>
 						)}
 					</Flex>

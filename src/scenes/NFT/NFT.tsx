@@ -42,7 +42,8 @@ const NFT = () => {
 								justifyContent='center'
 							>
 								<Tag background='white'>
-									You must own at least one NFT from the Searched Collection
+									You must own at least one NFT from the Searched
+									Collection
 								</Tag>
 							</Flex>
 						)}

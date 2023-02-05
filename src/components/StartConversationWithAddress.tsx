@@ -88,7 +88,10 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
 				)}
 				{isResolvingENS && <Spinner size='sm' mt={2} />}
 				{toAddr.includes('.eth') && resolvedAddr && !isResolvingENS && (
-					<Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
+					<Link
+						to={`/dm/${resolvedAddr}`}
+						style={{ textDecoration: 'none' }}
+					>
 						<Flex
 							alignItems='center'
 							justifyContent='flex-start'
@@ -98,7 +101,10 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
 							mt={2}
 							as={Button}
 						>
-							<Blockies seed={resolvedAddr.toLocaleLowerCase()} scale={3} />
+							<Blockies
+								seed={resolvedAddr.toLocaleLowerCase()}
+								scale={3}
+							/>
 							<Text fontWeight='bold' fontSize='md' ml={2}>
 								{toAddr} ({truncateAddress(resolvedAddr)})
 							</Text>

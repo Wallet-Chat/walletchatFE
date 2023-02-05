@@ -76,7 +76,8 @@ const CommunityInboxList = () => {
 					localStorage['inbox_' + account] = JSON.stringify([])
 				} else if (
 					!localStorage['inboxEnc_' + account] ||
-					equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !== true
+					equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !==
+						true
 				) {
 					console.log('✅[GET][Inbox]:', data)
 					//setEncChatData(data)

@@ -204,12 +204,15 @@ const NFTByContract = () => {
 				console.log('Missing OpenSea API Key')
 				return
 			}
-			fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
-				method: 'GET',
-				headers: {
-					Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
-				},
-			})
+			fetch(
+				`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`,
+				{
+					method: 'GET',
+					headers: {
+						Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+					},
+				}
+			)
 				.then((response) => response.json())
 				.then((result: OpenSeaNFTCollection) => {
 					if (result?.collection?.name) {
@@ -353,7 +356,10 @@ const NFTByContract = () => {
 									<StatNumber fontSize='md' color='darkgray.700'>
 										{nFormatter(nftStatistics.num_owners, 1)}
 									</StatNumber>
-									<StatHelpText color='darkgray.200' whiteSpace='nowrap'>
+									<StatHelpText
+										color='darkgray.200'
+										whiteSpace='nowrap'
+									>
 										Owners
 									</StatHelpText>
 								</Stat>
@@ -375,7 +381,10 @@ const NFTByContract = () => {
 											: nftStatistics.floor_price.toFixed(2)}
 										<IconCurrencyEthereum size='18' />
 									</StatNumber>
-									<StatHelpText color='darkgray.200' whiteSpace='nowrap'>
+									<StatHelpText
+										color='darkgray.200'
+										whiteSpace='nowrap'
+									>
 										Floor
 									</StatHelpText>
 								</Stat>
@@ -395,7 +404,10 @@ const NFTByContract = () => {
 										{nFormatter(nftStatistics.total_volume, 1)}
 										<IconCurrencyEthereum size='18' />
 									</StatNumber>
-									<StatHelpText color='darkgray.200' whiteSpace='nowrap'>
+									<StatHelpText
+										color='darkgray.200'
+										whiteSpace='nowrap'
+									>
 										Total Vol.
 									</StatHelpText>
 								</Stat>
@@ -549,12 +561,22 @@ const NFTByContract = () => {
 					)}
 				</TabList>
 
-				<TabPanels overflowY='auto' className='custom-scrollbar' height='100%'>
+				<TabPanels
+					overflowY='auto'
+					className='custom-scrollbar'
+					height='100%'
+				>
 					<TabPanel px='0' height='100%' padding='0'>
-						<NFTGroupChat account={account} nftContractAddr={nftContractAddr} />
+						<NFTGroupChat
+							account={account}
+							nftContractAddr={nftContractAddr}
+						/>
 					</TabPanel>
 					<TabPanel p={5}>
-						<NFTTweets account={account} nftContractAddr={nftContractAddr} />
+						<NFTTweets
+							account={account}
+							nftContractAddr={nftContractAddr}
+						/>
 					</TabPanel>
 				</TabPanels>
 			</Tabs>

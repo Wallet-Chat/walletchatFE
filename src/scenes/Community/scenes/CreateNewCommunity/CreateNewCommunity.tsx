@@ -136,7 +136,10 @@ const CreateNewCommunity = () => {
 				</HStack>
 			</Box>
 			<Box px={5} pt={5} pb={3} pos='sticky' top='0'>
-				<form onSubmit={handleSubmit(onSubmit)} style={{ minHeight: '100vh' }}>
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					style={{ minHeight: '100vh' }}
+				>
 					<FormControl mb={5} isRequired>
 						<FormLabel fontWeight='bold'>Name of community</FormLabel>
 						<Input

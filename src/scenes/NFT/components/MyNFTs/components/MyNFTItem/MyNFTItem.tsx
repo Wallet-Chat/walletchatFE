@@ -34,7 +34,11 @@ export default function MyNFTItem({ nft }: { nft: NFT }) {
 					fit='cover'
 					borderRadius='md'
 					fallback={
-						<Box background='lightgray.400' width='100px' height='100px'></Box>
+						<Box
+							background='lightgray.400'
+							width='100px'
+							height='100px'
+						></Box>
 					}
 				/>
 			) : (

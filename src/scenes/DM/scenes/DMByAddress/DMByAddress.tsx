@@ -157,14 +157,18 @@ const DMByAddress = () => {
 			setChatData(
 				localStorage['dmData_' + account + '_' + toAddr.toLowerCase()]
 					? JSON.parse(
-							localStorage['dmData_' + account + '_' + toAddr.toLowerCase()]
+							localStorage[
+								'dmData_' + account + '_' + toAddr.toLowerCase()
+							]
 					  )
 					: []
 			)
 			setEncChatData(
 				localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()]
 					? JSON.parse(
-							localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()]
+							localStorage[
+								'dmDataEnc_' + account + '_' + toAddr.toLowerCase()
+							]
 					  )
 					: []
 			)
@@ -252,8 +256,9 @@ const DMByAddress = () => {
 				if (chatData.length > 0) {
 					if (data.length > 0) {
 						//START LIT ENCRYPTION
-						localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(encryptedChatData.concat(data))
+						localStorage[
+							'dmDataEnc_' + account + '_' + toAddr.toLowerCase()
+						] = JSON.stringify(encryptedChatData.concat(data))
 						setEncChatData(encryptedChatData.concat(data))
 
 						const replica = JSON.parse(JSON.stringify(data))
@@ -277,16 +282,18 @@ const DMByAddress = () => {
 						//END LIT ENCRYPTION
 						let allChats = chatData.concat(replica)
 						setChatData(allChats)
-						localStorage['dmData_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(allChats) //store so when user switches views, data is ready
+						localStorage[
+							'dmData_' + account + '_' + toAddr.toLowerCase()
+						] = JSON.stringify(allChats) //store so when user switches views, data is ready
 						console.log('✅[GET][New Chat items]:', data)
 					}
 				} else {
 					if (equal(data, encryptedChatData) === false) {
 						console.log('✅[GET][Chat items]:', data)
 						//START LIT ENCRYPTION
-						localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(data)
+						localStorage[
+							'dmDataEnc_' + account + '_' + toAddr.toLowerCase()
+						] = JSON.stringify(data)
 						setEncChatData(data)
 
 						const replica = JSON.parse(JSON.stringify(data))
@@ -308,8 +315,9 @@ const DMByAddress = () => {
 							}
 						}
 						setChatData(replica)
-						localStorage['dmData_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(replica)
+						localStorage[
+							'dmData_' + account + '_' + toAddr.toLowerCase()
+						] = JSON.stringify(replica)
 						//END LIT ENCRYPTION
 						//setChatData(data)  //use when not using encryption
 					}
@@ -342,7 +350,9 @@ const DMByAddress = () => {
 				if (localRead != data) {
 					if (data.length > 0) {
 						let localData =
-							localStorage['dmData_' + account + '_' + toAddr.toLowerCase()]
+							localStorage[
+								'dmData_' + account + '_' + toAddr.toLowerCase()
+							]
 						if (localData) {
 							localData = JSON.parse(localData)
 							for (let j = 0; j < localData.length; j++) {
@@ -357,8 +367,9 @@ const DMByAddress = () => {
 							localStorage[
 								'dmReadIDs_' + account + '_' + toAddr.toLowerCase()
 							] = data
-							localStorage['dmData_' + account + '_' + toAddr.toLowerCase()] =
-								JSON.stringify(localData) //store so when user switches views, data is ready
+							localStorage[
+								'dmData_' + account + '_' + toAddr.toLowerCase()
+							] = JSON.stringify(localData) //store so when user switches views, data is ready
 							console.log('✅[GET][Updated Read Items]:', data)
 						}
 					}
@@ -584,7 +595,11 @@ const DMByAddress = () => {
 				//getChatData()
 			})
 			.catch((error) => {
-				console.error('🚨[POST][Send message]:', error, JSON.stringify(data))
+				console.error(
+					'🚨[POST][Send message]:',
+					error,
+					JSON.stringify(data)
+				)
 			})
 			.finally(() => {
 				setIsSendingMessage(false)
@@ -616,7 +631,11 @@ const DMByAddress = () => {
 						console.log('✅[POST][Feedback]:', data)
 					})
 					.catch((error) => {
-						console.error('🚨[POST][Feedback]:', error, JSON.stringify(data))
+						console.error(
+							'🚨[POST][Feedback]:',
+							error,
+							JSON.stringify(data)
+						)
 					})
 			}
 		}
@@ -654,7 +673,11 @@ const DMByAddress = () => {
 				{isMobile && (
 					<Box mb={4}>
 						<Link to='/dm' style={{ textDecoration: 'none' }}>
-							<Button colorScheme='gray' background='lightgray.300' size='sm'>
+							<Button
+								colorScheme='gray'
+								background='lightgray.300'
+								size='sm'
+							>
 								<Flex alignItems='center'>
 									<IconArrowLeft size={18} />
 									<Text ml='1'>Back to Inbox</Text>
@@ -676,13 +699,20 @@ const DMByAddress = () => {
 								/>
 							) : (
 								<BlockieWrapper>
-									<Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
+									<Blockies
+										seed={toAddr.toLocaleLowerCase()}
+										scale={4}
+									/>
 								</BlockieWrapper>
 							)}
 							<Box ml={2}>
 								{name ? (
 									<Box>
-										<Text fontWeight='bold' color='darkgray.800' fontSize='md'>
+										<Text
+											fontWeight='bold'
+											color='darkgray.800'
+											fontSize='md'
+										>
 											{name}
 										</Text>
 										<Text fontSize='sm' color='darkgray.500'>
@@ -690,7 +720,11 @@ const DMByAddress = () => {
 										</Text>
 									</Box>
 								) : (
-									<Text fontWeight='bold' color='darkgray.800' fontSize='md'>
+									<Text
+										fontWeight='bold'
+										color='darkgray.800'
+										fontSize='md'
+									>
 										{truncateAddress(toAddr)}
 									</Text>
 								)}
@@ -742,7 +776,9 @@ const DMByAddress = () => {
 	const renderedMessages = useMemo(() => {
 		return loadedMsgs.map((msg: MessageUIType, i) => {
 			if (msg && msg.message) {
-				if (msg.toAddr?.toLocaleLowerCase() === account.toLocaleLowerCase()) {
+				if (
+					msg.toAddr?.toLocaleLowerCase() === account.toLocaleLowerCase()
+				) {
 					return (
 						<ChatMessage
 							key={i}

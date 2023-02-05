@@ -43,7 +43,9 @@ const DMInboxList = () => {
 
 	useEffect(() => {
 		setDms(
-			inboxData.filter((d) => d.context_type === 'dm' && !(d.chain === 'none'))
+			inboxData.filter(
+				(d) => d.context_type === 'dm' && !(d.chain === 'none')
+			)
 		)
 		setCommunities(
 			inboxData.filter(
@@ -94,7 +96,8 @@ const DMInboxList = () => {
 					localStorage['inbox_' + account] = JSON.stringify([])
 				} else if (
 					!localStorage['inboxEnc_' + account] ||
-					equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !== true
+					equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !==
+						true
 				) {
 					console.log('✅[GET][Inbox]:', data)
 					//setEncChatData(data)

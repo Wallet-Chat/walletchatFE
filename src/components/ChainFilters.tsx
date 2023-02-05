@@ -50,7 +50,8 @@ const ChainFilters = ({
 				All
 			</Button>
 			{Object.keys(chains).map((chain) => {
-				const _selected = chainFilters.includes(chain) || chainFilters[0] === ''
+				const _selected =
+					chainFilters.includes(chain) || chainFilters[0] === ''
 				return (
 					<Button
 						key={chain}

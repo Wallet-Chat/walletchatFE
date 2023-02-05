@@ -204,15 +204,26 @@ export default function Sidebar() {
 							</Text>
 							<CDivider my='1' />
 							<Flex alignItems='center'>
-								<CLink href='https://twitter.com/wallet_chat' target='_blank'>
+								<CLink
+									href='https://twitter.com/wallet_chat'
+									target='_blank'
+								>
 									<IconBrandTwitter
 										stroke={1.5}
 										color='white'
 										fill='var(--chakra-colors-lightgray-800)'
 									/>
 								</CLink>
-								<CLink href='http://discord.gg/S47CDmDtdf' target='_blank'>
-									<Image src={IconDiscord} alt='' height='24px' width='24px' />
+								<CLink
+									href='http://discord.gg/S47CDmDtdf'
+									target='_blank'
+								>
+									<Image
+										src={IconDiscord}
+										alt=''
+										height='24px'
+										width='24px'
+									/>
 								</CLink>
 							</Flex>
 							<Text fontSize='sm' mt={2} color='lightgray.900'>
@@ -332,7 +343,10 @@ export default function Sidebar() {
 									/>
 								)}
 								{!pfpData && (
-									<Blockies seed={account.toLocaleLowerCase()} scale={4} />
+									<Blockies
+										seed={account.toLocaleLowerCase()}
+										scale={4}
+									/>
 								)}
 								{!isMobile && (
 									<span
@@ -450,13 +464,19 @@ export default function Sidebar() {
 									WalletChat Ver. {process.env.REACT_APP_VERSION}
 								</Text>
 								<Flex alignItems='center'>
-									<CLink href='https://twitter.com/wallet_chat' target='_blank'>
+									<CLink
+										href='https://twitter.com/wallet_chat'
+										target='_blank'
+									>
 										<IconBrandTwitter
 											fill='var(--chakra-colors-lightgray-800)'
 											stroke='none'
 										/>
 									</CLink>
-									<CLink href='http://discord.gg/S47CDmDtdf' target='_blank'>
+									<CLink
+										href='http://discord.gg/S47CDmDtdf'
+										target='_blank'
+									>
 										<Image
 											src={IconDiscord}
 											alt=''

@@ -235,13 +235,20 @@ const POAPById = () => {
 										/>{' '}
 										{poapEvent?.start_date.replaceAll('-', ' ')}
 										{poapEvent?.end_date !== poapEvent?.start_date
-											? ` - ${poapEvent?.end_date.replaceAll('-', ' ')}`
+											? ` - ${poapEvent?.end_date.replaceAll(
+													'-',
+													' '
+											  )}`
 											: ''}
 									</Text>
 								</Tag>
 							</Stack>
 							<Stack direction='row' mt={2}>
-								<Button size='xs' href={poapEvent?.event_url} as={CLink}>
+								<Button
+									size='xs'
+									href={poapEvent?.event_url}
+									as={CLink}
+								>
 									<Text ml={1}>
 										<IconExternalLink
 											stroke={1.5}
@@ -272,7 +279,11 @@ const POAPById = () => {
 					<Tab>Chat </Tab>
 				</TabList>
 
-				<TabPanels overflowY='auto' className='custom-scrollbar' height='100%'>
+				<TabPanels
+					overflowY='auto'
+					className='custom-scrollbar'
+					height='100%'
+				>
 					<TabPanel px='0' height='100%' padding='0'>
 						<NFTGroupChat
 							account={account}
