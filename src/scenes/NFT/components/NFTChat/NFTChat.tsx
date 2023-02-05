@@ -1,4 +1,4 @@
-import { useEffect, useState, KeyboardEvent } from 'react';
+import { useEffect, useState, KeyboardEvent } from 'react'
 import {
 	Box,
 	Button,
@@ -6,11 +6,11 @@ import {
 	FormControl,
 	Link as CLink,
 	Text,
-} from '@chakra-ui/react';
-import Blockies from 'react-blockies';
-import TextareaAutosize from 'react-textarea-autosize';
-import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons';
-import equal from 'fast-deep-equal/es6';
+} from '@chakra-ui/react'
+import Blockies from 'react-blockies'
+import TextareaAutosize from 'react-textarea-autosize'
+import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
+import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
 
@@ -18,12 +18,12 @@ import {
 	MessageType,
 	MessageUIType,
 	SettingsType,
-} from '../../../../types/Message';
+} from '../../../../types/Message'
 // import EncryptedMsgBlock from '../../../../types/Message'
-import { truncateAddress } from '../../../../helpers/truncateString';
-import { DottedBackground } from '../../../../styled/DottedBackground';
-import { BlockieWrapper } from '../../../../styled/BlockieWrapper';
-import ChatMessage from '../../../../components/Chat/ChatMessage';
+import { truncateAddress } from '../../../../helpers/truncateString'
+import { DottedBackground } from '../../../../styled/DottedBackground'
+import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
+import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 
 const NFTChat = ({
@@ -32,47 +32,47 @@ const NFTChat = ({
 	nftContractAddr,
 	nftId,
 }: {
-	recipientAddr: string | undefined | null;
-	account: string;
-	nftContractAddr: string;
-	nftId: string;
+	recipientAddr: string | undefined | null
+	account: string
+	nftContractAddr: string
+	nftId: string
 }) => {
-	const [copiedAddr, setCopiedAddr] = useState<boolean>(false);
-	const [msgInput, setMsgInput] = useState<string>('');
-	const [isSendingMessage, setIsSendingMessage] = useState(false);
+	const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
+	const [msgInput, setMsgInput] = useState<string>('')
+	const [isSendingMessage, setIsSendingMessage] = useState(false)
 	const [chatData, setChatData] = useState<MessageType[]>(
 		new Array<MessageType>()
-	);
-	const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([]);
+	)
+	const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
 	// const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
 
-	let timer: ReturnType<typeof setTimeout>;
+	let timer: ReturnType<typeof setTimeout>
 
 	useEffect(() => {
-		getChatData();
-	}, [account]);
+		getChatData()
+	}, [account])
 
 	useEffect(() => {
 		// Interval needs to reset else getChatData will use old state
 		const interval = setInterval(() => {
-			getChatData();
-		}, 5000); // every 5s
+			getChatData()
+		}, 5000) // every 5s
 
 		return () => {
-			clearInterval(interval);
-		};
-	}, [chatData, account]);
+			clearInterval(interval)
+		}
+	}, [chatData, account])
 
 	const getChatData = () => {
 		// GET request to get off-chain data for RX user
 		if (!process.env.REACT_APP_REST_API) {
-			console.log('REST API url not in .env', process.env);
-			return;
+			console.log('REST API url not in .env', process.env)
+			return
 		}
 		if (!account || !recipientAddr) {
-			console.log('No account connected');
-			return;
+			console.log('No account connected')
+			return
 		}
 		// setIsFetchingMessages(true)
 		fetch(
@@ -89,37 +89,37 @@ const NFTChat = ({
 			.then((response) => response.json())
 			.then(async (data: MessageType[]) => {
 				if (equal(data, chatData) === false) {
-					console.log('✅[GET][NFT][Messages]:', data);
-					setChatData(data);
+					console.log('✅[GET][NFT][Messages]:', data)
+					setChatData(data)
 				}
 			})
 			.catch((error) => {
-				console.error('🚨[GET][NFT][Messages]:', error);
-			});
+				console.error('🚨[GET][NFT][Messages]:', error)
+			})
 		// .finally(() => {
 		//    setIsFetchingMessages(false)
 		// })
-	};
+	}
 
 	const handleMessageKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (event.key === 'Enter') {
-			event.preventDefault();
-			sendMessage();
+			event.preventDefault()
+			sendMessage()
 		}
-	};
+	}
 
 	const sendMessage = async () => {
-		if (msgInput.length <= 0) return;
+		if (msgInput.length <= 0) return
 
 		// Make a copy and clear input field
-		const msgInputCopy = (' ' + msgInput).slice(1);
-		setMsgInput('');
+		const msgInputCopy = (' ' + msgInput).slice(1)
+		setMsgInput('')
 
-		const timestamp = new Date();
+		const timestamp = new Date()
 
-		const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs));
+		const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
-		console.log('nft id from sendMessage: ', nftId);
+		console.log('nft id from sendMessage: ', nftId)
 
 		let data = {
 			message: msgInputCopy,
@@ -129,7 +129,7 @@ const NFTChat = ({
 			nftaddr: nftContractAddr,
 			nftid: nftId,
 			read: false,
-		};
+		}
 
 		addMessageToUI(
 			msgInputCopy,
@@ -141,7 +141,7 @@ const NFTChat = ({
 			true,
 			'',
 			null
-		);
+		)
 
 		// TODO: ENCRYPT MESSAGES HERE / https://github.com/cryptoKevinL/extensionAccessMM/blob/main/sample-extension/index.js
 
@@ -165,9 +165,9 @@ const NFTChat = ({
 		// )
 
 		//const cid = await postIpfsData(msgInputCopy)
-		data.message = msgInputCopy; //await cid
+		data.message = msgInputCopy //await cid
 
-		setIsSendingMessage(true);
+		setIsSendingMessage(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`,
 			{
@@ -182,20 +182,20 @@ const NFTChat = ({
 		)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log('✅[POST][NFT][Send message]:', data, latestLoadedMsgs);
-				getChatData();
+				console.log('✅[POST][NFT][Send message]:', data, latestLoadedMsgs)
+				getChatData()
 			})
 			.catch((error) => {
 				console.error(
 					'🚨[POST][NFT][Send message]:',
 					error,
 					JSON.stringify(data)
-				);
+				)
 			})
 			.finally(() => {
-				setIsSendingMessage(false);
-			});
-	};
+				setIsSendingMessage(false)
+			})
+	}
 
 	const addMessageToUI = (
 		message: string,
@@ -208,7 +208,7 @@ const NFTChat = ({
 		nftAddr: string | null,
 		nftId: string | null
 	) => {
-		console.log(`Add message to UI: ${message}`);
+		console.log(`Add message to UI: ${message}`)
 
 		const newMsg: MessageUIType = {
 			message,
@@ -220,51 +220,51 @@ const NFTChat = ({
 			isFetching,
 			nftAddr,
 			nftId,
-		};
-		let newLoadedMsgs: MessageUIType[] = [...loadedMsgs]; // copy the old array
-		newLoadedMsgs.push(newMsg);
-		setLoadedMsgs(newLoadedMsgs);
-	};
+		}
+		let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
+		newLoadedMsgs.push(newMsg)
+		setLoadedMsgs(newLoadedMsgs)
+	}
 
 	const updateRead = (data: MessageUIType) => {
-		let indexOfMsg = -1;
-		let newLoadedMsgs = [...loadedMsgs];
+		let indexOfMsg = -1
+		let newLoadedMsgs = [...loadedMsgs]
 		for (let i = newLoadedMsgs.length - 1; i > 0; i--) {
 			if (newLoadedMsgs[i].timestamp === data.timestamp) {
-				indexOfMsg = i;
-				break;
+				indexOfMsg = i
+				break
 			}
 		}
 		if (indexOfMsg !== -1) {
 			newLoadedMsgs[indexOfMsg] = {
 				...newLoadedMsgs[indexOfMsg],
 				read: true,
-			};
-			setLoadedMsgs(newLoadedMsgs);
+			}
+			setLoadedMsgs(newLoadedMsgs)
 		}
-	};
+	}
 
 	const copyToClipboard = () => {
 		if (recipientAddr) {
-			console.log('Copy to clipboard', recipientAddr);
-			let textField = document.createElement('textarea');
-			textField.innerText = recipientAddr;
-			document.body.appendChild(textField);
-			textField.select();
-			document.execCommand('copy');
-			textField.focus();
-			textField.remove();
-			setCopiedAddr(true);
+			console.log('Copy to clipboard', recipientAddr)
+			let textField = document.createElement('textarea')
+			textField.innerText = recipientAddr
+			document.body.appendChild(textField)
+			textField.select()
+			document.execCommand('copy')
+			textField.focus()
+			textField.remove()
+			setCopiedAddr(true)
 
-			window.clearTimeout(timer);
+			window.clearTimeout(timer)
 			timer = setTimeout(() => {
-				setCopiedAddr(false);
-			}, 3000);
+				setCopiedAddr(false)
+			}, 3000)
 		}
-	};
+	}
 
 	useEffect(() => {
-		const toAddToUI = [] as MessageUIType[];
+		const toAddToUI = [] as MessageUIType[]
 
 		for (let i = 0; i < chatData.length; i++) {
 			if (
@@ -284,7 +284,7 @@ const NFTChat = ({
 					isFetching: false,
 					nftAddr: chatData[i].nftaddr,
 					nftId: chatData[i].nftid,
-				});
+				})
 			} else if (
 				chatData[i] &&
 				chatData[i].toaddr &&
@@ -302,11 +302,11 @@ const NFTChat = ({
 					isFetching: false,
 					nftAddr: chatData[i].nftaddr,
 					nftId: chatData[i].nftid,
-				});
+				})
 			}
 		}
-		setLoadedMsgs(toAddToUI);
-	}, [chatData, account]);
+		setLoadedMsgs(toAddToUI)
+	}, [chatData, account])
 
 	return (
 		<Flex flexDirection='column' height='100%'>
@@ -382,9 +382,9 @@ const NFTChat = ({
 								context='nfts'
 								pfpImage=''
 							/>
-						);
+						)
 					}
-					return null;
+					return null
 				})}
 			</DottedBackground>
 
@@ -420,7 +420,7 @@ const NFTChat = ({
 				</Flex>
 			</Flex>
 		</Flex>
-	);
-};
+	)
+}
 
-export default NFTChat;
+export default NFTChat

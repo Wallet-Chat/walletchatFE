@@ -1,3 +1,3 @@
 export default interface NFTOwnerAddressType {
-	owners: [string];
+	owners: [string]
 }

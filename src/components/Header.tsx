@@ -1,7 +1,7 @@
-import { Image, Flex } from '@chakra-ui/react';
+import { Image, Flex } from '@chakra-ui/react'
 
-import logo from '../images/logo.svg';
-import { Link } from 'react-router-dom';
+import logo from '../images/logo.svg'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
 	return (
@@ -17,7 +17,7 @@ const Header = () => {
 				<Image src={logo} alt='' />
 			</Link>
 		</Flex>
-	);
-};
+	)
+}
 
-export default Header;
+export default Header

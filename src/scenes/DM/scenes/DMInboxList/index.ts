@@ -1,1 +1,1 @@
-export { default } from './DMInboxList';
+export { default } from './DMInboxList'

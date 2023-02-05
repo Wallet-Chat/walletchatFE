@@ -1,19 +1,19 @@
-import { Box, Button, Spinner, Flex, Image, Text } from '@chakra-ui/react';
-import { Link as RLink } from 'react-router-dom';
-import styled from 'styled-components';
-import Blockies from 'react-blockies';
-import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons';
-import { useCallback, useEffect, useState, memo, useRef } from 'react';
-import equal from 'fast-deep-equal/es6';
+import { Box, Button, Spinner, Flex, Image, Text } from '@chakra-ui/react'
+import { Link as RLink } from 'react-router-dom'
+import styled from 'styled-components'
+import Blockies from 'react-blockies'
+import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
+import { useCallback, useEffect, useState, memo, useRef } from 'react'
+import equal from 'fast-deep-equal/es6'
 
-import { formatMessageDate } from '../../helpers/date';
-import { MessageUIType } from '../../types/Message';
-import { BlockieWrapper } from '../../styled/BlockieWrapper';
-import NFT from '../../types/NFT';
-import OpenSeaNFT, { openseaToGeneralNFTType } from '../../types/OpenSea/NFT';
-import AlchemyNFT, { alchemyToGeneralNFTType } from '../../types/Alchemy/NFT';
-import UserProfileContextMenu from '../UserProfileContextMenu';
-import { useIsInViewport } from '../../helpers/useIsInViewport';
+import { formatMessageDate } from '../../helpers/date'
+import { MessageUIType } from '../../types/Message'
+import { BlockieWrapper } from '../../styled/BlockieWrapper'
+import NFT from '../../types/NFT'
+import OpenSeaNFT, { openseaToGeneralNFTType } from '../../types/OpenSea/NFT'
+import AlchemyNFT, { alchemyToGeneralNFTType } from '../../types/Alchemy/NFT'
+import UserProfileContextMenu from '../UserProfileContextMenu'
+import { useIsInViewport } from '../../helpers/useIsInViewport'
 
 const MessageBox = styled.div`
 	position: relative;
@@ -115,7 +115,7 @@ const MessageBox = styled.div`
 			}
 		}
 	}
-`;
+`
 
 const ChatMessage = ({
 	context,
@@ -124,28 +124,28 @@ const ChatMessage = ({
 	pfpImage,
 	updateRead,
 }: {
-	context: 'dms' | 'nfts' | 'communities';
-	account: string | undefined;
-	msg: MessageUIType;
-	pfpImage: string | undefined;
-	updateRead?: (data: MessageUIType) => void;
+	context: 'dms' | 'nfts' | 'communities'
+	account: string | undefined
+	msg: MessageUIType
+	pfpImage: string | undefined
+	updateRead?: (data: MessageUIType) => void
 }) => {
-	const [nftData, setNftData] = useState<NFT>();
+	const [nftData, setNftData] = useState<NFT>()
 
-	const messageRef = useRef(null);
-	const isInViewport = useIsInViewport(messageRef);
+	const messageRef = useRef(null)
+	const isInViewport = useIsInViewport(messageRef)
 
 	useEffect(() => {
 		const getNftMetadata = () => {
 			if (!msg.nftAddr || !msg.nftId) {
 				// console.log('Missing contract address or id')
-				return;
+				return
 			}
 
 			const fetchFromOpenSea = () => {
 				if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
-					console.log('Missing OpenSea API Key');
-					return;
+					console.log('Missing OpenSea API Key')
+					return
 				}
 				fetch(
 					`https://api.opensea.io/api/v1/asset/${msg.nftAddr}/${msg.nftId}?account_address=${account}`,
@@ -159,20 +159,20 @@ const ChatMessage = ({
 					.then((response) => response.json())
 					.then((result: OpenSeaNFT) => {
 						if (result?.collection?.name && !equal(result, nftData)) {
-							console.log(`✅[GET][NFT]:`, result);
-							setNftData(openseaToGeneralNFTType(result));
+							console.log(`✅[GET][NFT]:`, result)
+							setNftData(openseaToGeneralNFTType(result))
 						}
 					})
 					.catch((error) => {
-						console.log(`🚨[GET][NFT Contract][OpenSea]:`, error);
-						fetchFromAlchemy();
-					});
-			};
+						console.log(`🚨[GET][NFT Contract][OpenSea]:`, error)
+						fetchFromAlchemy()
+					})
+			}
 
 			const fetchFromAlchemy = () => {
 				if (process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
-					console.log('Missing Alchemy API Key');
-					return;
+					console.log('Missing Alchemy API Key')
+					return
 				}
 				fetch(
 					`https://polygon-mainnet.g.alchemy.com/v2/${process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${msg?.nftAddr}&tokenId=${msg?.nftId}`,
@@ -182,22 +182,22 @@ const ChatMessage = ({
 				)
 					.then((response) => response.json())
 					.then((data: AlchemyNFT) => {
-						console.log('✅[GET][NFT Metadata]:', data);
-						setNftData(alchemyToGeneralNFTType(data));
+						console.log('✅[GET][NFT Metadata]:', data)
+						setNftData(alchemyToGeneralNFTType(data))
 					})
-					.catch((error) => console.log('error', error));
-			};
+					.catch((error) => console.log('error', error))
+			}
 
-			fetchFromOpenSea();
-		};
-		if (context === 'dms') {
-			getNftMetadata();
+			fetchFromOpenSea()
 		}
-	}, [msg, account, context, nftData]);
+		if (context === 'dms') {
+			getNftMetadata()
+		}
+	}, [msg, account, context, nftData])
 
 	const setMessageAsRead = useCallback(() => {
 		if (msg.toAddr && msg.fromAddr && msg.timestamp) {
-			msg.read = true;
+			msg.read = true
 			fetch(
 				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
 				{
@@ -215,14 +215,14 @@ const ChatMessage = ({
 			)
 				.then((response) => response.json())
 				.then((data) => {
-					console.log('✅[PUT][Message]:', data);
-					updateRead && updateRead(data);
+					console.log('✅[PUT][Message]:', data)
+					updateRead && updateRead(data)
 				})
 				.catch((error) => {
-					console.error('🚨[PUT][Message]:', error);
-				});
+					console.error('🚨[PUT][Message]:', error)
+				})
 		}
-	}, [msg, updateRead]);
+	}, [msg, updateRead])
 
 	useEffect(() => {
 		if (
@@ -231,16 +231,9 @@ const ChatMessage = ({
 			msg?.read === false &&
 			msg?.toAddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
 		) {
-			setMessageAsRead();
+			setMessageAsRead()
 		}
-	}, [
-		isInViewport,
-		account,
-		context,
-		msg?.read,
-		msg?.toAddr,
-		setMessageAsRead,
-	]);
+	}, [isInViewport, account, context, msg?.read, msg?.toAddr, setMessageAsRead])
 
 	return (
 		<Flex
@@ -339,7 +332,7 @@ const ChatMessage = ({
 				)}
 			</MessageBox>
 		</Flex>
-	);
-};
+	)
+}
 
-export default memo(ChatMessage);
+export default memo(ChatMessage)

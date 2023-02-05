@@ -3,4 +3,4 @@ export const EthereumEvents = Object.freeze({
 	DISCONNECT: 'disconnect',
 	CHAIN_CHANGED: 'chainChanged',
 	ACCOUNTS_CHANGED: 'accountsChanged',
-});
+})

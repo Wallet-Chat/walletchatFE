@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const InboxItemWrapper = styled.button`
 	display: block;
@@ -23,7 +23,7 @@ export const InboxItemWrapper = styled.button`
 		user-select: none;
 		line-height: 1.7;
 	}
-`;
+`
 
 export const InboxItemNotificationCount = styled.div`
 	display: inline-block;
@@ -36,7 +36,7 @@ export const InboxItemNotificationCount = styled.div`
 	text-align: center;
 	margin-left: auto;
 	padding: 0 var(--chakra-space-2);
-`;
+`
 
 export const InboxItemRecipientAddress = styled.div`
 	font-size: var(--chakra-fontSizes-lg);
@@ -44,7 +44,7 @@ export const InboxItemRecipientAddress = styled.div`
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-`;
+`
 
 export const InboxItemChainImage = styled.div`
 	position: absolute;
@@ -55,4 +55,4 @@ export const InboxItemChainImage = styled.div`
 	background: rgba(255, 255, 255, 0.8);
 	padding: var(--chakra-space-0-5);
 	border-radius: var(--chakra-radii-sm);
-`;
+`

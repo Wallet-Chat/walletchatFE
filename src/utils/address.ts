@@ -1,3 +1,3 @@
 export const getNormalizedAddress = (account: string) => {
-	return account ? account.toLowerCase() : null;
-};
+	return account ? account.toLowerCase() : null
+}

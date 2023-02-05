@@ -6,54 +6,54 @@ import {
 	Input,
 	Spinner,
 	Text,
-} from '@chakra-ui/react';
-import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import Blockies from 'react-blockies';
-import { useWallet } from '../../../../context/WalletProvider';
-import { truncateAddress } from '../../../../helpers/truncateString';
-import useOnClickOutside from '../../../../hooks/useOnClickOutside';
+} from '@chakra-ui/react'
+import { useEffect, useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
+import Blockies from 'react-blockies'
+import { useWallet } from '../../../../context/WalletProvider'
+import { truncateAddress } from '../../../../helpers/truncateString'
+import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 
 export default function InboxSearchInput() {
-	const [toAddr, setToAddr] = useState<string>('');
-	const [resolvedAddr, setResolvedAddr] = useState<string | null>();
-	const [isResolvingENS, setIsResolvingENS] = useState(false);
-	const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false);
-	const { provider, web3 } = useWallet();
+	const [toAddr, setToAddr] = useState<string>('')
+	const [resolvedAddr, setResolvedAddr] = useState<string | null>()
+	const [isResolvingENS, setIsResolvingENS] = useState(false)
+	const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false)
+	const { provider, web3 } = useWallet()
 
-	const ref = useRef(null);
+	const ref = useRef(null)
 
 	const checkENS = async (address: string) => {
 		if (address.endsWith('.eth')) {
-			setIsResolvingENS(true);
-			const _addr = await provider.resolveName(address);
+			setIsResolvingENS(true)
+			const _addr = await provider.resolveName(address)
 			if (_addr) {
-				setResolvedAddr(_addr);
-				setIsSuggestionListOpen(true);
+				setResolvedAddr(_addr)
+				setIsSuggestionListOpen(true)
 			}
-			setIsResolvingENS(false);
+			setIsResolvingENS(false)
 		}
-	};
+	}
 
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
-			checkENS(toAddr);
-		}, 800);
+			checkENS(toAddr)
+		}, 800)
 
-		return () => clearTimeout(delayDebounceFn);
-	}, [toAddr]);
+		return () => clearTimeout(delayDebounceFn)
+	}, [toAddr])
 
 	const handleClickOutside = () => {
-		if (isSuggestionListOpen === true) setIsSuggestionListOpen(false);
-	};
+		if (isSuggestionListOpen === true) setIsSuggestionListOpen(false)
+	}
 
-	useOnClickOutside(ref, handleClickOutside);
+	useOnClickOutside(ref, handleClickOutside)
 
-	let suggestedAddress: string = toAddr;
+	let suggestedAddress: string = toAddr
 	if (web3.utils.isAddress(toAddr)) {
-		suggestedAddress = toAddr;
+		suggestedAddress = toAddr
 	} else if (toAddr.endsWith('.eth') && resolvedAddr && !isResolvingENS) {
-		suggestedAddress = resolvedAddr;
+		suggestedAddress = resolvedAddr
 	}
 
 	return (
@@ -67,7 +67,7 @@ export default function InboxSearchInput() {
 						setToAddr(e.target.value)
 					}
 					onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
-						if (resolvedAddr) setIsSuggestionListOpen(true);
+						if (resolvedAddr) setIsSuggestionListOpen(true)
 					}}
 					background='lightgray.300'
 				/>
@@ -105,8 +105,8 @@ export default function InboxSearchInput() {
 						<Link
 							to={`/dm/${suggestedAddress}`}
 							onClick={() => {
-								setIsSuggestionListOpen(false);
-								setToAddr('');
+								setIsSuggestionListOpen(false)
+								setToAddr('')
 							}}
 							style={{ textDecoration: 'none', width: '100%' }}
 						>
@@ -133,5 +133,5 @@ export default function InboxSearchInput() {
 					</Box>
 				)}
 		</Box>
-	);
+	)
 }

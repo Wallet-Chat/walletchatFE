@@ -1,5 +1,5 @@
 export function capitalizeFirstLetter(str: string) {
-	return str.charAt(0).toUpperCase() + str.slice(1);
+	return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 export function slugify(text: string) {
@@ -12,5 +12,5 @@ export function slugify(text: string) {
 		.replace(/[^\w\-]+/g, '') // Remove all non-word chars
 		.replace(/\_/g, '-') // Replace _ with -
 		.replace(/\-\-+/g, '-') // Replace multiple - with single -
-		.replace(/\-$/g, ''); // Remove trailing -
+		.replace(/\-$/g, '') // Remove trailing -
 }

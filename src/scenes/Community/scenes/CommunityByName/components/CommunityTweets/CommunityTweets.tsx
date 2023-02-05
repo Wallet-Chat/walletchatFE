@@ -1,6 +1,6 @@
-import TweetType from '../../../../../../types/Tweet';
-import Tweet from './components/Tweet';
-import { Box, Divider } from '@chakra-ui/react';
+import TweetType from '../../../../../../types/Tweet'
+import Tweet from './components/Tweet'
+import { Box, Divider } from '@chakra-ui/react'
 
 const CommunityTweets = ({ tweets }: { tweets: TweetType[] }) => {
 	return (
@@ -16,7 +16,7 @@ const CommunityTweets = ({ tweets }: { tweets: TweetType[] }) => {
 				<></>
 			)}
 		</Box>
-	);
-};
+	)
+}
 
-export default CommunityTweets;
+export default CommunityTweets

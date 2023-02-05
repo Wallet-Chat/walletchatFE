@@ -13,14 +13,14 @@ import {
 	Text,
 	Tooltip,
 	useToast,
-} from '@chakra-ui/react';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { IconSend } from '@tabler/icons';
-import { useWallet } from '../../../../context/WalletProvider';
-import OpenSeaNFT from '../../../../types/OpenSea/NFT';
-import Resizer from 'react-image-file-resizer';
+} from '@chakra-ui/react'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { IconSend } from '@tabler/icons'
+import { useWallet } from '../../../../context/WalletProvider'
+import OpenSeaNFT from '../../../../types/OpenSea/NFT'
+import Resizer from 'react-image-file-resizer'
 
 const EnterName = ({ account }: { account: string }) => {
 	const {
@@ -28,19 +28,19 @@ const EnterName = ({ account }: { account: string }) => {
 		register,
 		formState: { errors },
 		setValue,
-	} = useForm();
+	} = useForm()
 
-	const toast = useToast();
+	const toast = useToast()
 
-	const { setName: globalSetName, redirectUrl } = useWallet();
-	let navigate = useNavigate();
+	const { setName: globalSetName, redirectUrl } = useWallet()
+	let navigate = useNavigate()
 
-	const [name, setName] = useState('');
-	const [isFetching, setIsFetching] = useState(false);
-	const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([]);
+	const [name, setName] = useState('')
+	const [isFetching, setIsFetching] = useState(false)
+	const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
 
-	const [file, setFile] = useState<Blob | MediaSource>();
-	const [filePreview, setFilePreview] = useState('');
+	const [file, setFile] = useState<Blob | MediaSource>()
+	const [filePreview, setFilePreview] = useState('')
 
 	const resizeFile = (file: Blob) =>
 		new Promise((resolve) => {
@@ -52,29 +52,29 @@ const EnterName = ({ account }: { account: string }) => {
 				100,
 				0,
 				(uri) => {
-					resolve(uri);
+					resolve(uri)
 				},
 				'base64'
-			);
-		});
+			)
+		})
 
 	useEffect(() => {
 		// create the preview
 		if (file) {
-			const objectUrl = URL.createObjectURL(file);
-			setFilePreview(objectUrl);
+			const objectUrl = URL.createObjectURL(file)
+			setFilePreview(objectUrl)
 
 			// free memory whenever this component is unmounted
-			return () => URL.revokeObjectURL(objectUrl);
+			return () => URL.revokeObjectURL(objectUrl)
 		}
-	}, [file]);
+	}, [file])
 
 	const upload = async (e: ChangeEvent<HTMLInputElement>) => {
-		console.warn(e.target.files);
-		const files = e.target.files;
+		console.warn(e.target.files)
+		const files = e.target.files
 
 		if (files && files.length !== 0) {
-			const image = await resizeFile(files[0]);
+			const image = await resizeFile(files[0])
 			fetch(
 				`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image`,
 				{
@@ -92,7 +92,7 @@ const EnterName = ({ account }: { account: string }) => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[POST][Image]:', response);
+					console.log('✅[POST][Image]:', response)
 					toast({
 						title: 'Success',
 						description: `PFP updated!`,
@@ -100,11 +100,11 @@ const EnterName = ({ account }: { account: string }) => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
-					setName('');
+					})
+					setName('')
 				})
 				.catch((error) => {
-					console.error('🚨[POST][Image]:', error);
+					console.error('🚨[POST][Image]:', error)
 					toast({
 						title: 'Error',
 						description: `Image Not Updated - Unknown error`,
@@ -112,21 +112,21 @@ const EnterName = ({ account }: { account: string }) => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
+					})
 				})
 				.then(() => {
-					setIsFetching(false);
-				});
+					setIsFetching(false)
+				})
 		}
-	};
+	}
 	useEffect(() => {
 		const getOwnedENS = () => {
 			if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
-				console.log('Missing OpenSea API Key');
-				return;
+				console.log('Missing OpenSea API Key')
+				return
 			}
 			if (account) {
-				console.log('No account detected');
+				console.log('No account detected')
 			}
 			fetch(
 				`https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
@@ -139,27 +139,25 @@ const EnterName = ({ account }: { account: string }) => {
 			)
 				.then((response) => response.json())
 				.then((result) => {
-					console.log(`✅[GET][ENS Owned by ${account}]]:`, result);
+					console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
 					if (result?.assets?.length > 0) {
-						setOwnedENS(result.assets);
+						setOwnedENS(result.assets)
 					}
 				})
-				.catch((error) =>
-					console.log(`🚨[GET][ENS Owned by ${account}`, error)
-				);
-		};
-		if (account) {
-			getOwnedENS();
+				.catch((error) => console.log(`🚨[GET][ENS Owned by ${account}`, error))
 		}
-	}, [account]);
+		if (account) {
+			getOwnedENS()
+		}
+	}, [account])
 
 	useEffect(() => {
-		console.log(errors);
-	}, [errors]);
+		console.log(errors)
+	}, [errors])
 
 	const onSubmit = (values: any) => {
-		console.log('onSubmit');
-		console.log('Values are: ', values);
+		console.log('onSubmit')
+		console.log('Values are: ', values)
 		if (!localStorage.getItem('jwt')) {
 			toast({
 				title: 'Error',
@@ -168,12 +166,12 @@ const EnterName = ({ account }: { account: string }) => {
 				position: 'top',
 				duration: 2000,
 				isClosable: true,
-			});
-			return;
+			})
+			return
 		}
 
 		if (values?.name) {
-			setIsFetching(true);
+			setIsFetching(true)
 
 			fetch(
 				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`,
@@ -192,9 +190,9 @@ const EnterName = ({ account }: { account: string }) => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[POST][Name]:', response);
-					globalSetName(name);
-					navigate('/me/enter-email');
+					console.log('✅[POST][Name]:', response)
+					globalSetName(name)
+					navigate('/me/enter-email')
 				})
 				.catch((error) => {
 					toast({
@@ -204,16 +202,16 @@ const EnterName = ({ account }: { account: string }) => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
-					console.error('🚨[POST][Name]:', error);
+					})
+					console.error('🚨[POST][Name]:', error)
 				})
 				.then(() => {
-					setIsFetching(false);
-				});
+					setIsFetching(false)
+				})
 		}
-	};
+	}
 
-	const onSubmitPFP = (values: any) => {};
+	const onSubmitPFP = (values: any) => {}
 	return (
 		<Box p={6} pt={16} background='white' width='100%'>
 			<Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
@@ -266,7 +264,7 @@ const EnterName = ({ account }: { account: string }) => {
 							{...register('name', {
 								required: true,
 								onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-									setName(e.target.value);
+									setName(e.target.value)
 									// console.log(name)
 								},
 							})}
@@ -277,9 +275,9 @@ const EnterName = ({ account }: { account: string }) => {
 							type='submit'
 							isLoading={isFetching}
 							onClick={() => {
-								console.log('SUBMIT BTN');
-								console.log(errors);
-								console.log(name);
+								console.log('SUBMIT BTN')
+								console.log(errors)
+								console.log(name)
 							}}
 						>
 							<IconSend size='20' />
@@ -295,7 +293,7 @@ const EnterName = ({ account }: { account: string }) => {
 										onClick={() => {
 											setValue('name', item.name, {
 												shouldTouch: true,
-											});
+											})
 										}}
 										mr='2'
 										mb='2'
@@ -330,7 +328,7 @@ const EnterName = ({ account }: { account: string }) => {
 				</Alert>
 			</form>
 		</Box>
-	);
-};
+	)
+}
 
-export default EnterName;
+export default EnterName

@@ -1,38 +1,38 @@
-import React from 'react';
-import { Box, Button, Image } from '@chakra-ui/react';
-import { SetStateAction, Dispatch } from 'react';
-import { chains } from '../constants';
+import React from 'react'
+import { Box, Button, Image } from '@chakra-ui/react'
+import { SetStateAction, Dispatch } from 'react'
+import { chains } from '../constants'
 
 const ChainFilters = ({
 	chainFilters,
 	setChainFilters,
 }: {
-	chainFilters: Array<string>;
-	setChainFilters: Dispatch<SetStateAction<Array<string>>>;
+	chainFilters: Array<string>
+	setChainFilters: Dispatch<SetStateAction<Array<string>>>
 }) => {
 	const toggleChain = (chain: string) => {
 		if (chain === '') {
 			// Clear all filters
-			if (chainFilters.length > 1) setChainFilters(['']);
+			if (chainFilters.length > 1) setChainFilters([''])
 			else if (chainFilters.length === 1 && chainFilters[0] !== '')
-				setChainFilters(['']);
+				setChainFilters([''])
 		} else {
-			const index = chainFilters.indexOf(chain);
+			const index = chainFilters.indexOf(chain)
 			if (index > -1) {
 				// Filter found => remove it
-				let newChainsFilter = [...chainFilters];
-				newChainsFilter.splice(index, 1);
-				setChainFilters(newChainsFilter);
+				let newChainsFilter = [...chainFilters]
+				newChainsFilter.splice(index, 1)
+				setChainFilters(newChainsFilter)
 			} else {
 				// Filter not found => add it
 				if (chainFilters[0] === '') {
-					setChainFilters([chain]);
+					setChainFilters([chain])
 				} else {
-					setChainFilters([...chainFilters, chain]);
+					setChainFilters([...chainFilters, chain])
 				}
 			}
 		}
-	};
+	}
 
 	return (
 		<Box>
@@ -50,8 +50,7 @@ const ChainFilters = ({
 				All
 			</Button>
 			{Object.keys(chains).map((chain) => {
-				const _selected =
-					chainFilters.includes(chain) || chainFilters[0] === '';
+				const _selected = chainFilters.includes(chain) || chainFilters[0] === ''
 				return (
 					<Button
 						key={chain}
@@ -79,10 +78,10 @@ const ChainFilters = ({
 						)}
 						{chains[chain]?.name}
 					</Button>
-				);
+				)
 			})}
 		</Box>
-	);
-};
+	)
+}
 
-export default React.memo(ChainFilters);
+export default React.memo(ChainFilters)

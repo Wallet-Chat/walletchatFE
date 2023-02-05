@@ -1,1 +1,1 @@
-export { default } from './DM';
+export { default } from './DM'

@@ -15,35 +15,35 @@ import {
 	SkeletonCircle,
 	Skeleton,
 	Tag,
-} from '@chakra-ui/react';
-import { IconCalendarEvent, IconExternalLink, IconMapPin } from '@tabler/icons';
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+} from '@chakra-ui/react'
+import { IconCalendarEvent, IconExternalLink, IconMapPin } from '@tabler/icons'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 
-import NFTGroupChat from '../../components/NFTGroupChat';
-import POAPEvent from '../../../../types/POAP/POAPEvent';
-import { useHover } from '../../../../helpers/useHover';
-import { useWallet } from '../../../../context/WalletProvider';
+import NFTGroupChat from '../../components/NFTGroupChat'
+import POAPEvent from '../../../../types/POAP/POAPEvent'
+import { useHover } from '../../../../helpers/useHover'
+import { useWallet } from '../../../../context/WalletProvider'
 
 const POAPById = () => {
-	let { poapId = '' } = useParams();
+	let { poapId = '' } = useParams()
 
-	const [poapEvent, setPoapEvent] = useState<POAPEvent>();
-	const [isFetchingPoapEvent, setIsFetchingPoapEvent] = useState(false);
-	const [joined, setJoined] = useState<boolean | null>(null);
-	const [isFetchingJoining, setIsFetchingJoining] = useState(false);
-	const [joinBtnIsHovering, joinBtnHoverProps] = useHover();
-	const { account } = useWallet();
+	const [poapEvent, setPoapEvent] = useState<POAPEvent>()
+	const [isFetchingPoapEvent, setIsFetchingPoapEvent] = useState(false)
+	const [joined, setJoined] = useState<boolean | null>(null)
+	const [isFetchingJoining, setIsFetchingJoining] = useState(false)
+	const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
+	const { account } = useWallet()
 
 	useEffect(() => {
-		getPOAPEvent();
-		getJoinStatus();
-	}, [poapId]);
+		getPOAPEvent()
+		getJoinStatus()
+	}, [poapId])
 
 	const getJoinStatus = () => {
 		if (!poapId) {
-			console.log('Missing POAP id');
-			return;
+			console.log('Missing POAP id')
+			return
 		}
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/POAP_${poapId}`,
@@ -58,16 +58,16 @@ const POAPById = () => {
 		)
 			.then((response) => response.json())
 			.then((_joined: boolean) => {
-				console.log('✅[GET][POAP][Joined?]');
-				setJoined(_joined);
+				console.log('✅[GET][POAP][Joined?]')
+				setJoined(_joined)
 			})
 			.catch((error) => {
-				console.error('🚨[POST][POAP][Joined?]:', error);
-			});
-	};
+				console.error('🚨[POST][POAP][Joined?]:', error)
+			})
+	}
 
 	const joinGroup = () => {
-		setIsFetchingJoining(true);
+		setIsFetchingJoining(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`,
 			{
@@ -85,19 +85,19 @@ const POAPById = () => {
 		)
 			.then((response) => response.json())
 			.then(() => {
-				console.log('✅[POST][POAP][Join]');
-				setJoined(true);
+				console.log('✅[POST][POAP][Join]')
+				setJoined(true)
 			})
 			.finally(() => {
-				setIsFetchingJoining(false);
+				setIsFetchingJoining(false)
 			})
 			.catch((error) => {
-				console.error('🚨[POST][POAP][Join]:', error);
-			});
-	};
+				console.error('🚨[POST][POAP][Join]:', error)
+			})
+	}
 
 	const leaveGroup = () => {
-		setIsFetchingJoining(true);
+		setIsFetchingJoining(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`,
 			{
@@ -115,25 +115,25 @@ const POAPById = () => {
 		)
 			.then((response) => response.json())
 			.then((count: number) => {
-				console.log('✅[POST][POAP][Leave]');
-				setJoined(false);
+				console.log('✅[POST][POAP][Leave]')
+				setJoined(false)
 			})
 			.finally(() => setIsFetchingJoining(false))
 			.catch((error) => {
-				console.error('🚨[POST][POAP][Leave]:', error);
-			});
-	};
+				console.error('🚨[POST][POAP][Leave]:', error)
+			})
+	}
 
 	const getPOAPEvent = () => {
 		if (!process.env.REACT_APP_POAP_API_KEY) {
-			console.log('Missing POAP API key');
-			return;
+			console.log('Missing POAP API key')
+			return
 		}
 		if (!poapId) {
-			console.log('Missing POAP id');
-			return;
+			console.log('Missing POAP id')
+			return
 		}
-		setIsFetchingPoapEvent(true);
+		setIsFetchingPoapEvent(true)
 		fetch(`https://api.poap.tech/events/id/${poapId}`, {
 			method: 'GET',
 			headers: {
@@ -143,12 +143,12 @@ const POAPById = () => {
 		})
 			.then((response) => response.json())
 			.then((result: POAPEvent) => {
-				console.log(`✅[GET][POAP Event]:`, result);
-				setPoapEvent(result);
+				console.log(`✅[GET][POAP Event]:`, result)
+				setPoapEvent(result)
 			})
 			.then(() => setIsFetchingPoapEvent(false))
-			.catch((error) => console.log(error));
-	};
+			.catch((error) => console.log(error))
+	}
 
 	return (
 		<Flex flexDirection='column' background='white' height='100vh' flex='1'>
@@ -185,11 +185,11 @@ const POAPById = () => {
 									variant={joined ? 'black' : 'outline'}
 									isLoading={isFetchingJoining}
 									onClick={() => {
-										if (joined === null) return;
+										if (joined === null) return
 										else if (joined === false) {
-											joinGroup();
+											joinGroup()
 										} else if (joined === true) {
-											leaveGroup();
+											leaveGroup()
 										}
 									}}
 									// @ts-ignore
@@ -282,7 +282,7 @@ const POAPById = () => {
 				</TabPanels>
 			</Tabs>
 		</Flex>
-	);
-};
+	)
+}
 
-export default POAPById;
+export default POAPById

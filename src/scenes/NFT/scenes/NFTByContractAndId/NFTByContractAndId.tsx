@@ -13,88 +13,88 @@ import {
 	Tabs,
 	Text,
 	Tooltip,
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 import {
 	IconCurrencyEthereum,
 	IconExternalLink,
 	IconShieldLock,
-} from '@tabler/icons';
-import { useState, useEffect } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+} from '@tabler/icons'
+import { useState, useEffect } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 
-import NFTGroupChat from '../../components/NFTGroupChat';
-import NFTChat from '../../components/NFTChat';
-import NFTTweets from '../../components/NFTTweets';
-import { truncateAddress } from '../../../../helpers/truncateString';
-import NFTStatisticsType from '../../../../types/NFTPort/NFTStatistics';
-import NFTOwnerAddressType from '../../../../types/Alchemy/NFTOwnerAddressType';
-import NFT from '../../../../types/NFT';
+import NFTGroupChat from '../../components/NFTGroupChat'
+import NFTChat from '../../components/NFTChat'
+import NFTTweets from '../../components/NFTTweets'
+import { truncateAddress } from '../../../../helpers/truncateString'
+import NFTStatisticsType from '../../../../types/NFTPort/NFTStatistics'
+import NFTOwnerAddressType from '../../../../types/Alchemy/NFTOwnerAddressType'
+import NFT from '../../../../types/NFT'
 import OpenSeaNFT, {
 	openseaToGeneralNFTType,
-} from '../../../../types/OpenSea/NFT';
+} from '../../../../types/OpenSea/NFT'
 import AlchemyNFT, {
 	alchemyToGeneralNFTType,
-} from '../../../../types/Alchemy/NFT';
-import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg';
-import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg';
-import { capitalizeFirstLetter } from '../../../../helpers/text';
-import equal from 'fast-deep-equal/es6';
-import { useHover } from '../../../../helpers/useHover';
-import { useWallet } from '../../../../context/WalletProvider';
+} from '../../../../types/Alchemy/NFT'
+import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
+import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
+import { capitalizeFirstLetter } from '../../../../helpers/text'
+import equal from 'fast-deep-equal/es6'
+import { useHover } from '../../../../helpers/useHover'
+import { useWallet } from '../../../../context/WalletProvider'
 
-const tokenType = 'erc721';
+const tokenType = 'erc721'
 
 const NFTByContractAndId = () => {
-	let { nftContractAddr = '', nftId = '', chain = '' } = useParams();
-	let [searchParams] = useSearchParams();
-	let { account } = useWallet();
+	let { nftContractAddr = '', nftId = '', chain = '' } = useParams()
+	let [searchParams] = useSearchParams()
+	let { account } = useWallet()
 
-	const [nftData, setNftData] = useState<NFT>();
-	const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>();
+	const [nftData, setNftData] = useState<NFT>()
+	const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
 
-	const [joined, setJoined] = useState<boolean | null>(null);
-	const [isFetchingJoining, setIsFetchingJoining] = useState(false);
-	const [joinBtnIsHovering, joinBtnHoverProps] = useHover();
+	const [joined, setJoined] = useState<boolean | null>(null)
+	const [isFetchingJoining, setIsFetchingJoining] = useState(false)
+	const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
 
-	const [ownerAddr, setOwnerAddr] = useState<string>();
+	const [ownerAddr, setOwnerAddr] = useState<string>()
 	const recipientAddr =
 		searchParams.get('recipient') === null
 			? ownerAddr
-			: searchParams.get('recipient');
+			: searchParams.get('recipient')
 
-	const [unreadCount, setUnreadCount] = useState<number>(0);
-	const [tweetCount, setTweetCount] = useState<number>(0);
+	const [unreadCount, setUnreadCount] = useState<number>(0)
+	const [tweetCount, setTweetCount] = useState<number>(0)
 
 	useEffect(() => {
-		getNftMetadata();
-		getOwnerAddress();
-		getNftStatistics();
-		getJoinStatus();
-	}, [nftContractAddr, nftId]);
+		getNftMetadata()
+		getOwnerAddress()
+		getNftStatistics()
+		getJoinStatus()
+	}, [nftContractAddr, nftId])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			getNftStatistics();
-		}, 60000); // every 1 min
+			getNftStatistics()
+		}, 60000) // every 1 min
 
 		return () => {
-			clearInterval(interval);
-		};
-	}, [nftContractAddr, nftId, nftStatistics]);
+			clearInterval(interval)
+		}
+	}, [nftContractAddr, nftId, nftStatistics])
 
 	useEffect(() => {
-		getUnreadDMCount();
-		getTweetCount();
+		getUnreadDMCount()
+		getTweetCount()
 
 		const interval = setInterval(() => {
-			getUnreadDMCount();
+			getUnreadDMCount()
 			// getTweetCount()
-		}, 5000); // every 5s
+		}, 5000) // every 5s
 
 		return () => {
-			clearInterval(interval);
-		};
-	}, [account, ownerAddr]);
+			clearInterval(interval)
+		}
+	}, [account, ownerAddr])
 
 	const getJoinStatus = () => {
 		fetch(
@@ -110,16 +110,16 @@ const NFTByContractAndId = () => {
 		)
 			.then((response) => response.json())
 			.then((joined: boolean) => {
-				console.log('✅[GET][NFT][Bookmarked?]');
-				setJoined(joined);
+				console.log('✅[GET][NFT][Bookmarked?]')
+				setJoined(joined)
 			})
 			.catch((error) => {
-				console.error('🚨[POST][NFT][Bookmarked?]:', error);
-			});
-	};
+				console.error('🚨[POST][NFT][Bookmarked?]:', error)
+			})
+	}
 
 	const joinGroup = () => {
-		setIsFetchingJoining(true);
+		setIsFetchingJoining(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`,
 			{
@@ -137,17 +137,17 @@ const NFTByContractAndId = () => {
 		)
 			.then((response) => response.json())
 			.then(() => {
-				console.log('✅[POST][NFT][Join]');
-				setJoined(true);
+				console.log('✅[POST][NFT][Join]')
+				setJoined(true)
 			})
 			.finally(() => setIsFetchingJoining(false))
 			.catch((error) => {
-				console.error('🚨 [POST][NFT][Join]:', error);
-			});
-	};
+				console.error('🚨 [POST][NFT][Join]:', error)
+			})
+	}
 
 	const leaveGroup = () => {
-		setIsFetchingJoining(true);
+		setIsFetchingJoining(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`,
 			{
@@ -165,14 +165,14 @@ const NFTByContractAndId = () => {
 		)
 			.then((response) => response.json())
 			.then(() => {
-				console.log('✅[POST][NFT][Leave]');
-				setJoined(false);
+				console.log('✅[POST][NFT][Leave]')
+				setJoined(false)
 			})
 			.finally(() => setIsFetchingJoining(false))
 			.catch((error) => {
-				console.error('🚨[POST][NFT][Leave]:', error);
-			});
-	};
+				console.error('🚨[POST][NFT][Leave]:', error)
+			})
+	}
 
 	const getTweetCount = () => {
 		if (account) {
@@ -190,15 +190,15 @@ const NFTByContractAndId = () => {
 				.then((response) => response.json())
 				.then((count: number) => {
 					if (count !== tweetCount) {
-						console.log('✅[GET][NFT][No. of tweets]:', count);
-						setTweetCount(count);
+						console.log('✅[GET][NFT][No. of tweets]:', count)
+						setTweetCount(count)
 					}
 				})
 				.catch((error) => {
-					console.error('🚨[GET][NFT][No. of tweets]:', error);
-				});
+					console.error('🚨[GET][NFT][No. of tweets]:', error)
+				})
 		}
-	};
+	}
 
 	const getUnreadDMCount = () => {
 		if (account) {
@@ -216,25 +216,25 @@ const NFTByContractAndId = () => {
 				.then((response) => response.json())
 				.then((count: number) => {
 					if (count !== unreadCount) {
-						console.log('✅[GET][NFT][No. of unread msgs]:', count);
-						setUnreadCount(count);
+						console.log('✅[GET][NFT][No. of unread msgs]:', count)
+						setUnreadCount(count)
 					}
 				})
 				.catch((error) => {
-					console.error('🚨[GET][NFT][No. of unread msgs]:', error);
-				});
+					console.error('🚨[GET][NFT][No. of unread msgs]:', error)
+				})
 		}
-	};
+	}
 
 	const getNftMetadata = () => {
 		if (!nftContractAddr) {
-			console.log('Missing contract address');
-			return;
+			console.log('Missing contract address')
+			return
 		}
 		if (chain === 'ethereum') {
 			if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
-				console.log('Missing OpenSea API Key');
-				return;
+				console.log('Missing OpenSea API Key')
+				return
 			}
 			fetch(
 				`https://api.opensea.io/api/v1/asset/${nftContractAddr}/${nftId}?account_address=${account}`,
@@ -248,15 +248,15 @@ const NFTByContractAndId = () => {
 				.then((response) => response.json())
 				.then((result: OpenSeaNFT) => {
 					if (result?.collection?.name && !equal(result, nftData)) {
-						console.log(`✅[GET][NFT]:`, result);
-						setNftData(openseaToGeneralNFTType(result));
+						console.log(`✅[GET][NFT]:`, result)
+						setNftData(openseaToGeneralNFTType(result))
 					}
 				})
-				.catch((error) => console.log(`🚨[GET][NFT Contract]:`, error));
+				.catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
 		} else if (chain === 'polygon') {
 			if (process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
-				console.log('Missing Alchemy API Key');
-				return;
+				console.log('Missing Alchemy API Key')
+				return
 			}
 			fetch(
 				`https://polygon-mainnet.g.alchemy.com/v2/${process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${nftContractAddr}&tokenId=${nftId}`,
@@ -266,25 +266,25 @@ const NFTByContractAndId = () => {
 			)
 				.then((response) => response.json())
 				.then((data: AlchemyNFT) => {
-					console.log('✅[GET][NFT Metadata]:', data);
-					setNftData(alchemyToGeneralNFTType(data));
+					console.log('✅[GET][NFT Metadata]:', data)
+					setNftData(alchemyToGeneralNFTType(data))
 				})
-				.catch((error) => console.log('error', error));
+				.catch((error) => console.log('error', error))
 		}
-	};
+	}
 
 	const getNftStatistics = () => {
 		if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-			console.log('Missing NFT Port API Key');
-			return;
+			console.log('Missing NFT Port API Key')
+			return
 		}
 		if (!nftContractAddr) {
-			console.log('Missing contract address');
-			return;
+			console.log('Missing contract address')
+			return
 		}
 		if (!chain) {
-			console.log('Missing chain info');
-			return;
+			console.log('Missing chain info')
+			return
 		}
 		fetch(
 			`https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
@@ -302,42 +302,42 @@ const NFTByContractAndId = () => {
 					result.statistics &&
 					!equal(result.statistics, nftStatistics)
 				) {
-					console.log('✅[GET][NFT Statistics]:', result);
-					setNftStatistics(result.statistics);
+					console.log('✅[GET][NFT Statistics]:', result)
+					setNftStatistics(result.statistics)
 				}
 			})
 			.catch((error) => {
-				console.log('error', error);
-			});
-	};
+				console.log('error', error)
+			})
+	}
 
 	const getOwnerAddress = () => {
-		let alchemyUrl, key;
+		let alchemyUrl, key
 		if (chain === 'ethereum') {
-			alchemyUrl = 'https://eth-mainnet.g.alchemy.com/v2/';
-			key = process.env.REACT_APP_ALCHEMY_API_KEY_ETHEREUM;
+			alchemyUrl = 'https://eth-mainnet.g.alchemy.com/v2/'
+			key = process.env.REACT_APP_ALCHEMY_API_KEY_ETHEREUM
 		} else if (chain === 'polygon') {
-			alchemyUrl = 'https://polygon-mainnet.g.alchemy.com/v2/';
-			key = process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON;
+			alchemyUrl = 'https://polygon-mainnet.g.alchemy.com/v2/'
+			key = process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON
 		}
 
 		if (alchemyUrl && key) {
-			const baseURL = `${alchemyUrl}${key}/getOwnersForToken`;
-			const fetchURL = `${baseURL}?contractAddress=${nftContractAddr}&tokenId=${nftId}&tokenType=${tokenType}`;
+			const baseURL = `${alchemyUrl}${key}/getOwnersForToken`
+			const fetchURL = `${baseURL}?contractAddress=${nftContractAddr}&tokenId=${nftId}&tokenType=${tokenType}`
 
 			fetch(fetchURL, {
 				method: 'GET',
 			})
 				.then((response) => response.json())
 				.then((result: NFTOwnerAddressType) => {
-					console.log('✅[GET][NFT Owner Address]:', result);
+					console.log('✅[GET][NFT Owner Address]:', result)
 					if (result?.owners && result?.owners[0]) {
-						setOwnerAddr(result.owners[0]);
+						setOwnerAddr(result.owners[0])
 					}
 				})
-				.catch((error) => console.log('error', error));
+				.catch((error) => console.log('error', error))
 		}
-	};
+	}
 
 	return (
 		<Flex flexDirection='column' background='white' height='100vh' flex='1'>
@@ -421,11 +421,11 @@ const NFTByContractAndId = () => {
 								variant={joined ? 'black' : 'outline'}
 								isLoading={isFetchingJoining}
 								onClick={() => {
-									if (joined === null) return;
+									if (joined === null) return
 									else if (joined === false) {
-										joinGroup();
+										joinGroup()
 									} else if (joined === true) {
-										leaveGroup();
+										leaveGroup()
 									}
 								}}
 								// @ts-ignore
@@ -540,7 +540,7 @@ const NFTByContractAndId = () => {
 				</TabPanels>
 			</Tabs>
 		</Flex>
-	);
-};
+	)
+}
 
-export default NFTByContractAndId;
+export default NFTByContractAndId

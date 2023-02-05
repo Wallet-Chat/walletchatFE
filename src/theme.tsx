@@ -2,10 +2,10 @@ import {
 	extendTheme,
 	withDefaultColorScheme,
 	ThemeConfig,
-} from '@chakra-ui/react';
-import { createBreakpoints } from '@chakra-ui/theme-tools';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/700.css';
+} from '@chakra-ui/react'
+import { createBreakpoints } from '@chakra-ui/theme-tools'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/700.css'
 
 const breakpoints = createBreakpoints({
 	sm: '300px',
@@ -13,12 +13,12 @@ const breakpoints = createBreakpoints({
 	lg: '900px',
 	xl: '1200px',
 	'2xl': '1536px',
-});
+})
 
 const config: ThemeConfig = {
 	initialColorMode: 'light',
 	useSystemColorMode: false,
-};
+}
 
 export const theme = extendTheme(
 	{
@@ -340,4 +340,4 @@ export const theme = extendTheme(
 		},
 	},
 	withDefaultColorScheme({ colorScheme: 'gray' })
-);
+)

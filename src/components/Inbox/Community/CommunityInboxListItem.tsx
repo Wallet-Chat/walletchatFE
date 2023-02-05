@@ -1,30 +1,30 @@
-import { truncateAddress } from '../../../helpers/truncateString';
-import { InboxItemType } from '../../../types/InboxItem';
-import InboxItem from '../InboxListItem';
+import { truncateAddress } from '../../../helpers/truncateString'
+import { InboxItemType } from '../../../types/InboxItem'
+import InboxItem from '../InboxListItem'
 
 const CommunityInboxItem = ({
 	data,
 	account,
 }: {
-	data: InboxItemType;
-	account: string;
+	data: InboxItemType
+	account: string
 }) => {
-	let recipientAddress = '';
+	let recipientAddress = ''
 	if (data?.toaddr && data?.fromaddr) {
 		recipientAddress =
 			data.toaddr.toLocaleLowerCase() === account.toLocaleLowerCase()
 				? data.fromaddr.toLocaleLowerCase()
-				: data.toaddr.toLocaleLowerCase();
+				: data.toaddr.toLocaleLowerCase()
 	}
 
-	let displayName = '';
+	let displayName = ''
 
 	if (data?.sender_name && data?.sender_name !== '') {
-		displayName = data.sender_name;
+		displayName = data.sender_name
 	} else if (data?.name && data?.name !== '') {
-		displayName = data.name;
+		displayName = data.name
 	} else {
-		displayName = truncateAddress(recipientAddress) || '';
+		displayName = truncateAddress(recipientAddress) || ''
 	}
 
 	return (
@@ -41,7 +41,7 @@ const CommunityInboxItem = ({
 			unread={data?.unread || 0}
 			address={recipientAddress}
 		/>
-	);
-};
+	)
+}
 
-export default CommunityInboxItem;
+export default CommunityInboxItem

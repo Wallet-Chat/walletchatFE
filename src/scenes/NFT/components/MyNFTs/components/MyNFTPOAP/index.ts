@@ -1,1 +1,1 @@
-export { default } from './MyNFTPOAP';
+export { default } from './MyNFTPOAP'

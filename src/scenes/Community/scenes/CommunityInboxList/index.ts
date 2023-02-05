@@ -1,1 +1,1 @@
-export { default } from './CommunityInboxList';
+export { default } from './CommunityInboxList'

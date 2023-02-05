@@ -17,99 +17,99 @@ import {
 	PopoverContent,
 	PopoverArrow,
 	PopoverBody,
-} from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+} from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import {
 	IconLogout,
 	IconMessagePlus,
 	IconPencil,
 	IconBell,
 	IconSwitchHorizontal,
-} from '@tabler/icons';
-import Blockies from 'react-blockies';
-import styled from 'styled-components';
-import { isMobile } from 'react-device-detect';
-import { IconBrandTwitter } from '@tabler/icons';
+} from '@tabler/icons'
+import Blockies from 'react-blockies'
+import styled from 'styled-components'
+import { isMobile } from 'react-device-detect'
+import { IconBrandTwitter } from '@tabler/icons'
 
-import IconDiscord from '../../images/icon-products/icon-discord.svg';
-import logoThumb from '../../images/logo-thumb.svg';
-import { getContractAddressAndNFTId } from '../../helpers/contract';
-import NFTPortNFT from '../../types/NFTPort/NFT';
-import animatedPlaceholder from '../../images/animated-placeholder.gif';
-import { useWallet } from '../../context/WalletProvider';
-import { truncateAddress } from '../../helpers/truncateString';
-import { useIsMobileView } from '../../context/IsMobileViewProvider';
-import { convertIpfsUriToUrl } from '../../helpers/ipfs';
-import { useUnreadCount } from '../../context/UnreadCountProvider';
-import IconDM from '../../images/icon-dm.svg';
-import IconCommunity from '../../images/icon-community.svg';
-import IconNFT from '../../images/icon-nft.svg';
-import { isChromeExtension } from '../../helpers/chrome';
+import IconDiscord from '../../images/icon-products/icon-discord.svg'
+import logoThumb from '../../images/logo-thumb.svg'
+import { getContractAddressAndNFTId } from '../../helpers/contract'
+import NFTPortNFT from '../../types/NFTPort/NFT'
+import animatedPlaceholder from '../../images/animated-placeholder.gif'
+import { useWallet } from '../../context/WalletProvider'
+import { truncateAddress } from '../../helpers/truncateString'
+import { useIsMobileView } from '../../context/IsMobileViewProvider'
+import { convertIpfsUriToUrl } from '../../helpers/ipfs'
+import { useUnreadCount } from '../../context/UnreadCountProvider'
+import IconDM from '../../images/icon-dm.svg'
+import IconCommunity from '../../images/icon-community.svg'
+import IconNFT from '../../images/icon-nft.svg'
+import { isChromeExtension } from '../../helpers/chrome'
 
 interface URLChangedEvent extends Event {
-	detail?: string;
+	detail?: string
 }
 
 export default function Sidebar() {
-	const nftNotificationCount = 0;
-	const [url, setUrl] = useState<string | undefined>('');
-	const [nftContractAddr, setNftContractAddr] = useState<string>();
-	const [nftId, setNftId] = useState<string>();
-	const [chainName, setChainName] = useState('ethereum');
-	const [nftData, setNftData] = useState<NFTPortNFT>();
-	const [imageUrl, setImageUrl] = useState<string>();
-	const [pfpData, setPfpData] = useState<string>();
-	const { unreadCount } = useUnreadCount();
+	const nftNotificationCount = 0
+	const [url, setUrl] = useState<string | undefined>('')
+	const [nftContractAddr, setNftContractAddr] = useState<string>()
+	const [nftId, setNftId] = useState<string>()
+	const [chainName, setChainName] = useState('ethereum')
+	const [nftData, setNftData] = useState<NFTPortNFT>()
+	const [imageUrl, setImageUrl] = useState<string>()
+	const [pfpData, setPfpData] = useState<string>()
+	const { unreadCount } = useUnreadCount()
 
-	const { isMobileView } = useIsMobileView();
+	const { isMobileView } = useIsMobileView()
 
-	const { metadata } = nftData?.nft || {};
+	const { metadata } = nftData?.nft || {}
 
 	const { disconnectWallet, name, account, walletRequestPermissions } =
-		useWallet();
+		useWallet()
 
 	useEffect(() => {
 		if (isChromeExtension()) {
-			const queryInfo = { active: true, lastFocusedWindow: true };
+			const queryInfo = { active: true, lastFocusedWindow: true }
 			chrome.tabs &&
 				chrome.tabs.query(queryInfo, (tabs) => {
-					const url = tabs[0].url;
-					setUrl(url);
-				});
+					const url = tabs[0].url
+					setUrl(url)
+				})
 
 			const updateURL = (e: URLChangedEvent) => {
 				if (e.detail && e.detail !== url) {
 					// if incoming and existing url are the same, do nothing
-					setUrl(e.detail);
+					setUrl(e.detail)
 				}
-			};
+			}
 
-			window.addEventListener('urlChangedEvent', updateURL);
+			window.addEventListener('urlChangedEvent', updateURL)
 
 			return () => {
-				window.removeEventListener('urlChangedEvent', updateURL);
-			};
+				window.removeEventListener('urlChangedEvent', updateURL)
+			}
 		}
-	}, []);
+	}, [])
 
 	useEffect(() => {
 		if (url) {
-			const [contractAddress, nftId, chain] = getContractAddressAndNFTId(url);
+			const [contractAddress, nftId, chain] = getContractAddressAndNFTId(url)
 			if (contractAddress && nftId !== null && chain) {
-				setNftContractAddr(contractAddress);
-				setNftId(nftId);
-				setChainName(chain);
+				setNftContractAddr(contractAddress)
+				setNftId(nftId)
+				setChainName(chain)
 				if (contractAddress.startsWith('0x')) {
-					getNftMetadata(contractAddress, nftId, chain);
+					getNftMetadata(contractAddress, nftId, chain)
 				}
 			}
 		}
-	}, [url]);
+	}, [url])
 
 	useEffect(() => {
-		getImagePFP();
-	}, [account]);
+		getImagePFP()
+	}, [account])
 
 	const getNftMetadata = (
 		nftContractAddr: string,
@@ -117,12 +117,12 @@ export default function Sidebar() {
 		chain: string
 	) => {
 		if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-			console.log('Missing NFT Port API Key');
-			return;
+			console.log('Missing NFT Port API Key')
+			return
 		}
 		if (!nftContractAddr || !nftId) {
-			console.log('Missing contract address or id');
-			return;
+			console.log('Missing contract address or id')
+			return
 		}
 		fetch(
 			`https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=${chain}`,
@@ -135,19 +135,19 @@ export default function Sidebar() {
 		)
 			.then((response) => response.json())
 			.then((result: NFTPortNFT) => {
-				console.log('✅[GET][NFT Metadata]:', result);
+				console.log('✅[GET][NFT Metadata]:', result)
 
-				setNftData(result);
+				setNftData(result)
 
-				let url = result.nft?.cached_file_url;
+				let url = result.nft?.cached_file_url
 				if (url?.includes('ipfs://')) {
-					setImageUrl(convertIpfsUriToUrl(url));
+					setImageUrl(convertIpfsUriToUrl(url))
 				} else if (url !== null) {
-					setImageUrl(url);
+					setImageUrl(url)
 				}
 			})
-			.catch((error) => console.log('error', error));
-	};
+			.catch((error) => console.log('error', error))
+	}
 
 	const getImagePFP = () => {
 		fetch(
@@ -163,13 +163,13 @@ export default function Sidebar() {
 		)
 			.then((response) => response.json())
 			.then((response) => {
-				console.log('✅[GET][Image Sidebar]:', response);
-				if (response[0]?.base64data) setPfpData(response[0].base64data);
+				console.log('✅[GET][Image Sidebar]:', response)
+				if (response[0]?.base64data) setPfpData(response[0].base64data)
 			})
 			.catch((error) => {
-				console.error('🚨[GET][Image]:', error);
-			});
-	};
+				console.error('🚨[GET][Image]:', error)
+			})
+	}
 
 	return (
 		<Flex
@@ -471,7 +471,7 @@ export default function Sidebar() {
 				</Menu>
 			</Flex>
 		</Flex>
-	);
+	)
 }
 
 const LinkElem = styled(NavLink)`
@@ -541,10 +541,10 @@ const LinkElem = styled(NavLink)`
 		transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 		font-size: var(--chakra-fontSizes-md);
 	}
-`;
+`
 const LinkElem2 = styled(LinkElem)`
 	background: var(--chakra-colors-lightgray-200);
-`;
+`
 const AccountInfo = styled.button`
 	padding: 0.6rem 0.8rem;
 	border-radius: var(--chakra-radii-md);
@@ -565,7 +565,7 @@ const AccountInfo = styled.button`
 	&:hover {
 		background: var(--chakra-colors-lightgray-500);
 	}
-`;
+`
 const Divider = styled.div`
 	display: block;
 	width: ${isMobile ? '1px' : '100%'};
@@ -579,7 +579,7 @@ const Divider = styled.div`
 		border-bottom: 1px solid #cbcbcb;
 		border-right: 1px solid #cbcbcb;
 	}
-`;
+`
 const UnreadCountContainer = styled.div`
 	position: absolute;
 	top: 0;
@@ -588,4 +588,4 @@ const UnreadCountContainer = styled.div`
 	background: var(--chakra-colors-information-400);
 	border-radius: var(--chakra-radii-md);
 	border: 2px solid #fff;
-`;
+`

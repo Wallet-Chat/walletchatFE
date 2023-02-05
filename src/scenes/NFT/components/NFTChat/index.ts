@@ -1,1 +1,1 @@
-export { default } from './NFTChat';
+export { default } from './NFTChat'

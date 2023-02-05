@@ -2,32 +2,32 @@
 
 let activeTabId: number,
 	lastUrl: string | undefined,
-	lastTitle: string | undefined;
+	lastTitle: string | undefined
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
 	for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
 		console.log(
 			`Storage key "${key}" in namespace "${namespace}" changed.`,
 			`Old value was "${oldValue}", new value is "${newValue}".`
-		);
+		)
 	}
-});
+})
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 	// console.log('[chrome.tabs.onUpdated', tabId, changeInfo, tab)
-	getTabInfo(tabId);
-});
+	getTabInfo(tabId)
+})
 chrome.tabs.onActivated.addListener(function (activeInfo) {
 	// console.log('[chrome.tabs.onActivated', activeInfo)
-	getTabInfo((activeTabId = activeInfo.tabId));
-});
+	getTabInfo((activeTabId = activeInfo.tabId))
+})
 chrome.runtime.onInstalled.addListener((details) => {
-	console.log('[background.ts] onInstalled', details);
+	console.log('[background.ts] onInstalled', details)
 
 	chrome.contextMenus.create({
 		id: 'notify',
 		title: 'WalletChat: %s',
 		contexts: ['selection'],
-	});
+	})
 
 	// try {
 	//    let provider = createMetaMaskProvider()
@@ -56,62 +56,62 @@ chrome.runtime.onInstalled.addListener((details) => {
 	// } catch (e) {
 	//    console.log(e)
 	// }
-});
+})
 chrome.runtime.onStartup.addListener(() => {
-	console.log('[background.ts] onStartup');
-	startAlarm();
-});
+	console.log('[background.ts] onStartup')
+	startAlarm()
+})
 chrome.runtime.onConnect.addListener((port) => {
-	console.log('[background.ts] onConnect', port);
-});
+	console.log('[background.ts] onConnect', port)
+})
 chrome.runtime.onSuspend.addListener(() => {
-	console.log('[background.ts] onSuspend');
-});
+	console.log('[background.ts] onSuspend')
+})
 chrome.runtime.onMessage.addListener((data) => {
-	console.log('[background.ts] onMessage', data);
+	console.log('[background.ts] onMessage', data)
 	if (data.type === 'notification') {
-		notify(data.message);
+		notify(data.message)
 	}
-});
+})
 chrome.alarms.onAlarm.addListener((alarm) => {
-	console.log('[background.ts] onAlarm');
+	console.log('[background.ts] onAlarm')
 	if (alarm.name === 'badgeUpdate') {
 		chrome.storage.local.get(['account'], (data) => {
 			if (data.account) {
-				getInboxCount(data.account);
+				getInboxCount(data.account)
 			}
-		});
+		})
 	}
-});
+})
 chrome.runtime.onInstalled.addListener((details) => {
 	//When extension is installed or updated, set or reset the count variable in storage
 	if (details.reason === 'update' || details.reason === 'install') {
 		chrome.storage.local.set({
 			count: 0,
-		});
+		})
 		// Start alarm when the extension is first installed.
-		startAlarm();
+		startAlarm()
 	}
-});
+})
 
 function startAlarm() {
-	console.log('[background.ts] startAlarm');
+	console.log('[background.ts] startAlarm')
 	// Call fn immediately
 	chrome.storage.local.get(['account'], (data) => {
 		if (data.account) {
-			getInboxCount(data.account);
+			getInboxCount(data.account)
 		}
-	});
+	})
 
 	// Create intervals to call alarm
 	chrome.alarms.create('badgeUpdate', {
 		periodInMinutes: 1 / 30,
 		delayInMinutes: 0,
-	});
+	})
 }
 
 async function getInboxCount(account: string) {
-	console.log('[background.ts] getInboxCount', account);
+	console.log('[background.ts] getInboxCount', account)
 	if (account) {
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${account}`,
@@ -126,16 +126,16 @@ async function getInboxCount(account: string) {
 		)
 			.then((response) => response.json())
 			.then((count: number) => {
-				console.log('✅[GET][Unread Count]:', count);
+				console.log('✅[GET][Unread Count]:', count)
 				chrome.storage.local.get(['count'], (data) => {
 					//Get the count variable from storage, then, in this callback I can call setBadgeText.
-					updateUnreadCountBadge(count);
-					chrome.storage.local.set({ count: count });
-				});
+					updateUnreadCountBadge(count)
+					chrome.storage.local.set({ count: count })
+				})
 			})
 			.catch((error) => {
-				console.error('🚨[GET][Unread Count]:', error);
-			});
+				console.error('🚨[GET][Unread Count]:', error)
+			})
 	}
 }
 
@@ -144,8 +144,8 @@ function getTabInfo(tabId: number) {
 		if (lastUrl !== tab.url || lastTitle !== tab.title)
 			window.dispatchEvent(
 				new CustomEvent('urlChangedEvent', { detail: tab.url })
-			);
-	});
+			)
+	})
 }
 
 function updateUnreadCountBadge(unreadCount: number) {
@@ -153,28 +153,28 @@ function updateUnreadCountBadge(unreadCount: number) {
 		case 0:
 			chrome.action.setBadgeBackgroundColor({
 				color: [110, 140, 180, 255],
-			});
-			chrome.action.setTitle({ title: 'No unread messages' });
-			chrome.action.setBadgeText({ text: '' });
-			break;
+			})
+			chrome.action.setTitle({ title: 'No unread messages' })
+			chrome.action.setBadgeText({ text: '' })
+			break
 		case 1:
 			chrome.action.setBadgeBackgroundColor({
 				color: '#1236AA',
-			});
+			})
 			chrome.action.setTitle({
 				title: unreadCount + ' unread message',
-			});
-			chrome.action.setBadgeText({ text: unreadCount.toString() });
-			break;
+			})
+			chrome.action.setBadgeText({ text: unreadCount.toString() })
+			break
 		default:
 			chrome.action.setBadgeBackgroundColor({
 				color: '#1236AA',
-			});
+			})
 			chrome.action.setTitle({
 				title: unreadCount + ' unread messages',
-			});
-			chrome.action.setBadgeText({ text: unreadCount.toString() });
-			break;
+			})
+			chrome.action.setBadgeText({ text: unreadCount.toString() })
+			break
 	}
 }
 
@@ -184,7 +184,7 @@ const notify = (message: string) => {
 		title: 'WalletChat',
 		message: message || 'Enter your message here',
 		iconUrl: './assets/icons/128.png',
-	});
-};
+	})
+}
 
-export {};
+export {}

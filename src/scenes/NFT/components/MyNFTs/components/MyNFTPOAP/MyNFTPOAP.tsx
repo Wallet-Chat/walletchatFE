@@ -7,21 +7,21 @@ import {
 	Flex,
 	Tooltip,
 	Badge,
-} from '@chakra-ui/react';
-import { IconArrowNarrowRight } from '@tabler/icons';
-import { Link as RLink } from 'react-router-dom';
-import { truncateAddress } from '../../../../../../helpers/truncateString';
-import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg';
-import { chains, poapContractAddress } from '../../../../../../constants';
-import POAP from '../../../../../../types/POAP/POAP';
+} from '@chakra-ui/react'
+import { IconArrowNarrowRight } from '@tabler/icons'
+import { Link as RLink } from 'react-router-dom'
+import { truncateAddress } from '../../../../../../helpers/truncateString'
+import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg'
+import { chains, poapContractAddress } from '../../../../../../constants'
+import POAP from '../../../../../../types/POAP/POAP'
 
 export default function MyNFTItem({ poap }: { poap: POAP }) {
-	let chain, blockExplorerUrl, chainLogo, chainName;
+	let chain, blockExplorerUrl, chainLogo, chainName
 	if (poap?.chain && poap?.chain !== '') {
-		chain = chains['100'];
-		blockExplorerUrl = chain?.block_explorer_url;
-		chainLogo = chain?.logo;
-		chainName = chain?.name;
+		chain = chains['100']
+		blockExplorerUrl = chain?.block_explorer_url
+		chainLogo = chain?.logo
+		chainName = chain?.name
 	}
 
 	return (
@@ -112,5 +112,5 @@ export default function MyNFTItem({ poap }: { poap: POAP }) {
 				)}
 			</Box>
 		</Flex>
-	);
+	)
 }

@@ -1,11 +1,11 @@
-import { Box, Text } from '@chakra-ui/react';
-import Web3 from 'web3';
-import NFTInboxItem from './NFT/NFTInboxListItem';
-import { InboxItemType } from '../../types/InboxItem';
-import { memo } from 'react';
-import CommunityInboxItem from './Community/CommunityInboxListItem';
-import StartConversationWithAddress from '../StartConversationWithAddress';
-import DMInboxItem from './DM/DMInboxListItem';
+import { Box, Text } from '@chakra-ui/react'
+import Web3 from 'web3'
+import NFTInboxItem from './NFT/NFTInboxListItem'
+import { InboxItemType } from '../../types/InboxItem'
+import { memo } from 'react'
+import CommunityInboxItem from './Community/CommunityInboxListItem'
+import StartConversationWithAddress from '../StartConversationWithAddress'
+import DMInboxItem from './DM/DMInboxListItem'
 
 const InboxList = ({
 	context,
@@ -13,10 +13,10 @@ const InboxList = ({
 	account,
 	web3,
 }: {
-	context: string;
-	data: InboxItemType[] | undefined;
-	account: string;
-	web3: Web3;
+	context: string
+	data: InboxItemType[] | undefined
+	account: string
+	web3: Web3
 }) => {
 	return (
 		<Box>
@@ -27,7 +27,7 @@ const InboxList = ({
 							key={`${conversation.timestamp.toString()}${i}`}
 							data={conversation}
 						/>
-					);
+					)
 				} else if (conversation.context_type === 'community') {
 					return (
 						<CommunityInboxItem
@@ -35,7 +35,7 @@ const InboxList = ({
 							data={conversation}
 							account={account}
 						/>
-					);
+					)
 				} else if (
 					conversation.context_type === 'dm' ||
 					conversation.context_type === 'community'
@@ -46,9 +46,9 @@ const InboxList = ({
 							data={conversation}
 							account={account}
 						/>
-					);
+					)
 				}
-				return <Box key={`inbox-list-item-empty-box}${i}`}></Box>;
+				return <Box key={`inbox-list-item-empty-box}${i}`}></Box>
 			})}
 			{data?.length === 0 && (context === 'dms' || context === 'all') && (
 				<Box p={5}>
@@ -66,7 +66,7 @@ const InboxList = ({
 				</Box>
 			)}
 		</Box>
-	);
-};
+	)
+}
 
-export default memo(InboxList);
+export default memo(InboxList)

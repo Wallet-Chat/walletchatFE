@@ -1,4 +1,4 @@
-import { ChainObjectType } from './types/Chain';
+import { ChainObjectType } from './types/Chain'
 
 export const currencyList = [
 	{ name: 'US Dollar', code: 'USD', symbol: '$' },
@@ -17,9 +17,9 @@ export const currencyList = [
 	{ name: 'Singapore Dollar', code: 'SGD', symbol: '$' },
 	{ name: 'Swiss Franc', code: 'CHF', symbol: 'CHf' },
 	{ name: 'Thai Baht', code: 'THB', symbol: '฿' },
-];
+]
 
-export const poapContractAddress = '0x22c1f6050e56d2876009903609a2cc3fef83b415';
+export const poapContractAddress = '0x22c1f6050e56d2876009903609a2cc3fef83b415'
 
 export const chains: ChainObjectType = {
 	'1': {
@@ -49,4 +49,4 @@ export const chains: ChainObjectType = {
 	//     slug: "avalanche",
 	//     block_explorer_url: "https://snowtrace.io/"
 	// }
-};
+}

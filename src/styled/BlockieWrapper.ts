@@ -1,8 +1,8 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 interface BlockieWrapperProps {
-	width?: string | null;
-	height?: string | null;
+	width?: string | null
+	height?: string | null
 }
 
 export const BlockieWrapper = styled.div<BlockieWrapperProps>`
@@ -11,4 +11,4 @@ export const BlockieWrapper = styled.div<BlockieWrapperProps>`
 	height: ${(props) => (props.height ? props.height : 'auto')};
 	border-radius: 0.3rem;
 	overflow: hidden;
-`;
+`

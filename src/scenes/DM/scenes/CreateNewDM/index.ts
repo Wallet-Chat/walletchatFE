@@ -1,1 +1,1 @@
-export { default } from './CreateNewDM';
+export { default } from './CreateNewDM'

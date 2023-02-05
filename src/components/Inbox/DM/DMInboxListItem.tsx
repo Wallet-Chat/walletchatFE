@@ -1,40 +1,40 @@
-import { Box, Flex, Image } from '@chakra-ui/react';
-import Blockies from 'react-blockies';
-import { Link } from 'react-router-dom';
+import { Box, Flex, Image } from '@chakra-ui/react'
+import Blockies from 'react-blockies'
+import { Link } from 'react-router-dom'
 
-import { formatInboxDate } from '../../../helpers/date';
-import { truncateAddress } from '../../../helpers/truncateString';
-import { InboxItemType } from '../../../types/InboxItem';
-import { BlockieWrapper } from '../../../styled/BlockieWrapper';
+import { formatInboxDate } from '../../../helpers/date'
+import { truncateAddress } from '../../../helpers/truncateString'
+import { InboxItemType } from '../../../types/InboxItem'
+import { BlockieWrapper } from '../../../styled/BlockieWrapper'
 import {
 	InboxItemNotificationCount,
 	InboxItemRecipientAddress,
 	InboxItemWrapper,
-} from '../../../styled/InboxItem';
+} from '../../../styled/InboxItem'
 
 const DMInboxItem = ({
 	data,
 	account,
 }: {
-	data: InboxItemType;
-	account: string;
+	data: InboxItemType
+	account: string
 }) => {
-	let recipientAddress = '';
+	let recipientAddress = ''
 	if (data?.toaddr && data?.fromaddr) {
 		recipientAddress =
 			data.toaddr.toLocaleLowerCase() === account.toLocaleLowerCase()
 				? data.fromaddr.toLocaleLowerCase()
-				: data.toaddr.toLocaleLowerCase();
+				: data.toaddr.toLocaleLowerCase()
 	}
 
-	let displayName = '';
+	let displayName = ''
 
 	if (data?.sender_name && data?.sender_name !== '') {
-		displayName = data.sender_name;
+		displayName = data.sender_name
 	} else if (data?.name && data?.name !== '') {
-		displayName = data.name;
+		displayName = data.name
 	} else {
-		displayName = truncateAddress(recipientAddress) || '';
+		displayName = truncateAddress(recipientAddress) || ''
 	}
 
 	return (
@@ -95,7 +95,7 @@ const DMInboxItem = ({
 				</Flex>
 			</InboxItemWrapper>
 		</Link>
-	);
-};
+	)
+}
 
-export default DMInboxItem;
+export default DMInboxItem

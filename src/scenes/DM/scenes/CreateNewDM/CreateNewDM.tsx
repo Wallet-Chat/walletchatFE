@@ -1,10 +1,10 @@
-import { Flex } from '@chakra-ui/react';
-import { isMobile } from 'react-device-detect';
-import StartConversationWithAddress from '../../../../components/StartConversationWithAddress';
-import { useWallet } from '../../../../context/WalletProvider';
+import { Flex } from '@chakra-ui/react'
+import { isMobile } from 'react-device-detect'
+import StartConversationWithAddress from '../../../../components/StartConversationWithAddress'
+import { useWallet } from '../../../../context/WalletProvider'
 
 const NewConversation = () => {
-	const { web3 } = useWallet();
+	const { web3 } = useWallet()
 
 	return (
 		<Flex
@@ -18,7 +18,7 @@ const NewConversation = () => {
 		>
 			<StartConversationWithAddress web3={web3} />
 		</Flex>
-	);
-};
+	)
+}
 
-export default NewConversation;
+export default NewConversation

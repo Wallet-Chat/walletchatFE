@@ -1,1 +1,1 @@
-export { default } from './MyNFTSkeleton';
+export { default } from './MyNFTSkeleton'

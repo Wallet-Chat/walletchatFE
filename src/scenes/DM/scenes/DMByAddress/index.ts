@@ -1,1 +1,1 @@
-export { default } from './DMByAddress';
+export { default } from './DMByAddress'

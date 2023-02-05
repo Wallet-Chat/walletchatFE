@@ -1,38 +1,38 @@
-import { default as GeneralNFT } from '../NFT';
+import { default as GeneralNFT } from '../NFT'
 
 export default interface AlchemyNFT {
 	contract: {
-		address: string;
-	};
+		address: string
+	}
 	id: {
-		tokenId: string;
+		tokenId: string
 		tokenMetadata: {
-			tokenType: string;
-		};
-	};
-	title: string;
-	description: string;
+			tokenType: string
+		}
+	}
+	title: string
+	description: string
 	tokenUri: {
-		raw: string;
-		gateway: string;
-	};
+		raw: string
+		gateway: string
+	}
 	media: [
 		{
-			raw: string;
-			gateway: string;
+			raw: string
+			gateway: string
 		}
-	];
+	]
 	metadata: {
-		name: string;
-		image: string;
-		description: string;
-		external_url: string;
+		name: string
+		image: string
+		description: string
+		external_url: string
 		attributes: Array<{
-			trait_type: string;
-			value: string;
-		}>;
-	};
-	timeLastUpdated: string;
+			trait_type: string
+			value: string
+		}>
+	}
+	timeLastUpdated: string
 }
 
 export function alchemyToGeneralNFTType(data: AlchemyNFT): GeneralNFT {
@@ -47,5 +47,5 @@ export function alchemyToGeneralNFTType(data: AlchemyNFT): GeneralNFT {
 			image: data?.metadata?.image,
 			contract_address: data?.contract?.address,
 		},
-	};
+	}
 }

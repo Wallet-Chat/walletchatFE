@@ -7,48 +7,48 @@ import {
 	Input,
 	Spinner,
 	Text,
-} from '@chakra-ui/react';
-import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import Blockies from 'react-blockies';
-import { useWallet } from '../../../../context/WalletProvider';
-import { truncateAddress } from '../../../../helpers/truncateString';
-import useOnClickOutside from '../../../../hooks/useOnClickOutside';
+} from '@chakra-ui/react'
+import { useEffect, useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
+import Blockies from 'react-blockies'
+import { useWallet } from '../../../../context/WalletProvider'
+import { truncateAddress } from '../../../../helpers/truncateString'
+import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 import OpenSeaNFTCollection, {
 	openseaToGeneralNFTCollectionType,
-} from '../../../../types/OpenSea/NFTCollection';
+} from '../../../../types/OpenSea/NFTCollection'
 import NFTPortNFTCollection, {
 	nftPortToGeneralNFTCollectionType,
-} from '../../../../types/NFTPort/NFTCollection';
-import NFTCollection from '../../../../types/NFTCollection';
-import { convertIpfsUriToUrl } from '../../../../helpers/ipfs';
+} from '../../../../types/NFTPort/NFTCollection'
+import NFTCollection from '../../../../types/NFTCollection'
+import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
 
 export default function NFTInboxSearchInput() {
-	const [toAddr, setToAddr] = useState<string>('');
-	const [isFetchingEthereum, setIsFetchingEthereum] = useState(false);
-	const [isFetchingPolygon, setIsFetchingPolygon] = useState(false);
-	const [nft, setNft] = useState<NFTCollection>();
-	const [chain, setChain] = useState('ethereum');
-	const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false);
-	const { web3 } = useWallet();
+	const [toAddr, setToAddr] = useState<string>('')
+	const [isFetchingEthereum, setIsFetchingEthereum] = useState(false)
+	const [isFetchingPolygon, setIsFetchingPolygon] = useState(false)
+	const [nft, setNft] = useState<NFTCollection>()
+	const [chain, setChain] = useState('ethereum')
+	const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false)
+	const { web3 } = useWallet()
 
-	const ref = useRef(null);
+	const ref = useRef(null)
 
 	const fetchNFTContractDetails = async (address: string) => {
 		if (!web3.utils.isAddress(address)) {
-			console.log('Invalid contract address');
-			return;
+			console.log('Invalid contract address')
+			return
 		}
 
-		fetchEthereumContract(address);
-	};
+		fetchEthereumContract(address)
+	}
 
 	const fetchEthereumContract = async (address: string) => {
 		if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
-			console.log('Missing OpenSea API Key');
-			return;
+			console.log('Missing OpenSea API Key')
+			return
 		}
-		setIsFetchingEthereum(true);
+		setIsFetchingEthereum(true)
 		fetch(`https://api.opensea.io/api/v1/asset_contract/${address}`, {
 			method: 'GET',
 			headers: {
@@ -59,26 +59,26 @@ export default function NFTInboxSearchInput() {
 			.then((result: OpenSeaNFTCollection) => {
 				if (result?.collection?.name) {
 					// console.log(`✅[GET][NFT Contract]:`, result)
-					setNft(openseaToGeneralNFTCollectionType(result));
-					setIsSuggestionListOpen(true);
+					setNft(openseaToGeneralNFTCollectionType(result))
+					setIsSuggestionListOpen(true)
 				}
 			})
 			.finally(() => {
-				setIsFetchingEthereum(false);
+				setIsFetchingEthereum(false)
 			})
 			.catch((error) => {
-				console.log(`🚨[GET][NFT Contract]:`, error);
-				fetchPolygonContract(address);
-				setChain('polygon');
-			});
-	};
+				console.log(`🚨[GET][NFT Contract]:`, error)
+				fetchPolygonContract(address)
+				setChain('polygon')
+			})
+	}
 
 	const fetchPolygonContract = (address: string) => {
 		if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
-			console.log('Missing NFT Port API Key');
-			return;
+			console.log('Missing NFT Port API Key')
+			return
 		}
-		setIsFetchingPolygon(true);
+		setIsFetchingPolygon(true)
 		fetch(
 			`https://api.nftport.xyz/v0/nfts/${address}/1?chain=polygon&page_size=1&include=all`,
 			{
@@ -93,37 +93,37 @@ export default function NFTInboxSearchInput() {
 				// console.log('✅[GET][NFT Metadata]:', data)
 
 				let _transformed: NFTCollection =
-					nftPortToGeneralNFTCollectionType(data);
+					nftPortToGeneralNFTCollectionType(data)
 				setNft({
 					..._transformed,
 					image_url: _transformed.image_url?.includes('ipfs://')
 						? convertIpfsUriToUrl(_transformed.image_url)
 						: _transformed.image_url,
-				});
-				setIsSuggestionListOpen(true);
+				})
+				setIsSuggestionListOpen(true)
 			})
 			.finally(() => {
-				setIsFetchingPolygon(false);
+				setIsFetchingPolygon(false)
 			})
 			.catch((error) => {
-				console.log('🚨[GET][NFT Metadata]:', error);
-				setChain('ethereum');
-			});
-	};
+				console.log('🚨[GET][NFT Metadata]:', error)
+				setChain('ethereum')
+			})
+	}
 
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
-			fetchNFTContractDetails(toAddr);
-		}, 800);
+			fetchNFTContractDetails(toAddr)
+		}, 800)
 
-		return () => clearTimeout(delayDebounceFn);
-	}, [toAddr]);
+		return () => clearTimeout(delayDebounceFn)
+	}, [toAddr])
 
 	const handleClickOutside = () => {
-		if (isSuggestionListOpen === true) setIsSuggestionListOpen(false);
-	};
+		if (isSuggestionListOpen === true) setIsSuggestionListOpen(false)
+	}
 
-	useOnClickOutside(ref, handleClickOutside);
+	useOnClickOutside(ref, handleClickOutside)
 
 	return (
 		<Box position={'relative'} ref={ref}>
@@ -136,7 +136,7 @@ export default function NFTInboxSearchInput() {
 						setToAddr(e.target.value)
 					}
 					onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
-						if (nft?.name) setIsSuggestionListOpen(true);
+						if (nft?.name) setIsSuggestionListOpen(true)
 					}}
 					background='lightgray.300'
 				/>
@@ -174,8 +174,8 @@ export default function NFTInboxSearchInput() {
 						<Link
 							to={`/nft/${chain}/${toAddr}`}
 							onClick={() => {
-								setIsSuggestionListOpen(false);
-								setToAddr('');
+								setIsSuggestionListOpen(false)
+								setToAddr('')
 							}}
 							style={{ textDecoration: 'none', width: '100%' }}
 						>
@@ -207,5 +207,5 @@ export default function NFTInboxSearchInput() {
 					</Box>
 				)}
 		</Box>
-	);
+	)
 }

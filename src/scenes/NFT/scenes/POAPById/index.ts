@@ -1,1 +1,1 @@
-export { default } from './POAPById';
+export { default } from './POAPById'

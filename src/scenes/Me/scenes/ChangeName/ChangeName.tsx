@@ -11,13 +11,13 @@ import {
 	Text,
 	Tooltip,
 	useToast,
-} from '@chakra-ui/react';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { IconSend } from '@tabler/icons';
-import { useWallet } from '../../../../context/WalletProvider';
-import OpenSeaNFT from '../../../../types/OpenSea/NFT';
-import Resizer from 'react-image-file-resizer';
+} from '@chakra-ui/react'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { IconSend } from '@tabler/icons'
+import { useWallet } from '../../../../context/WalletProvider'
+import OpenSeaNFT from '../../../../types/OpenSea/NFT'
+import Resizer from 'react-image-file-resizer'
 
 const ChangeName = () => {
 	const {
@@ -25,17 +25,17 @@ const ChangeName = () => {
 		register,
 		formState: { errors },
 		setValue,
-	} = useForm();
+	} = useForm()
 
-	const { name: _name, setName: globalSetName, account } = useWallet();
-	const toast = useToast();
+	const { name: _name, setName: globalSetName, account } = useWallet()
+	const toast = useToast()
 
-	const [name, setName] = useState('');
-	const [isFetching, setIsFetching] = useState(false);
-	const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([]);
+	const [name, setName] = useState('')
+	const [isFetching, setIsFetching] = useState(false)
+	const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
 
-	const [file, setFile] = useState<Blob | MediaSource>();
-	const [filePreview, setFilePreview] = useState('');
+	const [file, setFile] = useState<Blob | MediaSource>()
+	const [filePreview, setFilePreview] = useState('')
 
 	const resizeFile = (file: Blob) =>
 		new Promise((resolve) => {
@@ -47,29 +47,29 @@ const ChangeName = () => {
 				100,
 				0,
 				(uri) => {
-					resolve(uri);
+					resolve(uri)
 				},
 				'base64'
-			);
-		});
+			)
+		})
 
 	useEffect(() => {
 		// create the preview
 		if (file) {
-			const objectUrl = URL.createObjectURL(file);
-			setFilePreview(objectUrl);
+			const objectUrl = URL.createObjectURL(file)
+			setFilePreview(objectUrl)
 
 			// free memory whenever this component is unmounted
-			return () => URL.revokeObjectURL(objectUrl);
+			return () => URL.revokeObjectURL(objectUrl)
 		}
-	}, [file]);
+	}, [file])
 
 	const upload = async (e: ChangeEvent<HTMLInputElement>) => {
-		console.warn(e.target.files);
-		const files = e.target.files;
+		console.warn(e.target.files)
+		const files = e.target.files
 		if (files && files.length !== 0) {
-			setFile(files[0]);
-			const image = await resizeFile(files[0]);
+			setFile(files[0])
+			const image = await resizeFile(files[0])
 
 			fetch(
 				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image`,
@@ -88,7 +88,7 @@ const ChangeName = () => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[POST][Image]:', response);
+					console.log('✅[POST][Image]:', response)
 					toast({
 						title: 'Success',
 						description: `PFP updated!`,
@@ -96,11 +96,11 @@ const ChangeName = () => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
-					setName('');
+					})
+					setName('')
 				})
 				.catch((error) => {
-					console.error('🚨[POST][Image]:', error);
+					console.error('🚨[POST][Image]:', error)
 					toast({
 						title: 'Error',
 						description: `Image Not Updated - Unknown error`,
@@ -108,19 +108,19 @@ const ChangeName = () => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
+					})
 				})
 				.then(() => {
-					setIsFetching(false);
-				});
+					setIsFetching(false)
+				})
 		}
-	};
+	}
 
 	useEffect(() => {
 		const getOwnedENS = () => {
 			if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
-				console.log('Missing OpenSea API Key');
-				return;
+				console.log('Missing OpenSea API Key')
+				return
 			}
 			fetch(
 				`https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
@@ -133,23 +133,21 @@ const ChangeName = () => {
 			)
 				.then((response) => response.json())
 				.then((result) => {
-					console.log(`✅[GET][ENS Owned by ${account}]]:`, result);
+					console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
 					if (result?.assets?.length > 0) {
-						setOwnedENS(result.assets);
+						setOwnedENS(result.assets)
 					}
 				})
-				.catch((error) =>
-					console.log(`🚨[GET][ENS Owned by ${account}`, error)
-				);
-		};
-		if (account) {
-			getOwnedENS();
+				.catch((error) => console.log(`🚨[GET][ENS Owned by ${account}`, error))
 		}
-	}, [account]);
+		if (account) {
+			getOwnedENS()
+		}
+	}, [account])
 
 	const onSubmit = (values: any) => {
 		if (values?.name) {
-			setIsFetching(true);
+			setIsFetching(true)
 
 			fetch(
 				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`,
@@ -168,8 +166,8 @@ const ChangeName = () => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[PUT][Name]:', response);
-					globalSetName(values.name);
+					console.log('✅[PUT][Name]:', response)
+					globalSetName(values.name)
 					toast({
 						title: 'Success',
 						description: `Name's updated to ${values.name}`,
@@ -177,11 +175,11 @@ const ChangeName = () => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
-					setName('');
+					})
+					setName('')
 				})
 				.catch((error) => {
-					console.error('🚨[PUT][Name]:', error);
+					console.error('🚨[PUT][Name]:', error)
 					toast({
 						title: 'Error',
 						description: `Name Not Updated - Ensure you own this ENS address!`,
@@ -189,15 +187,15 @@ const ChangeName = () => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
+					})
 				})
 				.then(() => {
-					setIsFetching(false);
-				});
+					setIsFetching(false)
+				})
 		}
-	};
+	}
 
-	const onSubmitPFP = (values: any) => {};
+	const onSubmitPFP = (values: any) => {}
 
 	return (
 		<Box p={6} pt={16} background='white' width='100%' height='100vh'>
@@ -298,7 +296,7 @@ const ChangeName = () => {
 				</FormControl>
 			</form>
 		</Box>
-	);
-};
+	)
+}
 
-export default ChangeName;
+export default ChangeName

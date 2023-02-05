@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const DottedBackground = styled.div`
 	flex-grow: 1;
@@ -17,4 +17,4 @@ export const DottedBackground = styled.div`
 	background-position: top left !important;
 	padding: var(--chakra-space-1);
 	overflow-y: scroll;
-`;
+`

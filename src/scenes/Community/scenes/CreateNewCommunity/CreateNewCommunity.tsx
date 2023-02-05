@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
 	Box,
 	Button,
@@ -13,53 +13,53 @@ import {
 	Spinner,
 	Switch,
 	Text,
-} from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
-import { isMobile } from 'react-device-detect';
+} from '@chakra-ui/react'
+import { useForm } from 'react-hook-form'
+import { isMobile } from 'react-device-detect'
 import {
 	IconArrowRight,
 	IconBrandTwitter,
 	IconChevronLeft,
-} from '@tabler/icons';
-import { useWallet } from '../../../../context/WalletProvider';
+} from '@tabler/icons'
+import { useWallet } from '../../../../context/WalletProvider'
 
 const CreateNewCommunity = () => {
-	const [name, setName] = useState<string>('');
-	const [twitter, setTwitter] = useState<string>('');
-	const [twitterActive, setTwitterActive] = useState(false);
-	const [discord, setDiscord] = useState<string>('');
-	const [discordActive, setDiscordActive] = useState(false);
+	const [name, setName] = useState<string>('')
+	const [twitter, setTwitter] = useState<string>('')
+	const [twitterActive, setTwitterActive] = useState(false)
+	const [discord, setDiscord] = useState<string>('')
+	const [discordActive, setDiscordActive] = useState(false)
 
-	const [isFetching, setIsFetching] = useState(false);
+	const [isFetching, setIsFetching] = useState(false)
 
-	let navigate = useNavigate();
+	let navigate = useNavigate()
 
 	const {
 		handleSubmit,
 		register,
 		formState: { errors },
-	} = useForm();
+	} = useForm()
 
 	const onSubmit = (values: any) => {
-		let social = [];
+		let social = []
 		if (values.twitter) {
 			social.push({
 				type: 'twitter',
 				name: values.twitter,
-			});
+			})
 		}
 		if (values.discord) {
 			social.push({
 				type: 'discord',
 				name: values.discord,
-			});
+			})
 		}
 
-		setIsFetching(true);
+		setIsFetching(true)
 
 		if (!process.env.REACT_APP_REST_API) {
-			console.log('REST API url not in .env', process.env);
-			return;
+			console.log('REST API url not in .env', process.env)
+			return
 		}
 
 		fetch(
@@ -78,16 +78,16 @@ const CreateNewCommunity = () => {
 			}
 		)
 			.then((slug) => {
-				console.log('✅[POST][Create Community]');
-				navigate(`/community/${slug}`);
+				console.log('✅[POST][Create Community]')
+				navigate(`/community/${slug}`)
 			})
 			.catch((error) => {
-				console.error('🚨[POST][Create Community]:', error);
+				console.error('🚨[POST][Create Community]:', error)
 			})
 			.finally(() => {
-				setIsFetching(false);
-			});
-	};
+				setIsFetching(false)
+			})
+	}
 
 	// const fetchTwitterUser = () => {
 	//    if (twitter) {
@@ -186,11 +186,11 @@ const CreateNewCommunity = () => {
 								})}
 								color={twitterActive ? 'inherit' : 'gray.400'}
 								onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-									setTwitter(e.target.value);
+									setTwitter(e.target.value)
 									if (e.target.value === '') {
-										setTwitterActive(false);
+										setTwitterActive(false)
 									} else if (!twitterActive) {
-										setTwitterActive(true);
+										setTwitterActive(true)
 									}
 								}}
 								// onBlur={() => fetchTwitterUser()}
@@ -238,11 +238,11 @@ const CreateNewCommunity = () => {
 									required: false,
 								})}
 								onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-									setDiscord(e.target.value);
+									setDiscord(e.target.value)
 									if (e.target.value === '') {
-										setDiscordActive(false);
+										setDiscordActive(false)
 									} else if (!discordActive) {
-										setDiscordActive(true);
+										setDiscordActive(true)
 									}
 								}}
 							/>
@@ -265,7 +265,7 @@ const CreateNewCommunity = () => {
 				</form>
 			</Box>
 		</Box>
-	);
-};
+	)
+}
 
-export default CreateNewCommunity;
+export default CreateNewCommunity

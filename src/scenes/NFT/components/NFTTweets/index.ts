@@ -1,1 +1,1 @@
-export { default } from './NFTTweets';
+export { default } from './NFTTweets'

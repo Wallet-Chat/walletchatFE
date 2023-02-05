@@ -1,14 +1,14 @@
-import { Avatar, Box, Flex, Image, Tooltip } from '@chakra-ui/react';
-import { memo } from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import Blockies from 'react-blockies';
+import { Avatar, Box, Flex, Image, Tooltip } from '@chakra-ui/react'
+import { memo } from 'react'
+import { Link } from 'react-router-dom'
+import styled from 'styled-components'
+import Blockies from 'react-blockies'
 
-import { BlockieWrapper } from '../../styled/BlockieWrapper';
-import IconPolygon from '../../images/icon-chains/icon-polygon.svg';
-import IconEthereum from '../../images/icon-chains/icon-ethereum.svg';
-import IconGnosis from '../../images/icon-chains/icon-gnosis.svg';
-import { formatInboxDate } from '../../helpers/date';
+import { BlockieWrapper } from '../../styled/BlockieWrapper'
+import IconPolygon from '../../images/icon-chains/icon-polygon.svg'
+import IconEthereum from '../../images/icon-chains/icon-ethereum.svg'
+import IconGnosis from '../../images/icon-chains/icon-gnosis.svg'
+import { formatInboxDate } from '../../helpers/date'
 
 const InboxItemWrapper = styled.button`
 	display: block;
@@ -33,7 +33,7 @@ const InboxItemWrapper = styled.button`
 		user-select: none;
 		line-height: 1.7;
 	}
-`;
+`
 
 const InboxItemNotificationCount = styled.div`
 	display: inline-block;
@@ -46,7 +46,7 @@ const InboxItemNotificationCount = styled.div`
 	text-align: center;
 	margin-left: auto;
 	padding: 0 var(--chakra-space-2);
-`;
+`
 
 const InboxItemRecipientAddress = styled.div`
 	font-size: var(--chakra-fontSizes-lg);
@@ -54,7 +54,7 @@ const InboxItemRecipientAddress = styled.div`
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-`;
+`
 
 const InboxItemChainImage = styled.div`
 	position: absolute;
@@ -65,7 +65,7 @@ const InboxItemChainImage = styled.div`
 	background: rgba(255, 255, 255, 0.8);
 	padding: var(--chakra-space-0-5);
 	border-radius: var(--chakra-radii-sm);
-`;
+`
 const InboxItem = ({
 	chain,
 	displayName = '',
@@ -77,15 +77,15 @@ const InboxItem = ({
 	unread = 0,
 	address,
 }: {
-	chain?: string | undefined;
-	displayName: string | undefined;
-	url: string;
-	image: string | undefined;
-	isPoap?: boolean;
-	latestMessage: string | undefined;
-	timestamp: string;
-	unread: number;
-	address: string | undefined | null;
+	chain?: string | undefined
+	displayName: string | undefined
+	url: string
+	image: string | undefined
+	isPoap?: boolean
+	latestMessage: string | undefined
+	timestamp: string
+	unread: number
+	address: string | undefined | null
 }) => {
 	return (
 		<Link to={url} style={{ textDecoration: 'none' }}>
@@ -192,7 +192,7 @@ const InboxItem = ({
 				</Flex>
 			</InboxItemWrapper>
 		</Link>
-	);
-};
+	)
+}
 
-export default memo(InboxItem);
+export default memo(InboxItem)

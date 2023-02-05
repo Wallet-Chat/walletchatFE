@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
 	Button,
 	Flex,
@@ -9,47 +9,47 @@ import {
 	Input,
 	Spinner,
 	Text,
-} from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
-import Blockies from 'react-blockies';
-import { truncateAddress } from '../helpers/truncateString';
-import { IconArrowRight } from '@tabler/icons';
-import { useWallet } from '../context/WalletProvider';
-import { addressIsValid } from '../helpers/address';
+} from '@chakra-ui/react'
+import { useForm } from 'react-hook-form'
+import Blockies from 'react-blockies'
+import { truncateAddress } from '../helpers/truncateString'
+import { IconArrowRight } from '@tabler/icons'
+import { useWallet } from '../context/WalletProvider'
+import { addressIsValid } from '../helpers/address'
 
 const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
-	const [toAddr, setToAddr] = useState<string>('');
-	const [resolvedAddr, setResolvedAddr] = useState<string | null>();
-	const [isResolvingENS, setIsResolvingENS] = useState(false);
-	const { provider } = useWallet();
+	const [toAddr, setToAddr] = useState<string>('')
+	const [resolvedAddr, setResolvedAddr] = useState<string | null>()
+	const [isResolvingENS, setIsResolvingENS] = useState(false)
+	const { provider } = useWallet()
 
 	const {
 		handleSubmit,
 		register,
 		formState: { errors },
-	} = useForm();
-	let navigate = useNavigate();
+	} = useForm()
+	let navigate = useNavigate()
 
 	const onSubmit = (values: any) => {
-		navigate(`/dm/${toAddr}`);
-	};
+		navigate(`/dm/${toAddr}`)
+	}
 
 	const checkENS = async (address: string) => {
 		if (address.includes('.eth')) {
-			setIsResolvingENS(true);
-			const _addr = await provider.resolveName(address);
-			setResolvedAddr(_addr);
-			setIsResolvingENS(false);
+			setIsResolvingENS(true)
+			const _addr = await provider.resolveName(address)
+			setResolvedAddr(_addr)
+			setIsResolvingENS(false)
 		}
-	};
+	}
 
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
-			checkENS(toAddr);
-		}, 800);
+			checkENS(toAddr)
+		}, 800)
 
-		return () => clearTimeout(delayDebounceFn);
-	}, [toAddr]);
+		return () => clearTimeout(delayDebounceFn)
+	}, [toAddr])
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>
@@ -116,7 +116,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
 				</Text>
 			</Button>
 		</form>
-	);
-};
+	)
+}
 
-export default StartConversationWithAddress;
+export default StartConversationWithAddress

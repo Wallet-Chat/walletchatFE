@@ -1,10 +1,10 @@
-import { useEffect, useState, KeyboardEvent } from 'react';
-import TextareaAutosize from 'react-textarea-autosize';
-import { IconSend } from '@tabler/icons';
-import { Button, Divider, Flex, FormControl } from '@chakra-ui/react';
+import { useEffect, useState, KeyboardEvent } from 'react'
+import TextareaAutosize from 'react-textarea-autosize'
+import { IconSend } from '@tabler/icons'
+import { Button, Divider, Flex, FormControl } from '@chakra-ui/react'
 
-import CommentType from '../../../../types/Comment';
-import Comment from './components/Comment';
+import CommentType from '../../../../types/Comment'
+import Comment from './components/Comment'
 
 const NFTComments = ({
 	account,
@@ -12,31 +12,31 @@ const NFTComments = ({
 	nftContractAddr,
 	nftId,
 }: {
-	account: string;
-	ownerAddr: string | undefined | null;
-	nftContractAddr: string;
-	nftId: string;
+	account: string
+	ownerAddr: string | undefined | null
+	nftContractAddr: string
+	nftId: string
 }) => {
 	// Comment
-	const [commentInput, setCommentInput] = useState<string>('');
-	const [loadedComments, setLoadedComments] = useState<CommentType[]>([]);
-	const [isFetchingComments, setIsFetchingComments] = useState<boolean>(false);
-	const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
+	const [commentInput, setCommentInput] = useState<string>('')
+	const [loadedComments, setLoadedComments] = useState<CommentType[]>([])
+	const [isFetchingComments, setIsFetchingComments] = useState<boolean>(false)
+	const [isPostingComment, setIsPostingComment] = useState<boolean>(false)
 
 	useEffect(() => {
-		getComments();
+		getComments()
 
 		const interval = setInterval(() => {
-			getComments();
-		}, 5000); // every 5s
+			getComments()
+		}, 5000) // every 5s
 
 		return () => {
-			clearInterval(interval);
-		};
-	}, [account, ownerAddr]);
+			clearInterval(interval)
+		}
+	}, [account, ownerAddr])
 
 	const getComments = () => {
-		setIsFetchingComments(true);
+		setIsFetchingComments(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_comments/${nftContractAddr}/${nftId}`,
 			{
@@ -45,38 +45,38 @@ const NFTComments = ({
 		)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log('✅[GET][NFT][Comments]:', data);
+				console.log('✅[GET][NFT][Comments]:', data)
 				const translatedData = data.map((item: any) => ({
 					fromAddr: item.fromaddr,
 					nftAddr: item.nftaddr,
 					nftId: item.nftid,
 					timestamp: item.timestamp,
 					message: item.message,
-				}));
+				}))
 
-				setLoadedComments(translatedData);
+				setLoadedComments(translatedData)
 			})
 			.catch((error) => {
-				console.error('🚨🚨[POST][NFT][Comments]:', error);
+				console.error('🚨🚨[POST][NFT][Comments]:', error)
 			})
-			.finally(() => setIsFetchingComments(false));
-	};
+			.finally(() => setIsFetchingComments(false))
+	}
 
 	const handleCommentKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (event.key === 'Enter') {
-			event.preventDefault();
-			sendComment();
+			event.preventDefault()
+			sendComment()
 		}
-	};
+	}
 
 	const sendComment = async () => {
-		if (commentInput.length <= 0) return;
+		if (commentInput.length <= 0) return
 
 		// Make a copy and clear input field
-		const commentInputCopy = (' ' + commentInput).slice(1);
-		setCommentInput('');
+		const commentInputCopy = (' ' + commentInput).slice(1)
+		setCommentInput('')
 
-		const timestamp = new Date();
+		const timestamp = new Date()
 
 		let data = {
 			fromAddr: account.toLocaleLowerCase(),
@@ -84,9 +84,9 @@ const NFTComments = ({
 			nftId: nftId,
 			timestamp: new Date(),
 			message: commentInputCopy,
-		};
+		}
 
-		setIsPostingComment(true);
+		setIsPostingComment(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_comments`,
 			{
@@ -101,21 +101,21 @@ const NFTComments = ({
 		)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log('nft id: ', nftId);
-				console.log('✅[POST][NFT][Comment]:', data);
+				console.log('nft id: ', nftId)
+				console.log('✅[POST][NFT][Comment]:', data)
 				addCommentToUI(
 					account,
 					nftContractAddr,
 					nftId,
 					timestamp,
 					commentInputCopy
-				);
+				)
 			})
 			.catch((error) => {
-				console.error('🚨🚨[POST][NFT][Comment]:', error, JSON.stringify(data));
+				console.error('🚨🚨[POST][NFT][Comment]:', error, JSON.stringify(data))
 			})
-			.finally(() => setIsPostingComment(false));
-	};
+			.finally(() => setIsPostingComment(false))
+	}
 
 	const addCommentToUI = (
 		fromAddr: string,
@@ -124,7 +124,7 @@ const NFTComments = ({
 		timestamp: Date,
 		message: string
 	) => {
-		console.log(`Add comment to UI: ${message}`);
+		console.log(`Add comment to UI: ${message}`)
 
 		const newComment: CommentType = {
 			fromAddr,
@@ -132,12 +132,12 @@ const NFTComments = ({
 			nftId: nftId,
 			timestamp: timestamp.toISOString(),
 			message,
-		};
-		let newLoadedComments: CommentType[] = [...loadedComments]; // copy the old array
-		newLoadedComments = [newComment].concat(newLoadedComments); // place new comment in 0 index
-		console.log(newLoadedComments);
-		setLoadedComments(newLoadedComments);
-	};
+		}
+		let newLoadedComments: CommentType[] = [...loadedComments] // copy the old array
+		newLoadedComments = [newComment].concat(newLoadedComments) // place new comment in 0 index
+		console.log(newLoadedComments)
+		setLoadedComments(newLoadedComments)
+	}
 
 	return (
 		<>
@@ -180,7 +180,7 @@ const NFTComments = ({
 				</>
 			))}
 		</>
-	);
-};
+	)
+}
 
-export default NFTComments;
+export default NFTComments

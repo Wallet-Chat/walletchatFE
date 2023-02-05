@@ -18,42 +18,42 @@ import {
 	Tooltip,
 	useDisclosure,
 	useToast,
-} from '@chakra-ui/react';
-import { IconBrandTwitter, IconExternalLink, IconPhoto } from '@tabler/icons';
-import pluralize from 'pluralize';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useParams, NavLink, Route, Routes, useMatch } from 'react-router-dom';
-import equal from 'fast-deep-equal/es6';
+} from '@chakra-ui/react'
+import { IconBrandTwitter, IconExternalLink, IconPhoto } from '@tabler/icons'
+import pluralize from 'pluralize'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { useParams, NavLink, Route, Routes, useMatch } from 'react-router-dom'
+import equal from 'fast-deep-equal/es6'
 
-import CommunityGroupChat from './components/CommunityGroupChat';
-import CommunityTweets from './components/CommunityTweets';
-import { useHover } from '../../../../helpers/useHover';
-import IconDiscord from '../../../../images/icon-products/icon-discord.svg';
-import CommunityType from '../../../../types/Community';
-import Resizer from 'react-image-file-resizer';
-import { useWallet } from '../../../../context/WalletProvider';
+import CommunityGroupChat from './components/CommunityGroupChat'
+import CommunityTweets from './components/CommunityTweets'
+import { useHover } from '../../../../helpers/useHover'
+import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
+import CommunityType from '../../../../types/Community'
+import Resizer from 'react-image-file-resizer'
+import { useWallet } from '../../../../context/WalletProvider'
 
 const CommunityByName = () => {
-	let { community = '' } = useParams();
-	const match = useMatch('/community/:community/*');
-	const { account } = useWallet();
+	let { community = '' } = useParams()
+	const match = useMatch('/community/:community/*')
+	const { account } = useWallet()
 
-	const [communityData, setCommunityData] = useState<CommunityType>();
+	const [communityData, setCommunityData] = useState<CommunityType>()
 	const [
 		isFetchingCommunityDataFirstTime,
 		setIsFetchingCommunityDataFirstTime,
-	] = useState(true);
-	const [joined, setJoined] = useState<boolean | null>(null);
-	const [joinBtnIsHovering, joinBtnHoverProps] = useHover();
-	const [isFetchingJoining, setIsFetchingJoining] = useState(false);
+	] = useState(true)
+	const [joined, setJoined] = useState<boolean | null>(null)
+	const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
+	const [isFetchingJoining, setIsFetchingJoining] = useState(false)
 
-	const { isOpen, onOpen, onClose } = useDisclosure();
+	const { isOpen, onOpen, onClose } = useDisclosure()
 
-	const [file, setFile] = useState<Blob | MediaSource>();
-	const [filePreview, setFilePreview] = useState('');
-	const [isFetchingAvatar, setIsFetchingAvatar] = useState(false);
-	const [isSuccessAvatar, setIsSuccessAvatar] = useState(false);
-	const toast = useToast();
+	const [file, setFile] = useState<Blob | MediaSource>()
+	const [filePreview, setFilePreview] = useState('')
+	const [isFetchingAvatar, setIsFetchingAvatar] = useState(false)
+	const [isSuccessAvatar, setIsSuccessAvatar] = useState(false)
+	const toast = useToast()
 
 	const resizeFile = (file: Blob) =>
 		new Promise((resolve) => {
@@ -65,32 +65,32 @@ const CommunityByName = () => {
 				100,
 				0,
 				(uri) => {
-					resolve(uri);
+					resolve(uri)
 				},
 				'base64'
-			);
-		});
+			)
+		})
 
 	useEffect(() => {
-		getCommunityData();
-	}, [account, community]);
+		getCommunityData()
+	}, [account, community])
 
 	useEffect(() => {
 		// Interval needs to reset else getChatData will use old state
 		const interval = setInterval(() => {
-			getCommunityData();
-		}, 5000); // every 5s
+			getCommunityData()
+		}, 5000) // every 5s
 
 		return () => {
-			clearInterval(interval);
-		};
-	}, [communityData, account]);
+			clearInterval(interval)
+		}
+	}, [communityData, account])
 
 	const getCommunityData = () => {
 		if (account) {
 			if (!account) {
-				console.log('No account connected');
-				return;
+				console.log('No account connected')
+				return
 			}
 			fetch(
 				`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community/${community}/${account}`,
@@ -106,35 +106,35 @@ const CommunityByName = () => {
 				.then((response) => response.json())
 				.then(async (data: CommunityType) => {
 					if (!equal(data?.messages, communityData?.messages)) {
-						console.log('✅[GET][Community]:', data);
+						console.log('✅[GET][Community]:', data)
 						setCommunityData({
 							...data,
 							twitter: data?.social?.find((i) => i.type === 'twitter')
 								?.username,
 							discord: data?.social?.find((i) => i.type === 'discord')
 								?.username,
-						});
+						})
 					}
 					if (data?.joined === true && joined !== true) {
-						setJoined(true);
+						setJoined(true)
 					} else if (data?.joined === false && joined !== false) {
-						setJoined(false);
+						setJoined(false)
 					}
 				})
 				.catch((error) => {
-					console.error('🚨[GET][Community]:', error);
+					console.error('🚨[GET][Community]:', error)
 				})
 				.finally(() => {
 					if (isFetchingCommunityDataFirstTime) {
-						setIsFetchingCommunityDataFirstTime(false);
+						setIsFetchingCommunityDataFirstTime(false)
 					}
-				});
+				})
 		}
-	};
+	}
 
 	const joinGroup = () => {
 		if (!isFetchingJoining) {
-			setIsFetchingJoining(true);
+			setIsFetchingJoining(true)
 			fetch(
 				`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`,
 				{
@@ -152,21 +152,21 @@ const CommunityByName = () => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[POST][Community][Join]', response);
-					setJoined(true);
+					console.log('✅[POST][Community][Join]', response)
+					setJoined(true)
 				})
 				.catch((error) => {
-					console.error('🚨[POST][Community][Join]:', error);
+					console.error('🚨[POST][Community][Join]:', error)
 				})
 				.then(() => {
-					setIsFetchingJoining(false);
-				});
+					setIsFetchingJoining(false)
+				})
 		}
-	};
+	}
 
 	const leaveGroup = () => {
 		if (!isFetchingJoining) {
-			setIsFetchingJoining(true);
+			setIsFetchingJoining(true)
 			fetch(
 				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`,
 				{
@@ -184,44 +184,44 @@ const CommunityByName = () => {
 			)
 				.then((response) => response.json())
 				.then((count: number) => {
-					console.log('✅[POST][Community][Leave]');
-					setJoined(false);
+					console.log('✅[POST][Community][Leave]')
+					setJoined(false)
 				})
 				.catch((error) => {
-					console.error('🚨[POST][Community][Leave]:', error);
+					console.error('🚨[POST][Community][Leave]:', error)
 				})
 				.then(() => {
-					setIsFetchingJoining(false);
-				});
+					setIsFetchingJoining(false)
+				})
 		}
-	};
+	}
 
 	useEffect(() => {
 		// create the preview
 		if (file) {
-			const objectUrl = URL.createObjectURL(file);
-			setFilePreview(objectUrl);
+			const objectUrl = URL.createObjectURL(file)
+			setFilePreview(objectUrl)
 
 			// free memory whenever this component is unmounted
-			return () => URL.revokeObjectURL(objectUrl);
+			return () => URL.revokeObjectURL(objectUrl)
 		}
-	}, [file]);
+	}, [file])
 
 	const upload = async (e: ChangeEvent<HTMLInputElement>) => {
-		console.warn(e.target.files);
-		const files = e.target.files;
+		console.warn(e.target.files)
+		const files = e.target.files
 		if (files && files.length !== 0) {
-			setFile(files[0]);
-			const image = await resizeFile(files[0]);
+			setFile(files[0])
+			const image = await resizeFile(files[0])
 
-			setIsFetchingAvatar(true);
+			setIsFetchingAvatar(true)
 			if (isSuccessAvatar) {
-				setIsSuccessAvatar(false);
+				setIsSuccessAvatar(false)
 			}
 
 			if (!community) {
-				console.log('Missing community name');
-				return;
+				console.log('Missing community name')
+				return
 			}
 
 			fetch(
@@ -241,7 +241,7 @@ const CommunityByName = () => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[POST][Image]:', response);
+					console.log('✅[POST][Image]:', response)
 					toast({
 						title: 'Success',
 						description: 'Community avatar updated',
@@ -249,11 +249,11 @@ const CommunityByName = () => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
-					setIsSuccessAvatar(true);
+					})
+					setIsSuccessAvatar(true)
 				})
 				.catch((error) => {
-					console.error('🚨[POST][Image]:', error);
+					console.error('🚨[POST][Image]:', error)
 					toast({
 						title: 'Error',
 						description: `Image Not Updated - Unknown error`,
@@ -261,13 +261,13 @@ const CommunityByName = () => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
+					})
 				})
 				.then(() => {
-					setIsFetchingAvatar(false);
-				});
+					setIsFetchingAvatar(false)
+				})
 		}
-	};
+	}
 
 	return (
 		<Flex flexDirection='column' background='white' height='100vh' flex='1'>
@@ -606,11 +606,11 @@ const CommunityByName = () => {
 							variant={joined ? 'black' : 'outline'}
 							isLoading={isFetchingJoining}
 							onClick={() => {
-								if (joined === null) return;
+								if (joined === null) return
 								else if (joined === false) {
-									joinGroup();
+									joinGroup()
 								} else if (joined === true) {
-									leaveGroup();
+									leaveGroup()
 								}
 							}}
 							// @ts-ignore
@@ -636,7 +636,7 @@ const CommunityByName = () => {
 				</ModalContent>
 			</Modal>
 		</Flex>
-	);
-};
+	)
+}
 
-export default CommunityByName;
+export default CommunityByName

@@ -4,7 +4,7 @@ import {
 	SkeletonCircle,
 	SkeletonText,
 	Stack,
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 
 export default function InboxListLoadingSkeleton() {
 	return (
@@ -37,5 +37,5 @@ export default function InboxListLoadingSkeleton() {
 				))}
 			</Box>
 		</Box>
-	);
+	)
 }

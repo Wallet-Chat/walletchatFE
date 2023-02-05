@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
 	Divider,
 	Flex,
@@ -9,21 +9,21 @@ import {
 	MenuItem,
 	MenuList,
 	Text,
-} from '@chakra-ui/react';
-import { IconExternalLink, IconMessage } from '@tabler/icons';
-import { Link as RLink } from 'react-router-dom';
+} from '@chakra-ui/react'
+import { IconExternalLink, IconMessage } from '@tabler/icons'
+import { Link as RLink } from 'react-router-dom'
 
-import IconOpenSea from '../images/icon-products/icon-opensea.svg';
-import IconGemXyz from '../images/icon-products/icon-gemxyz.svg';
-import IconEtherscan from '../images/icon-products/icon-etherscan.svg';
-import { truncateAddress } from '../helpers/truncateString';
+import IconOpenSea from '../images/icon-products/icon-opensea.svg'
+import IconGemXyz from '../images/icon-products/icon-gemxyz.svg'
+import IconEtherscan from '../images/icon-products/icon-etherscan.svg'
+import { truncateAddress } from '../helpers/truncateString'
 
 const UserProfileContextMenu = ({
 	address,
 	children,
 }: {
-	address: string;
-	children?: React.ReactNode;
+	address: string
+	children?: React.ReactNode
 }) => {
 	return (
 		<Menu isLazy>
@@ -103,7 +103,7 @@ const UserProfileContextMenu = ({
 				</Link>
 			</MenuList>
 		</Menu>
-	);
-};
+	)
+}
 
-export default UserProfileContextMenu;
+export default UserProfileContextMenu

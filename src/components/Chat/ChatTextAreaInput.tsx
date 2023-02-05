@@ -1,28 +1,28 @@
-import { Button, Flex, FormControl } from '@chakra-ui/react';
-import { IconSend } from '@tabler/icons';
-import React, { KeyboardEvent, useState } from 'react';
-import ReactTextareaAutosize from 'react-textarea-autosize';
+import { Button, Flex, FormControl } from '@chakra-ui/react'
+import { IconSend } from '@tabler/icons'
+import React, { KeyboardEvent, useState } from 'react'
+import ReactTextareaAutosize from 'react-textarea-autosize'
 
 const ChatTextAreaInput = ({
 	isSendingMessage,
 	sendMessage,
 }: {
-	isSendingMessage: boolean;
-	sendMessage: (msg: string) => void;
+	isSendingMessage: boolean
+	sendMessage: (msg: string) => void
 }) => {
-	const [msgInput, setMsgInput] = useState<string>('');
+	const [msgInput, setMsgInput] = useState<string>('')
 
 	const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (event.key === 'Enter') {
-			event.preventDefault();
-			handleSendMessage();
+			event.preventDefault()
+			handleSendMessage()
 		}
-	};
+	}
 
 	const handleSendMessage = () => {
-		sendMessage && sendMessage(msgInput);
-		setMsgInput('');
-	};
+		sendMessage && sendMessage(msgInput)
+		setMsgInput('')
+	}
 
 	return (
 		<Flex>
@@ -56,7 +56,7 @@ const ChatTextAreaInput = ({
 				</Button>
 			</Flex>
 		</Flex>
-	);
-};
+	)
+}
 
-export default React.memo(ChatTextAreaInput);
+export default React.memo(ChatTextAreaInput)

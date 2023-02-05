@@ -1,1 +1,1 @@
-export { default } from './CommunityTweets';
+export { default } from './CommunityTweets'

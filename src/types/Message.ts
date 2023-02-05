@@ -1,4 +1,4 @@
-import { Encrypted } from 'eth-crypto';
+import { Encrypted } from 'eth-crypto'
 
 // export default interface MessageType {
 //    message: string
@@ -10,61 +10,61 @@ import { Encrypted } from 'eth-crypto';
 // }
 
 interface MessageSkeletonType {
-	sender_name?: string; // name of sender
-	type?: string;
-	context_type?: string;
-	message: string;
-	fromaddr: string;
-	timestamp: string;
-	read: boolean;
-	id?: number;
+	sender_name?: string // name of sender
+	type?: string
+	context_type?: string
+	message: string
+	fromaddr: string
+	timestamp: string
+	read: boolean
+	id?: number
 }
 
 export interface MessageType extends MessageSkeletonType {
-	toaddr: string;
-	nftaddr: string;
-	nftid: string;
+	toaddr: string
+	nftaddr: string
+	nftid: string
 }
 
 export interface GroupMessageType extends MessageSkeletonType {
-	nftaddr: string;
+	nftaddr: string
 }
 
 export interface MessageUIType {
-	sender_name?: string; // name of sender
-	message?: string;
-	fromAddr?: string;
-	toAddr?: string;
-	timestamp: string;
-	read?: boolean;
-	id?: number;
-	img?: string;
-	position?: string;
-	isFetching?: boolean;
-	unread?: number;
-	nftAddr?: string | null;
-	nftId?: string | null;
-	type?: string;
-	context_type?: string;
-	name?: string;
-	logo?: string;
+	sender_name?: string // name of sender
+	message?: string
+	fromAddr?: string
+	toAddr?: string
+	timestamp: string
+	read?: boolean
+	id?: number
+	img?: string
+	position?: string
+	isFetching?: boolean
+	unread?: number
+	nftAddr?: string | null
+	nftId?: string | null
+	type?: string
+	context_type?: string
+	name?: string
+	logo?: string
 }
 
 export interface MessageUIDataType {
-	[key: string]: MessageUIType[];
+	[key: string]: MessageUIType[]
 }
 
 export interface SettingsType {
-	walletaddr: string;
-	publickey: string;
+	walletaddr: string
+	publickey: string
 }
 
 export interface PfpType {
-	walletaddr: string;
-	imageB64: string;
+	walletaddr: string
+	imageB64: string
 }
 
 export interface EncryptedMsgBlock {
-	to: Encrypted;
-	from: Encrypted;
+	to: Encrypted
+	from: Encrypted
 }

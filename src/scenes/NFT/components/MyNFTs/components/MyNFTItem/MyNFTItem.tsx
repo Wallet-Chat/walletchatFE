@@ -1,26 +1,18 @@
-import {
-	Box,
-	Button,
-	Image,
-	Text,
-	Link,
-	Flex,
-	Tooltip,
-} from '@chakra-ui/react';
-import { IconArrowNarrowRight } from '@tabler/icons';
-import { Link as RLink } from 'react-router-dom';
-import { truncateAddress } from '../../../../../../helpers/truncateString';
-import NFT from '../../../../../../types/NFT';
-import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg';
-import { chains } from '../../../../../../constants';
+import { Box, Button, Image, Text, Link, Flex, Tooltip } from '@chakra-ui/react'
+import { IconArrowNarrowRight } from '@tabler/icons'
+import { Link as RLink } from 'react-router-dom'
+import { truncateAddress } from '../../../../../../helpers/truncateString'
+import NFT from '../../../../../../types/NFT'
+import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg'
+import { chains } from '../../../../../../constants'
 
 export default function MyNFTItem({ nft }: { nft: NFT }) {
-	let chain, blockExplorerUrl, chainLogo, chainName;
+	let chain, blockExplorerUrl, chainLogo, chainName
 	if (nft?.chain_id) {
-		chain = chains[nft.chain_id];
-		blockExplorerUrl = nft.chain_id && chain?.block_explorer_url;
-		chainLogo = chain?.logo;
-		chainName = chain?.name;
+		chain = chains[nft.chain_id]
+		blockExplorerUrl = nft.chain_id && chain?.block_explorer_url
+		chainLogo = chain?.logo
+		chainName = chain?.name
 	}
 
 	return (
@@ -110,5 +102,5 @@ export default function MyNFTItem({ nft }: { nft: NFT }) {
 				)}
 			</Box>
 		</Flex>
-	);
+	)
 }

@@ -1,4 +1,4 @@
-import { Box, Flex, Skeleton, Stack } from '@chakra-ui/react';
+import { Box, Flex, Skeleton, Stack } from '@chakra-ui/react'
 
 export default function InboxSkeleton() {
 	return (
@@ -44,5 +44,5 @@ export default function InboxSkeleton() {
 				))}
 			</Flex>
 		</Box>
-	);
+	)
 }

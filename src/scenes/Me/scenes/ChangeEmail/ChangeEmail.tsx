@@ -14,34 +14,34 @@ import {
 	Text,
 	toast,
 	useToast,
-} from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { IconSend } from '@tabler/icons';
-import { useWallet } from '../../../../context/WalletProvider';
+} from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { IconSend } from '@tabler/icons'
+import { useWallet } from '../../../../context/WalletProvider'
 
 const ChangeEmail = ({ account }: { account: string }) => {
 	const {
 		handleSubmit,
 		register,
 		formState: { errors },
-	} = useForm();
+	} = useForm()
 
-	let navigate = useNavigate();
-	const toast = useToast();
+	let navigate = useNavigate()
+	const toast = useToast()
 
-	const { email: _email, setEmail: globalSetEmail } = useWallet();
-	const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet();
-	const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet();
-	var dmBool = _notifyDM === 'true';
-	var dailyBool = _notify24 === 'true';
-	const [email, setEmail] = useState('');
-	const [isFetching, setIsFetching] = useState(false);
+	const { email: _email, setEmail: globalSetEmail } = useWallet()
+	const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
+	const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
+	var dmBool = _notifyDM === 'true'
+	var dailyBool = _notify24 === 'true'
+	const [email, setEmail] = useState('')
+	const [isFetching, setIsFetching] = useState(false)
 
 	const handleChangeOne = (checked: boolean) => {
 		//setCheckedItems([checked, checkedItems[1]])
-		globalSetNotifyDM(checked.toString());
+		globalSetNotifyDM(checked.toString())
 
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`,
@@ -60,7 +60,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
 		)
 			.then((response) => response.json())
 			.then((response) => {
-				console.log('✅[POST][NotifyDM]:', response);
+				console.log('✅[POST][NotifyDM]:', response)
 				toast({
 					title: 'Success',
 					description: `Notifications updated!`,
@@ -68,16 +68,16 @@ const ChangeEmail = ({ account }: { account: string }) => {
 					position: 'top',
 					duration: 2000,
 					isClosable: true,
-				});
+				})
 			})
 			.catch((error) => {
-				console.error('🚨[POST][NotifyDM]:', error);
-			});
-	};
+				console.error('🚨[POST][NotifyDM]:', error)
+			})
+	}
 
 	const handleChangeTwo = (checked: boolean) => {
 		//setCheckedItems([checkedItems[0], checked])
-		globalSetNotify24(checked.toString());
+		globalSetNotify24(checked.toString())
 
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`,
@@ -96,7 +96,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
 		)
 			.then((response) => response.json())
 			.then((response) => {
-				console.log('✅[POST][Notify24]:', response);
+				console.log('✅[POST][Notify24]:', response)
 				toast({
 					title: 'Success',
 					description: `Notifications updated!`,
@@ -104,16 +104,16 @@ const ChangeEmail = ({ account }: { account: string }) => {
 					position: 'top',
 					duration: 2000,
 					isClosable: true,
-				});
+				})
 			})
 			.catch((error) => {
-				console.error('🚨[POST][Notify24]:', error);
-			});
-	};
+				console.error('🚨[POST][Notify24]:', error)
+			})
+	}
 
 	const onSubmit = (values: any) => {
 		if (values?.email) {
-			setIsFetching(true);
+			setIsFetching(true)
 
 			fetch(
 				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`,
@@ -134,7 +134,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[POST][Email]:', response);
+					console.log('✅[POST][Email]:', response)
 					toast({
 						title: 'Success',
 						description: `Email updated to ${email}`,
@@ -142,18 +142,18 @@ const ChangeEmail = ({ account }: { account: string }) => {
 						position: 'top',
 						duration: 2000,
 						isClosable: true,
-					});
-					globalSetEmail(values.email);
-					navigate('/me/verify-email');
+					})
+					globalSetEmail(values.email)
+					navigate('/me/verify-email')
 				})
 				.catch((error) => {
-					console.error('🚨[POST][Email]:', error);
+					console.error('🚨[POST][Email]:', error)
 				})
 				.then(() => {
-					setIsFetching(false);
-				});
+					setIsFetching(false)
+				})
 		}
-	};
+	}
 
 	return (
 		<Box p={6} pt={16} background='white' width='100%'>
@@ -227,7 +227,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
 				</FormControl>
 			</form>
 		</Box>
-	);
-};
+	)
+}
 
-export default ChangeEmail;
+export default ChangeEmail

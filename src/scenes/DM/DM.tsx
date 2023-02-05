@@ -1,12 +1,12 @@
-import { Flex, Tag } from '@chakra-ui/react';
-import { Route, Routes } from 'react-router';
-import { useIsMobileView } from '../../context/IsMobileViewProvider';
-import CreateNewDM from './scenes/CreateNewDM';
-import DMByAddress from './scenes/DMByAddress';
-import DMInboxList from './scenes/DMInboxList';
+import { Flex, Tag } from '@chakra-ui/react'
+import { Route, Routes } from 'react-router'
+import { useIsMobileView } from '../../context/IsMobileViewProvider'
+import CreateNewDM from './scenes/CreateNewDM'
+import DMByAddress from './scenes/DMByAddress'
+import DMInboxList from './scenes/DMInboxList'
 
 const DM = () => {
-	const { isMobileView } = useIsMobileView();
+	const { isMobileView } = useIsMobileView()
 
 	return (
 		<Routes>
@@ -56,7 +56,7 @@ const DM = () => {
 				}
 			/>
 		</Routes>
-	);
-};
+	)
+}
 
-export default DM;
+export default DM

@@ -7,7 +7,7 @@ import {
 	Image,
 	Spinner,
 	Link as CLink,
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 import {
 	KeyboardEvent,
 	useCallback,
@@ -15,76 +15,76 @@ import {
 	useMemo,
 	useRef,
 	useState,
-} from 'react';
-import { useParams, Link } from 'react-router-dom';
-import Web3 from 'web3';
+} from 'react'
+import { useParams, Link } from 'react-router-dom'
+import Web3 from 'web3'
 import {
 	IconArrowLeft,
 	IconCheck,
 	IconCopy,
 	IconExternalLink,
 	IconSend,
-} from '@tabler/icons';
-import Blockies from 'react-blockies';
-import TextareaAutosize from 'react-textarea-autosize';
+} from '@tabler/icons'
+import Blockies from 'react-blockies'
+import TextareaAutosize from 'react-textarea-autosize'
 
-import { MessageType, MessageUIType } from '../../../../types/Message';
-import { truncateAddress } from '../../../../helpers/truncateString';
-import { isMobile } from 'react-device-detect';
-import equal from 'fast-deep-equal/es6';
-import { DottedBackground } from '../../../../styled/DottedBackground';
-import { BlockieWrapper } from '../../../../styled/BlockieWrapper';
-import ChatMessage from '../../../../components/Chat/ChatMessage';
+import { MessageType, MessageUIType } from '../../../../types/Message'
+import { truncateAddress } from '../../../../helpers/truncateString'
+import { isMobile } from 'react-device-detect'
+import equal from 'fast-deep-equal/es6'
+import { DottedBackground } from '../../../../styled/DottedBackground'
+import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
+import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../services/ipfs'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 //import sigUtil from 'eth-sig-util'
-import lit from '../../../../utils/lit';
-import ScrollToBottom from 'react-scroll-to-bottom';
-import { useWallet } from '../../../../context/WalletProvider';
+import lit from '../../../../utils/lit'
+import ScrollToBottom from 'react-scroll-to-bottom'
+import { useWallet } from '../../../../context/WalletProvider'
 
 const DMByAddress = () => {
-	let { address: toAddr = '' } = useParams();
-	let { account, web3, isAuthenticated } = useWallet();
+	let { address: toAddr = '' } = useParams()
+	let { account, web3, isAuthenticated } = useWallet()
 
 	// const [ens, setEns] = useState<string>('')
-	const [name, setName] = useState<string>('');
-	const [pfpDataToAddr, setPfpDataToAddr] = useState<string>();
-	const [pfpDataFromAddr, setPfpDataFromAddr] = useState<string>();
-	const [prevAddr, setPrevAddr] = useState<string>('');
-	const [sentMsg, setSentMsg] = useState(false);
-	const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([]);
-	const [msgInput, setMsgInput] = useState<string>('');
-	const [isSendingMessage, setIsSendingMessage] = useState(false);
-	const [copiedAddr, setCopiedAddr] = useState(false);
+	const [name, setName] = useState<string>('')
+	const [pfpDataToAddr, setPfpDataToAddr] = useState<string>()
+	const [pfpDataFromAddr, setPfpDataFromAddr] = useState<string>()
+	const [prevAddr, setPrevAddr] = useState<string>('')
+	const [sentMsg, setSentMsg] = useState(false)
+	const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+	const [msgInput, setMsgInput] = useState<string>('')
+	const [isSendingMessage, setIsSendingMessage] = useState(false)
+	const [copiedAddr, setCopiedAddr] = useState(false)
 	const [chatData, setChatData] = useState<MessageType[]>(
 		new Array<MessageType>()
-	);
+	)
 	const [encryptedChatData, setEncChatData] = useState<MessageType[]>(
 		new Array<MessageType>()
-	);
-	const [isFetchingChatData, setIsFetchingChatData] = useState(false);
+	)
+	const [isFetchingChatData, setIsFetchingChatData] = useState(false)
 
-	const timerRef: { current: NodeJS.Timeout | null } = useRef(null);
+	const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
 
-	const scrollToBottomRef = useRef<HTMLDivElement>(null);
+	const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
-	let semaphore = false;
+	let semaphore = false
 	//let isFetchingDataFirstTime = true;
 
 	useEffect(() => {
-		console.log('useEffect scroll');
+		console.log('useEffect scroll')
 		// Scroll to bottom of chat if user sends a message
 		if (scrollToBottomRef?.current) {
 			const { scrollTop, scrollHeight, clientHeight } =
-				scrollToBottomRef.current;
+				scrollToBottomRef.current
 			if (scrollTop + clientHeight === scrollHeight) {
 				console.log(
 					'reached bottom: st, ch, SH',
 					scrollTop,
 					clientHeight,
 					scrollHeight
-				);
-				scrollToBottomRef.current.scrollIntoView();
+				)
+				scrollToBottomRef.current.scrollIntoView()
 			}
 
 			// if(scrollToBottomRef.current.scrollHeight - scrollToBottomRef.current.scrollTop === scrollToBottomRef.current.clientHeight) {
@@ -93,7 +93,7 @@ const DMByAddress = () => {
 			// }
 			//setSentMsg(false)
 		}
-	}, [loadedMsgs]);
+	}, [loadedMsgs])
 
 	useEffect(() => {
 		if (!pfpDataFromAddr) {
@@ -110,18 +110,18 @@ const DMByAddress = () => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[GET][Image FromAddr]:', account, response);
+					console.log('✅[GET][Image FromAddr]:', account, response)
 					if (response[0]?.base64data) {
-						setPfpDataFromAddr(response[0].base64data);
-						localStorage['pfpData_' + account] = response[0].base64data;
+						setPfpDataFromAddr(response[0].base64data)
+						localStorage['pfpData_' + account] = response[0].base64data
 					} else {
-						setPfpDataFromAddr('');
-						console.log('cleared from PFP');
+						setPfpDataFromAddr('')
+						console.log('cleared from PFP')
 					}
 				})
 				.catch((error) => {
-					console.error('🚨[GET][Image FromAddr]:', error);
-				});
+					console.error('🚨[GET][Image FromAddr]:', error)
+				})
 		}
 
 		if (toAddr) {
@@ -139,18 +139,18 @@ const DMByAddress = () => {
 				)
 					.then((response) => response.json())
 					.then((response) => {
-						console.log('✅[GET][Image ToAddr]:', toAddr, response);
+						console.log('✅[GET][Image ToAddr]:', toAddr, response)
 						if (response[0]?.base64data) {
-							setPfpDataToAddr(response[0].base64data);
-							localStorage['pfpData_' + toAddr] = response[0].base64data;
+							setPfpDataToAddr(response[0].base64data)
+							localStorage['pfpData_' + toAddr] = response[0].base64data
 						} else {
-							setPfpDataToAddr('');
-							console.log('cleared to PFP');
+							setPfpDataToAddr('')
+							console.log('cleared to PFP')
 						}
 					})
 					.catch((error) => {
-						console.error('🚨[GET][Image]:', error);
-					});
+						console.error('🚨[GET][Image]:', error)
+					})
 			}
 
 			//load chat data from localStorage to chatData
@@ -160,14 +160,14 @@ const DMByAddress = () => {
 							localStorage['dmData_' + account + '_' + toAddr.toLowerCase()]
 					  )
 					: []
-			);
+			)
 			setEncChatData(
 				localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()]
 					? JSON.parse(
 							localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()]
 					  )
 					: []
-			);
+			)
 
 			fetch(
 				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`,
@@ -182,59 +182,59 @@ const DMByAddress = () => {
 			)
 				.then((response) => response.json())
 				.then((response) => {
-					console.log('✅[GET][Name]:', response);
-					if (response[0]?.name) setName(response[0].name);
-					else setName('User Not Yet Joined');
+					console.log('✅[GET][Name]:', response)
+					if (response[0]?.name) setName(response[0].name)
+					else setName('User Not Yet Joined')
 				})
 				.catch((error) => {
-					console.error('🚨[GET][Name]:', error);
-				});
+					console.error('🚨[GET][Name]:', error)
+				})
 		}
-	}, [toAddr]);
+	}, [toAddr])
 
 	const getChatData = useCallback(() => {
 		// GET request to get off-chain data for RX user
 		if (!process.env.REACT_APP_REST_API) {
-			console.log('REST API url not in .env', process.env);
-			return;
+			console.log('REST API url not in .env', process.env)
+			return
 		}
 		if (!account) {
-			console.log('No account connected');
-			return;
+			console.log('No account connected')
+			return
 		}
 		if (!isAuthenticated) {
-			console.log('Not authenticated');
-			return;
+			console.log('Not authenticated')
+			return
 		}
 		if (!toAddr) {
-			console.log('Recipient address is not available');
-			return;
+			console.log('Recipient address is not available')
+			return
 		}
 		if (semaphore) {
 			console.log(
 				'preventing re-entrant calls if fetching is slow (happens at statup with decryption sometimes)'
-			);
-			return;
+			)
+			return
 		}
-		setIsFetchingChatData(true);
+		setIsFetchingChatData(true)
 
 		//console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
 		if (toAddr != prevAddr) {
-			setPrevAddr(toAddr);
-			setIsFetchingChatData(false);
-			const temp = [] as MessageUIType[];
-			setLoadedMsgs(temp);
-			setPfpDataToAddr('');
-			return; //skip the account transition glitch
+			setPrevAddr(toAddr)
+			setIsFetchingChatData(false)
+			const temp = [] as MessageUIType[]
+			setLoadedMsgs(temp)
+			setPfpDataToAddr('')
+			return //skip the account transition glitch
 		}
-		setPrevAddr(toAddr);
-		semaphore = true;
+		setPrevAddr(toAddr)
+		semaphore = true
 
-		let lastTimeMsg = '2006-01-02T15:04:05.000Z';
+		let lastTimeMsg = '2006-01-02T15:04:05.000Z'
 		if (chatData.length > 0) {
-			lastTimeMsg = chatData[chatData.length - 1].timestamp;
+			lastTimeMsg = chatData[chatData.length - 1].timestamp
 		}
-		lastTimeMsg = encodeURIComponent(lastTimeMsg);
+		lastTimeMsg = encodeURIComponent(lastTimeMsg)
 
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
@@ -253,75 +253,75 @@ const DMByAddress = () => {
 					if (data.length > 0) {
 						//START LIT ENCRYPTION
 						localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(encryptedChatData.concat(data));
-						setEncChatData(encryptedChatData.concat(data));
+							JSON.stringify(encryptedChatData.concat(data))
+						setEncChatData(encryptedChatData.concat(data))
 
-						const replica = JSON.parse(JSON.stringify(data));
+						const replica = JSON.parse(JSON.stringify(data))
 						// Get data from LIT and replace the message with the decrypted text
 						for (let i = 0; i < replica.length; i++) {
 							if (replica[i].encrypted_sym_lit_key) {
 								//only needed for mixed DB with plain and encrypted data
 								const _accessControlConditions = JSON.parse(
 									replica[i].lit_access_conditions
-								);
+								)
 
 								//console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
 								const rawmsg = await lit.decryptString(
 									lit.b64toBlob(replica[i].message),
 									replica[i].encrypted_sym_lit_key,
 									_accessControlConditions
-								);
-								replica[i].message = rawmsg.decryptedFile.toString();
+								)
+								replica[i].message = rawmsg.decryptedFile.toString()
 							}
 						}
 						//END LIT ENCRYPTION
-						let allChats = chatData.concat(replica);
-						setChatData(allChats);
+						let allChats = chatData.concat(replica)
+						setChatData(allChats)
 						localStorage['dmData_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(allChats); //store so when user switches views, data is ready
-						console.log('✅[GET][New Chat items]:', data);
+							JSON.stringify(allChats) //store so when user switches views, data is ready
+						console.log('✅[GET][New Chat items]:', data)
 					}
 				} else {
 					if (equal(data, encryptedChatData) === false) {
-						console.log('✅[GET][Chat items]:', data);
+						console.log('✅[GET][Chat items]:', data)
 						//START LIT ENCRYPTION
 						localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(data);
-						setEncChatData(data);
+							JSON.stringify(data)
+						setEncChatData(data)
 
-						const replica = JSON.parse(JSON.stringify(data));
+						const replica = JSON.parse(JSON.stringify(data))
 						// Get data from LIT and replace the message with the decrypted text
 						for (let i = 0; i < replica.length; i++) {
 							if (replica[i].encrypted_sym_lit_key) {
 								//only needed for mixed DB with plain and encrypted data
 								const _accessControlConditions = JSON.parse(
 									replica[i].lit_access_conditions
-								);
+								)
 
 								//console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
 								const rawmsg = await lit.decryptString(
 									lit.b64toBlob(replica[i].message),
 									replica[i].encrypted_sym_lit_key,
 									_accessControlConditions
-								);
-								replica[i].message = rawmsg.decryptedFile.toString();
+								)
+								replica[i].message = rawmsg.decryptedFile.toString()
 							}
 						}
-						setChatData(replica);
+						setChatData(replica)
 						localStorage['dmData_' + account + '_' + toAddr.toLowerCase()] =
-							JSON.stringify(replica);
+							JSON.stringify(replica)
 						//END LIT ENCRYPTION
 						//setChatData(data)  //use when not using encryption
 					}
 				}
-				setIsFetchingChatData(false);
-				semaphore = false;
+				setIsFetchingChatData(false)
+				semaphore = false
 			})
 			.catch((error) => {
-				console.error('🚨[GET][Chat items]:', error);
-				setIsFetchingChatData(false);
-				semaphore = false;
-			});
+				console.error('🚨[GET][Chat items]:', error)
+				setIsFetchingChatData(false)
+				semaphore = false
+			})
 		//since we are only loading new messages, we need to update read status async and even after we aren't get new messages
 		//in the case its a while before a user reads the message
 		fetch(
@@ -338,53 +338,53 @@ const DMByAddress = () => {
 			.then((response) => response.json())
 			.then(async (data: Int32Array[]) => {
 				let localRead =
-					localStorage['dmReadIDs_' + account + '_' + toAddr.toLowerCase()];
+					localStorage['dmReadIDs_' + account + '_' + toAddr.toLowerCase()]
 				if (localRead != data) {
 					if (data.length > 0) {
 						let localData =
-							localStorage['dmData_' + account + '_' + toAddr.toLowerCase()];
+							localStorage['dmData_' + account + '_' + toAddr.toLowerCase()]
 						if (localData) {
-							localData = JSON.parse(localData);
+							localData = JSON.parse(localData)
 							for (let j = 0; j < localData.length; j++) {
 								for (let i = 0; i < data.length; i++) {
 									if (localData[j].Id == data[i]) {
-										localData[j].read = true;
-										break;
+										localData[j].read = true
+										break
 									}
 								}
 							}
-							setChatData(localData);
+							setChatData(localData)
 							localStorage[
 								'dmReadIDs_' + account + '_' + toAddr.toLowerCase()
-							] = data;
+							] = data
 							localStorage['dmData_' + account + '_' + toAddr.toLowerCase()] =
-								JSON.stringify(localData); //store so when user switches views, data is ready
-							console.log('✅[GET][Updated Read Items]:', data);
+								JSON.stringify(localData) //store so when user switches views, data is ready
+							console.log('✅[GET][Updated Read Items]:', data)
 						}
 					}
 				}
 			})
 			.catch((error) => {
-				console.error('🚨[GET][Update Read items]:', error);
-				setIsFetchingChatData(false);
-			});
-	}, [account, chatData, isAuthenticated, toAddr]);
+				console.error('🚨[GET][Update Read items]:', error)
+				setIsFetchingChatData(false)
+			})
+	}, [account, chatData, isAuthenticated, toAddr])
 
 	useEffect(() => {
-		getChatData();
-	}, [isAuthenticated, account, toAddr, getChatData]);
+		getChatData()
+	}, [isAuthenticated, account, toAddr, getChatData])
 
 	useEffect(() => {
 		// Interval needs to reset else getChatData will use old state
 		const interval = setInterval(() => {
-			getChatData();
-		}, 5000); // every 5s
+			getChatData()
+		}, 5000) // every 5s
 
-		return () => clearInterval(interval);
-	}, [isAuthenticated, account, toAddr, chatData, getChatData]);
+		return () => clearInterval(interval)
+	}, [isAuthenticated, account, toAddr, chatData, getChatData])
 
 	useEffect(() => {
-		const toAddToUI = [] as MessageUIType[];
+		const toAddToUI = [] as MessageUIType[]
 
 		for (let i = 0; i < chatData.length; i++) {
 			if (
@@ -404,7 +404,7 @@ const DMByAddress = () => {
 					isFetching: false,
 					nftAddr: chatData[i].nftaddr,
 					nftId: chatData[i].nftid,
-				});
+				})
 			} else if (
 				chatData[i] &&
 				chatData[i].toaddr &&
@@ -422,39 +422,39 @@ const DMByAddress = () => {
 					isFetching: false,
 					nftAddr: chatData[i].nftaddr,
 					nftId: chatData[i].nftid,
-				});
+				})
 			}
 		}
 		if (!equal(toAddToUI, chatData)) {
-			setLoadedMsgs(toAddToUI);
+			setLoadedMsgs(toAddToUI)
 		}
-	}, [chatData, account]);
+	}, [chatData, account])
 
 	const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (event.key === 'Enter') {
-			event.preventDefault();
-			sendMessage();
+			event.preventDefault()
+			sendMessage()
 		}
-	};
+	}
 
 	const copyToClipboard = useCallback(() => {
 		if (toAddr) {
-			console.log('Copy to clipboard', toAddr);
-			let textField = document.createElement('textarea');
-			textField.innerText = toAddr;
-			document.body.appendChild(textField);
-			textField.select();
-			document.execCommand('copy');
-			textField.focus();
-			textField.remove();
-			setCopiedAddr(true);
+			console.log('Copy to clipboard', toAddr)
+			let textField = document.createElement('textarea')
+			textField.innerText = toAddr
+			document.body.appendChild(textField)
+			textField.select()
+			document.execCommand('copy')
+			textField.focus()
+			textField.remove()
+			setCopiedAddr(true)
 
-			timerRef?.current && window.clearTimeout(timerRef.current);
+			timerRef?.current && window.clearTimeout(timerRef.current)
 			timerRef.current = setTimeout(() => {
-				setCopiedAddr(false);
-			}, 3000);
+				setCopiedAddr(false)
+			}, 3000)
 		}
-	}, [toAddr]);
+	}, [toAddr])
 
 	const addMessageToUI = useCallback(
 		(
@@ -468,7 +468,7 @@ const DMByAddress = () => {
 			nftAddr: string | null,
 			nftId: string | null
 		) => {
-			console.log(`Add message to UI: ${message}`);
+			console.log(`Add message to UI: ${message}`)
 
 			const newMsg: MessageUIType = {
 				message,
@@ -480,26 +480,26 @@ const DMByAddress = () => {
 				isFetching,
 				nftAddr,
 				nftId,
-			};
-			let newLoadedMsgs: MessageUIType[] = [...loadedMsgs]; // copy the old array
-			newLoadedMsgs.push(newMsg);
-			setLoadedMsgs(newLoadedMsgs);
+			}
+			let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
+			newLoadedMsgs.push(newMsg)
+			setLoadedMsgs(newLoadedMsgs)
 		},
 		[loadedMsgs]
-	);
+	)
 
 	const sendMessage = async () => {
-		setSentMsg(true);
-		console.log('sendMessage');
-		if (msgInput.length <= 0) return;
+		setSentMsg(true)
+		console.log('sendMessage')
+		if (msgInput.length <= 0) return
 
 		// Make a copy and clear input field
-		const msgInputCopy = (' ' + msgInput).slice(1);
-		setMsgInput('');
+		const msgInputCopy = (' ' + msgInput).slice(1)
+		setMsgInput('')
 
-		const timestamp = new Date();
+		const timestamp = new Date()
 
-		const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs));
+		const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
 		let data = {
 			message: msgInputCopy,
@@ -510,7 +510,7 @@ const DMByAddress = () => {
 			encrypted_sym_lit_key: '',
 			lit_access_conditions: '',
 			read: false,
-		};
+		}
 
 		addMessageToUI(
 			msgInputCopy,
@@ -522,7 +522,7 @@ const DMByAddress = () => {
 			true,
 			null,
 			null
-		);
+		)
 
 		//data.message = msgInputCopy
 		const _accessControlConditions = [
@@ -549,23 +549,23 @@ const DMByAddress = () => {
 					value: data.fromAddr,
 				},
 			},
-		];
+		]
 
 		console.log(
 			'✅[POST][Encrypting Message]:',
 			msgInputCopy,
 			_accessControlConditions
-		);
+		)
 		const encrypted = await lit.encryptString(
 			msgInputCopy,
 			_accessControlConditions
-		);
-		data.message = await lit.blobToB64(encrypted.encryptedFile);
-		data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey;
-		data.lit_access_conditions = JSON.stringify(_accessControlConditions);
-		console.log('✅[POST][Encrypted Message]:', data);
+		)
+		data.message = await lit.blobToB64(encrypted.encryptedFile)
+		data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
+		data.lit_access_conditions = JSON.stringify(_accessControlConditions)
+		console.log('✅[POST][Encrypted Message]:', data)
 
-		setIsSendingMessage(true);
+		setIsSendingMessage(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`,
 			{
@@ -580,22 +580,22 @@ const DMByAddress = () => {
 		)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log('✅[POST][Send Message]:', data, latestLoadedMsgs);
+				console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
 				//getChatData()
 			})
 			.catch((error) => {
-				console.error('🚨[POST][Send message]:', error, JSON.stringify(data));
+				console.error('🚨[POST][Send message]:', error, JSON.stringify(data))
 			})
 			.finally(() => {
-				setIsSendingMessage(false);
-			});
+				setIsSendingMessage(false)
+			})
 
 		if (
 			toAddr.toLocaleLowerCase() ===
 			'0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
 		) {
 			if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
-				console.log('Missing REACT_APP_SLEEKPLAN_API_KEY');
+				console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
 			} else {
 				fetch(`https://api.sleekplan.com/v1/post`, {
 					method: 'POST',
@@ -613,36 +613,36 @@ const DMByAddress = () => {
 				})
 					.then((response) => response.json())
 					.then((data) => {
-						console.log('✅[POST][Feedback]:', data);
+						console.log('✅[POST][Feedback]:', data)
 					})
 					.catch((error) => {
-						console.error('🚨[POST][Feedback]:', error, JSON.stringify(data));
-					});
+						console.error('🚨[POST][Feedback]:', error, JSON.stringify(data))
+					})
 			}
 		}
-	};
+	}
 
 	const updateRead = useCallback(
 		(data: MessageUIType) => {
-			console.log('updateRead');
-			let indexOfMsg = -1;
-			let newLoadedMsgs = [...loadedMsgs];
+			console.log('updateRead')
+			let indexOfMsg = -1
+			let newLoadedMsgs = [...loadedMsgs]
 			for (let i = newLoadedMsgs.length - 1; i > 0; i--) {
 				if (newLoadedMsgs[i].timestamp === data.timestamp) {
-					indexOfMsg = i;
-					break;
+					indexOfMsg = i
+					break
 				}
 			}
 			if (indexOfMsg !== -1) {
 				newLoadedMsgs[indexOfMsg] = {
 					...newLoadedMsgs[indexOfMsg],
 					read: true,
-				};
-				setLoadedMsgs(newLoadedMsgs);
+				}
+				setLoadedMsgs(newLoadedMsgs)
 			}
 		},
 		[loadedMsgs]
-	);
+	)
 
 	const header = useMemo(() => {
 		return (
@@ -736,8 +736,8 @@ const DMByAddress = () => {
 					</Flex>
 				)}
 			</Box>
-		);
-	}, [copiedAddr, copyToClipboard, name, toAddr]);
+		)
+	}, [copiedAddr, copyToClipboard, name, toAddr])
 
 	const renderedMessages = useMemo(() => {
 		return loadedMsgs.map((msg: MessageUIType, i) => {
@@ -752,7 +752,7 @@ const DMByAddress = () => {
 							pfpImage={localStorage['pfpData_' + msg.fromAddr]}
 							updateRead={updateRead}
 						/>
-					);
+					)
 				} else {
 					return (
 						<ChatMessage
@@ -763,12 +763,12 @@ const DMByAddress = () => {
 							pfpImage={pfpDataFromAddr}
 							updateRead={updateRead}
 						/>
-					);
+					)
 				}
 			}
-			return null;
-		});
-	}, [account, loadedMsgs, updateRead]);
+			return null
+		})
+	}, [account, loadedMsgs, updateRead])
 
 	return (
 		<Flex background='white' height='100vh' flexDirection='column' flex='1'>
@@ -845,7 +845,7 @@ const DMByAddress = () => {
 				</Flex>
 			</Flex>
 		</Flex>
-	);
-};
+	)
+}
 
-export default DMByAddress;
+export default DMByAddress

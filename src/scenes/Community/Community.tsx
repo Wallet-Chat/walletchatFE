@@ -1,13 +1,13 @@
-import { Flex, Tag } from '@chakra-ui/react';
-import { Route, Routes } from 'react-router-dom';
+import { Flex, Tag } from '@chakra-ui/react'
+import { Route, Routes } from 'react-router-dom'
 
-import CreateNewCommunity from './scenes/CreateNewCommunity';
-import { useIsMobileView } from '../../context/IsMobileViewProvider';
-import CommunityInboxList from './scenes/CommunityInboxList';
-import CommunityByName from './scenes/CommunityByName';
+import CreateNewCommunity from './scenes/CreateNewCommunity'
+import { useIsMobileView } from '../../context/IsMobileViewProvider'
+import CommunityInboxList from './scenes/CommunityInboxList'
+import CommunityByName from './scenes/CommunityByName'
 
 const Community = () => {
-	const { isMobileView } = useIsMobileView();
+	const { isMobileView } = useIsMobileView()
 
 	return (
 		<Routes>
@@ -55,7 +55,7 @@ const Community = () => {
 				}
 			/>
 		</Routes>
-	);
-};
+	)
+}
 
-export default Community;
+export default Community

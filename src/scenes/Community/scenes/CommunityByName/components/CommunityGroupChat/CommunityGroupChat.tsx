@@ -7,21 +7,21 @@ import {
 	Spinner,
 	Tag,
 	Text,
-} from '@chakra-ui/react';
-import { IconSend } from '@tabler/icons';
-import { useEffect, useState, KeyboardEvent, useRef } from 'react';
-import { Link as RLink } from 'react-router-dom';
-import TextareaAutosize from 'react-textarea-autosize';
-import ChatMessage from '../../../../../../components/Chat/ChatMessage';
-import { getFormattedDate } from '../../../../../../helpers/date';
-import { truncateAddress } from '../../../../../../helpers/truncateString';
-import { DottedBackground } from '../../../../../../styled/DottedBackground';
+} from '@chakra-ui/react'
+import { IconSend } from '@tabler/icons'
+import { useEffect, useState, KeyboardEvent, useRef } from 'react'
+import { Link as RLink } from 'react-router-dom'
+import TextareaAutosize from 'react-textarea-autosize'
+import ChatMessage from '../../../../../../components/Chat/ChatMessage'
+import { getFormattedDate } from '../../../../../../helpers/date'
+import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { DottedBackground } from '../../../../../../styled/DottedBackground'
 
 import {
 	GroupMessageType,
 	MessageUIType,
-} from '../../../../../../types/Message';
-import generateItems from '../../../../helpers/generateGroupedByDays';
+} from '../../../../../../types/Message'
+import generateItems from '../../../../helpers/generateGroupedByDays'
 
 const CommunityGroupChat = ({
 	account,
@@ -29,20 +29,20 @@ const CommunityGroupChat = ({
 	chatData,
 	isFetchingCommunityDataFirstTime,
 }: {
-	account: string | undefined;
-	community: string;
-	chatData: GroupMessageType[];
-	isFetchingCommunityDataFirstTime: boolean;
+	account: string | undefined
+	community: string
+	chatData: GroupMessageType[]
+	isFetchingCommunityDataFirstTime: boolean
 }) => {
-	const [firstLoad, setFirstLoad] = useState(true);
-	const [msgInput, setMsgInput] = useState<string>('');
-	const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
-	const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([]);
+	const [firstLoad, setFirstLoad] = useState(true)
+	const [msgInput, setMsgInput] = useState<string>('')
+	const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
+	const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
-	const scrollToBottomRef = useRef<HTMLDivElement>(null);
+	const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		const toAddToUI = [] as MessageUIType[];
+		const toAddToUI = [] as MessageUIType[]
 
 		for (let i = 0; i < chatData.length; i++) {
 			if (
@@ -59,7 +59,7 @@ const CommunityGroupChat = ({
 					timestamp: chatData[i].timestamp,
 					position: 'right',
 					isFetching: false,
-				});
+				})
 			} else {
 				toAddToUI.push({
 					sender_name: chatData[i].sender_name,
@@ -69,45 +69,45 @@ const CommunityGroupChat = ({
 					timestamp: chatData[i].timestamp,
 					position: 'left',
 					isFetching: false,
-				});
+				})
 			}
 		}
-		const items = generateItems(toAddToUI);
-		setLoadedMsgs(items);
-	}, [chatData, account]);
+		const items = generateItems(toAddToUI)
+		setLoadedMsgs(items)
+	}, [chatData, account])
 
 	useEffect(() => {
 		// Scroll to bottom of chat once all messages are loaded
 		if (scrollToBottomRef?.current && firstLoad) {
-			scrollToBottomRef.current.scrollIntoView();
+			scrollToBottomRef.current.scrollIntoView()
 
 			setTimeout(() => {
-				setFirstLoad(false);
-			}, 5000);
+				setFirstLoad(false)
+			}, 5000)
 		}
-	}, [loadedMsgs]);
+	}, [loadedMsgs])
 
 	const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (event.key === 'Enter') {
-			event.preventDefault();
-			sendMessage();
+			event.preventDefault()
+			sendMessage()
 		}
-	};
+	}
 
 	const sendMessage = async () => {
-		if (msgInput.length <= 0) return;
+		if (msgInput.length <= 0) return
 		if (!account) {
-			console.log('No account connected');
-			return;
+			console.log('No account connected')
+			return
 		}
 
 		// Make a copy and clear input field
-		const msgInputCopy = (' ' + msgInput).slice(1);
-		setMsgInput('');
+		const msgInputCopy = (' ' + msgInput).slice(1)
+		setMsgInput('')
 
-		const timestamp = new Date();
+		const timestamp = new Date()
 
-		const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs));
+		const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
 		let data = {
 			type: 'message',
@@ -115,7 +115,7 @@ const CommunityGroupChat = ({
 			nftaddr: community,
 			fromaddr: account.toLocaleLowerCase(),
 			timestamp,
-		};
+		}
 
 		addMessageToUI(
 			'message',
@@ -124,11 +124,11 @@ const CommunityGroupChat = ({
 			timestamp.toString(),
 			'right',
 			false
-		);
+		)
 
-		data.message = msgInputCopy;
+		data.message = msgInputCopy
 
-		setIsSendingMessage(true);
+		setIsSendingMessage(true)
 
 		fetch(
 			`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community`,
@@ -144,19 +144,19 @@ const CommunityGroupChat = ({
 		)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log('✅[POST][Community][Message]:', data, latestLoadedMsgs);
+				console.log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
 			})
 			.catch((error) => {
 				console.error(
 					'🚨[POST][Community][Message]:',
 					error,
 					JSON.stringify(data)
-				);
+				)
 			})
 			.finally(() => {
-				setIsSendingMessage(false);
-			});
-	};
+				setIsSendingMessage(false)
+			})
+	}
 
 	const addMessageToUI = (
 		type: string,
@@ -166,7 +166,7 @@ const CommunityGroupChat = ({
 		position: string,
 		isFetching: boolean
 	) => {
-		console.log(`Add message to UI: ${message}`);
+		console.log(`Add message to UI: ${message}`)
 
 		const newMsg: MessageUIType = {
 			type,
@@ -175,11 +175,11 @@ const CommunityGroupChat = ({
 			timestamp,
 			position,
 			isFetching,
-		};
-		let newLoadedMsgs: MessageUIType[] = [...loadedMsgs]; // copy the old array
-		newLoadedMsgs.push(newMsg);
-		setLoadedMsgs(newLoadedMsgs);
-	};
+		}
+		let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
+		newLoadedMsgs.push(newMsg)
+		setLoadedMsgs(newLoadedMsgs)
+	}
 
 	return (
 		<Flex flexDirection='column' height='100%'>
@@ -220,7 +220,7 @@ const CommunityGroupChat = ({
 								</Tag>
 								<Divider />
 							</Box>
-						);
+						)
 					} else if (msg.type && msg.type === 'welcome') {
 						return (
 							<Box textAlign='center' key={`welcome-${msg.fromAddr}`}>
@@ -233,7 +233,7 @@ const CommunityGroupChat = ({
 									</RLink>
 								</Text>
 							</Box>
-						);
+						)
 					} else if (msg.message) {
 						return (
 							<ChatMessage
@@ -243,9 +243,9 @@ const CommunityGroupChat = ({
 								pfpImage=''
 								msg={msg}
 							/>
-						);
+						)
 					}
-					return null;
+					return null
 				})}
 				<Box
 					float='left'
@@ -286,7 +286,7 @@ const CommunityGroupChat = ({
 				</Flex>
 			</Flex>
 		</Flex>
-	);
-};
+	)
+}
 
-export default CommunityGroupChat;
+export default CommunityGroupChat

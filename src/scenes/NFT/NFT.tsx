@@ -1,13 +1,13 @@
-import { Flex, Tag } from '@chakra-ui/react';
-import { Route, Routes } from 'react-router';
-import { useIsMobileView } from '../../context/IsMobileViewProvider';
-import NFTByContract from './scenes/NFTByContract';
-import NFTByContractAndId from './scenes/NFTByContractAndId';
-import NFTInboxList from './scenes/NFTInboxList';
-import POAPById from './scenes/POAPById';
+import { Flex, Tag } from '@chakra-ui/react'
+import { Route, Routes } from 'react-router'
+import { useIsMobileView } from '../../context/IsMobileViewProvider'
+import NFTByContract from './scenes/NFTByContract'
+import NFTByContractAndId from './scenes/NFTByContractAndId'
+import NFTInboxList from './scenes/NFTInboxList'
+import POAPById from './scenes/POAPById'
 
 const NFT = () => {
-	const { isMobileView } = useIsMobileView();
+	const { isMobileView } = useIsMobileView()
 
 	return (
 		<Routes>
@@ -79,7 +79,7 @@ const NFT = () => {
 				/>
 			</Route>
 		</Routes>
-	);
-};
+	)
+}
 
-export default NFT;
+export default NFT

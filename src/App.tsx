@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { IconX } from '@tabler/icons';
-import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react'
+import { IconX } from '@tabler/icons'
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import {
 	Button,
 	Box,
@@ -10,26 +10,26 @@ import {
 	Spinner,
 	Alert,
 	Tag,
-} from '@chakra-ui/react';
-import { isMobile } from 'react-device-detect';
+} from '@chakra-ui/react'
+import { isMobile } from 'react-device-detect'
 
-import logoThumb from './images/logo-thumb.svg';
-import './App.scss';
-import NFT from './scenes/NFT';
-import Sidebar from './components/Sidebar/Sidebar';
-import { useWallet } from './context/WalletProvider';
-import { useIsMobileView } from './context/IsMobileViewProvider';
-import EnterName from './scenes/Me/scenes/EnterName';
-import ChangeName from './scenes/Me/scenes/ChangeName';
-import EnterEmail from './scenes/Me/scenes/EnterEmail';
-import ChangeEmail from './scenes/Me/scenes/ChangeEmail';
-import VerifyEmail from './scenes/Me/scenes/VerifyEmail';
-import Community from './scenes/Community';
-import { isChromeExtension } from './helpers/chrome';
-import DM from './scenes/DM';
+import logoThumb from './images/logo-thumb.svg'
+import './App.scss'
+import NFT from './scenes/NFT'
+import Sidebar from './components/Sidebar/Sidebar'
+import { useWallet } from './context/WalletProvider'
+import { useIsMobileView } from './context/IsMobileViewProvider'
+import EnterName from './scenes/Me/scenes/EnterName'
+import ChangeName from './scenes/Me/scenes/ChangeName'
+import EnterEmail from './scenes/Me/scenes/EnterEmail'
+import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
+import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
+import Community from './scenes/Community'
+import { isChromeExtension } from './helpers/chrome'
+import DM from './scenes/DM'
 
 export const App = () => {
-	const location = useLocation();
+	const location = useLocation()
 
 	const {
 		appLoading,
@@ -43,14 +43,14 @@ export const App = () => {
 		setRedirectUrl,
 		btnClicks,
 		setBtnClicks,
-	} = useWallet();
+	} = useWallet()
 	useEffect(() => {
-		const currentPath = location.pathname;
-		console.log(`currentPath: ${currentPath}`);
-		setRedirectUrl(currentPath);
-	}, [location]);
+		const currentPath = location.pathname
+		console.log(`currentPath: ${currentPath}`)
+		setRedirectUrl(currentPath)
+	}, [location])
 
-	const { isMobileView } = useIsMobileView();
+	const { isMobileView } = useIsMobileView()
 
 	const closeBtn = (
 		<Flex textAlign='right' position='fixed' top={0} right={0}>
@@ -69,7 +69,7 @@ export const App = () => {
 				<IconX size={18} color='var(--chakra-colors-darkgray-700)' />
 			</Button>
 		</Flex>
-	);
+	)
 
 	if (appLoading || !isAuthenticated) {
 		return (
@@ -102,8 +102,8 @@ export const App = () => {
 						<Button
 							variant='black'
 							onClick={() => {
-								setBtnClicks(btnClicks + 1);
-								connectWallet();
+								setBtnClicks(btnClicks + 1)
+								connectWallet()
 							}}
 							size='lg'
 						>
@@ -122,7 +122,7 @@ export const App = () => {
 					</Box>
 				)}
 			</Flex>
-		);
+		)
 	} else if (isAuthenticated && name === null) {
 		return (
 			<Box>
@@ -143,7 +143,7 @@ export const App = () => {
 					)}
 				</Flex>
 			</Box>
-		);
+		)
 	} else {
 		return (
 			<Box>
@@ -181,6 +181,6 @@ export const App = () => {
 					</Box>
 				</Flex>
 			</Box>
-		);
+		)
 	}
-};
+}
