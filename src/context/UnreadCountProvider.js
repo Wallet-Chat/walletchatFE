@@ -42,7 +42,7 @@ const UnreadCountProvider = React.memo(({ children }) => {
                      "data": total_cnt,
                      "target": "unread_cnt"
                   }
-                  window.parent.postMessage(msg, "*");
+                  window.parent.postMessage(msg, "*"); //targertOrigin should be a .env variable
 
                   setUnreadCount(data)
                   if (typeof data === 'object') {
