@@ -266,12 +266,14 @@ const DMByAddress = () => {
 								);
 
 								//console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-								const rawmsg = await lit.decryptString(
-									lit.b64toBlob(replica[i].message),
-									replica[i].encrypted_sym_lit_key,
-									_accessControlConditions
-								);
-								replica[i].message = rawmsg.decryptedFile.toString();
+								if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
+									//console.log('✅[INFO][Using Orig Decrypt Conditions]')
+									const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+									replica[i].message = rawmsg.decryptedFile.toString()
+								 } else {
+									const rawmsg = await lit.decryptStringOrig(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+									replica[i].message = rawmsg.decryptedFile.toString()
+								 }
 							}
 						}
 						//END LIT ENCRYPTION
@@ -299,12 +301,14 @@ const DMByAddress = () => {
 								);
 
 								//console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-								const rawmsg = await lit.decryptString(
-									lit.b64toBlob(replica[i].message),
-									replica[i].encrypted_sym_lit_key,
-									_accessControlConditions
-								);
-								replica[i].message = rawmsg.decryptedFile.toString();
+								if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
+									//console.log('✅[INFO][Using Orig Decrypt Conditions]')
+									const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+									replica[i].message = rawmsg.decryptedFile.toString()
+								 } else {
+									const rawmsg = await lit.decryptStringOrig(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+									replica[i].message = rawmsg.decryptedFile.toString()
+								 }
 							}
 						}
 						setChatData(replica);

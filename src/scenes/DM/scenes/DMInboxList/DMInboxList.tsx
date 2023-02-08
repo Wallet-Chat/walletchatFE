@@ -116,12 +116,13 @@ const DMInboxList = () => {
 								_accessControlConditions
 							);
 							const blob = lit.b64toBlob(replica[i].message);
-							const rawmsg = await lit.decryptString(
-								blob,
-								replica[i].encrypted_sym_lit_key,
-								_accessControlConditions
-							);
-							replica[i].message = rawmsg.decryptedFile.toString();
+							if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
+								const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+								replica[i].message = rawmsg.decryptedFile.toString()
+							 } else {
+								const rawmsg = await lit.decryptStringOrig(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+								replica[i].message = rawmsg.decryptedFile.toString()
+							 }
 						}
 					}
 					setInboxData(replica);
