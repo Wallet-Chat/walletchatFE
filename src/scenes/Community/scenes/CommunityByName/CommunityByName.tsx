@@ -378,11 +378,14 @@ const CommunityByName = () => {
 								</Flex>
 							)}
 							<Box>
-								{communityData?.members && (
+								{communityData?.member_count && (
 									<Box>
 										<Text fontSize='md'>
-											{communityData.members}{' '}
-											{pluralize('member', communityData?.members)}
+											{communityData.member_count}{' '}
+											{pluralize(
+												'member',
+												communityData?.member_count
+											)}
 										</Text>
 									</Box>
 								)}
