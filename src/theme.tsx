@@ -322,6 +322,16 @@ export const theme = extendTheme(
 							},
 						},
 					},
+					translucent80: {
+						bg: 'rgba(255, 255, 255, 0.15)',
+						color: 'white',
+						_hover: {
+							bg: 'rgba(255, 255, 255, 0.2)',
+							_disabled: {
+								bg: 'rgba(255, 255, 255, 0.2)',
+							},
+						},
+					},
 					white: {
 						bg: 'white',
 						color: 'darkgray.800',

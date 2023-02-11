@@ -19,7 +19,12 @@ import {
 	useDisclosure,
 	useToast,
 } from '@chakra-ui/react'
-import { IconBrandTwitter, IconExternalLink, IconPhoto } from '@tabler/icons'
+import {
+	IconBrandTwitter,
+	IconChevronDown,
+	IconExternalLink,
+	IconPhoto,
+} from '@tabler/icons'
 import pluralize from 'pluralize'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { useParams, NavLink, Route, Routes, useMatch } from 'react-router-dom'
@@ -271,7 +276,13 @@ const CommunityByName = () => {
 
 	return (
 		<Flex flexDirection='column' background='white' height='100vh' flex='1'>
-			<Flex alignItems='center' px={5} py={2}>
+			<Flex
+				alignItems='center'
+				px={5}
+				py={2}
+				borderBottomWidth={1}
+				borderBottomColor='lightgray.300'
+			>
 				<Flex
 					justifyContent='space-between'
 					width='100%'
@@ -339,49 +350,39 @@ const CommunityByName = () => {
 								</Flex>
 							</Avatar>
 						</label>
-
-						<Button
-							onClick={onOpen}
-							display='unset'
-							textAlign='unset'
-							height='unset'
-							py={1}
-							lineHeight='unset'
-							flex='1'
-							background='white'
-							_hover={{
-								border: 'none',
-								background: 'gray.100',
-							}}
-						>
-							{communityData?.name && (
-								<Flex alignItems='center'>
-									<Heading
-										size='md'
-										mr='1'
-										maxWidth={[140, 140, 200, 300]}
-										overflow='hidden'
-										textOverflow='ellipsis'
-										whiteSpace='nowrap'
-									>
-										{communityData.name}
-									</Heading>
-								</Flex>
-							)}
-							<Box>
-								{communityData?.member_count && (
-									<Box>
-										<Text fontSize='md'>
-											{communityData.member_count}{' '}
-											{pluralize(
-												'member',
-												communityData?.member_count
-											)}
-										</Text>
-									</Box>
+						<Box px={2}>
+							<Button
+								onClick={onOpen}
+								display='inline-flex'
+								textAlign='unset'
+								height='unset'
+								py={1}
+								lineHeight='unset'
+								flex='1'
+								alignItems='center'
+								background='white'
+								_hover={{
+									border: 'none',
+									background: 'gray.100',
+								}}
+								rightIcon={<IconChevronDown size={20} />}
+							>
+								{communityData?.name && (
+									<Flex alignItems='center' d='inline-flex'>
+										<Heading
+											size='md'
+											mr='1'
+											maxWidth={[140, 140, 200, 300]}
+											overflow='hidden'
+											textOverflow='ellipsis'
+											whiteSpace='nowrap'
+										>
+											{communityData.name}
+										</Heading>
+									</Flex>
 								)}
-							</Box>
-							{/* 
+
+								{/* 
                      <Box mb={2}>
                         {nftData?.collection?.external_url && (
                            <Tooltip label="Visit website">
@@ -453,9 +454,24 @@ const CommunityByName = () => {
                            </Tooltip>
                         )}
                      </Box> */}
-						</Button>
+							</Button>
+							<Box px={4}>
+								{communityData?.member_count && (
+									<Box>
+										<Text fontSize='md'>
+											{communityData.member_count}{' '}
+											{pluralize(
+												'member',
+												communityData?.member_count
+											)}
+										</Text>
+									</Box>
+								)}
+							</Box>
+						</Box>
 					</Flex>
-					<Flex>
+
+					<Flex py={2}>
 						{communityData?.discord && (
 							<Tooltip
 								label={
@@ -527,60 +543,70 @@ const CommunityByName = () => {
 					</Flex>
 				</Flex>
 			</Flex>
-			<Flex px={6} py={2} background='lightgray.200'>
-				<Button
-					as={NavLink}
-					end
-					to={`${match?.pathnameBase}`}
-					relative='path'
-					size='sm'
-					fontWeight='bold'
-					fontSize='md'
-					_hover={{
-						textDecor: 'none',
-					}}
-					_activeLink={{
-						background: 'black',
-						color: 'white',
-					}}
-				>
-					<Box px={3} py={1.5}>
-						Chat
-					</Box>
-				</Button>
-				{communityData?.tweets && communityData.tweets.length > 0 ? (
-					<Button
-						as={NavLink}
-						to={`${match?.pathnameBase}/tweets`}
-						relative='path'
-						size='sm'
-						fontWeight='bold'
-						fontSize='md'
-						ml={2}
-						_hover={{
-							textDecor: 'none',
-							background: 'lightgray.400',
-						}}
-						_activeLink={{
-							background: 'black',
-							color: 'white',
-						}}
-					>
-						<Box px={3} py={1.5}>
-							Tweets
-						</Box>
-					</Button>
-				) : (
-					<></>
-				)}
-			</Flex>
+
 			<Box
 				display='flex'
-				flexDirection='column'
 				overflowY='auto'
 				flexGrow={1}
 				background='lightgray.200'
 			>
+				<Box bg='darkgray.700' p={2}>
+					<Button
+						as={NavLink}
+						end
+						to={`${match?.pathnameBase}`}
+						relative='path'
+						size='sm'
+						fontWeight='bold'
+						fontSize='md'
+						d='block'
+						variant='translucent80'
+						background='transparent'
+						mb={1}
+						_hover={{
+							textDecor: 'none',
+							background: 'rgba(255, 255, 255, 0.2)',
+							color: 'white',
+						}}
+						_activeLink={{
+							background: 'rgba(255, 255, 255, 0.2)',
+							color: 'white',
+						}}
+					>
+						<Box px={3} py={1.5}>
+							Chat
+						</Box>
+					</Button>
+					{communityData?.tweets && communityData.tweets.length > 0 ? (
+						<Button
+							as={NavLink}
+							to={`${match?.pathnameBase}/tweets`}
+							relative='path'
+							size='sm'
+							fontWeight='bold'
+							fontSize='md'
+							d='block'
+							variant='translucent80'
+							background='transparent'
+							mb={1}
+							_hover={{
+								textDecor: 'none',
+								background: 'rgba(255, 255, 255, 0.2)',
+								color: 'white',
+							}}
+							_activeLink={{
+								background: 'rgba(255, 255, 255, 0.2)',
+								color: 'white',
+							}}
+						>
+							<Box px={3} py={1.5}>
+								Tweets
+							</Box>
+						</Button>
+					) : (
+						<></>
+					)}
+				</Box>
 				<Box overflowY='auto' className='custom-scrollbar' height='100%'>
 					<Routes>
 						<Route
