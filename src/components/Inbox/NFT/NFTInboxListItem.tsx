@@ -1,8 +1,8 @@
 import { Box } from '@chakra-ui/react'
 import { memo, useEffect, useState } from 'react'
-import { truncateAddress } from '../../../helpers/truncateString'
+import { truncateAddress } from '../../../helpers/text'
 import { InboxItemType } from '../../../types/InboxItem'
-import { convertIpfsUriToUrl } from '../../../helpers/ipfs'
+import { convertIpfsUriToUrl } from '../../../helpers/text'
 import NFTCollection from '../../../types/NFTCollection'
 import OpenSeaNFTCollection, {
 	openseaToGeneralNFTCollectionType,

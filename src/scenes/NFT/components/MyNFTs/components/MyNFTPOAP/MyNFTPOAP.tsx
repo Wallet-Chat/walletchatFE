@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react'
 import { IconArrowNarrowRight } from '@tabler/icons'
 import { Link as RLink } from 'react-router-dom'
-import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../../../helpers/text'
 import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg'
 import { chains, poapContractAddress } from '../../../../../../constants'
 import POAP from '../../../../../../types/POAP/POAP'

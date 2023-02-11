@@ -1,4 +1,4 @@
-import { truncateAddress } from '../../../helpers/truncateString'
+import { truncateAddress } from '../../../helpers/text'
 import { InboxItemType } from '../../../types/InboxItem'
 import InboxItem from '../InboxListItem'
 

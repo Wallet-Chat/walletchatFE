@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import Blockies from 'react-blockies'
 
 import CommentType from '../../../../../../types/Comment'
-import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../../../helpers/text'
 import { timeSince } from '../../../../../../helpers/date'
 import { BlockieWrapper } from '../../../../../../styled/BlockieWrapper'
 

@@ -1,7 +1,7 @@
 import { Box, Button, Image, Text, Link, Flex, Tooltip } from '@chakra-ui/react'
 import { IconArrowNarrowRight } from '@tabler/icons'
 import { Link as RLink } from 'react-router-dom'
-import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../../../helpers/text'
 import NFT from '../../../../../../types/NFT'
 import IconEtherscan from '../../../../../../images/icon-products/icon-etherscan-mono.svg'
 import { chains } from '../../../../../../constants'

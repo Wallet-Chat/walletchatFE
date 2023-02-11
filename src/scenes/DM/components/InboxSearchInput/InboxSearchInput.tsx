@@ -11,7 +11,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Blockies from 'react-blockies'
 import { useWallet } from '../../../../context/WalletProvider'
-import { truncateAddress } from '../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../helpers/text'
 import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 
 export default function InboxSearchInput() {

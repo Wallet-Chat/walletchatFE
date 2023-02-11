@@ -3,7 +3,7 @@ import Blockies from 'react-blockies'
 import { Link } from 'react-router-dom'
 
 import { formatInboxDate } from '../../../helpers/date'
-import { truncateAddress } from '../../../helpers/truncateString'
+import { truncateAddress } from '../../../helpers/text'
 import { InboxItemType } from '../../../types/InboxItem'
 import { BlockieWrapper } from '../../../styled/BlockieWrapper'
 import {

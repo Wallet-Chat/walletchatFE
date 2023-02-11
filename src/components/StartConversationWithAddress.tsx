@@ -12,10 +12,10 @@ import {
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import Blockies from 'react-blockies'
-import { truncateAddress } from '../helpers/truncateString'
+import { truncateAddress } from '../helpers/text'
 import { IconArrowRight } from '@tabler/icons'
 import { useWallet } from '../context/WalletProvider'
-import { addressIsValid } from '../helpers/address'
+import { addressIsValid } from '../helpers/text'
 
 const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
 	const [toAddr, setToAddr] = useState<string>('')

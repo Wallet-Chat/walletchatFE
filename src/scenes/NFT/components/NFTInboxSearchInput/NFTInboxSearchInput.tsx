@@ -12,7 +12,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Blockies from 'react-blockies'
 import { useWallet } from '../../../../context/WalletProvider'
-import { truncateAddress } from '../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../helpers/text'
 import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 import OpenSeaNFTCollection, {
 	openseaToGeneralNFTCollectionType,
@@ -21,7 +21,7 @@ import NFTPortNFTCollection, {
 	nftPortToGeneralNFTCollectionType,
 } from '../../../../types/NFTPort/NFTCollection'
 import NFTCollection from '../../../../types/NFTCollection'
-import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
+import { convertIpfsUriToUrl } from '../../../../helpers/text'
 
 export default function NFTInboxSearchInput() {
 	const [toAddr, setToAddr] = useState<string>('')

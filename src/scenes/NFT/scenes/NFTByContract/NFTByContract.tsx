@@ -38,7 +38,7 @@ import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
 import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
 import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { nFormatter } from '../../../../helpers/number'
-import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
+import { convertIpfsUriToUrl } from '../../../../helpers/text'
 import OpenSeaNFTCollection, {
 	openseaToGeneralNFTCollectionType,
 } from '../../../../types/OpenSea/NFTCollection'

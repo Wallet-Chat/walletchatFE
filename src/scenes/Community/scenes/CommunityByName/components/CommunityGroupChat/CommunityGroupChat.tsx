@@ -14,7 +14,7 @@ import { Link as RLink } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
 import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
-import { truncateAddress } from '../../../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../../../helpers/text'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 
 import {

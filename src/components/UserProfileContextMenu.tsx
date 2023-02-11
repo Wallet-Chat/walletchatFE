@@ -16,7 +16,7 @@ import { Link as RLink } from 'react-router-dom'
 import IconOpenSea from '../images/icon-products/icon-opensea.svg'
 import IconGemXyz from '../images/icon-products/icon-gemxyz.svg'
 import IconEtherscan from '../images/icon-products/icon-etherscan.svg'
-import { truncateAddress } from '../helpers/truncateString'
+import { truncateAddress } from '../helpers/text'
 
 const UserProfileContextMenu = ({
 	address,

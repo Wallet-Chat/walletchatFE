@@ -29,7 +29,7 @@ import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 
 import { MessageType, MessageUIType } from '../../../../types/Message'
-import { truncateAddress } from '../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../helpers/text'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
 import { DottedBackground } from '../../../../styled/DottedBackground'

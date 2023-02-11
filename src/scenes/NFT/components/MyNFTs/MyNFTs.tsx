@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
 
-import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
+import { convertIpfsUriToUrl } from '../../../../helpers/text'
 import MyNFTItem from './components/MyNFTItem'
 import { NFTPortNFT } from '../../../../types/NFTPort/NFT'
 import OpenSeaNFT, {

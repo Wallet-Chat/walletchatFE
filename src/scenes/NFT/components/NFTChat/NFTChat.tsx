@@ -20,7 +20,7 @@ import {
 	SettingsType,
 } from '../../../../types/Message'
 // import EncryptedMsgBlock from '../../../../types/Message'
-import { truncateAddress } from '../../../../helpers/truncateString'
+import { truncateAddress } from '../../../../helpers/text'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
