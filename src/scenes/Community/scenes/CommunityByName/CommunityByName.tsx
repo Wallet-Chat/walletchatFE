@@ -607,7 +607,12 @@ const CommunityByName = () => {
 						<></>
 					)}
 				</Box>
-				<Box overflowY='auto' className='custom-scrollbar' height='100%'>
+				<Box
+					overflowY='auto'
+					className='custom-scrollbar'
+					height='100%'
+					flexGrow={1}
+				>
 					<Routes>
 						<Route
 							index
