@@ -350,7 +350,7 @@ const CommunityByName = () => {
 								</Flex>
 							</Avatar>
 						</label>
-						<Box px={2}>
+						<Box>
 							<Button
 								onClick={onOpen}
 								display='inline-flex'

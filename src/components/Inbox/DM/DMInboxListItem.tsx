@@ -68,7 +68,7 @@ const DMInboxItem = ({
 							<InboxItemRecipientAddress>
 								{displayName}
 							</InboxItemRecipientAddress>
-							{data.message && (
+							{data?.message && typeof data.message === 'string' && (
 								<Box
 									fontSize='md'
 									color='darkgray.100'

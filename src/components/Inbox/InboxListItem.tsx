@@ -130,8 +130,8 @@ const InboxItem = ({
 										</InboxItemChainImage>
 									</Tooltip>
 								)}
-								{image ? (
-									<Image src={image} alt='' width='41px' />
+								{image || displayName ? (
+									<Avatar src={image} size='md' name={displayName} />
 								) : address ? (
 									<Blockies
 										seed={
@@ -141,8 +141,6 @@ const InboxItem = ({
 										}
 										scale={5}
 									/>
-								) : displayName ? (
-									<Avatar size='md' name={displayName} />
 								) : (
 									''
 								)}
