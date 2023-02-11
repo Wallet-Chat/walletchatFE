@@ -12,6 +12,7 @@ import InboxListLoadingSkeleton from '../../../../components/Inbox/InboxListLoad
 import lit from '../../../../utils/lit'
 import WalletAccount from '../../../../chrome/wallet'
 import { useWallet } from '../../../../context/WalletProvider'
+import { decryptMessageWithLit } from '../../../../helpers/decryptMessageWithLit'
 
 const DMInboxList = () => {
 	const { account, web3, isAuthenticated } = useWallet()
@@ -107,37 +108,7 @@ const DMInboxList = () => {
 					// Get data from LIT and replace the message with the decrypted text
 					for (let i = 0; i < replica.length; i++) {
 						if (replica[i].encrypted_sym_lit_key) {
-							//only needed for mixed DB with plain and encrypted data
-							const _accessControlConditions = JSON.parse(
-								replica[i].lit_access_conditions
-							)
-
-							console.log(
-								'✅[POST][Decrypt GetInbox Message]:',
-								replica[i],
-								replica[i].encrypted_sym_lit_key,
-								_accessControlConditions
-							)
-							const blob = lit.b64toBlob(replica[i].message)
-							if (
-								String(replica[i].lit_access_conditions).includes(
-									'evmBasic'
-								)
-							) {
-								const rawmsg = await lit.decryptString(
-									blob,
-									replica[i].encrypted_sym_lit_key,
-									_accessControlConditions
-								)
-								replica[i].message = rawmsg.decryptedFile.toString()
-							} else {
-								const rawmsg = await lit.decryptStringOrig(
-									blob,
-									replica[i].encrypted_sym_lit_key,
-									_accessControlConditions
-								)
-								replica[i].message = rawmsg.decryptedFile.toString()
-							}
+							replica[i].message = decryptMessageWithLit(replica[i])
 						}
 					}
 					setInboxData(replica)

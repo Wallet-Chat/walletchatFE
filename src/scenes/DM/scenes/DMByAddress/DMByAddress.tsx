@@ -41,6 +41,7 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 import lit from '../../../../utils/lit'
 import ScrollToBottom from 'react-scroll-to-bottom'
 import { useWallet } from '../../../../context/WalletProvider'
+import { decryptMessageWithLit } from '../../../../helpers/decryptMessageWithLit'
 
 const DMByAddress = () => {
 	let { address: toAddr = '' } = useParams()
@@ -265,32 +266,7 @@ const DMByAddress = () => {
 						// Get data from LIT and replace the message with the decrypted text
 						for (let i = 0; i < replica.length; i++) {
 							if (replica[i].encrypted_sym_lit_key) {
-								//only needed for mixed DB with plain and encrypted data
-								const _accessControlConditions = JSON.parse(
-									replica[i].lit_access_conditions
-								)
-
-								//console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-								if (
-									String(replica[i].lit_access_conditions).includes(
-										'evmBasic'
-									)
-								) {
-									//console.log('✅[INFO][Using Orig Decrypt Conditions]')
-									const rawmsg = await lit.decryptString(
-										lit.b64toBlob(replica[i].message),
-										replica[i].encrypted_sym_lit_key,
-										_accessControlConditions
-									)
-									replica[i].message = rawmsg.decryptedFile.toString()
-								} else {
-									const rawmsg = await lit.decryptStringOrig(
-										lit.b64toBlob(replica[i].message),
-										replica[i].encrypted_sym_lit_key,
-										_accessControlConditions
-									)
-									replica[i].message = rawmsg.decryptedFile.toString()
-								}
+								replica[i].message = decryptMessageWithLit(replica[i])
 							}
 						}
 						//END LIT ENCRYPTION
