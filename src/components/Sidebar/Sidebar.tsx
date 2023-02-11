@@ -183,6 +183,7 @@ export default function Sidebar() {
 			px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
 			order={isMobile ? 2 : 0}
 			zIndex='docked'
+			overflow='auto'
 		>
 			<Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
 				<Popover>
