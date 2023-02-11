@@ -550,7 +550,12 @@ const CommunityByName = () => {
 				flexGrow={1}
 				background='lightgray.200'
 			>
-				<Box bg='darkgray.700' p={2}>
+				<Box
+					bg='lightgray.100'
+					p={2}
+					borderRightWidth={1}
+					borderRightColor='lightgray.300'
+				>
 					<Button
 						as={NavLink}
 						end
@@ -566,14 +571,31 @@ const CommunityByName = () => {
 						px={3}
 						py={1.5}
 						lineHeight='unset'
+						color='darkgray.500'
 						_hover={{
 							textDecor: 'none',
-							background: 'rgba(255, 255, 255, 0.2)',
-							color: 'white',
+							background: 'lightgray.400',
+							color: 'darkgray.800',
 						}}
 						_activeLink={{
-							background: 'rgba(255, 255, 255, 0.2)',
-							color: 'white',
+							background: 'lightgray.400',
+							color: 'darkgray.600',
+							_before: {
+								opacity: 1,
+							},
+						}}
+						_before={{
+							content: '""',
+							opacity: 0,
+							display: 'inline-block',
+							position: ' absolute',
+							top: '50%',
+							left: '0.2rem',
+							width: '.25rem',
+							height: '.25rem',
+							borderRadius: '50%',
+							background: 'lightgray.700',
+							transform: 'translateY(-50%)',
 						}}
 					>
 						Chat
@@ -593,14 +615,31 @@ const CommunityByName = () => {
 							px={3}
 							py={1.5}
 							lineHeight='unset'
+							color='darkgray.500'
 							_hover={{
 								textDecor: 'none',
-								background: 'rgba(255, 255, 255, 0.2)',
-								color: 'white',
+								background: 'lightgray.400',
+								color: 'darkgray.800',
 							}}
 							_activeLink={{
-								background: 'rgba(255, 255, 255, 0.2)',
-								color: 'white',
+								background: 'lightgray.400',
+								color: 'darkgray.600',
+								_before: {
+									opacity: 1,
+								},
+							}}
+							_before={{
+								content: '""',
+								opacity: 0,
+								display: 'inline-block',
+								position: ' absolute',
+								top: '50%',
+								left: '0.2rem',
+								width: '.25rem',
+								height: '.25rem',
+								borderRadius: '50%',
+								background: 'lightgray.700',
+								transform: 'translateY(-50%)',
 							}}
 						>
 							Tweets

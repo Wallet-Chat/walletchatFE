@@ -4,7 +4,7 @@ import { Box, Divider } from '@chakra-ui/react'
 
 const CommunityTweets = ({ tweets }: { tweets: TweetType[] }) => {
 	return (
-		<Box borderRadius='md' px={6}>
+		<Box borderRadius='md' p={4}>
 			{tweets ? (
 				tweets.map((tweet: TweetType, i) => (
 					<>
