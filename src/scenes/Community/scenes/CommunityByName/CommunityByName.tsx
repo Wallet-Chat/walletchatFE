@@ -340,15 +340,6 @@ const CommunityByName = () => {
 							</Avatar>
 						</label>
 
-						{communityData?.logo && (
-							<Image
-								src={communityData.logo}
-								alt=''
-								height='60px'
-								borderRadius='var(--chakra-radii-xl)'
-								mr={3}
-							/>
-						)}
 						<Button
 							onClick={onOpen}
 							display='unset'
