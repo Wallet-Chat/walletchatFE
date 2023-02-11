@@ -92,7 +92,7 @@ const InboxItem = ({
 		<Link to={url} style={{ textDecoration: 'none' }}>
 			<InboxItemWrapper>
 				<Flex justifyContent='space-between'>
-					<Flex>
+					<Flex width='75%'>
 						<Box mr={2} flexShrink={0}>
 							<BlockieWrapper>
 								{chain === 'ethereum' && (

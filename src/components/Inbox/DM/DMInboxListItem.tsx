@@ -48,7 +48,7 @@ const DMInboxItem = ({
 		>
 			<InboxItemWrapper>
 				<Flex justifyContent='space-between'>
-					<Flex>
+					<Flex width='75%'>
 						<Box mr={2} flexShrink={0}>
 							{data?.logo ? (
 								<Image
