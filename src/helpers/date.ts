@@ -1,5 +1,20 @@
 import { isWithinInterval } from 'date-fns'
 
+const monthNames = [
+	'Jan',
+	'Feb',
+	'Mar',
+	'Apr',
+	'May',
+	'Jun',
+	'Jul',
+	'Aug',
+	'Sep',
+	'Oct',
+	'Nov',
+	'Dec',
+]
+
 const today = new Date()
 const yesterday = ((d) => new Date(d.setDate(d.getDate() - 1)))(new Date())
 const tomorrow = ((d) => new Date(d.setDate(d.getDate() + 1)))(new Date())
@@ -110,20 +125,7 @@ export const isDateTimePassed = (inputDate: string) => {
 export const getFormattedDate = (inputDate: string) => {
 	// console.log(inputDate, isValidISODate(inputDate))
 	// if (!isValidISODate(inputDate)) return
-	const monthNames = [
-		'Jan',
-		'Feb',
-		'Mar',
-		'Apr',
-		'May',
-		'Jun',
-		'Jul',
-		'Aug',
-		'Sep',
-		'Oct',
-		'Nov',
-		'Dec',
-	]
+
 	const dateObj = new Date(inputDate)
 	const month = monthNames[dateObj.getMonth()]
 	const day = String(dateObj.getDate()).padStart(2, '0')
@@ -212,6 +214,9 @@ export const formatInboxDate = (date: string) => {
 		return formatMessageDate(_date)
 	} else if (isCurrentWeek(date) && isCurrentYear(date)) {
 		return new Date(date).toLocaleString('en-us', { weekday: 'short' })
+	} else if (isCurrentYear(date)) {
+		const d = new Date(date)
+		return `${d.getDate()} ${monthNames[d.getMonth()]}`
 	} else {
 		return getFormattedDateDMYYYY(date)
 	}

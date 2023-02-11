@@ -563,6 +563,9 @@ const CommunityByName = () => {
 						variant='translucent80'
 						background='transparent'
 						mb={1}
+						px={3}
+						py={1.5}
+						lineHeight='unset'
 						_hover={{
 							textDecor: 'none',
 							background: 'rgba(255, 255, 255, 0.2)',
@@ -573,9 +576,7 @@ const CommunityByName = () => {
 							color: 'white',
 						}}
 					>
-						<Box px={3} py={1.5}>
-							Chat
-						</Box>
+						Chat
 					</Button>
 					{communityData?.tweets && communityData.tweets.length > 0 ? (
 						<Button
@@ -589,6 +590,9 @@ const CommunityByName = () => {
 							variant='translucent80'
 							background='transparent'
 							mb={1}
+							px={3}
+							py={1.5}
+							lineHeight='unset'
 							_hover={{
 								textDecor: 'none',
 								background: 'rgba(255, 255, 255, 0.2)',
@@ -599,9 +603,7 @@ const CommunityByName = () => {
 								color: 'white',
 							}}
 						>
-							<Box px={3} py={1.5}>
-								Tweets
-							</Box>
+							Tweets
 						</Button>
 					) : (
 						<></>
