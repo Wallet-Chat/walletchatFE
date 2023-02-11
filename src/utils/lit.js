@@ -88,7 +88,7 @@ class Lit {
 	async decryptString(
 		encryptedStr,
 		encryptedSymmetricKey,
-		accessControlConditionz
+		unifiedAccessControlConditions
 	) {
 		if (!this.litNodeClient) {
 			await this.connect()
@@ -100,7 +100,37 @@ class Lit {
 			authSig = JSON.parse(authSig)
 		}
 		const symmetricKey = await this.litNodeClient.getEncryptionKey({
-			accessControlConditions: accessControlConditionz,
+			unifiedAccessControlConditions: unifiedAccessControlConditions,
+			toDecrypt: encryptedSymmetricKey,
+			chain,
+			authSig,
+		})
+		const decryptedFile = await LitJsSdk.decryptString(
+			encryptedStr,
+			symmetricKey
+		)
+		// eslint-disable-next-line no-console
+		// console.log({
+		//   decryptedFile
+		// })
+		return { decryptedFile }
+	}
+	async decryptStringOrig(
+		encryptedStr,
+		encryptedSymmetricKey,
+		_accessControlConditions
+	) {
+		if (!this.litNodeClient) {
+			await this.connect()
+		}
+		let authSig = localStorage.getItem('lit-auth-signature')
+		if (!authSig) {
+			authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
+		} else {
+			authSig = JSON.parse(authSig)
+		}
+		const symmetricKey = await this.litNodeClient.getEncryptionKey({
+			accessControlConditions: _accessControlConditions,
 			toDecrypt: encryptedSymmetricKey,
 			chain,
 			authSig,
