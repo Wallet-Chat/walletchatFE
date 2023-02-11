@@ -64,7 +64,8 @@ const InboxItemChainImage = styled.div`
 	height: 1rem;
 	background: rgba(255, 255, 255, 0.8);
 	padding: var(--chakra-space-0-5);
-	border-radius: var(--chakra-radii-sm);
+	border-radius: 50%;
+	z-index: var(--chakra-zIndices-docked);
 `
 const InboxItem = ({
 	chain,
