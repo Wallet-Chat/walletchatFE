@@ -327,7 +327,7 @@ const WalletProvider = React.memo(({ children }) => {
 	}, [])
 
 	const connectWallet = async () => {
-		console.log('connectWallet')
+		console.log('👛[connectWallet]')
 		try {
 			let _provider, _account, _signer
 			let _web3 = new Web3(provider)
