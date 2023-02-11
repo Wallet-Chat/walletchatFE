@@ -149,6 +149,8 @@ const NFTInboxList = () => {
 					setInboxData(replica)
 					//setInboxData(data)
 					localStorage['inbox_' + account] = JSON.stringify(replica)
+				} else {
+					setInboxData(data)
 				}
 				setIsFetchingInboxData(false)
 				semaphore = false

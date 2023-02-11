@@ -5,9 +5,7 @@ import equal from 'fast-deep-equal/es6'
 import { Link } from 'react-router-dom'
 
 import InboxList from '../../../../components/Inbox/InboxList'
-import InboxListLoadingSkeleton from '../../../../components/Inbox/InboxListLoadingSkeleton'
 import { InboxItemType } from '../../../../types/InboxItem'
-import lit from '../../../../utils/lit'
 import { useWallet } from '../../../../context/WalletProvider'
 import { decryptMessageWithLit } from '../../../../helpers/decryptMessageWithLit'
 
@@ -94,6 +92,8 @@ const CommunityInboxList = () => {
 					setInboxData(replica)
 					//setInboxData(data)
 					localStorage['inbox_' + account] = JSON.stringify(replica)
+				} else {
+					setInboxData(data)
 				}
 				setIsFetchingInboxData(false)
 				semaphore = false

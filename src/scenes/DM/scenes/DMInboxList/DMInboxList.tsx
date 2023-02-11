@@ -8,9 +8,6 @@ import { InboxItemType } from '../../../../types/InboxItem'
 import { useUnreadCount } from '../../../../context/UnreadCountProvider'
 import InboxSearchInput from '../../components/InboxSearchInput'
 import InboxList from '../../../../components/Inbox/InboxList'
-import InboxListLoadingSkeleton from '../../../../components/Inbox/InboxListLoadingSkeleton'
-import lit from '../../../../utils/lit'
-import WalletAccount from '../../../../chrome/wallet'
 import { useWallet } from '../../../../context/WalletProvider'
 import { decryptMessageWithLit } from '../../../../helpers/decryptMessageWithLit'
 
@@ -114,6 +111,8 @@ const DMInboxList = () => {
 					setInboxData(replica)
 					//setInboxData(data)
 					localStorage['inbox_' + account] = JSON.stringify(replica)
+				} else {
+					setInboxData(data)
 				}
 				setIsFetchingInboxData(false)
 				semaphore = false
