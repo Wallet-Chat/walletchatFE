@@ -64,6 +64,8 @@ export function withWallet(Component) {
 }
 
 const WalletProvider = React.memo(({ children }) => {
+	const [isInitializing, setIsInitializing] = useState(true)
+
 	const [provider, setProvider] = useState()
 	const [web3ModalProvider, setWeb3ModalProvider] = useState()
 	const [chainId, setChainId] = useState(null)
@@ -72,7 +74,7 @@ const WalletProvider = React.memo(({ children }) => {
 	const [email, setEmail] = useState(null)
 	const [notifyDM, setNotifyDM] = useState('true')
 	const [notify24, setNotify24] = useState('true')
-	const [isFetchingName, setIsFetchingName] = useState(true)
+
 	const [account, setAccount] = useState(null)
 	const [accounts, setAccounts] = useState(null)
 	const [web3, setWeb3] = useState(null)
@@ -98,7 +100,7 @@ const WalletProvider = React.memo(({ children }) => {
 	}, [web3Modal])
 
 	React.useEffect(() => {
-		console.log('useEffect: [account]')
+		// console.log('useEffect: [account]', account)
 		if (account) {
 			setAccount(account)
 			// setChainId(chainId)
@@ -119,11 +121,10 @@ const WalletProvider = React.memo(({ children }) => {
 	}, [account])
 
 	useEffect(() => {
-		console.log(
-			'useEffect: web3modalProvider',
-			web3ModalProvider,
-			web3ModalProvider?.on
-		)
+		// console.log(
+		// 	'useEffect: web3modalProvider',
+		// 	web3ModalProvider,
+		// )
 		if (web3ModalProvider?.on) {
 			const handleAccountsChanged = (accounts) => {
 				console.log('handleAccountsChanged', accounts)
@@ -139,10 +140,6 @@ const WalletProvider = React.memo(({ children }) => {
 					storage.set('active-account', {
 						address: getNormalizedAddress(accounts[0]),
 					})
-					console.log(
-						'[account changes]: ',
-						getNormalizedAddress(accounts[0])
-					)
 					if (!isChromeExtension()) {
 						// TODO: how can we refresh data loaded without manual refresh?
 						// window.location.reload()
@@ -165,7 +162,7 @@ const WalletProvider = React.memo(({ children }) => {
 				disconnectWallet()
 			}
 
-			console.log('subscribeToEvents', web3ModalProvider)
+			console.log('🔔[subscribeToEvents]')
 			web3ModalProvider.on(EthereumEvents.CHAIN_CHANGED, handleChainChanged)
 			web3ModalProvider.on(
 				EthereumEvents.ACCOUNTS_CHANGED,
@@ -175,7 +172,7 @@ const WalletProvider = React.memo(({ children }) => {
 			web3ModalProvider.on(EthereumEvents.DISCONNECT, handleDisconnect)
 
 			return () => {
-				console.log('unsubscribeToEvents', web3ModalProvider)
+				console.log('🔔❌[unsubscribeToEvents]')
 				if (web3ModalProvider?.removeListener) {
 					web3ModalProvider.removeListener(
 						EthereumEvents.CHAIN_CHANGED,
@@ -207,7 +204,7 @@ const WalletProvider = React.memo(({ children }) => {
 			console.log('No account connected')
 			return
 		}
-		setIsFetchingName(true)
+
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${_account}`,
 			{
@@ -230,7 +227,7 @@ const WalletProvider = React.memo(({ children }) => {
 				console.error('🚨[GET][Name]:', error)
 			})
 			.then(() => {
-				setIsFetchingName(false)
+				setIsInitializing(false)
 			})
 	}
 
@@ -243,7 +240,6 @@ const WalletProvider = React.memo(({ children }) => {
 			console.log('No account connected')
 			return
 		}
-		setIsFetchingName(true)
 		fetch(
 			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_settings/${_account}`,
 			{
@@ -275,7 +271,7 @@ const WalletProvider = React.memo(({ children }) => {
 				console.error('🚨[GET][Setting]:', error)
 			})
 			.then(() => {
-				setIsFetchingName(false)
+				setIsInitializing(false)
 			})
 	}
 
@@ -548,7 +544,7 @@ const WalletProvider = React.memo(({ children }) => {
 				setEmail,
 				setNotifyDM,
 				setNotify24,
-				isFetchingName,
+				isInitializing,
 				account,
 				accounts,
 				walletRequestPermissions,

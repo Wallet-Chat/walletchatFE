@@ -36,7 +36,7 @@ export const App = () => {
 		isAuthenticated,
 		connectWallet,
 		name,
-		isFetchingName,
+		isInitializing,
 		account,
 		web3,
 		error,
@@ -134,7 +134,7 @@ export const App = () => {
 				<Flex>
 					{isChromeExtension() && closeBtn}
 					<Sidebar />
-					{isFetchingName ? (
+					{isInitializing ? (
 						<Flex
 							justifyContent='center'
 							alignItems='center'

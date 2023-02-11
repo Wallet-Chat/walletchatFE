@@ -8,9 +8,11 @@
       "default_title": "Open WalletChat popup"
    },
    "permissions": ["contextMenus", "notifications", "storage", "tabs", "alarms"],
-   "icons": {
-      "512": "logo512.png"
-   },
+   "icons": [{
+      "src": "logo512.png",
+      "size": "512x512",
+      "type": "png"
+   }],
    "background": {
       "service_worker": "./static/js/background.js"
    },

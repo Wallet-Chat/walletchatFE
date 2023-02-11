@@ -5,7 +5,6 @@ import {
 	Divider,
 	Flex,
 	FormControl,
-	FormErrorMessage,
 	FormHelperText,
 	FormLabel,
 	Image,
@@ -119,13 +118,17 @@ const EnterName = ({ account }: { account: string }) => {
 				})
 		}
 	}
+
 	useEffect(() => {
+		const controller = new AbortController()
+		const signal = controller.signal
+
 		const getOwnedENS = () => {
 			if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
 				console.log('Missing OpenSea API Key')
 				return
 			}
-			if (account) {
+			if (!account) {
 				console.log('No account detected')
 			}
 			fetch(
@@ -135,6 +138,7 @@ const EnterName = ({ account }: { account: string }) => {
 					headers: {
 						Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
 					},
+					signal: signal,
 				}
 			)
 				.then((response) => response.json())
@@ -151,11 +155,10 @@ const EnterName = ({ account }: { account: string }) => {
 		if (account) {
 			getOwnedENS()
 		}
+		return () => {
+			controller.abort()
+		}
 	}, [account])
-
-	useEffect(() => {
-		console.log(errors)
-	}, [errors])
 
 	const onSubmit = (values: any) => {
 		console.log('onSubmit')

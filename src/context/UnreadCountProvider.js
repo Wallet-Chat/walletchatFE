@@ -37,7 +37,7 @@ const UnreadCountProvider = ({ children }) => {
 				.then((response) => response.json())
 				.then((data) => {
 					if (!equal(data, unreadCount)) {
-						console.log('✅[GET][unread Count]:', data)
+						console.log('✅[GET][Unread Count]:', data)
 						//let total_cnt = Object.values(data).reduce((a, b) => a + b);
 						//for now we only have DMs in widget so only sent DM unread count
 						let total_cnt = data.dm
