@@ -8,6 +8,10 @@ export const addressIsValid = async (web3: Web3, address: string) => {
 	return web3.utils.isAddress(address) || address.includes('.eth')
 }
 
+export const getNormalizedAddress = (account: string) => {
+	return account ? account.toLowerCase() : null
+}
+
 export function slugify(text: string) {
 	return text
 		.toString() // Cast to string (optional)

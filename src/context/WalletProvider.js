@@ -8,7 +8,7 @@ import Web3Modal from '@0xsequence/web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { sequence } from '0xsequence'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
-import { getNormalizedAddress } from '../utils/address'
+import { getNormalizedAddress } from '../helpers/text'
 
 import { EthereumEvents } from '../utils/events'
 import storage from '../utils/storage'
