@@ -6,37 +6,26 @@ import {
 	Heading,
 	Image,
 	Link,
-	Modal,
-	ModalBody,
-	ModalCloseButton,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-	ModalOverlay,
-	Spinner,
 	Text,
 	Tooltip,
 	useDisclosure,
-	useToast,
 } from '@chakra-ui/react'
 import {
 	IconBrandTwitter,
 	IconChevronDown,
 	IconExternalLink,
-	IconPhoto,
 } from '@tabler/icons'
 import pluralize from 'pluralize'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, NavLink, Route, Routes, useMatch } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
 
 import CommunityGroupChat from './components/CommunityGroupChat'
 import CommunityTweets from './components/CommunityTweets'
-import { useHover } from '../../../../helpers/useHover'
 import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
 import CommunityType from '../../../../types/Community'
-import Resizer from 'react-image-file-resizer'
 import { useWallet } from '../../../../context/WalletProvider'
+import CommunityModal from './components/CommunityModal'
 
 const CommunityByName = () => {
 	let { community = '' } = useParams()
@@ -48,33 +37,8 @@ const CommunityByName = () => {
 		isFetchingCommunityDataFirstTime,
 		setIsFetchingCommunityDataFirstTime,
 	] = useState(true)
-	const [joined, setJoined] = useState<boolean | null>(null)
-	const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
-	const [isFetchingJoining, setIsFetchingJoining] = useState(false)
 
 	const { isOpen, onOpen, onClose } = useDisclosure()
-
-	const [file, setFile] = useState<Blob | MediaSource>()
-	const [filePreview, setFilePreview] = useState('')
-	const [isFetchingAvatar, setIsFetchingAvatar] = useState(false)
-	const [isSuccessAvatar, setIsSuccessAvatar] = useState(false)
-	const toast = useToast()
-
-	const resizeFile = (file: Blob) =>
-		new Promise((resolve) => {
-			Resizer.imageFileResizer(
-				file,
-				64,
-				64,
-				'JPEG',
-				100,
-				0,
-				(uri) => {
-					resolve(uri)
-				},
-				'base64'
-			)
-		})
 
 	useEffect(() => {
 		getCommunityData()
@@ -120,11 +84,6 @@ const CommunityByName = () => {
 								?.username,
 						})
 					}
-					if (data?.joined === true && joined !== true) {
-						setJoined(true)
-					} else if (data?.joined === false && joined !== false) {
-						setJoined(false)
-					}
 				})
 				.catch((error) => {
 					console.error('🚨[GET][Community]:', error)
@@ -133,143 +92,6 @@ const CommunityByName = () => {
 					if (isFetchingCommunityDataFirstTime) {
 						setIsFetchingCommunityDataFirstTime(false)
 					}
-				})
-		}
-	}
-
-	const joinGroup = () => {
-		if (!isFetchingJoining) {
-			setIsFetchingJoining(true)
-			fetch(
-				`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`,
-				{
-					method: 'POST',
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-					},
-					body: JSON.stringify({
-						walletaddr: account,
-						nftaddr: community,
-					}),
-				}
-			)
-				.then((response) => response.json())
-				.then((response) => {
-					console.log('✅[POST][Community][Join]', response)
-					setJoined(true)
-				})
-				.catch((error) => {
-					console.error('🚨[POST][Community][Join]:', error)
-				})
-				.then(() => {
-					setIsFetchingJoining(false)
-				})
-		}
-	}
-
-	const leaveGroup = () => {
-		if (!isFetchingJoining) {
-			setIsFetchingJoining(true)
-			fetch(
-				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`,
-				{
-					method: 'POST',
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-					},
-					body: JSON.stringify({
-						walletaddr: account,
-						nftaddr: community,
-					}),
-				}
-			)
-				.then((response) => response.json())
-				.then((count: number) => {
-					console.log('✅[POST][Community][Leave]')
-					setJoined(false)
-				})
-				.catch((error) => {
-					console.error('🚨[POST][Community][Leave]:', error)
-				})
-				.then(() => {
-					setIsFetchingJoining(false)
-				})
-		}
-	}
-
-	useEffect(() => {
-		// create the preview
-		if (file) {
-			const objectUrl = URL.createObjectURL(file)
-			setFilePreview(objectUrl)
-
-			// free memory whenever this component is unmounted
-			return () => URL.revokeObjectURL(objectUrl)
-		}
-	}, [file])
-
-	const upload = async (e: ChangeEvent<HTMLInputElement>) => {
-		console.warn(e.target.files)
-		const files = e.target.files
-		if (files && files.length !== 0) {
-			setFile(files[0])
-			const image = await resizeFile(files[0])
-
-			setIsFetchingAvatar(true)
-			if (isSuccessAvatar) {
-				setIsSuccessAvatar(false)
-			}
-
-			if (!community) {
-				console.log('Missing community name')
-				return
-			}
-
-			fetch(
-				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image`,
-				{
-					method: 'PUT',
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-					},
-					body: JSON.stringify({
-						base64data: image,
-						addr: community,
-					}),
-				}
-			)
-				.then((response) => response.json())
-				.then((response) => {
-					console.log('✅[POST][Image]:', response)
-					toast({
-						title: 'Success',
-						description: 'Community avatar updated',
-						status: 'success',
-						position: 'top',
-						duration: 2000,
-						isClosable: true,
-					})
-					setIsSuccessAvatar(true)
-				})
-				.catch((error) => {
-					console.error('🚨[POST][Image]:', error)
-					toast({
-						title: 'Error',
-						description: `Image Not Updated - Unknown error`,
-						status: 'error',
-						position: 'top',
-						duration: 2000,
-						isClosable: true,
-					})
-				})
-				.then(() => {
-					setIsFetchingAvatar(false)
 				})
 		}
 	}
@@ -289,67 +111,14 @@ const CommunityByName = () => {
 					alignItems='center'
 				>
 					<Flex alignItems='flex-start' p={2} borderRadius='md' flex='1'>
-						<label
-							style={{
-								pointerEvents: isFetchingAvatar ? 'none' : 'auto',
-							}}
-						>
-							<Avatar
-								size='md'
-								name={communityData?.name}
-								src={
-									isSuccessAvatar ? filePreview : communityData?.logo
-								}
-								mr={1}
-								cursor='pointer'
-								overflow='hidden'
-								data-group
-							>
-								<input
-									type='file'
-									onChange={(e) => upload(e)}
-									name='img'
-									style={{
-										position: 'absolute',
-										opacity: '0',
-									}}
-								/>
-								{isFetchingAvatar && (
-									<Flex
-										background='rgba(0,0,0,0.5)'
-										position='absolute'
-										bottom='0%'
-										width='100%'
-										height='100%'
-										borderRadius='50%'
-										justifyContent='center'
-										alignItems='center'
-									>
-										<Spinner color='gray.500' size='sm' />
-									</Flex>
-								)}
-								<Flex
-									background='gray.300'
-									position='absolute'
-									bottom='0%'
-									width='100%'
-									justifyContent='center'
-									py={0.5}
-									px={1}
-									transform='translateY(100%)'
-									transition='transform 0.2s ease-in-out'
-									_groupHover={{
-										transform: 'translateY(0)',
-									}}
-								>
-									<IconPhoto
-										color='black'
-										size={20}
-										strokeWidth={1.5}
-									/>
-								</Flex>
-							</Avatar>
-						</label>
+						<Avatar
+							size='md'
+							name={communityData?.name}
+							src={communityData?.logo}
+							mr={1}
+							overflow='hidden'
+							data-group
+						/>
 						<Box>
 							<Button
 								onClick={onOpen}
@@ -381,79 +150,6 @@ const CommunityByName = () => {
 										</Heading>
 									</Flex>
 								)}
-
-								{/* 
-                     <Box mb={2}>
-                        {nftData?.collection?.external_url && (
-                           <Tooltip label="Visit website">
-                              <Link
-                                 href={nftData.collection.external_url}
-                                 target="_blank"
-                                 d="inline-block"
-                                 verticalAlign="middle"
-                                 mr={1}
-                              >
-                                 <IconLink stroke={1.5} color="var(--chakra-colors-lightgray-800)" />
-                              </Link>
-                           </Tooltip>
-                        )}
-                        {nftData?.collection?.discord_url && (
-                           <Tooltip label="Discord">
-                              <Link
-                                 href={nftData.collection.discord_url}
-                                 target="_blank"
-                                 d="inline-block"
-                                 verticalAlign="middle"
-                                 mr={1}
-                              >
-                                 <Image src={IconDiscord} alt="" height="24px" width="24px" />
-                              </Link>
-                           </Tooltip>
-                        )}
-                        {nftData?.collection?.twitter_username && (
-                           <Tooltip label="Twitter">
-                              <Link
-                                 href={`https://twitter.com/${nftData.collection.twitter_username}`}
-                                 target="_blank"
-                                 d="inline-block"
-                                 verticalAlign="middle"
-                                 mr={1}
-                              >
-                                 <IconBrandTwitter stroke={1.5} color="white"
-                                    fill="var(--chakra-colors-lightgray-800)" />
-                              </Link>
-                           </Tooltip>
-                        )}
-                        {nftData?.address && (
-                           <Tooltip label="Etherscan">
-                              <Link
-                                 href={`https://etherscan.io/address/${nftData.address}`}
-                                 target="_blank"
-                                 d="inline-block"
-                                 verticalAlign="middle"
-                                 mr={1}
-                              >
-                                 <Image src={IconEtherscan} alt="" height="21px" width="21px" padding="2px" />
-                              </Link>
-                           </Tooltip>
-                        )}
-                        {nftData?.collection?.medium_username && (
-                           <Tooltip label="Medium">
-                              <Link
-                                 href={`https://medium.com/${nftData.collection.medium_username}`}
-                                 target="_blank"
-                                 d="inline-block"
-                                 verticalAlign="middle"
-                              >
-                                 <IconBrandMedium
-                                    stroke={1.5}
-                                    color="white"
-                                    fill="var(--chakra-colors-lightgray-800)"
-                                 />
-                              </Link>
-                           </Tooltip>
-                        )}
-                     </Box> */}
 							</Button>
 							<Box px={4}>
 								{communityData?.member_count && (
@@ -677,47 +373,11 @@ const CommunityByName = () => {
 					</Routes>
 				</Box>
 			</Box>
-			<Modal isOpen={isOpen} onClose={onClose}>
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>Community Info</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody>
-						<Button
-							ml={2}
-							size='xs'
-							variant={joined ? 'black' : 'outline'}
-							isLoading={isFetchingJoining}
-							onClick={() => {
-								if (joined === null) return
-								else if (joined === false) {
-									joinGroup()
-								} else if (joined === true) {
-									leaveGroup()
-								}
-							}}
-							// @ts-ignore
-							{...joinBtnHoverProps}
-						>
-							<Text ml={1}>
-								{joinBtnIsHovering
-									? joined
-										? 'Leave?'
-										: '+ Join'
-									: joined
-									? 'Joined'
-									: '+ Join'}
-							</Text>
-						</Button>
-					</ModalBody>
-
-					<ModalFooter>
-						<Button colorScheme='blue' mr={3} onClick={onClose}>
-							Close
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+			<CommunityModal
+				isOpen={isOpen}
+				onClose={onClose}
+				communityData={communityData}
+			/>
 		</Flex>
 	)
 }
