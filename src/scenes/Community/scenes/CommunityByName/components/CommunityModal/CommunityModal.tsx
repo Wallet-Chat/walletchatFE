@@ -23,10 +23,14 @@ import pluralize from 'pluralize'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import Resizer from 'react-image-file-resizer'
+import { FixedSizeList as List } from 'react-window'
+import AutoSizer from 'react-virtualized-auto-sizer'
+
 import { useWallet } from '../../../../../../context/WalletProvider'
 import { useHover } from '../../../../../../helpers/useHover'
 import CommunityType from '../../../../../../types/Community'
 import { IconDots, IconLogout, IconPhoto, IconUsers } from '@tabler/icons'
+import CommunityModalMember from '../CommunityModalMember'
 
 const CommunityModal = ({
 	isOpen,
@@ -325,7 +329,7 @@ const CommunityModal = ({
 									</Avatar>
 								</label>
 								<Box px={2}>
-									<Text>
+									<Box>
 										{communityData?.name && (
 											<Flex alignItems='center' d='inline-flex'>
 												<Heading
@@ -340,7 +344,7 @@ const CommunityModal = ({
 												</Heading>
 											</Flex>
 										)}
-									</Text>
+									</Box>
 									<Box>
 										{communityData?.member_count && (
 											<Box>
@@ -369,14 +373,38 @@ const CommunityModal = ({
 					></Box>
 
 					<Box px={6} py={3}>
-						<Flex alignItems='center'>
+						<Flex alignItems='center' mb={2}>
 							<Box flex='0 0 30px'>
 								<IconUsers strokeWidth={1.5} size={20} />
 							</Box>
-							<Heading size='sm' flexGrow={1}>
+							<Text fontSize='md' flexGrow={1}>
 								Members
-							</Heading>
+							</Text>
 						</Flex>
+
+						{communityData?.members &&
+							communityData?.members?.length > 1 && (
+								<Box height={64}>
+									<AutoSizer>
+										{({ width, height }) => (
+											<List
+												width={width}
+												height={height}
+												itemSize={35}
+												itemCount={communityData.members.length}
+												className='custom-scrollbar'
+											>
+												{({ index, style }) => (
+													<CommunityModalMember
+														member={communityData?.members[index]}
+														style={style}
+													/>
+												)}
+											</List>
+										)}
+									</AutoSizer>
+								</Box>
+							)}
 					</Box>
 
 					{/* <Box px={6}>
