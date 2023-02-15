@@ -5,6 +5,9 @@ import {
 	CloseButton,
 	Flex,
 	Heading,
+	Input,
+	InputGroup,
+	InputLeftElement,
 	Menu,
 	MenuButton,
 	MenuItem,
@@ -24,13 +27,19 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import Resizer from 'react-image-file-resizer'
 import { FixedSizeList as List } from 'react-window'
-import AutoSizer from 'react-virtualized-auto-sizer'
 
 import { useWallet } from '../../../../../../context/WalletProvider'
-import { useHover } from '../../../../../../helpers/useHover'
 import CommunityType from '../../../../../../types/Community'
-import { IconDots, IconLogout, IconPhoto, IconUsers } from '@tabler/icons'
+import {
+	IconDots,
+	IconLogout,
+	IconPhoto,
+	IconSearch,
+	IconUsers,
+} from '@tabler/icons'
 import CommunityModalMember from '../CommunityModalMember'
+import { useDebounce } from '../../../../../../hooks/useDebounce'
+import User from '../../../../../../types/User'
 
 const CommunityModal = ({
 	isOpen,
@@ -44,8 +53,13 @@ const CommunityModal = ({
 	const { community = '' } = useParams()
 	const { account } = useWallet()
 
+	const [searchTerm, setSearchTerm] = useState<string>('')
+	const debouncedSearchTerm: string = useDebounce<string>(searchTerm, 500)
+	const [filteredMembers, setFilteredMembers] = useState<User[]>(
+		communityData?.members ? communityData.members : []
+	)
+
 	const [joined, setJoined] = useState<boolean | null>(null)
-	const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
 	const [isFetchingJoining, setIsFetchingJoining] = useState(false)
 
 	const [file, setFile] = useState<Blob | MediaSource>()
@@ -60,7 +74,10 @@ const CommunityModal = ({
 		} else if (communityData?.joined === false && joined !== false) {
 			setJoined(false)
 		}
-	}, [communityData?.joined])
+		if (communityData?.members) {
+			setFilteredMembers(communityData.members)
+		}
+	}, [communityData])
 
 	const joinGroup = () => {
 		if (!isFetchingJoining) {
@@ -125,6 +142,27 @@ const CommunityModal = ({
 				})
 		}
 	}
+
+	useEffect(
+		() => {
+			if (
+				debouncedSearchTerm &&
+				communityData?.members &&
+				communityData?.members?.length > 0
+			) {
+				setFilteredMembers(
+					communityData.members.filter(
+						(m) =>
+							m.name.includes(debouncedSearchTerm) ||
+							m.address.includes(debouncedSearchTerm)
+					)
+				)
+			} else {
+				setFilteredMembers([])
+			}
+		},
+		[debouncedSearchTerm] // Only call effect if debounced search term changes
+	)
 
 	const resizeFile = (file: Blob) =>
 		new Promise((resolve) => {
@@ -373,64 +411,64 @@ const CommunityModal = ({
 					></Box>
 
 					<Box py={3}>
-						<Flex alignItems='center' mb={2} px={6}>
-							<Box flex='0 0 30px'>
-								<IconUsers strokeWidth={1.5} size={20} />
-							</Box>
-							<Text fontSize='md' flexGrow={1}>
-								Members
-							</Text>
+						<Flex
+							alignItems='center'
+							mb={2}
+							px={6}
+							justifyContent='space-between'
+						>
+							<Flex alignItems='center'>
+								<Box flex='0 0 30px'>
+									<IconUsers strokeWidth={1.5} size={20} />
+								</Box>
+								<Text fontSize='md' flexGrow={1} mr={3}>
+									Members
+								</Text>
+							</Flex>
+							<InputGroup
+								size='sm'
+								role='group'
+								width='fit-content'
+								_groupFocus={{ width: '100%' }}
+							>
+								<InputLeftElement
+									pointerEvents='none'
+									color='gray.300'
+									fontSize='1.2em'
+								>
+									<IconSearch size={20} />
+								</InputLeftElement>
+								<Input
+									size='sm'
+									onChange={(e) => setSearchTerm(e.target.value)}
+									border='none'
+									width='fit-content'
+									_groupFocus={{
+										border: 'unset',
+									}}
+								/>
+							</InputGroup>
 						</Flex>
 
-						{communityData?.members &&
-							communityData?.members?.length > 1 && (
-								<Box height='300px'>
-									<List
-										width='100%'
-										height={300}
-										itemSize={55}
-										itemCount={communityData.members.length}
-										className='custom-scrollbar'
-									>
-										{({ index, style }) => (
-											<CommunityModalMember
-												member={communityData?.members[index]}
-												style={style}
-											/>
-										)}
-									</List>
-								</Box>
-							)}
+						{filteredMembers.length > 1 && (
+							<Box height='300px'>
+								<List
+									width='100%'
+									height={300}
+									itemSize={55}
+									itemCount={filteredMembers.length}
+									className='custom-scrollbar'
+								>
+									{({ index, style }) => (
+										<CommunityModalMember
+											member={filteredMembers[index]}
+											style={style}
+										/>
+									)}
+								</List>
+							</Box>
+						)}
 					</Box>
-
-					{/* <Box px={6}>
-						<Button
-							ml={2}
-							size='xs'
-							variant={joined ? 'black' : 'outline'}
-							isLoading={isFetchingJoining}
-							onClick={() => {
-								if (joined === null) return
-								else if (joined === false) {
-									joinGroup()
-								} else if (joined === true) {
-									leaveGroup()
-								}
-							}}
-							// @ts-ignore
-							{...joinBtnHoverProps}
-						>
-							<Text ml={1}>
-								{joinBtnIsHovering
-									? joined
-										? 'Leave?'
-										: '+ Join'
-									: joined
-									? 'Joined'
-									: '+ Join'}
-							</Text>
-						</Button>
-					</Box> */}
 				</ModalBody>
 			</ModalContent>
 		</Modal>

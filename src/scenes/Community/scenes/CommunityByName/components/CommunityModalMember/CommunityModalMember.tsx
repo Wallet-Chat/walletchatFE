@@ -15,7 +15,6 @@ const CommunityModalMember = ({
 		<Flex
 			alignItems='center'
 			style={style}
-			cursor='pointer'
 			borderRadius='md'
 			_hover={{ background: 'lightgray.200' }}
 			px={6}
