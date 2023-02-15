@@ -34,6 +34,9 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 //import sigUtil from 'eth-sig-util'
 import lit from "../../../../utils/lit";
 import ScrollToBottom from 'react-scroll-to-bottom';
+import { useAppSelector } from "@/hooks/useSelector"
+import { fetchPfpDataForAddr } from '@/redux/reducers/dm'
+import { useAppDispatch } from '@/hooks/useDispatch'
 
 const DMByAddress = ({
    account,
@@ -46,11 +49,12 @@ const DMByAddress = ({
    web3: Web3
    isAuthenticated: boolean
 }) => {
+   const { pfpDataByAddr } = useAppSelector((state) => state.dm)
+   const dispatch = useAppDispatch()
+
    let { address: toAddr = '' } = useParams()
    // const [ens, setEns] = useState<string>('')
    const [name, setName] = useState<string>('')
-   const [pfpDataToAddr, setPfpDataToAddr] = useState<string>()
-   const [pfpDataFromAddr, setPfpDataFromAddr] = useState<string>()
    const [prevAddr, setPrevAddr] = useState<string>('')
    const [sentMsg, setSentMsg] = useState(false)
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
@@ -71,6 +75,9 @@ const DMByAddress = ({
 
    let semaphore = false;
    //let isFetchingDataFirstTime = true;
+
+   const accountPfp = pfpDataByAddr[account] || ''
+   const toAddrPfp = pfpDataByAddr[toAddr]
 
    useEffect(() => {
       console.log('useEffect scroll')
@@ -93,82 +100,36 @@ const DMByAddress = ({
    }, [loadedMsgs])
 
    useEffect(() => {
-      if(!pfpDataFromAddr) {
-         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image/${account}`, {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-            },
-         })
-            .then((response) => response.json())
-            .then((response) => {
-               console.log('✅[GET][Image FromAddr]:', account, response)
-               if (response[0]?.base64data) {
-                  setPfpDataFromAddr(response[0].base64data)
-                  localStorage['pfpData_' + account] = response[0].base64data
-               }
-               else {
-                  setPfpDataFromAddr('')
-                  console.log('cleared from PFP')
-               }
-            })
-            .catch((error) => {
-               console.error('🚨[GET][Image FromAddr]:', error)
-            })
+      if (!accountPfp) {
+        dispatch(fetchPfpDataForAddr(account))
       }
 
-      if (toAddr) {
-         if (localStorage.getItem("'pfpData_' + account") === null) {
-            fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image/${toAddr}`, {
-               method: 'GET',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-               },
-            })
-               .then((response) => response.json())
-               .then((response) => {
-                  console.log('✅[GET][Image ToAddr]:', toAddr, response)
-                  if (response[0]?.base64data) {
-                     setPfpDataToAddr(response[0].base64data)
-                     localStorage['pfpData_' + toAddr] = response[0].base64data
-                  }
-                  else {
-                     setPfpDataToAddr('')
-                     console.log('cleared to PFP')
-                  }
-               })
-               .catch((error) => {
-                  console.error('🚨[GET][Image]:', error)
-               })
-         }
+      if (!toAddrPfp) {
+        dispatch(fetchPfpDataForAddr(toAddr))
 
-         //load chat data from localStorage to chatData
-         setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
-         setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
+        //load chat data from localStorage to chatData
+        setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
+        setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
 
-         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name/${toAddr}`, {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-            },
-         })
-            .then((response) => response.json())
-            .then((response) => {
-               console.log('✅[GET][Name]:', response)
-               if (response[0]?.name) setName(response[0].name)
-               else setName('User Not Yet Joined')
-            })
-            .catch((error) => {
-               console.error('🚨[GET][Name]:', error)
-            })
-         }
-   }, [toAddr])
+        fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name/${toAddr}`, {
+           method: 'GET',
+           credentials: "include",
+           headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+           },
+        })
+           .then((response) => response.json())
+           .then((response) => {
+              console.log('✅[GET][Name]:', response)
+              if (response[0]?.name) setName(response[0].name)
+              else setName('User Not Yet Joined')
+           })
+           .catch((error) => {
+              console.error('🚨[GET][Name]:', error)
+           })
+      }
+   }, [account, accountPfp, dispatch, toAddr, toAddrPfp])
 
    const getChatData = useCallback(() => {
       // GET request to get off-chain data for RX user
@@ -200,7 +161,6 @@ const DMByAddress = ({
          setIsFetchingChatData(false)
          const temp = [] as MessageUIType[]
          setLoadedMsgs(temp)
-         setPfpDataToAddr('')
          return //skip the account transition glitch
       }
       setPrevAddr(toAddr)
@@ -718,9 +678,9 @@ const DMByAddress = ({
             {toAddr && (
                <Flex alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center">
-                  {localStorage.getItem('pfpData_' + toAddr) != null ? (
+                       {toAddrPfp ? (
                            <Image
-                              src={localStorage['pfpData_' + toAddr]}
+                              src={toAddrPfp}
                               height="40px"
                               width="40px"
                               borderRadius="var(--chakra-radii-xl)"
@@ -796,7 +756,7 @@ const DMByAddress = ({
             )}
          </Box>
       )
-   }, [copiedAddr, copyToClipboard, name, toAddr])
+   }, [copiedAddr, copyToClipboard, name, toAddr, toAddrPfp])
 
    const renderedMessages = useMemo(() => {
       return loadedMsgs.map((msg: MessageUIType, i) => {
@@ -808,7 +768,7 @@ const DMByAddress = ({
                      context="dms"
                      account={account}
                      msg={msg}
-                     pfpImage={localStorage['pfpData_' + msg.fromAddr]}
+                     pfpImage={accountPfp}
                      updateRead={updateRead}
                   />
                )
@@ -819,7 +779,7 @@ const DMByAddress = ({
                      context="dms"
                      account={account}
                      msg={msg}
-                     pfpImage={pfpDataFromAddr}
+                     pfpImage={toAddrPfp}
                      updateRead={updateRead}
                   />
                )
@@ -827,7 +787,7 @@ const DMByAddress = ({
          }
          return null
       })
-   }, [account, loadedMsgs, updateRead])
+   }, [account, accountPfp, loadedMsgs, toAddrPfp, updateRead])
 
    return (
       <Flex background="white" height="100vh" flexDirection="column" flex="1">

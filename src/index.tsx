@@ -11,23 +11,27 @@ import WalletProvider from './context/WalletProvider'
 import UnreadCountProvider from './context/UnreadCountProvider'
 import IsMobileViewProvider from './context/IsMobileViewProvider'
 import { theme } from './theme'
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
 ReactDOM.render(
-   <React.StrictMode>
-      <ColorModeScript />
+  <React.StrictMode>
+    <ColorModeScript />
+    <Provider store={store}>
       <BrowserRouter>
-         <IsMobileViewProvider>
-            <WalletProvider>
-               <UnreadCountProvider>
-                  <ChakraProvider theme={theme}>
-                     <App />
-                  </ChakraProvider>
-               </UnreadCountProvider>
-            </WalletProvider>
-         </IsMobileViewProvider>
+        <IsMobileViewProvider>
+          <WalletProvider>
+            <UnreadCountProvider>
+              <ChakraProvider theme={theme}>
+                <App />
+              </ChakraProvider>
+            </UnreadCountProvider>
+          </WalletProvider>
+        </IsMobileViewProvider>
       </BrowserRouter>
-   </React.StrictMode>,
-   document.getElementById('root')
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('root')
 )
 
 // If you want your app to work offline and load faster, you can change
