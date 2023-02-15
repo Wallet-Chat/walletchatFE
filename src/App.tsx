@@ -36,27 +36,19 @@ import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
 
 export const App = () => {
-   const location = useLocation();
-
-   const {
-      appLoading,
-      isAuthenticated,
-      connectWallet,
-      name,
-      isFetchingName,
-      account,
-      delegate,
-      web3,
-      error,
-      setRedirectUrl,
-      btnClicks,
-      setBtnClicks
-   } = useWallet()
-   useEffect(() => {
-      const currentPath = location.pathname;
-      console.log(`currentPath: ${currentPath}`)
-      setRedirectUrl(currentPath)
-   }, [location]);
+  const {
+     appLoading,
+     isAuthenticated,
+     connectWallet,
+     name,
+     isFetchingName,
+     account,
+     delegate,
+     web3,
+     error,
+     btnClicks,
+     setBtnClicks
+  } = useWallet()
 
    const { isMobileView } = useIsMobileView()
 
