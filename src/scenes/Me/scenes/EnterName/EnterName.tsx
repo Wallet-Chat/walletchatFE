@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 import OpenSeaNFT from '../../../../types/OpenSea/NFT'
+import * as ENV from '@/constants/env'
 import Resizer from 'react-image-file-resizer'
 
 const EnterName = ({ account }: { account: string }) => {
@@ -32,7 +33,7 @@ const EnterName = ({ account }: { account: string }) => {
 
    const toast = useToast()
 
-   const { setName: globalSetName, redirectUrl } = useWallet()
+   const { setName: globalSetName } = useWallet()
    let navigate = useNavigate()
 
    const [name, setName] = useState('')
@@ -71,7 +72,7 @@ const EnterName = ({ account }: { account: string }) => {
       if (files && files.length !== 0) {
          const image = await resizeFile(files[0])
          fetch(
-            `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image`,
+            `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image`,
             {
             method: 'PUT',
                credentials: 'include',
@@ -116,7 +117,7 @@ const EnterName = ({ account }: { account: string }) => {
    }
    useEffect(() => {
       const getOwnedENS = () => {
-         if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+         if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
             console.log('Missing OpenSea API Key')
             return
          }
@@ -128,7 +129,7 @@ const EnterName = ({ account }: { account: string }) => {
             {
                method: 'GET',
                headers: {
-                  Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                  Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
                },
             }
          )
@@ -172,7 +173,7 @@ const EnterName = ({ account }: { account: string }) => {
          setIsFetching(true)
 
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`,
+            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name`,
             {
             method: 'POST',
                credentials: 'include',

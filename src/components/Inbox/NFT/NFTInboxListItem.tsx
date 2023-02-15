@@ -12,6 +12,7 @@ import NFTPortNFTCollection, {
 } from '../../../types/NFTPort/NFTCollection'
 import POAPEvent from '../../../types/POAP/POAPEvent'
 import InboxItem from '../InboxListItem'
+import * as ENV from '@/constants/env'
 
 const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    const [nft, setNft] = useState<NFTCollection>()
@@ -39,7 +40,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
             return
          }
          if (data?.chain === 'ethereum') {
-            if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+            if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
                console.log('Missing OpenSea API Key')
                return
             }
@@ -48,7 +49,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                {
                   method: 'GET',
                   headers: {
-                     Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                     Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
                   },
                }
             )
@@ -64,7 +65,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                   setIsError(error)
                })
          } else if (data?.chain === 'polygon') {
-            if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+            if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
                console.log('Missing NFT Port API Key')
                return
             }
@@ -73,7 +74,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                {
                   method: 'GET',
                   headers: {
-                     Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+                     Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
                   },
                }
             )
@@ -98,7 +99,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
       }
 
       const getPOAPEvent = () => {
-         if (!process.env.REACT_APP_POAP_API_KEY) {
+         if (!ENV.REACT_APP_POAP_API_KEY) {
             console.log('Missing POAP API key')
             return
          }
@@ -111,7 +112,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
             method: 'GET',
             headers: {
                accept: 'application/json',
-               'X-API-Key': process.env.REACT_APP_POAP_API_KEY,
+               'X-API-Key': ENV.REACT_APP_POAP_API_KEY,
              },
          })
             .then((response) => response.json())

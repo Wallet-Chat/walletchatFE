@@ -13,6 +13,7 @@ import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
 import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
+import * as ENV from '@/constants/env'
 
 import { MessageType, MessageUIType, SettingsType } from '../../../../types/Message'
 // import EncryptedMsgBlock from '../../../../types/Message'
@@ -63,7 +64,7 @@ const NFTChat = ({
 
    const getChatData = () => {
       // GET request to get off-chain data for RX user
-      if (!process.env.REACT_APP_REST_API) {
+      if (!ENV.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
          return
       }
@@ -73,7 +74,7 @@ const NFTChat = ({
       }
       // setIsFetchingMessages(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
+         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getnft_chatitems/${account}/${recipientAddr}/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
             credentials: "include",
@@ -167,7 +168,7 @@ const NFTChat = ({
       data.message = msgInputCopy //await cid
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`, {
          method: 'POST',
          credentials: "include",
          headers: {

@@ -23,6 +23,7 @@ import { useParams } from 'react-router-dom'
 import NFTGroupChat from '../../components/NFTGroupChat'
 import POAPEvent from '../../../../types/POAP/POAPEvent'
 import { useHover } from '../../../../helpers/useHover'
+import * as ENV from '@/constants/env'
 
 const POAPById = ({ account }: { account: string }) => {
    let { poapId = '' } = useParams()
@@ -44,7 +45,7 @@ const POAPById = ({ account }: { account: string }) => {
          return
       }
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/POAP_${poapId}`,
+         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_bookmarks/${account}/POAP_${poapId}`,
          {
             method: 'GET',
             credentials: "include",
@@ -66,7 +67,7 @@ const POAPById = ({ account }: { account: string }) => {
 
    const joinGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_bookmark`, {
          method: 'POST',
          credentials: "include",
          headers: {
@@ -93,7 +94,7 @@ const POAPById = ({ account }: { account: string }) => {
 
    const leaveGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/delete_bookmark`, {
          method: 'POST',
          credentials: "include",
          headers: {
@@ -117,7 +118,7 @@ const POAPById = ({ account }: { account: string }) => {
    }
 
    const getPOAPEvent = () => {
-      if (!process.env.REACT_APP_POAP_API_KEY) {
+      if (!ENV.REACT_APP_POAP_API_KEY) {
          console.log('Missing POAP API key')
          return
       }
@@ -130,7 +131,7 @@ const POAPById = ({ account }: { account: string }) => {
          method: 'GET',
          headers: {
             accept: 'application/json',
-            'X-API-Key': process.env.REACT_APP_POAP_API_KEY,
+            'X-API-Key': ENV.REACT_APP_POAP_API_KEY,
           },
       })
          .then((response) => response.json())

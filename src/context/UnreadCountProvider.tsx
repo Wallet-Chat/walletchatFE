@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import equal from 'fast-deep-equal/es6'
 import { useWallet } from './WalletProvider'
+import * as ENV from '@/constants/env'
 
 export const UnreadCountContext = React.createContext()
 export const useUnreadCount = () => React.useContext(UnreadCountContext)
@@ -21,7 +22,7 @@ const UnreadCountProvider = React.memo(({ children }) => {
 
    const getUnreadCount = useCallback(() => {
       if (account) {
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/unreadcount/${account}`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/unreadcount/${account}`, {
             method: 'GET',
             credentials: "include",
             headers: {

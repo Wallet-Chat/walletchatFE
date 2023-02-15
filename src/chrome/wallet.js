@@ -1,3 +1,6 @@
+const REACT_APP_REST_API = import.meta.env.VITE_REACT_APP_REST_API
+const REACT_APP_API_VERSION = import.meta.env.VITE_REACT_APP_API_VERSION
+
 export default function WalletAccount(address) {
 
     let unreadCount = -1;
@@ -51,7 +54,7 @@ export default function WalletAccount(address) {
             // console.log(`[getInboxCount][${address}`)
 
             fetch(
-                ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${address}`,
+                ` ${REACT_APP_REST_API}/${REACT_APP_API_VERSION}/get_unread_cnt/${address}`,
                 {
                     method: 'GET',
                     credentials: "include",

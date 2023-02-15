@@ -32,6 +32,7 @@ import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
 import { IconBrandTwitter } from '@tabler/icons'
 
+import * as ENV from '@/constants/env'
 import IconDiscord from '../../images/icon-products/icon-discord.svg'
 import IconPrivacy from '../../images/privacy-policy.png'
 import logoThumb from '../../images/logo-thumb.svg'
@@ -117,7 +118,7 @@ export default function Sidebar() {
       nftId: string,
       chain: string
    ) => {
-      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+      if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
          console.log('Missing NFT Port API Key')
          return
       }
@@ -130,7 +131,7 @@ export default function Sidebar() {
          {
             method: 'GET',
             headers: {
-               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+               Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
             },
          }
       )
@@ -151,7 +152,7 @@ export default function Sidebar() {
    }
 
    const getImagePFP = () => {
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${account}`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image/${account}`, {
          method: 'GET',
          credentials: "include",
          headers: {
@@ -236,7 +237,7 @@ export default function Sidebar() {
                         </CLink>
                      </Flex>
                      <Text fontSize="sm" mt={2} color="lightgray.900">
-                        Ver. {process.env.REACT_APP_VERSION}
+                        Ver. {ENV.REACT_APP_VERSION}
                      </Text>
                   </PopoverBody>
                </PopoverContent>
@@ -446,7 +447,7 @@ export default function Sidebar() {
                      </MenuItem>
                      <Flex justifyContent="space-between" alignItems="center" px={3} background="lightgray.300" pb={1} borderRadius="md" mt={2}>
                      <Text fontSize="sm" mt={2} color="lightgray.900">
-                        WalletChat Ver. {process.env.REACT_APP_VERSION}
+                        WalletChat Ver. {ENV.REACT_APP_VERSION}
                      </Text>
                      <Flex alignItems="center">
                         <CLink

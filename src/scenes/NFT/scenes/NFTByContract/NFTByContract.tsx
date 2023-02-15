@@ -42,7 +42,8 @@ import {
  import OpenSeaNFTCollection, { openseaToGeneralNFTCollectionType } from '../../../../types/OpenSea/NFTCollection'
  import NFTPortNFTCollection, { nftPortToGeneralNFTCollectionType } from '../../../../types/NFTPort/NFTCollection'
  import NFTCollection from '../../../../types/NFTCollection'
- 
+ import * as ENV from '@/constants/env'
+
  const NFTByContract = ({ account }: { account: string }) => {
     let { nftContractAddr = '', chain = '' } = useParams()
  
@@ -78,7 +79,7 @@ import {
  
     const getJoinStatus = () => {
        fetch(
-          ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
+          ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
           {
              method: 'GET',
              credentials: "include",
@@ -101,7 +102,7 @@ import {
     const joinGroup = () => {
        if (!isFetchingJoining) {
           setIsFetchingJoining(true)
-          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
+          fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_bookmark`, {
              method: 'POST',
              credentials: "include",
              headers: {
@@ -130,7 +131,7 @@ import {
     const leaveGroup = () => {
        if (!isFetchingJoining) {
           setIsFetchingJoining(true)
-          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
+          fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/delete_bookmark`, {
              method: 'POST',
              credentials: "include",
              headers: {
@@ -159,7 +160,7 @@ import {
     const getTweetCount = () => {
        if (account) {
           fetch(
-             ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
+             ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
              {
                 method: 'GET',
                 credentials: "include",
@@ -188,7 +189,7 @@ import {
           return
        }
        if (chain === 'ethereum') {
-          if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+          if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
              console.log('Missing OpenSea API Key')
              return
           }
@@ -197,7 +198,7 @@ import {
              {
                 method: 'GET',
                 headers: {
-                   Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                   Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
                 },
              }
           )
@@ -210,7 +211,7 @@ import {
              })
              .catch((error) => console.log(`🚨[GET][NFT]:`, error))
        } else if (chain === 'polygon') {
-          if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+          if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
              console.log('Missing NFT Port API Key')
              return
           }
@@ -219,7 +220,7 @@ import {
              {
                 method: 'GET',
                 headers: {
-                   Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+                   Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
                 },
              }
           )
@@ -237,7 +238,7 @@ import {
     }
  
     const getNftStatistics = () => {
-       if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+       if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
           console.log('Missing NFT Port API Key')
           return
        }
@@ -250,7 +251,7 @@ import {
           {
              method: 'GET',
              headers: {
-                Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+                Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
              },
           }
        )

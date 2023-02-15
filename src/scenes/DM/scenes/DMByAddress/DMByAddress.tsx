@@ -20,6 +20,7 @@ import {
 } from '@tabler/icons'
 import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
+import * as ENV from '@/constants/env'
 
 import { MessageType, MessageUIType } from '../../../../types/Message'
 import { truncateAddress } from '../../../../helpers/truncateString'
@@ -93,7 +94,7 @@ const DMByAddress = ({
 
    useEffect(() => {
       if(!pfpDataFromAddr) {
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${account}`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image/${account}`, {
             method: 'GET',
             credentials: "include",
             headers: {
@@ -120,7 +121,7 @@ const DMByAddress = ({
 
       if (toAddr) {
          if (localStorage.getItem("'pfpData_' + account") === null) {
-            fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image/${toAddr}`, {
+            fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image/${toAddr}`, {
                method: 'GET',
                credentials: "include",
                headers: {
@@ -149,7 +150,7 @@ const DMByAddress = ({
          setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
          setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
 
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name/${toAddr}`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name/${toAddr}`, {
             method: 'GET',
             credentials: "include",
             headers: {
@@ -171,7 +172,7 @@ const DMByAddress = ({
 
    const getChatData = useCallback(() => {
       // GET request to get off-chain data for RX user
-      if (!process.env.REACT_APP_REST_API) {
+      if (!ENV.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
          return
       }
@@ -212,7 +213,7 @@ const DMByAddress = ({
       lastTimeMsg = encodeURIComponent(lastTimeMsg)
 
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
+         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
          {
             method: 'GET',
             credentials: "include",
@@ -298,7 +299,7 @@ const DMByAddress = ({
          //since we are only loading new messages, we need to update read status async and even after we aren't get new messages
          //in the case its a while before a user reads the message
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`,
+            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`,
             {
                method: 'GET',
                credentials: "include",
@@ -610,7 +611,7 @@ const DMByAddress = ({
       console.log('✅[POST][Encrypted Message]:', data)
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`, {
          method: 'POST',
          credentials: "include",
          headers: {
@@ -636,7 +637,7 @@ const DMByAddress = ({
          })
 
       if (toAddr.toLocaleLowerCase() === '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()) {
-         if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
+         if (!ENV.REACT_APP_SLEEKPLAN_API_KEY) {
             console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
          } else {
             fetch(`https://api.sleekplan.com/v1/post`, {
@@ -644,7 +645,7 @@ const DMByAddress = ({
                credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
-                  Authorization: `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
+                  Authorization: `Bearer ${ENV.REACT_APP_SLEEKPLAN_API_KEY}`,
                },
                body: JSON.stringify({
                   title: account,

@@ -4,6 +4,7 @@ import equal from 'fast-deep-equal/es6'
 import TweetType from '../../../../types/Tweet'
 import Tweet from './components/Tweet'
 import { Box, Divider, Flex, Spinner } from '@chakra-ui/react'
+import * as ENV from '@/constants/env'
 
 
 const NFTTweets = ({
@@ -27,7 +28,7 @@ const NFTTweets = ({
    const getTwitterInfo = async (nftContractAddr: string) => {
       setIsFetchingTweets(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter/${nftContractAddr}`,
+         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_twitter/${nftContractAddr}`,
          {
             method: 'GET',
             credentials: "include",

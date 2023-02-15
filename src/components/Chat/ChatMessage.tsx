@@ -14,6 +14,7 @@ import OpenSeaNFT, { openseaToGeneralNFTType } from '../../types/OpenSea/NFT'
 import AlchemyNFT, { alchemyToGeneralNFTType } from '../../types/Alchemy/NFT'
 import UserProfileContextMenu from '../UserProfileContextMenu'
 import { useIsInViewport } from '../../helpers/useIsInViewport'
+import * as ENV from '@/constants/env'
 
 const MessageBox = styled.div`
    position: relative;
@@ -143,7 +144,7 @@ const ChatMessage = ({
          }
 
          const fetchFromOpenSea = () => {
-            if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+            if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
                console.log('Missing OpenSea API Key')
                return
             }
@@ -152,7 +153,7 @@ const ChatMessage = ({
                {
                   method: 'GET',
                   headers: {
-                     Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                     Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
                   },
                }
             )
@@ -170,12 +171,12 @@ const ChatMessage = ({
          }
 
          const fetchFromAlchemy = () => {
-            if (process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
+            if (ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
                console.log('Missing Alchemy API Key')
                return
             }
             fetch(
-               `https://polygon-mainnet.g.alchemy.com/v2/${process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${msg?.nftAddr}&tokenId=${msg?.nftId}`,
+               `https://polygon-mainnet.g.alchemy.com/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${msg?.nftAddr}&tokenId=${msg?.nftId}`,
                {
                   method: 'GET',
                }
@@ -199,7 +200,7 @@ const ChatMessage = ({
       if (msg.toAddr && msg.fromAddr && msg.timestamp) {
          msg.read = true
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
+            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
             {
                method: 'PUT',
                credentials: "include",

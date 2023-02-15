@@ -16,6 +16,7 @@ import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
+import * as ENV from '@/constants/env'
 
 import { GroupMessageType, MessageUIType } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
@@ -127,7 +128,7 @@ const CommunityGroupChat = ({
 
       setIsSendingMessage(true)
 
-      fetch(`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community`, {
+      fetch(`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/community`, {
          method: 'POST',
          credentials: "include",
          headers: {

@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
+import * as ENV from '@/constants/env'
 
 const EnterEmail = ({ account }: { account: string }) => {
    const {
@@ -43,7 +44,7 @@ const EnterEmail = ({ account }: { account: string }) => {
       //setCheckedItems([checked, checkedItems[1]])
       globalSetNotifyDM(checked.toString())
 
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
          credentials: "include",
          headers: {
@@ -76,7 +77,7 @@ const EnterEmail = ({ account }: { account: string }) => {
       //setCheckedItems([checkedItems[0], checked])
       globalSetNotify24(checked.toString())
 
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_settings`, {
          method: 'POST',
          credentials: "include",
          headers: {
@@ -115,7 +116,7 @@ const EnterEmail = ({ account }: { account: string }) => {
 
          setIsFetching(true)
 
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_settings`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_settings`, {
             method: 'POST',
             credentials: "include",
             headers: {

@@ -22,6 +22,7 @@ import NFTPortNFTCollection, {
 } from '../../../../types/NFTPort/NFTCollection'
 import NFTCollection from '../../../../types/NFTCollection'
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
+import * as ENV from '@/constants/env'
 
 export default function NFTInboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -47,7 +48,7 @@ export default function NFTInboxSearchInput() {
    }
 
    const fetchEthereumContract = async (address: string) => {
-      if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+      if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
          console.log('Missing OpenSea API Key')
          return
       }
@@ -55,7 +56,7 @@ export default function NFTInboxSearchInput() {
       fetch(`https://api.opensea.io/api/v1/asset_contract/${address}`, {
          method: 'GET',
          headers: {
-            Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+            Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
          },
       })
          .then((response) => response.json())
@@ -77,7 +78,7 @@ export default function NFTInboxSearchInput() {
    }
 
    const fetchPolygonContract = (address: string) => {
-      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+      if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
          console.log('Missing NFT Port API Key')
          return
       }
@@ -87,7 +88,7 @@ export default function NFTInboxSearchInput() {
          {
             method: 'GET',
             headers: {
-               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+               Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
             },
          }
       )

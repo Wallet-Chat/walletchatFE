@@ -16,6 +16,7 @@ import MyNFTPOAP from './components/MyNFTPOAP'
 import { chains } from '../../../../constants'
 import ChainFilters from '../../../../components/ChainFilters'
 import MyNFTSkeleton from './components/MyNFTSkeleton'
+import * as ENV from '@/constants/env'
 
 export default function MyNFTs({ account }: { account: string }) {
    // NFTs
@@ -33,11 +34,11 @@ export default function MyNFTs({ account }: { account: string }) {
 
    useEffect(() => {
       const fetchAllNfts = async () => {
-         if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+         if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
             console.log('Missing NFTPort API Key')
             return
          }
-         if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+         if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
             console.log('Missing OpenSea API Key')
             return
          }
@@ -54,14 +55,14 @@ export default function MyNFTs({ account }: { account: string }) {
                {
                   method: 'GET',
                   headers: {
-                     Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+                     Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
                   },
                }
             ).then((res) => res.json()),
             fetch(`https://api.opensea.io/api/v1/assets?owner=${account}`, {
                method: 'GET',
                headers: {
-                  Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                  Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
                },
             }).then((res) => res.json()),
          ])
@@ -108,7 +109,7 @@ export default function MyNFTs({ account }: { account: string }) {
             
       }
       const fetchPoaps = async () => {
-         if (process.env.REACT_APP_POAP_API_KEY === undefined) {
+         if (ENV.REACT_APP_POAP_API_KEY === undefined) {
             console.log('Missing POAP API Key')
             return
          }
@@ -123,7 +124,7 @@ export default function MyNFTs({ account }: { account: string }) {
             method: 'GET',
             headers: {
                accept: 'application/json',
-               'X-API-Key': process.env.REACT_APP_POAP_API_KEY,
+               'X-API-Key': ENV.REACT_APP_POAP_API_KEY,
              },
          })
             .then((response) => response.json())

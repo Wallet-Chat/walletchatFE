@@ -2,10 +2,12 @@
 import namehash from '@ensdomains/eth-ens-namehash'
 import Web3 from 'web3'
 import { ethers } from 'ethers'
+import * as ENV from '@/constants/env'
+
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 
 export async function reverseENSLookup(address: string) {
-   const web3 = createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/" + process.env.REACT_APP_ALCHEMY_API_KEY_ETHEREUM);
+   const web3 = createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/" + ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM);
    
    let lookup = address.toLowerCase().substring(0, 2) + '.addr.reverse'
    let ResolverContract = await web3.eth.ens.getResolver(lookup)
@@ -27,7 +29,7 @@ export async function reverseENSLookup(address: string) {
 }
 
 export async function registrantENSLookup(domainName: string) {
-   const web3 = createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/" + process.env.REACT_APP_ALCHEMY_API_KEY_ETHEREUM);
+   const web3 = createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/" + ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM);
  
    const BigNumber = ethers.BigNumber
     const utils = ethers.utils

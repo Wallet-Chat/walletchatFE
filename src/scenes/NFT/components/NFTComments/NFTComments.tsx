@@ -2,6 +2,7 @@ import { useEffect, useState, KeyboardEvent } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import { IconSend } from '@tabler/icons'
 import { Button, Divider, Flex, FormControl } from '@chakra-ui/react'
+import * as ENV from '@/constants/env'
 
 import CommentType from '../../../../types/Comment'
 import Comment from './components/Comment'
@@ -38,7 +39,7 @@ const NFTComments = ({
    const getComments = () => {
       setIsFetchingComments(true)
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_comments/${nftContractAddr}/${nftId}`,
+         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_comments/${nftContractAddr}/${nftId}`,
          {
             method: 'GET',
          }
@@ -89,7 +90,7 @@ const NFTComments = ({
       }
 
       setIsPostingComment(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_comments`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_comments`, {
          method: 'POST',
          credentials: "include",
          headers: {

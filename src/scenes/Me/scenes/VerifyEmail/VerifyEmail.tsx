@@ -19,6 +19,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
+import * as ENV from '@/constants/env'
 
 const VerifyEmail = ({ account }: { account: string }) => {
    const location = useLocation();
@@ -47,7 +48,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
    const [fetchError, setFetchError] = useState(false)
    const [isVerifySuccess, setIsVerifySuccess] = useState(false)
    const callVerifyEmail = () => {
-      fetch(` ${process.env.REACT_APP_REST_API}/verify_email/${verificationemail}/${verificationcode}`, {
+      fetch(`${ENV.REACT_APP_REST_API}/verify_email/${verificationemail}/${verificationcode}`, {
          method: 'GET'
       })
          .then((response) => response.json())
@@ -77,7 +78,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
    const onSubmit = (values: any) => {
       if (values?.code) {
          setIsFetching(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/verify_email/${_email}/${values.code}`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/verify_email/${_email}/${values.code}`, {
             method: 'GET',
             credentials: "include",
             headers: {

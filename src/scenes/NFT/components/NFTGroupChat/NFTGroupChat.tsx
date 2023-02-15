@@ -2,6 +2,7 @@ import { Box, Divider, Flex, Tag } from '@chakra-ui/react'
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import equal from 'fast-deep-equal/es6'
 import { useNavigate } from 'react-router-dom'
+import * as ENV from '@/constants/env'
 
 import { getFormattedDate } from '../../../../helpers/date'
 import { GroupMessageType, MessageUIType, PfpType } from '../../../../types/Message'
@@ -50,7 +51,7 @@ const NFTGroupChat = ({
       // setIsFetchingMessages(true)
 
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_groupchatitems/${nftContractAddr}/${account}`,
+         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_groupchatitems/${nftContractAddr}/${account}`,
          {
             method: 'GET',
             credentials: "include",
@@ -107,7 +108,7 @@ const NFTGroupChat = ({
       data.message = msgInputCopy
 
       setIsSendingMessage(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_groupchatitem`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_groupchatitem`, {
          method: 'POST',
          credentials: "include",
          headers: {

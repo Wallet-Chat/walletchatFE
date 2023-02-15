@@ -21,6 +21,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
+import * as ENV from '@/constants/env'
 
 import CommunityGroupChat from './components/CommunityGroupChat'
 import CommunityTweets from './components/CommunityTweets'
@@ -59,7 +60,7 @@ const CommunityByName = ({ account }: { account: string }) => {
             return
          }
          fetch(
-            `${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/community/${community}/${account}`,
+            `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/community/${community}/${account}`,
             {
                method: 'GET',
                credentials: "include",
@@ -99,7 +100,7 @@ const CommunityByName = ({ account }: { account: string }) => {
    const joinGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_bookmark`, {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -128,7 +129,7 @@ const CommunityByName = ({ account }: { account: string }) => {
    const leaveGroup = () => {
       if (!isFetchingJoining) {
          setIsFetchingJoining(true)
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/delete_bookmark`, {
             method: 'POST',
             credentials: "include",
             headers: {

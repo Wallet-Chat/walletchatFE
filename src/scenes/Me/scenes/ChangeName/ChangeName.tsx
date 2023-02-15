@@ -18,6 +18,7 @@ import {
  import { useWallet } from '../../../../context/WalletProvider'
  import OpenSeaNFT from '../../../../types/OpenSea/NFT'
  import Resizer from "react-image-file-resizer";
+ import * as ENV from '@/constants/env'
 
  const ChangeName = () => {
     const {
@@ -69,7 +70,7 @@ import {
          setFile(files[0])
          const image = await resizeFile(files[0])
          
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image`, {
+         fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image`, {
             method: 'PUT',
             credentials: "include",
             headers: {
@@ -112,7 +113,7 @@ import {
  
     useEffect(() => {
        const getOwnedENS = () => {
-          if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+          if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
              console.log('Missing OpenSea API Key')
              return
           }
@@ -121,7 +122,7 @@ import {
              {
                 method: 'GET',
                 headers: {
-                   Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                   Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
                 },
              }
           )
@@ -146,7 +147,7 @@ import {
 
          setIsFetching(true)
 
-          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`, {
+          fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name`, {
              method: 'POST',
              credentials: "include",
              headers: {

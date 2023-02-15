@@ -21,6 +21,7 @@ import {
 } from '@tabler/icons'
 import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
+import * as ENV from '@/constants/env'
 
 import NFTGroupChat from '../../components/NFTGroupChat'
 import NFTChat from '../../components/NFTChat'
@@ -96,7 +97,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const getJoinStatus = () => {
       fetch(
-         ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
+         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_bookmarks/${account}/${nftContractAddr}`,
          {
             method: 'GET',
             credentials: "include",
@@ -118,7 +119,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const joinGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_bookmark`, {
          method: 'POST',
          credentials: "include",
          headers: {
@@ -143,7 +144,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
    const leaveGroup = () => {
       setIsFetchingJoining(true)
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/delete_bookmark`, {
          method: 'POST',
          credentials: "include",
          headers: {
@@ -169,7 +170,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
    const getTweetCount = () => {
       if (account) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
+            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,
             {
                method: 'GET',
                credentials: "include",
@@ -195,7 +196,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
    const getUnreadDMCount = () => {
       if (account) {
          fetch(
-            ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
+            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_unread_cnt/${account}/${nftContractAddr}/${nftId}`,
             {
                method: 'GET',
                credentials: "include",
@@ -224,7 +225,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
          return
       }
       if (chain === 'ethereum') {
-         if (process.env.REACT_APP_OPENSEA_API_KEY === undefined) {
+         if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
             console.log('Missing OpenSea API Key')
             return
          }
@@ -233,7 +234,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
             {
                method: 'GET',
                headers: {
-                  Authorization: process.env.REACT_APP_OPENSEA_API_KEY,
+                  Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
                },
             }
          )
@@ -246,12 +247,12 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
             })
             .catch((error) => console.log(`🚨[GET][NFT Contract]:`, error))
       } else if (chain === 'polygon') {
-         if (process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
+         if (ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
             console.log('Missing Alchemy API Key')
             return
          }
          fetch(
-            `https://polygon-mainnet.g.alchemy.com/v2/${process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${nftContractAddr}&tokenId=${nftId}`,
+            `https://polygon-mainnet.g.alchemy.com/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${nftContractAddr}&tokenId=${nftId}`,
             {
                method: 'GET',
             }
@@ -266,7 +267,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
    }
 
    const getNftStatistics = () => {
-      if (process.env.REACT_APP_NFTPORT_API_KEY === undefined) {
+      if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
          console.log('Missing NFT Port API Key')
          return
       }
@@ -283,7 +284,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
          {
             method: 'GET',
             headers: {
-               Authorization: process.env.REACT_APP_NFTPORT_API_KEY,
+               Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
             },
          }
       )
@@ -307,10 +308,10 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
       let alchemyUrl, key
       if (chain === 'ethereum') {
          alchemyUrl = 'https://eth-mainnet.g.alchemy.com/v2/'
-         key = process.env.REACT_APP_ALCHEMY_API_KEY_ETHEREUM
+         key = ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM
       } else if (chain === 'polygon') {
          alchemyUrl = 'https://polygon-mainnet.g.alchemy.com/v2/'
-         key = process.env.REACT_APP_ALCHEMY_API_KEY_POLYGON
+         key = ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON
       }
 
       if (alchemyUrl && key) {

@@ -1,4 +1,5 @@
 // import createMetaMaskProvider from 'metamask-extension-provider'
+import * as ENV from '@/constants/env'
 
 let activeTabId: number,
    lastUrl: string | undefined,
@@ -113,7 +114,7 @@ function startAlarm() {
 async function getInboxCount(account: string) {
    console.log('[background.ts] getInboxCount', account)
    if (account) {
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_unread_cnt/${account}`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_unread_cnt/${account}`, {
          method: 'GET',
          credentials: "include",
          headers: {

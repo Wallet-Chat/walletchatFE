@@ -17,7 +17,7 @@ import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 import lit from "../../utils/lit";
 import WalletAccount from '../../chrome/wallet'
-
+import * as ENV from '@/constants/env'
 
 const Inbox = ({
    account,
@@ -61,7 +61,7 @@ const Inbox = ({
 
    const getInboxData = () => {
       // GET request to get off-chain data for RX user
-      if (!process.env.REACT_APP_REST_API) {
+      if (!ENV.REACT_APP_REST_API) {
          console.log('REST API url not in .env', process.env)
          return
       }
@@ -79,7 +79,7 @@ const Inbox = ({
       }
       setIsFetchingInboxData(true)
       semaphore = true;
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_inbox/${account}`, {
          method: 'GET',
          credentials: "include",
          headers: {
