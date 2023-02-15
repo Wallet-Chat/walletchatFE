@@ -51,7 +51,8 @@
           "state"
         ]
       }
-    ]
+    ],
+    "consistent-return": 0
   },
   "settings": {
     "react": {

@@ -1,870 +1,415 @@
-import {
-   Box,
-   FormControl,
-   Button,
-   Flex,
-   Text,
-   Image,
-   Spinner,
-   Link as CLink,
-} from '@chakra-ui/react'
-import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import Web3 from 'web3'
-import {
-   IconArrowLeft,
-   IconCheck,
-   IconCopy,
-   IconExternalLink,
-   IconSend,
-} from '@tabler/icons'
-import Blockies from 'react-blockies'
-import TextareaAutosize from 'react-textarea-autosize'
-import * as ENV from '@/constants/env'
-
-import { MessageType, MessageUIType } from '../../../../types/Message'
-import { truncateAddress } from '../../../../helpers/truncateString'
-import { isMobile } from 'react-device-detect'
+/* eslint-disable no-console */
+import { Box, Flex, Spinner } from '@chakra-ui/react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
+import { MessageType, MessageUIType } from '../../../../types/Message'
 import { DottedBackground } from '../../../../styled/DottedBackground'
-import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
-// import { getIpfsData, postIpfsData } from '../../services/ipfs'
-// import EthCrypto, { Encrypted } from 'eth-crypto'
-//import sigUtil from 'eth-sig-util'
-import lit from "../../../../utils/lit";
-import ScrollToBottom from 'react-scroll-to-bottom';
-import { useAppSelector } from "@/hooks/useSelector"
+import lit from '../../../../utils/lit'
+import Header from './Header'
+import * as ENV from '@/constants/env'
+import { getFetchOptions } from '@/helpers/fetch'
+import { useAppSelector } from '@/hooks/useSelector'
 import { fetchPfpDataForAddr } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import Submit from './Submit'
+
+const DEFAULT_LAST_MESSAGE_TIME = '2006-01-02T15:04:05.000Z'
 
 const DMByAddress = ({
-   account,
-   delegate,
-   web3,
-   isAuthenticated,
+  account,
+  delegate,
+  isAuthenticated,
 }: {
-   account: string
-   delegate: string
-   web3: Web3
-   isAuthenticated: boolean
+  account: string
+  delegate: string
+  isAuthenticated: boolean
 }) => {
-   const { pfpDataByAddr } = useAppSelector((state) => state.dm)
-   const dispatch = useAppDispatch()
+  const { pfpDataByAddr } = useAppSelector((state) => state.dm)
+  const dispatch = useAppDispatch()
 
-   let { address: toAddr = '' } = useParams()
-   // const [ens, setEns] = useState<string>('')
-   const [name, setName] = useState<string>('')
-   const [prevAddr, setPrevAddr] = useState<string>('')
-   const [sentMsg, setSentMsg] = useState(false)
-   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-   const [msgInput, setMsgInput] = useState<string>('')
-   const [isSendingMessage, setIsSendingMessage] = useState(false)
-   const [copiedAddr, setCopiedAddr] = useState(false)
-   const [chatData, setChatData] = useState<MessageType[]>(
-      new Array<MessageType>()
-   )
-   const [encryptedChatData, setEncChatData] = useState<MessageType[]>(
-      new Array<MessageType>()
-   )
-   const [isFetchingChatData, setIsFetchingChatData] = useState(false)
+  const semaphore = React.useRef(false)
+  const { address: toAddr = '' } = useParams()
 
-   const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
+  const localStorageKeyDmDataToAddr = `dmData_${account}_${toAddr.toLowerCase()}`
+  const localStorageKeyDmDataEncToAddr = `dmDataEnc_${account}_${toAddr.toLowerCase()}`
+  const localStorageKeyDmReadIDsToAddr = `dmReadIDs_${account}_${toAddr.toLowerCase()}`
 
-   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+  const [prevAddr, setPrevAddr] = useState<string>('')
+  const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+  const [chatData, setChatData] = useState<MessageType[]>(
+    localStorage['dmData_' + account + '_' + toAddr.toLowerCase()]
+      ? JSON.parse(
+        localStorage['dmData_' + account + '_' + toAddr.toLowerCase()]
+      )
+      : []
+  )
+  const [encryptedChatData, setEncChatData] = useState<MessageType[]>(
+    localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()]
+      ? JSON.parse(
+        localStorage['dmDataEnc_' + account + '_' + toAddr.toLowerCase()]
+      )
+      : []
+  )
+  const [isFetchingChatData, setIsFetchingChatData] = useState(false)
 
-   let semaphore = false;
-   //let isFetchingDataFirstTime = true;
+  const scrollToBottomRef = React.useRef<HTMLDivElement>(null)
 
-   const accountPfp = pfpDataByAddr[account] || ''
-   const toAddrPfp = pfpDataByAddr[toAddr]
+  const accountPfp = pfpDataByAddr[account] || ''
+  const toAddrPfp = pfpDataByAddr[toAddr]
 
-   useEffect(() => {
-      console.log('useEffect scroll')
-      // Scroll to bottom of chat if user sends a message
-      if (scrollToBottomRef?.current) {
-         
+  useEffect(() => {
+    if (accountPfp === undefined) {
+      dispatch(fetchPfpDataForAddr(account))
+    }
 
-      const { scrollTop, scrollHeight, clientHeight } = scrollToBottomRef.current;
-      if (scrollTop + clientHeight === scrollHeight) {
-        console.log("reached bottom: st, ch, SH", scrollTop, clientHeight, scrollHeight);
-        scrollToBottomRef.current.scrollIntoView()
-      }
+    if (toAddrPfp === undefined) {
+      dispatch(fetchPfpDataForAddr(toAddr))
+    }
+  }, [account, toAddr, accountPfp, toAddrPfp, dispatch])
 
-         // if(scrollToBottomRef.current.scrollHeight - scrollToBottomRef.current.scrollTop === scrollToBottomRef.current.clientHeight) {
-         //    console.log('At bottom, scrolling...')
-         //    scrollToBottomRef.current.scrollIntoView()
-         // }
-         //setSentMsg(false)
-      }
-   }, [loadedMsgs])
+  const getChatData = useCallback(() => {
+    // GET request to get off-chain data for RX user
+    if (!ENV.REACT_APP_REST_API) {
+      console.log('REST API url not in .env', ENV)
+      return
+    }
+    if (!account) {
+      console.log('No account connected')
+      return
+    }
+    if (!isAuthenticated) {
+      console.log('Not authenticated')
+      return
+    }
+    if (!toAddr) {
+      console.log('Recipient address is not available')
+      return
+    }
+    if (semaphore.current) {
+      console.log(
+        'preventing re-entrant calls if fetching is slow (happens at statup with decryption sometimes)'
+      )
+      return
+    }
+    setIsFetchingChatData(true)
 
-   useEffect(() => {
-      if (!accountPfp) {
-        dispatch(fetchPfpDataForAddr(account))
-      }
-
-      if (!toAddrPfp) {
-        dispatch(fetchPfpDataForAddr(toAddr))
-
-        //load chat data from localStorage to chatData
-        setChatData(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]) : [])
-        setEncChatData(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] ? JSON.parse(localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()]) : [])
-
-        fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name/${toAddr}`, {
-           method: 'GET',
-           credentials: "include",
-           headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-           },
-        })
-           .then((response) => response.json())
-           .then((response) => {
-              console.log('✅[GET][Name]:', response)
-              if (response[0]?.name) setName(response[0].name)
-              else setName('User Not Yet Joined')
-           })
-           .catch((error) => {
-              console.error('🚨[GET][Name]:', error)
-           })
-      }
-   }, [account, accountPfp, dispatch, toAddr, toAddrPfp])
-
-   const getChatData = useCallback(() => {
-      // GET request to get off-chain data for RX user
-      if (!ENV.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
-         return
-      }
-      if (!account) {
-         console.log('No account connected')
-         return
-      }
-      if (!isAuthenticated) {
-         console.log('Not authenticated')
-         return
-      }
-      if (!toAddr) {
-         console.log('Recipient address is not available')
-         return
-      }
-      if (semaphore){
-         console.log('preventing re-entrant calls if fetching is slow (happens at statup with decryption sometimes)')
-         return
-      }
-      setIsFetchingChatData(true)
-
-      //console.log(`getall_chatitems/${account}/${toAddr} *prev addr: `, prevAddr)
-      if (toAddr != prevAddr){
-         setPrevAddr(toAddr)
-         setIsFetchingChatData(false)
-         const temp = [] as MessageUIType[]
-         setLoadedMsgs(temp)
-         return //skip the account transition glitch
-      }
+    if (toAddr !== prevAddr) {
       setPrevAddr(toAddr)
-      semaphore = true;
+      setIsFetchingChatData(false)
+      const temp = [] as MessageUIType[]
+      setLoadedMsgs(temp)
+      return // skip the account transition glitch
+    }
+    setPrevAddr(toAddr)
+    semaphore.current = true
 
-      let lastTimeMsg = "2006-01-02T15:04:05.000Z"
-      if (chatData.length > 0) {
-          lastTimeMsg = chatData[chatData.length - 1].timestamp
-      } 
-      lastTimeMsg = encodeURIComponent(lastTimeMsg)
+    let lastTimeMsg = DEFAULT_LAST_MESSAGE_TIME
+    if (chatData.length > 0) {
+      lastTimeMsg = chatData[chatData.length - 1].timestamp
+    }
+    lastTimeMsg = encodeURIComponent(lastTimeMsg)
 
-      fetch(
-         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
-         {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-               'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-            },
-         }
-      )
-         .then((response) => response.json())
-         .then(async (data: MessageType[]) => {
-            if (chatData.length > 0) {
-               if (data.length > 0) {
-                  //START LIT ENCRYPTION
-                  localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(encryptedChatData.concat(data))
-                  setEncChatData(encryptedChatData.concat(data))
-
-                  const replica = JSON.parse(JSON.stringify(data));
-                  // Get data from LIT and replace the message with the decrypted text
-                  for (let i = 0; i < replica.length; i++) {
-                     if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-                        const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
-                        
-                        //console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                        //after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
-                        //this is done to support legacy messages (new databases wouldn't need this)
-                        if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
-                           //console.log('✅[INFO][Using Orig Decrypt Conditions]')
-                           const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                           replica[i].message = rawmsg.decryptedFile.toString()
-                        } else {
-                           const rawmsg = await lit.decryptStringOrig(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                           replica[i].message = rawmsg.decryptedFile.toString()
-                        }
-                     }
-                  }
-                  //END LIT ENCRYPTION
-                  let allChats = chatData.concat(replica)
-                  setChatData(allChats)
-                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(allChats) //store so when user switches views, data is ready
-                  console.log('✅[GET][New Chat items]:', data)
-               }
-            } else {
-               if (equal(data, encryptedChatData) === false) {
-                  console.log('✅[GET][Chat items]:', data)
-                  //START LIT ENCRYPTION
-                  localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data)
-                  setEncChatData(data)
-
-                  const replica = JSON.parse(JSON.stringify(data));
-                  // Get data from LIT and replace the message with the decrypted text
-                  for (let i = 0; i < replica.length; i++) {
-                     if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-                        const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
-                        
-                        //console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                        //after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
-                        //this is done to support legacy messages (new databases wouldn't need this)
-                        if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
-                           //console.log('✅[INFO][Using Orig Decrypt Conditions]')
-                           const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                           replica[i].message = rawmsg.decryptedFile.toString()
-                        } else {
-                           const rawmsg = await lit.decryptStringOrig(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                           replica[i].message = rawmsg.decryptedFile.toString()
-                        }
-                     }
-                  }
-                  setChatData(replica)
-                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(replica) 
-                  //END LIT ENCRYPTION
-                  //setChatData(data)  //use when not using encryption
-               }
-            }
-            setIsFetchingChatData(false)
-            semaphore = false;
-         })
-         .catch((error) => {
-            console.error('🚨[GET][Chat items]:', error)
-            setIsFetchingChatData(false)
-            semaphore = false;
-         })
-         //since we are only loading new messages, we need to update read status async and even after we aren't get new messages
-         //in the case its a while before a user reads the message
-         fetch(
-            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`,
-            {
-               method: 'GET',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-               },
-            }
-         )
-         .then((response) => response.json())
-         .then(async (data: Int32Array[]) => {
-            let localRead = localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()]
-            if (localRead != data) {
-               if (data.length > 0) {
-                  let localData = localStorage["dmData_" + account + "_" + toAddr.toLowerCase()]
-                  if (localData) {
-                     localData = JSON.parse(localData)
-                     for (let j = 0; j < localData.length; j++) {
-                        for (let i = 0; i < data.length; i++) {
-                           if (localData[j].Id == data[i]) {
-                              localData[j].read = true
-                              break
-                           }
-                        }
-                     }
-                     setChatData(localData)
-                     localStorage["dmReadIDs_" + account + "_" + toAddr.toLowerCase()] = data
-                     localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(localData) //store so when user switches views, data is ready
-                     console.log('✅[GET][Updated Read Items]:', data)
-                  }
-               }
-            }
-         })
-         .catch((error) => {
-            console.error('🚨[GET][Update Read items]:', error)
-            setIsFetchingChatData(false)
-         })
-   }, [account, chatData, isAuthenticated, toAddr])
-
-   useEffect(() => {
-      getChatData()
-   }, [isAuthenticated, account, toAddr, getChatData])
-
-   useEffect(() => {
-      // Interval needs to reset else getChatData will use old state
-      const interval = setInterval(() => {
-         getChatData()
-      }, 5000) // every 5s
-
-      return () => clearInterval(interval)
-   }, [isAuthenticated, account, toAddr, chatData, getChatData])
-
-   useEffect(() => {
-      
-      const toAddToUI = [] as MessageUIType[]
-
-      for (let i = 0; i < chatData.length; i++) {
-         if (
-            chatData[i] &&
-            chatData[i].toaddr &&
-            chatData[i].toaddr.toLowerCase() === account.toLowerCase()
-         ) {
-            toAddToUI.push({
-               sender_name: chatData[i].sender_name,
-               message: chatData[i].message,
-               fromAddr: chatData[i].fromaddr,
-               toAddr: chatData[i].toaddr,
-               timestamp: chatData[i].timestamp,
-               read: chatData[i].read,
-               id: chatData[i].id,
-               position: 'left',
-               isFetching: false,
-               nftAddr: chatData[i].nftaddr,
-               nftId: chatData[i].nftid,
-            })
-         } else if (
-            chatData[i] &&
-            chatData[i].toaddr &&
-            chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
-         ) {
-            toAddToUI.push({
-               sender_name: chatData[i].sender_name,
-               message: chatData[i].message,
-               fromAddr: chatData[i].fromaddr,
-               toAddr: chatData[i].toaddr,
-               timestamp: chatData[i].timestamp,
-               read: chatData[i].read,
-               id: chatData[i].id,
-               position: 'right',
-               isFetching: false,
-               nftAddr: chatData[i].nftaddr,
-               nftId: chatData[i].nftid,
-            })
-         }
-      }
-      if (!equal(toAddToUI, chatData)) {
-         setLoadedMsgs(toAddToUI)
-      }
-   }, [chatData, account])
-
-   const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (event.key === 'Enter') {
-         event.preventDefault()
-         sendMessage()
-      }
-   }
-
-   const copyToClipboard = useCallback(() => {
-      if (toAddr) {
-         console.log('Copy to clipboard', toAddr)
-         let textField = document.createElement('textarea')
-         textField.innerText = toAddr
-         document.body.appendChild(textField)
-         textField.select()
-         document.execCommand('copy')
-         textField.focus()
-         textField.remove()
-         setCopiedAddr(true)
-
-         timerRef?.current && window.clearTimeout(timerRef.current)
-         timerRef.current = setTimeout(() => {
-            setCopiedAddr(false)
-         }, 3000)
-      }
-   }, [toAddr])
-
-   const addMessageToUI = useCallback(
-      (
-         message: string,
-         fromAddr: string,
-         toAddr: string,
-         timestamp: string,
-         read: boolean,
-         position: string,
-         isFetching: boolean,
-         nftAddr: string | null,
-         nftId: string | null
-      ) => {
-         console.log(`Add message to UI: ${message}`)
-
-         const newMsg: MessageUIType = {
-            message,
-            fromAddr,
-            toAddr,
-            timestamp,
-            read,
-            position,
-            isFetching,
-            nftAddr,
-            nftId,
-         }
-         let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-         newLoadedMsgs.push(newMsg)
-         setLoadedMsgs(newLoadedMsgs)
-      },
-      [loadedMsgs]
-   )
-
-   const sendMessage = async () => {
-      setSentMsg(true)
-      console.log('sendMessage')
-      if (msgInput.length <= 0) return
-
-      // Make a copy and clear input field
-      const msgInputCopy = (' ' + msgInput).slice(1)
-      setMsgInput('')
-
-      const timestamp = new Date()
-
-      const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
-
-      let data = {
-         message: msgInputCopy,
-         fromAddr: account.toLocaleLowerCase(),
-         toAddr: toAddr.toLocaleLowerCase(),
-         timestamp,
-         nftid: "0",
-         encrypted_sym_lit_key: "",
-         lit_access_conditions: "",
-         read: false,
-      }
-
-      addMessageToUI(
-         msgInputCopy,
-         account,
-         toAddr,
-         timestamp.toString(),
-         false,
-         'right',
-         true,
-         null,
-         null
-      )
-
-      //data.message = msgInputCopy
-      const _accessControlConditions = [
-         {
-           conditionType: 'evmBasic',
-           contractAddress: '',
-           standardContractType: '',
-           chain: 'ethereum',
-           method: '',
-           parameters: [
-             ':userAddress',
-           ],
-           returnValueTest: {
-             comparator: '=',
-             value: data.toAddr
-           }
-         },
-         {"operator": "or"},
-         {
-           conditionType: 'evmBasic',
-           contractAddress: '',
-           standardContractType: '',
-           chain: 'ethereum',
-           method: '',
-           parameters: [
-             ':userAddress',
-           ],
-           returnValueTest: {
-             comparator: '=',
-             value: data.fromAddr
-           }
-         },
-         {"operator": "or"}, //delegate.cash full wallet delegation
-         {
-            conditionType: "evmContract",
-            contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
-            functionName: "checkDelegateForAll",
-            functionParams: [":userAddress", data.toAddr],
-            functionAbi: {
-               inputs: [
-               {
-                  name: "delegate",
-                  type: "address",
-                  internalType: "address",
-               },
-               {
-                  name: "vault",
-                  type: "address",
-                  internalType: "address",
-               },
-               ],
-               name: "checkDelegateForAll",
-               outputs: [
-               {
-                  name: "",
-                  type: "bool",
-               },
-               ],
-               payable: false,
-               stateMutability: "view",
-               type: "function",
-            },
-            chain: "ethereum",
-            returnValueTest: {
-               key: "",
-               comparator: "=",
-               value: 'true',
-            },
-         },
-         {"operator": "or"}, //delegate.cash full wallet delegation
-         {
-            conditionType: "evmContract",
-            contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
-            functionName: "checkDelegateForAll",
-            functionParams: [":userAddress", data.fromAddr],
-            functionAbi: {
-               inputs: [
-               {
-                  name: "delegate",
-                  type: "address",
-                  internalType: "address",
-               },
-               {
-                  name: "vault",
-                  type: "address",
-                  internalType: "address",
-               },
-               ],
-               name: "checkDelegateForAll",
-               outputs: [
-               {
-                  name: "",
-                  type: "bool",
-               },
-               ],
-               payable: false,
-               stateMutability: "view",
-               type: "function",
-            },
-            chain: "ethereum",
-            returnValueTest: {
-               key: "",
-               comparator: "=",
-               value: 'true',
-            },
-         },
-       ]
-       
-      console.log('✅[TEST][Delegate Wallet]:', delegate)
-
-      console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
-      const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
-      data.message = await lit.blobToB64(encrypted.encryptedFile)
-      data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-      data.lit_access_conditions = JSON.stringify(_accessControlConditions)
-      console.log('✅[POST][Encrypted Message]:', data)
-
-      setIsSendingMessage(true)
-      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`, {
-         method: 'POST',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-         },
-         body: JSON.stringify(data),
-      })
-         .then((response) => response.json())
-         .then((data) => {
-            console.log('✅[POST][Send Message]:', data, latestLoadedMsgs)
-            //getChatData()
-         })
-         .catch((error) => {
-            console.error(
-               '🚨[POST][Send message]:',
-               error,
-               JSON.stringify(data)
+    fetch(
+      ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getall_chatitems/${account}/${toAddr}/${lastTimeMsg}`,
+      getFetchOptions()
+    )
+      .then((response) => response.json())
+      .then(async (data: MessageType[]) => {
+        if (chatData.length > 0) {
+          if (data.length > 0) {
+            // START LIT ENCRYPTION
+            localStorage[localStorageKeyDmDataEncToAddr] = JSON.stringify(
+              encryptedChatData.concat(data)
             )
-         })
-         .finally(() => {
-            setIsSendingMessage(false)
-         })
+            setEncChatData(encryptedChatData.concat(data))
 
-      if (toAddr.toLocaleLowerCase() === '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()) {
-         if (!ENV.REACT_APP_SLEEKPLAN_API_KEY) {
-            console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
-         } else {
-            fetch(`https://api.sleekplan.com/v1/post`, {
-               method: 'POST',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${ENV.REACT_APP_SLEEKPLAN_API_KEY}`,
-               },
-               body: JSON.stringify({
-                  title: account,
-                  type: 'feedback',
-                  description: msgInputCopy,
-                  user: 347112,
-               }),
-            })
-               .then((response) => response.json())
-               .then((data) => {
-                  console.log('✅[POST][Feedback]:', data)
-               })
-               .catch((error) => {
-                  console.error(
-                     '🚨[POST][Feedback]:',
-                     error,
-                     JSON.stringify(data)
+            const replica = JSON.parse(JSON.stringify(data))
+            // Get data from LIT and replace the message with the decrypted text
+            for (let i = 0; i < replica.length; i += 1) {
+              if (replica[i].encrypted_sym_lit_key) {
+                // only needed for mixed DB with plain and encrypted data
+                const accessControlConditions = JSON.parse(
+                  replica[i].lit_access_conditions
+                )
+
+                // console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, accessControlConditions)
+                // after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+                // this is done to support legacy messages (new databases wouldn't need this)
+                if (
+                  String(replica[i].lit_access_conditions).includes('evmBasic')
+                ) {
+                  // console.log('✅[INFO][Using Orig Decrypt Conditions]')
+                  const rawmsg = await lit.decryptString(
+                    lit.b64toBlob(replica[i].message),
+                    replica[i].encrypted_sym_lit_key,
+                    accessControlConditions
                   )
-               })
-         }
-      }
-   }
-
-   const updateRead = useCallback(
-      (data: MessageUIType) => {
-         console.log('updateRead')
-         let indexOfMsg = -1
-         let newLoadedMsgs = [...loadedMsgs]
-         for (let i = newLoadedMsgs.length - 1; i > 0; i--) {
-            if (newLoadedMsgs[i].timestamp === data.timestamp) {
-               indexOfMsg = i
-               break
+                  replica[i].message = rawmsg.decryptedFile.toString()
+                } else {
+                  const rawmsg = await lit.decryptStringOrig(
+                    lit.b64toBlob(replica[i].message),
+                    replica[i].encrypted_sym_lit_key,
+                    accessControlConditions
+                  )
+                  replica[i].message = rawmsg.decryptedFile.toString()
+                }
+              }
             }
-         }
-         if (indexOfMsg !== -1) {
-            newLoadedMsgs[indexOfMsg] = {
-               ...newLoadedMsgs[indexOfMsg],
-               read: true,
+            // END LIT ENCRYPTION
+            const allChats = chatData.concat(replica)
+            setChatData(allChats)
+            localStorage[localStorageKeyDmDataToAddr] = JSON.stringify(allChats) // store so when user switches views, data is ready
+            console.log('✅[GET][New Chat items]:', data)
+          }
+        } else if (equal(data, encryptedChatData) === false) {
+          console.log('✅[GET][Chat items]:', data)
+          // START LIT ENCRYPTION
+          localStorage[localStorageKeyDmDataEncToAddr] = JSON.stringify(data)
+          setEncChatData(data)
+
+          const replica = JSON.parse(JSON.stringify(data))
+          // Get data from LIT and replace the message with the decrypted text
+          for (let i = 0; i < replica.length; i += 1) {
+            if (replica[i].encrypted_sym_lit_key) {
+              // only needed for mixed DB with plain and encrypted data
+              const accessControlConditions = JSON.parse(
+                replica[i].lit_access_conditions
+              )
+
+              // console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, accessControlConditions)
+              // after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+              // this is done to support legacy messages (new databases wouldn't need this)
+              if (
+                String(replica[i].lit_access_conditions).includes('evmBasic')
+              ) {
+                // console.log('✅[INFO][Using Orig Decrypt Conditions]')
+                const rawmsg = await lit.decryptString(
+                  lit.b64toBlob(replica[i].message),
+                  replica[i].encrypted_sym_lit_key,
+                  accessControlConditions
+                )
+                replica[i].message = rawmsg.decryptedFile.toString()
+              } else {
+                const rawmsg = await lit.decryptStringOrig(
+                  lit.b64toBlob(replica[i].message),
+                  replica[i].encrypted_sym_lit_key,
+                  accessControlConditions
+                )
+                replica[i].message = rawmsg.decryptedFile.toString()
+              }
             }
-            setLoadedMsgs(newLoadedMsgs)
-         }
-      },
-      [loadedMsgs]
-   )
-
-   const header = useMemo(() => {
-      return (
-         <Box
-            p={5}
-            pb={3}
-            borderBottom="1px solid var(--chakra-colors-lightgray-400)"
-         >
-            {isMobile && (
-               <Box mb={4}>
-                  <Link to="/dm" style={{ textDecoration: 'none' }}>
-                     <Button
-                        colorScheme="gray"
-                        background="lightgray.300"
-                        size="sm"
-                     >
-                        <Flex alignItems="center">
-                           <IconArrowLeft size={18} />
-                           <Text ml="1">Back to Inbox</Text>
-                        </Flex>
-                     </Button>
-                  </Link>
-               </Box>
-            )}
-
-            {toAddr && (
-               <Flex alignItems="center" justifyContent="space-between">
-                  <Flex alignItems="center">
-                       {toAddrPfp ? (
-                           <Image
-                              src={toAddrPfp}
-                              height="40px"
-                              width="40px"
-                              borderRadius="var(--chakra-radii-xl)"
-                           />
-                           ) : (
-                     <BlockieWrapper>
-                        <Blockies seed={toAddr.toLocaleLowerCase()} scale={4} />
-                     </BlockieWrapper>
-                  )}
-                     <Box ml={2}>
-                        {name ? (
-                           <Box>
-                              <Text
-                                 fontWeight="bold"
-                                 color="darkgray.800"
-                                 fontSize="md"
-                              >
-                                 {name}
-                              </Text>
-                              <Text fontSize="sm" color="darkgray.500">
-                                 {truncateAddress(toAddr)}
-                              </Text>
-                           </Box>
-                        ) : (
-                           <Text
-                              fontWeight="bold"
-                              color="darkgray.800"
-                              fontSize="md"
-                           >
-                              {truncateAddress(toAddr)}
-                           </Text>
-                        )}
-                     </Box>
-                  </Flex>
-                  <Box>
-                     {document.queryCommandSupported('copy') && (
-                        <Button
-                           onClick={() => copyToClipboard()}
-                           size="xs"
-                           disabled={copiedAddr}
-                           ml={3}
-                        >
-                           {copiedAddr ? (
-                              <IconCheck
-                                 size={20}
-                                 color="var(--chakra-colors-darkgray-500)"
-                                 stroke="1.5"
-                              />
-                           ) : (
-                              <IconCopy
-                                 size={20}
-                                 color="var(--chakra-colors-lightgray-900)"
-                                 stroke="1.5"
-                              />
-                           )}
-                        </Button>
-                     )}
-                     <Button
-                        href={`https://etherscan.io/address/${toAddr}`}
-                        target="_blank"
-                        as={CLink}
-                        size="xs"
-                        ml={2}
-                     >
-                        <IconExternalLink
-                           size={20}
-                           color="var(--chakra-colors-lightgray-900)"
-                           stroke="1.5"
-                        />
-                     </Button>
-                  </Box>
-               </Flex>
-            )}
-         </Box>
-      )
-   }, [copiedAddr, copyToClipboard, name, toAddr, toAddrPfp])
-
-   const renderedMessages = useMemo(() => {
-      return loadedMsgs.map((msg: MessageUIType, i) => {
-         if (msg && msg.message) {
-            if (msg.toAddr?.toLocaleLowerCase() === account.toLocaleLowerCase()) {
-               return (
-                  <ChatMessage
-                     key={i}
-                     context="dms"
-                     account={account}
-                     msg={msg}
-                     pfpImage={accountPfp}
-                     updateRead={updateRead}
-                  />
-               )
-            } else {
-               return (
-                  <ChatMessage
-                     key={i}
-                     context="dms"
-                     account={account}
-                     msg={msg}
-                     pfpImage={toAddrPfp}
-                     updateRead={updateRead}
-                  />
-               )
-            }
-         }
-         return null
+          }
+          setChatData(replica)
+          localStorage[localStorageKeyDmDataToAddr] = JSON.stringify(replica)
+          // END LIT ENCRYPTION
+          // setChatData(data) use when not using encryption
+        }
+        setIsFetchingChatData(false)
+        semaphore.current = false
       })
-   }, [account, accountPfp, loadedMsgs, toAddrPfp, updateRead])
+      .catch((error) => {
+        console.error('🚨[GET][Chat items]:', error)
+        setIsFetchingChatData(false)
+        semaphore.current = false
+      })
+    // since we are only loading new messages, we need to update read status async and even after we aren't get new messages
+    // in the case its a while before a user reads the message
+    fetch(
+      ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`,
+      getFetchOptions()
+    )
+      .then((response) => response.json())
+      .then(async (data: Int32Array[]) => {
+        const localRead = localStorage[localStorageKeyDmReadIDsToAddr]
+        if (localRead !== data) {
+          if (data.length > 0) {
+            let localData = localStorage[localStorageKeyDmDataToAddr]
+            if (localData) {
+              localData = JSON.parse(localData)
+              for (let j = 0; j < localData.length; j += 1) {
+                for (let i = 0; i < data.length; i += 1) {
+                  if (localData[j].Id === data[i]) {
+                    localData[j].read = true
+                    break
+                  }
+                }
+              }
+              setChatData(localData)
+              localStorage[localStorageKeyDmReadIDsToAddr] = data
+              localStorage[localStorageKeyDmDataToAddr] =
+                JSON.stringify(localData) // store so when user switches views, data is ready
+              console.log('✅[GET][Updated Read Items]:', data)
+            }
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('🚨[GET][Update Read items]:', error)
+        setIsFetchingChatData(false)
+      })
+  }, [account, chatData, isAuthenticated, toAddr])
 
-   return (
-      <Flex background="white" height="100vh" flexDirection="column" flex="1">
-         {header}
-         <DottedBackground className="custom-scrollbar">
-            {isFetchingChatData && loadedMsgs.length === 0 && (
-               <Flex
-                  justifyContent="center"
-                  alignItems="center"
-                  borderRadius="lg"
-                  background="green.200"
-                  p={4}
-               >
-                  <Box fontSize="md">
-                     Decrypting Your Messages, Please Wait and Do Not Refresh 😊
-                  </Box>
-               </Flex>
-            )}
-            {isFetchingChatData && loadedMsgs.length === 0 && (
-               <Flex justifyContent="center" alignItems="center" height="100%">
-                  <Spinner />
-               </Flex>
-            )}
-            {toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19' && (
-               <Flex
-                  justifyContent="center"
-                  alignItems="center"
-                  borderRadius="lg"
-                  background="green.200"
-                  p={4}
-               >
-                  <Box fontSize="md">
-                     We welcome all feedback and bug reports. Thank you! 😊
-                  </Box>
-               </Flex>
-            )}
-            {renderedMessages}
-            <Box
-               float="left"
-               style={{ clear: 'both' }}
-               ref={scrollToBottomRef}
-            ></Box>
-         </DottedBackground>
+  useEffect(() => {
+    getChatData()
 
-         <Flex>
-            <FormControl style={{ flexGrow: 1 }}>
-               <TextareaAutosize
-                  placeholder="Write a message..."
-                  value={msgInput}
-                  onChange={(e) => setMsgInput(e.target.value)}
-                  onKeyPress={(e) => handleKeyPress(e)}
-                  className="custom-scrollbar"
-                  style={{
-                     resize: 'none',
-                     padding: '.5rem 1rem',
-                     width: '100%',
-                     fontSize: 'var(--chakra-fontSizes-md)',
-                     background: 'var(--chakra-colors-lightgray-400)',
-                     borderRadius: '0.3rem',
-                     marginBottom: '-6px',
-                  }}
-                  maxRows={8}
-               />
-            </FormControl>
-            <Flex alignItems="flex-end">
-               <Button
-                  variant="black"
-                  height="100%"
-                  onClick={() => sendMessage()}
-                  isLoading={isSendingMessage}
-               >
-                  <IconSend size="20" />
-               </Button>
-            </Flex>
-         </Flex>
-      </Flex>
-   )
+    // Interval needs to reset else getChatData will use old state
+    const interval = setInterval(() => getChatData, 5000) // every 5s
+
+    return () => clearInterval(interval)
+  }, [isAuthenticated, account, toAddr, chatData, getChatData])
+
+  useEffect(() => {
+    const toAddToUI = [] as MessageUIType[]
+
+    for (let i = 0; i < chatData.length; i += 1) {
+      if (
+        chatData[i] &&
+        chatData[i].toaddr &&
+        chatData[i].toaddr.toLowerCase() === account.toLowerCase()
+      ) {
+        toAddToUI.push({
+          sender_name: chatData[i].sender_name,
+          message: chatData[i].message,
+          fromAddr: chatData[i].fromaddr,
+          toAddr: chatData[i].toaddr,
+          timestamp: chatData[i].timestamp,
+          read: chatData[i].read,
+          id: chatData[i].id,
+          position: 'left',
+          isFetching: false,
+          nftAddr: chatData[i].nftaddr,
+          nftId: chatData[i].nftid,
+        })
+      } else if (
+        chatData[i] &&
+        chatData[i].toaddr &&
+        chatData[i].fromaddr.toLowerCase() === account.toLowerCase()
+      ) {
+        toAddToUI.push({
+          sender_name: chatData[i].sender_name,
+          message: chatData[i].message,
+          fromAddr: chatData[i].fromaddr,
+          toAddr: chatData[i].toaddr,
+          timestamp: chatData[i].timestamp,
+          read: chatData[i].read,
+          id: chatData[i].id,
+          position: 'right',
+          isFetching: false,
+          nftAddr: chatData[i].nftaddr,
+          nftId: chatData[i].nftid,
+        })
+      }
+    }
+    if (!equal(toAddToUI, chatData)) {
+      setLoadedMsgs(toAddToUI)
+    }
+  }, [chatData, account])
+
+  const updateRead = useCallback(
+    (data: MessageUIType) => {
+      console.log('updateRead')
+      let indexOfMsg = -1
+      const newLoadedMsgs = [...loadedMsgs]
+      for (let i = newLoadedMsgs.length - 1; i > 0; i -= 1) {
+        if (newLoadedMsgs[i].timestamp === data.timestamp) {
+          indexOfMsg = i
+          break
+        }
+      }
+      if (indexOfMsg !== -1) {
+        newLoadedMsgs[indexOfMsg] = {
+          ...newLoadedMsgs[indexOfMsg],
+          read: true,
+        }
+        setLoadedMsgs(newLoadedMsgs)
+      }
+    },
+    [loadedMsgs]
+  )
+
+  const renderedMessages = useMemo(() => {
+    return loadedMsgs.map((msg: MessageUIType, i) => {
+      if (msg && msg.message) {
+        if (msg.fromAddr?.toLocaleLowerCase() === account.toLocaleLowerCase()) {
+          return (
+            <ChatMessage
+              key={i}
+              context='dms'
+              account={account}
+              msg={msg}
+              pfpImage={accountPfp}
+              updateRead={updateRead}
+            />
+          )
+        } else {
+          return (
+            <ChatMessage
+              key={i}
+              context='dms'
+              account={account}
+              msg={msg}
+              pfpImage={toAddrPfp}
+              updateRead={updateRead}
+            />
+          )
+        }
+      }
+      return null
+    })
+  }, [account, accountPfp, loadedMsgs, toAddrPfp, updateRead])
+
+  return (
+    <Flex background='white' height='100vh' flexDirection='column' flex='1'>
+      <Header />
+
+      <DottedBackground className='custom-scrollbar'>
+        {isFetchingChatData && loadedMsgs.length === 0 && (
+          <Flex
+            justifyContent='center'
+            alignItems='center'
+            borderRadius='lg'
+            background='green.200'
+            p={4}
+          >
+            <Box fontSize='md'>
+              Decrypting Your Messages, Please Wait and Do Not Refresh 😊
+            </Box>
+          </Flex>
+        )}
+        {isFetchingChatData && loadedMsgs.length === 0 && (
+          <Flex justifyContent='center' alignItems='center' height='100%'>
+            <Spinner />
+          </Flex>
+        )}
+        {toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19' && (
+          <Flex
+            justifyContent='center'
+            alignItems='center'
+            borderRadius='lg'
+            background='green.200'
+            p={4}
+          >
+            <Box fontSize='md'>
+              We welcome all feedback and bug reports. Thank you! 😊
+            </Box>
+          </Flex>
+        )}
+        {renderedMessages}
+        <Box ref={scrollToBottomRef} float='left' style={{ clear: 'both' }} />
+      </DottedBackground>
+
+      <Submit
+        delegate={delegate}
+        loadedMsgs={loadedMsgs}
+        toAddr={toAddr}
+        setLoadedMsgs={setLoadedMsgs}
+        account={account}
+        scrollToBottomRef={scrollToBottomRef}
+      />
+    </Flex>
+  )
 }
 
 export default DMByAddress

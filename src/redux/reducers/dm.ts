@@ -1,124 +1,149 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { RootState } from '@/redux/store'
+import {
+  addPendingSetReducer,
+  deletePendingSetReducer,
+  createFetchCondition,
+} from '@/redux/reducers/helpers'
+import { getFetchOptions } from '@/helpers/fetch'
 import * as ENV from '@/constants/env'
 
 type DMState = {
-	pfpDataByAddr: { [addr: string]: null | string }
-	pfpDataFetchingAddrsByRequest: { [req: string]: string }
-	dmDataByAccountByAddr: { [account: string]: { [addr: string]: string } }
-	dmDataEncByAccountByAddr: { [account: string]: { [addr: string]: string } }
-	dmReadIdsByAccountByAddr: { [account: string]: { [addr: string]: string } }
+  pfpDataByAddr: { [addr: string]: null | string }
+  pfpDataFetchingAddresses: string[]
+  nameByAddr: { [addr: string]: null | string }
+  nameFetchingAddresses: string[]
+  dmDataByAccountByAddr: { [account: string]: { [addr: string]: string } }
+  dmDataEncByAccountByAddr: { [account: string]: { [addr: string]: string } }
+  dmReadIdsByAccountByAddr: { [account: string]: { [addr: string]: string } }
 }
 
 const initialState: DMState = {
-	pfpDataByAddr: {},
-	pfpDataFetchingAddrsByRequest: {},
-	dmDataByAccountByAddr: {},
-	dmDataEncByAccountByAddr: {},
-	dmReadIdsByAccountByAddr: {},
+  pfpDataByAddr: {},
+  pfpDataFetchingAddresses: [],
+  nameByAddr: {},
+  nameFetchingAddresses: [],
+  dmDataByAccountByAddr: {},
+  dmDataEncByAccountByAddr: {},
+  dmReadIdsByAccountByAddr: {},
 }
 
-const selectState = (state: any) => (state as RootState).dm
-
 export const fetchPfpDataForAddr = createAsyncThunk(
-	'dm/fetchPfpDataForAddr',
-	async (addr: string, thunkAPI) => {
-		const state = selectState(thunkAPI.getState())
-		const fetchingForAddr = state.pfpDataFetchingAddrsByRequest[addr]
-		const isFetching = fetchingForAddr && fetchingForAddr !== thunkAPI.requestId
-		const alreadyFetchedValue = state.pfpDataByAddr[addr]
+  'dm/fetchPfpDataForAddr',
+  async (addr: string, thunkAPI) => {
+    try {
+      const response: any = await fetch(
+        `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image/${addr}`,
+        getFetchOptions()
+      )
+      const json = await response.json()
 
-		if (isFetching || alreadyFetchedValue) {
-			return thunkAPI.fulfillWithValue(alreadyFetchedValue)
-		}
+      console.log('✅[GET][Image FromAddr]:', response)
 
-		try {
-			const response: any = await fetch(
-				`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image/${addr}`,
-				{
-					method: 'GET',
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-					},
-				}
-			)
+      const base64data = json[0]?.base64data
 
-			console.log('✅[GET][Image FromAddr]:', response)
+      if (base64data) {
+        return thunkAPI.fulfillWithValue(base64data)
+      }
 
-			const json = await response.json()
-			const base64data = json[0]?.base64data
+      return thunkAPI.rejectWithValue(addr)
+    } catch (error) {
+      console.error('🚨[GET][Image FromAddr]:', error)
+      return thunkAPI.rejectWithValue(addr)
+    }
+  },
+  {
+    condition: createFetchCondition(
+      'pfpDataFetchingAddresses',
+      'pfpDataByAddr'
+    ),
+  }
+)
 
-			if (base64data) {
-				return thunkAPI.fulfillWithValue(base64data)
-			}
+export const fetchNameForAddr = createAsyncThunk(
+  'dm/fetchNameForAddr',
+  async (addr: string, thunkAPI) => {
+    try {
+      const response: any = await fetch(
+        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name/${addr}`,
+        getFetchOptions()
+      )
+      const json = await response.json()
 
-			return thunkAPI.rejectWithValue(addr)
-		} catch (error) {
-			console.error('🚨[GET][Image FromAddr]:', error)
-			return thunkAPI.rejectWithValue(addr)
-		}
-	}
+      console.log('✅[GET][Name]:', response)
+
+      const name = json[0]?.name
+
+      if (!name) {
+        return thunkAPI.fulfillWithValue('User Not Yet Joined')
+      }
+
+      return thunkAPI.fulfillWithValue(name)
+    } catch (error) {
+      console.error('🚨[GET][Name]:', error)
+      return thunkAPI.rejectWithValue(addr)
+    }
+  },
+  {
+    condition: createFetchCondition('nameFetchingAddresses', 'nameByAddr'),
+  }
 )
 
 export const dmSlice = createSlice({
-	name: 'dm',
-	initialState,
-	reducers: {},
-	extraReducers: (builder) => {
-		builder.addCase(
-			fetchPfpDataForAddr.pending,
-			(state: DMState, action: any) => {
-				const { arg: addr, requestId } = action.meta
+  name: 'dm',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPfpDataForAddr.pending, (state, action) =>
+        addPendingSetReducer(action.meta.arg, state, 'pfpDataFetchingAddresses')
+      )
+      .addCase(fetchPfpDataForAddr.fulfilled, (state, action) => {
+        const addr = action.meta.arg
 
-				const newPfpDataFetchingAddrsByRequest = {
-					...state.pfpDataFetchingAddrsByRequest,
-				}
-				if (!newPfpDataFetchingAddrsByRequest[addr]) {
-					newPfpDataFetchingAddrsByRequest[addr] = requestId || ''
-				}
+        deletePendingSetReducer(addr, state, 'pfpDataFetchingAddresses')
 
-				state.pfpDataFetchingAddrsByRequest = newPfpDataFetchingAddrsByRequest
-			}
-		)
-		builder.addCase(
-			fetchPfpDataForAddr.fulfilled,
-			(state: DMState, action: any) => {
-				const addr = action.meta.arg
+        const response = action.payload
 
-				const newPfpDataFetchingAddrsByRequest = {
-					...state.pfpDataFetchingAddrsByRequest,
-				}
-				delete newPfpDataFetchingAddrsByRequest[addr]
-				state.pfpDataFetchingAddrsByRequest = newPfpDataFetchingAddrsByRequest
+        if (response) {
+          state.pfpDataByAddr[addr] = response
+        } else {
+          state.pfpDataByAddr[addr] = null
+        }
+      })
+      .addCase(fetchPfpDataForAddr.rejected, (state, action) => {
+        const addr = action.meta.arg
 
-				const response = action.payload
+        deletePendingSetReducer(addr, state, 'pfpDataFetchingAddresses')
 
-				if (response) {
-					state.pfpDataByAddr[addr] = response
-				} else {
-					state.pfpDataByAddr[addr] = null
-				}
-			}
-		)
-		builder.addCase(
-			fetchPfpDataForAddr.rejected,
-			(state: DMState, action: any) => {
-				const addr = action.meta.arg
+        state.pfpDataByAddr[addr] = null
+      })
 
-				const newPfpDataFetchingAddrsByRequest = {
-					...state.pfpDataFetchingAddrsByRequest,
-				}
-				delete newPfpDataFetchingAddrsByRequest[addr]
+      .addCase(fetchNameForAddr.pending, (state, action) =>
+        addPendingSetReducer(action.meta.arg, state, 'nameFetchingAddresses')
+      )
+      .addCase(fetchNameForAddr.fulfilled, (state: DMState, action: any) => {
+        const addr = action.meta.arg
 
-				state.pfpDataFetchingAddrsByRequest = newPfpDataFetchingAddrsByRequest
-				state.pfpDataByAddr[addr] = null
-			}
-		)
-	},
+        deletePendingSetReducer(addr, state, 'nameFetchingAddresses')
+
+        const response = action.payload
+
+        if (response) {
+          state.nameByAddr[addr] = response
+        } else {
+          state.nameByAddr[addr] = null
+        }
+      })
+      .addCase(fetchNameForAddr.rejected, (state: DMState, action: any) => {
+        const addr = action.meta.arg
+
+        deletePendingSetReducer(addr, state, 'nameFetchingAddresses')
+
+        state.nameByAddr[addr] = null
+      })
+  },
 })
 
-// export const { fetchPfpDataForAddr } = dmSlice.actions;
+// export const {  } = dmSlice.actions;
 
 export default dmSlice.reducer
