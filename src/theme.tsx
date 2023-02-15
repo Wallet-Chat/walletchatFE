@@ -292,6 +292,17 @@ export const theme = extendTheme(
 						color: 'white',
 						_hover: { bg: 'info.600' },
 					},
+					blue: {
+						color: 'blue.600',
+						background: 'blue.100',
+						borderColor: 'transparent',
+						borderWidth: '1px',
+						_hover: {
+							background: 'blue.50',
+							borderColor: 'blue.500',
+							borderWidth: '1px',
+						},
+					},
 					danger: {
 						bg: 'danger.700',
 						color: 'white',

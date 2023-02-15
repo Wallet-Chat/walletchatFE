@@ -372,8 +372,8 @@ const CommunityModal = ({
 						borderTopColor='gray.300'
 					></Box>
 
-					<Box px={6} py={3}>
-						<Flex alignItems='center' mb={2}>
+					<Box py={3}>
+						<Flex alignItems='center' mb={2} px={6}>
 							<Box flex='0 0 30px'>
 								<IconUsers strokeWidth={1.5} size={20} />
 							</Box>
@@ -384,25 +384,21 @@ const CommunityModal = ({
 
 						{communityData?.members &&
 							communityData?.members?.length > 1 && (
-								<Box height={64}>
-									<AutoSizer>
-										{({ width, height }) => (
-											<List
-												width={width}
-												height={height}
-												itemSize={35}
-												itemCount={communityData.members.length}
-												className='custom-scrollbar'
-											>
-												{({ index, style }) => (
-													<CommunityModalMember
-														member={communityData?.members[index]}
-														style={style}
-													/>
-												)}
-											</List>
+								<Box height='300px'>
+									<List
+										width='100%'
+										height={300}
+										itemSize={55}
+										itemCount={communityData.members.length}
+										className='custom-scrollbar'
+									>
+										{({ index, style }) => (
+											<CommunityModalMember
+												member={communityData?.members[index]}
+												style={style}
+											/>
 										)}
-									</AutoSizer>
+									</List>
 								</Box>
 							)}
 					</Box>
