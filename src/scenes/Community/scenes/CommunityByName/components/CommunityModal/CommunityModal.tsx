@@ -157,6 +157,10 @@ const CommunityModal = ({
 							m.address.includes(debouncedSearchTerm)
 					)
 				)
+			} else if (debouncedSearchTerm === '') {
+				if (communityData?.members) {
+					setFilteredMembers(communityData.members)
+				}
 			} else {
 				setFilteredMembers([])
 			}
@@ -427,9 +431,23 @@ const CommunityModal = ({
 							</Flex>
 							<InputGroup
 								size='sm'
+								transitionDuration='0.2s'
+								transitionTimingFunction='ease-in-out'
+								transitionProperty='width'
 								role='group'
-								width='fit-content'
-								_groupFocus={{ width: '100%' }}
+								width='min-content'
+								_hover={{
+									width: '100%',
+									transitionDuration: '0.2s',
+									transitionTimingFunction: 'ease-in-out',
+									transitionProperty: 'width',
+								}}
+								_focus={{
+									width: '100%',
+									transitionDuration: '0.2s',
+									transitionTimingFunction: 'ease-in-out',
+									transitionProperty: 'width',
+								}}
 							>
 								<InputLeftElement
 									pointerEvents='none'
@@ -441,10 +459,15 @@ const CommunityModal = ({
 								<Input
 									size='sm'
 									onChange={(e) => setSearchTerm(e.target.value)}
-									border='none'
-									width='fit-content'
+									border='1px solid transparent'
+									transitionDuration='0.2s'
+									transitionTimingFunction='ease-in-out'
+									transitionProperty='border'
 									_groupFocus={{
-										border: 'unset',
+										borderColor: 'blue.500',
+									}}
+									_groupHover={{
+										borderColor: 'blue.500',
 									}}
 								/>
 							</InputGroup>
