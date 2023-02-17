@@ -24,6 +24,7 @@
     "@types/react-dom": "^16.9.14",
     "@types/styled-components": "^5.1.24",
     "@types/uuid": "^8.3.4",
+    "@vitejs/plugin-react": "^3.1.0",
     "@vvo/tzdb": "^6.48.0",
     "@walletconnect/web3-provider": "^1.7.8",
     "0xsequence": "^0.40.5",
@@ -60,6 +61,10 @@
     "stream-browserify": "^3.0.0",
     "styled-components": "^5.3.3",
     "uuid": "^8.3.2",
+    "vite": "^4.1.2",
+    "vite-plugin-node-polyfills": "^0.7.0",
+    "vite-plugin-svgr": "^2.4.0",
+    "vite-tsconfig-paths": "^4.0.5",
     "web-vitals": "^0.2.4",
     "web3": "1.7.4",
     "web3modal": "1.9.5"
@@ -77,7 +82,6 @@
     "@types/web3": "^1.2.2",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
-    "@vitejs/plugin-react": "^3.1.0",
     "eslint": "7.32.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -90,11 +94,7 @@
     "prettier": "^2.8.4",
     "react-error-overlay": "6.0.9",
     "sass": "^1.54.4",
-    "typescript": "^4.9.5",
-    "vite": "^4.1.1",
-    "vite-plugin-node-polyfills": "^0.7.0",
-    "vite-plugin-svgr": "^2.4.0",
-    "vite-tsconfig-paths": "^4.0.5"
+    "typescript": "^4.9.5"
   },
   "scripts": {
     "start": "vite",

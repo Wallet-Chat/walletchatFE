@@ -33,6 +33,8 @@
   },
   "include": [
     ".eslintrc",
-    "src"
+    "src",
+    "vite.config.ts",
+    "vite-env.d.ts"
   ]
 }
