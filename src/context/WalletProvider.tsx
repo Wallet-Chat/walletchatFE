@@ -169,7 +169,7 @@ const WalletProvider = React.memo(({ children }) => {
 
   const getName = (_account) => {
     if (!ENV.REACT_APP_REST_API) {
-      console.log('REST API url not in .env', process.env)
+      console.log('REST API url not in .env', ENV)
       return
     }
     if (!_account) {
@@ -205,7 +205,7 @@ const WalletProvider = React.memo(({ children }) => {
 
   const getSettings = (_account) => {
     if (!ENV.REACT_APP_REST_API) {
-      console.log('REST API url not in .env', process.env)
+      console.log('REST API url not in .env', ENV)
       return
     }
     if (!_account) {

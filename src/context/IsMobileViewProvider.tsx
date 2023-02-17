@@ -1,40 +1,22 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-const IsMobileViewContext = React.createContext()
-export const useIsMobileView = () => React.useContext(IsMobileViewContext)
+function useIsMobileView() {
+	const [size, setSize] = React.useState({
+		width: window.innerWidth,
+		height: window.innerHeight,
+	})
 
-export function withIsMobileView(Component) {
-   const IsMobileViewComponent = (props) => (
-      <IsMobileViewContext.Consumer>
-         {(contexts) => <Component {...props} {...contexts} />}
-      </IsMobileViewContext.Consumer>
-   )
-   return IsMobileViewComponent
+	React.useEffect(() => {
+		const handleWindowSizeChange = () =>
+			setSize({ width: window.innerWidth, height: window.innerHeight })
+
+		window.addEventListener('resize', handleWindowSizeChange)
+		return () => window.removeEventListener('resize', handleWindowSizeChange)
+	}, [])
+
+	const isMobileView = size.width <= 600
+
+	return isMobileView
 }
 
-const IsMobileViewProvider = React.memo(({ children }) => {
-   const [size, setSize] = useState({
-      width: window.innerWidth,
-      height: window.innerHeight,
-   })
-
-   React.useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange)
-
-      return () => window.removeEventListener('resize', handleWindowSizeChange)
-   }, [])
-
-   const handleWindowSizeChange = (event) => {
-      setSize({ width: window.innerWidth, height: window.innerHeight })
-   }
-
-   const isMobileView = size.width <= 600
-
-   return (
-      <IsMobileViewContext.Provider value={{isMobileView}}>
-         {children}
-      </IsMobileViewContext.Provider>
-   )
-})
-
-export default IsMobileViewProvider
+export default useIsMobileView

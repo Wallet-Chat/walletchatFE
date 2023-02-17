@@ -9,12 +9,11 @@ import {
    TabPanel,
    Badge,
 } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
 import * as ENV from '@/constants/env'
-
 import { InboxItemType } from '../../types/InboxItem'
 import { chains } from '../../constants'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
@@ -24,7 +23,6 @@ import NFTInboxSearchInput from './components/NFTInboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 import lit from '../../utils/lit'
-
 
 const NFTInbox = ({
    account,
@@ -94,7 +92,7 @@ const NFTInbox = ({
    const getInboxData = () => {
       // GET request to get off-chain data for RX user
       if (!ENV.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
+         console.log('REST API url not in .env', ENV)
          return
       }
       if (!account) {

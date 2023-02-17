@@ -41,7 +41,6 @@ import NFTPortNFT from '../../types/NFTPort/NFT'
 import animatedPlaceholder from '../../images/animated-placeholder.gif'
 import { useWallet } from '../../context/WalletProvider'
 import { truncateAddress } from '../../helpers/truncateString'
-import { useIsMobileView } from '../../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../../helpers/ipfs'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
 import IconDM from '../../images/icon-dm.svg'
@@ -63,8 +62,6 @@ export default function Sidebar() {
   const [nftData, setNftData] = useState<NFTPortNFT>()
   const [imageUrl, setImageUrl] = useState<string>()
   const { unreadCount } = useUnreadCount()
-
-  const { isMobileView } = useIsMobileView()
 
   const { metadata } = nftData?.nft || {}
 
@@ -360,7 +357,6 @@ export default function Sidebar() {
                 Sign out
               </MenuItem>
             </MenuGroup>
-            {/* {isMobileView && ( */}
             <>
               <MenuDivider />
               <MenuItem
@@ -377,25 +373,6 @@ export default function Sidebar() {
                 </Text>
               </MenuItem>
             </>
-            {/* )} */}
-            {/* {!isMobileView && window == window.parent && (
-                     <>
-                        <MenuDivider />
-                        <MenuItem
-                           onClick={() => walletRequestPermissions()}
-                           icon={
-                              <Box>
-                                 <IconSwitchHorizontal stroke="1.5" />
-                              </Box>
-                           }
-                        >
-                           Switch Accounts
-                           <Text fontSize="sm" color="darkgray.400">
-                              Switch active account using MetaMask
-                           </Text>
-                        </MenuItem>
-                     </>
-                  )} */}
             <MenuDivider borderColor="lightgray.500" />
             <MenuGroup>
               <MenuItem

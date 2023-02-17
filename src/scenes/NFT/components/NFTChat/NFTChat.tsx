@@ -65,7 +65,7 @@ const NFTChat = ({
    const getChatData = () => {
       // GET request to get off-chain data for RX user
       if (!ENV.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
+         console.log('REST API url not in .env', ENV)
          return
       }
       if (!account || !recipientAddr) {
