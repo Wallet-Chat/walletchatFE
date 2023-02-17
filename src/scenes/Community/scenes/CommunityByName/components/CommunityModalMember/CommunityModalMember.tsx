@@ -36,7 +36,7 @@ const CommunityModalMember = ({
 				<Box fontSize='md' flexGrow={1} fontWeight='bold'>
 					{member?.name}
 				</Box>
-				<Box fontSize='sm' flexGrow={1} color='lightgray.500'>
+				<Box fontSize='sm' flexGrow={1} color='lightgray.700'>
 					{member?.address && truncateAddress(member.address)}
 				</Box>
 			</Box>
