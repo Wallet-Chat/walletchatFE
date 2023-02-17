@@ -304,7 +304,9 @@ const CommunityModalLanding = ({
 						transitionTimingFunction='ease-in-out'
 						transitionProperty='width'
 						role='group'
-						width='min-content'
+						width={
+							debouncedSearchTerm.length > 1 ? '100%' : 'min-content'
+						}
 						_hover={{
 							width: '100%',
 							transitionDuration: '0.2s',
@@ -343,11 +345,11 @@ const CommunityModalLanding = ({
 					</InputGroup>
 				</Flex>
 
-				{filteredMembers.length > 1 && (
+				{filteredMembers.length > 0 && (
 					<Box height='fit-content'>
 						<List
 							width='100%'
-							height={300}
+							height={200}
 							itemSize={55}
 							itemCount={filteredMembers.length}
 							className='custom-scrollbar'
