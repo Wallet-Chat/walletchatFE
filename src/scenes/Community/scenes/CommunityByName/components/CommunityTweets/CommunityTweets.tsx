@@ -7,10 +7,10 @@ const CommunityTweets = ({ tweets }: { tweets: TweetType[] }) => {
 		<Box borderRadius='md' p={4}>
 			{tweets ? (
 				tweets.map((tweet: TweetType, i) => (
-					<>
-						<Tweet data={tweet} key={i} />
+					<Box key={i}>
+						<Tweet data={tweet} />
 						{i + 1 !== tweets.length && <Divider mb={4} />}
-					</>
+					</Box>
 				))
 			) : (
 				<></>
