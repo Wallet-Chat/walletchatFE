@@ -1,8 +1,8 @@
 import { Avatar, Box, Button, Flex } from '@chakra-ui/react'
 import makeBlockie from 'ethereum-blockies-base64'
 import { Link } from 'react-router-dom'
-import { truncateAddress } from '../../../../../../helpers/text'
-import User from '../../../../../../types/User'
+import { truncateAddress } from '../../../../../../../../helpers/text'
+import User from '../../../../../../../../types/User'
 
 const CommunityModalMember = ({
 	member,
