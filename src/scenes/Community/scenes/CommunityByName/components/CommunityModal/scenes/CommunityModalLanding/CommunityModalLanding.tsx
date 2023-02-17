@@ -290,7 +290,7 @@ const CommunityModalLanding = ({
 					px={6}
 					justifyContent='space-between'
 				>
-					<Flex alignItems='center'>
+					<Flex alignItems='center' mr={3}>
 						<Box flex='0 0 30px'>
 							<IconUsers strokeWidth={1.5} size={20} />
 						</Box>
@@ -327,6 +327,7 @@ const CommunityModalLanding = ({
 						</InputLeftElement>
 						<Input
 							size='sm'
+							borderRadius='md'
 							onChange={(e) => setSearchTerm(e.target.value)}
 							border='1px solid transparent'
 							transitionDuration='0.2s'
@@ -343,7 +344,7 @@ const CommunityModalLanding = ({
 				</Flex>
 
 				{filteredMembers.length > 1 && (
-					<Box height='300px'>
+					<Box height='fit-content'>
 						<List
 							width='100%'
 							height={300}

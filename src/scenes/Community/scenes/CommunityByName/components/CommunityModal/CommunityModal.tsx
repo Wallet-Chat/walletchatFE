@@ -15,11 +15,11 @@ import {
 import { useEffect, useState } from 'react'
 
 import CommunityType from '../../../../../../types/Community'
-import { IconDots, IconLogout } from '@tabler/icons'
+import { IconArrowBack, IconDots, IconLogout } from '@tabler/icons'
 import User from '../../../../../../types/User'
 import CommunityModalLanding from './scenes/CommunityModalLanding'
 import { useWallet } from '../../../../../../context/WalletProvider'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import CommunityModalEdit from './scenes/CommunityModalEdit'
 
 const CommunityModal = ({
@@ -31,6 +31,8 @@ const CommunityModal = ({
 	onClose: () => void
 	communityData: CommunityType | undefined
 }) => {
+	let navigate = useNavigate()
+
 	const { account } = useWallet()
 	const { community = '' } = useParams()
 	const [pageState, setPageState] = useState<string>('')
@@ -79,10 +81,11 @@ const CommunityModal = ({
 	}
 
 	const leaveGroup = () => {
+		console.log(account, community, localStorage.getItem('jwt'))
 		if (!isFetchingJoining) {
 			setIsFetchingJoining(true)
 			fetch(
-				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`,
+				`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`,
 				{
 					method: 'POST',
 					credentials: 'include',
@@ -97,9 +100,11 @@ const CommunityModal = ({
 				}
 			)
 				.then((response) => response.json())
-				.then((count: number) => {
-					console.log('✅[POST][Community][Leave]')
+				.then((response) => {
+					console.log('✅[POST][Community][Leave]', response)
 					setJoined(false)
+					onClose()
+					navigate('/community')
 				})
 				.catch((error) => {
 					console.error('🚨[POST][Community][Leave]:', error)
@@ -114,7 +119,21 @@ const CommunityModal = ({
 		<Modal isOpen={isOpen} onClose={onClose} size='sm'>
 			<ModalOverlay />
 			<ModalContent>
-				<ModalHeader>Community Info</ModalHeader>
+				<ModalHeader d='flex' alignItems='center'>
+					<CloseButton
+						position='relative'
+						mr={2}
+						style={{
+							display: pageState !== '' ? 'unset' : 'none',
+						}}
+						onClick={() => setPageState('')}
+					>
+						<Flex justifyContent='center'>
+							<IconArrowBack strokeWidth={1.5} />
+						</Flex>
+					</CloseButton>
+					Community Info
+				</ModalHeader>
 				<ModalCloseButton />
 				<Menu>
 					<MenuButton
@@ -122,11 +141,15 @@ const CommunityModal = ({
 						position='absolute'
 						top={2}
 						right={12}
+						style={{
+							display: pageState === '' ? 'unset' : 'none',
+						}}
 					>
 						<Flex justifyContent='center'>
 							<IconDots strokeWidth={1.5} />
 						</Flex>
 					</MenuButton>
+
 					<MenuList>
 						<MenuItem
 							fontSize='md'
