@@ -385,7 +385,6 @@ const NFTChat = ({
                         msg={msg}
                         updateRead={updateRead}
                         context="nfts"
-                        pfpImage=''
                      />
                   )
                }

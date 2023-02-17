@@ -48,18 +48,13 @@ import IconDM from '../../images/icon-dm.svg'
 import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
 import { isChromeExtension } from '../../helpers/chrome'
-import { useAppSelector } from "@/hooks/useSelector"
-import { fetchPfpDataForAddr } from '@/redux/reducers/dm'
-import { useAppDispatch } from '@/hooks/useDispatch'
+import Avatar from '../Inbox/DM/Avatar'
 
 interface URLChangedEvent extends Event {
   detail?: string
 }
 
 export default function Sidebar() {
-  const { pfpDataByAddr } = useAppSelector((state) => state.dm)
-  const dispatch = useAppDispatch()
-
   const nftNotificationCount = 0
   const [url, setUrl] = useState<string | undefined>('')
   const [nftContractAddr, setNftContractAddr] = useState<string>()
@@ -75,8 +70,6 @@ export default function Sidebar() {
 
   const { disconnectWallet, name, account, walletRequestPermissions } =
     useWallet()
-
-  const pfpData = pfpDataByAddr[account]
 
   useEffect(() => {
     if (isChromeExtension()) {
@@ -115,10 +108,6 @@ export default function Sidebar() {
       }
     }
   }, [url])
-
-  useEffect(() => {
-    dispatch(fetchPfpDataForAddr(account))
-  }, [account])
 
   const getNftMetadata = (
     nftContractAddr: string,
@@ -316,20 +305,8 @@ export default function Sidebar() {
           <MenuButton as={AccountInfo}>
             {account && (
               <>
-                {pfpData && (
-                  <Image
-                    src={pfpData}
-                    height="45px"
-                    width="45px"
-                    borderRadius="var(--chakra-radii-xl)"
-                  />
-                )}
-                {!pfpData && (
-                  <Blockies
-                    seed={account.toLocaleLowerCase()}
-                    scale={4}
-                  />
-                )}
+                <Avatar account={account} />
+
                 {!isMobile && (
                   <span
                     style={{

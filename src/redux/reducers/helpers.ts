@@ -1,5 +1,18 @@
 import { RootState, ReducerStates } from '@/redux/store'
 
+export function createErrorResponse(call: string) {
+	return (response: any) => {
+		const errorResponse = response as unknown as {
+			status: string
+			error: string
+		}
+
+		console.error(`🚨[GET][${call}]:`, errorResponse.error)
+
+		return errorResponse.status
+	}
+}
+
 export function addPendingSetReducer(
 	arg: string,
 	state: ReducerStates,

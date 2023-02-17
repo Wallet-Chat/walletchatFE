@@ -1,12 +1,11 @@
-import { Box, Flex, Image } from '@chakra-ui/react'
-import Blockies from 'react-blockies'
+import { Box, Flex } from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 
 import { formatInboxDate } from '../../../helpers/date'
 import { truncateAddress } from '../../../helpers/truncateString'
 import { InboxItemType } from '../../../types/InboxItem'
-import { BlockieWrapper } from '../../../styled/BlockieWrapper'
 import { InboxItemNotificationCount, InboxItemRecipientAddress, InboxItemWrapper } from '../../../styled/InboxItem'
+import Avatar from './Avatar'
 
 const DMInboxItem = ({
    data,
@@ -46,19 +45,7 @@ const DMInboxItem = ({
             <Flex justifyContent="space-between">
                <Flex>
                   <Box mr={2} flexShrink={0}>
-                     {data?.logo ? (
-                        <Image
-                           src={data.logo}
-                           alt=""
-                           maxWidth="40px"
-                           maxHeight="40px"
-                           borderRadius="md"
-                        />
-                     ) : (
-                        <BlockieWrapper width="40px" height="40px">
-                           <Blockies seed={recipientAddress} scale={5} />
-                        </BlockieWrapper>
-                     )}
+                     <Avatar account={recipientAddress} />
                   </Box>
                   <Box minWidth="0">
                      <InboxItemRecipientAddress>{displayName}</InboxItemRecipientAddress>

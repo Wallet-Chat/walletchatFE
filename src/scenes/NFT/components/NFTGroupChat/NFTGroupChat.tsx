@@ -230,7 +230,6 @@ const NFTGroupChat = ({
                   account={account}
                   context="nfts"
                   msg={msg}
-                  pfpImage=''
                />
             )
          }

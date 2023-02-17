@@ -1,20 +1,19 @@
-import { Box, Button, Spinner, Flex, Image, Text } from '@chakra-ui/react'
+import { Box, Button,  Flex, Image, Text } from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
-import Blockies from 'react-blockies'
 import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
 import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
 
 import { formatMessageDate } from '../../helpers/date'
 import { MessageUIType } from '../../types/Message'
-import { BlockieWrapper } from '../../styled/BlockieWrapper'
 import NFT from '../../types/NFT'
 import OpenSeaNFT, { openseaToGeneralNFTType } from '../../types/OpenSea/NFT'
 import AlchemyNFT, { alchemyToGeneralNFTType } from '../../types/Alchemy/NFT'
 import UserProfileContextMenu from '../UserProfileContextMenu'
 import { useIsInViewport } from '../../helpers/useIsInViewport'
 import * as ENV from '@/constants/env'
+import Avatar from '../Inbox/DM/Avatar'
 
 const MessageBox = styled.div`
    position: relative;
@@ -122,13 +121,11 @@ const ChatMessage = ({
    context,
    account,
    msg,
-   pfpImage,
    updateRead,
 }: {
    context: 'dms' | 'nfts' | 'communities'
    account: string | undefined
    msg: MessageUIType
-   pfpImage: string | undefined
    updateRead?: (data: MessageUIType) => void
 }) => {
    const [nftData, setNftData] = useState<NFT>()
@@ -255,21 +252,7 @@ const ChatMessage = ({
          >
             {msg.fromAddr && (
                <UserProfileContextMenu address={msg.fromAddr}>
-                  {pfpImage ? (
-                     <Image
-                        src={pfpImage}
-                        height="40px"
-                        width="40px"
-                        borderRadius="var(--chakra-radii-xl)"
-                     />
-                     ) : (
-                  <BlockieWrapper>
-                     <Blockies
-                        seed={msg.fromAddr.toLocaleLowerCase()}
-                        scale={4}
-                     />
-                  </BlockieWrapper>
-                  )}
+                  <Avatar account={msg.fromAddr} />
                </UserProfileContextMenu>
             )}
          </Box>
