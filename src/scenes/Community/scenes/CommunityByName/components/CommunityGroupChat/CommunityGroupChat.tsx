@@ -223,7 +223,10 @@ const CommunityGroupChat = ({
 						)
 					} else if (msg.type && msg.type === 'welcome') {
 						return (
-							<Box textAlign='center' key={`welcome-${msg.fromAddr}`}>
+							<Box
+								textAlign='center'
+								key={`welcome-${msg.fromAddr}-${i}`}
+							>
 								<Text fontSize='sm' color='darkgray.200'>
 									A warm welcome to{' '}
 									<RLink to={`/dm/${msg.fromAddr}`}>

@@ -21,9 +21,11 @@ import CommunityType from '../../../../../../../../types/Community'
 const CommunityModalEdit = ({
 	setPageState,
 	communityData,
+	getCommunityData,
 }: {
 	setPageState: (state: string) => void
 	communityData: CommunityType | undefined
+	getCommunityData: () => void
 }) => {
 	const { community = '' } = useParams()
 
@@ -61,16 +63,34 @@ const CommunityModalEdit = ({
 
 	const onSubmit = (values: any) => {
 		let social = []
-		if (values.twitter) {
+		let _twitter =
+			communityData?.social &&
+			communityData.social.find((s) => s.type === 'twitter')
+
+		if (_twitter?.username && !twitterActive) {
 			social.push({
 				type: 'twitter',
-				name: values.twitter,
+				name: '',
+			})
+		} else if (twitter) {
+			social.push({
+				type: 'twitter',
+				name: twitter,
 			})
 		}
-		if (values.discord) {
+
+		let _discord =
+			communityData?.social &&
+			communityData?.social.find((s) => s.type === 'discord')
+		if (_discord?.username && !discordActive) {
 			social.push({
 				type: 'discord',
-				name: values.discord,
+				name: '',
+			})
+		} else if (discord) {
+			social.push({
+				type: 'discord',
+				name: discord,
 			})
 		}
 
@@ -82,7 +102,7 @@ const CommunityModalEdit = ({
 		}
 
 		fetch(
-			`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_community`,
+			`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_community`,
 			{
 				method: 'POST',
 				credentials: 'include',
@@ -92,16 +112,18 @@ const CommunityModalEdit = ({
 				},
 				body: JSON.stringify({
 					name: values?.name,
+					slug: community,
 					social,
 				}),
 			}
 		)
 			.then((rtn) => {
-				console.log('✅[POST][Create Community]', rtn)
+				console.log('✅[POST][Update Community]', rtn)
 				setPageState('')
+				getCommunityData()
 			})
 			.catch((error) => {
-				console.error('🚨[POST][Create Community]:', error)
+				console.error('🚨[POST][Update Community]:', error)
 			})
 			.finally(() => {
 				setIsFetching(false)

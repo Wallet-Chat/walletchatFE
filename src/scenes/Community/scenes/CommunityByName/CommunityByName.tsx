@@ -74,7 +74,11 @@ const CommunityByName = () => {
 			)
 				.then((response) => response.json())
 				.then(async (data: CommunityType) => {
-					if (!equal(data?.messages, communityData?.messages)) {
+					if (
+						!equal(data?.messages, communityData?.messages) ||
+						!equal(data?.name, communityData?.name) ||
+						!equal(data?.social?.length, communityData?.social?.length)
+					) {
 						console.log('✅[GET][Community]:', data)
 						setCommunityData({
 							...data,
@@ -377,6 +381,7 @@ const CommunityByName = () => {
 				isOpen={isOpen}
 				onClose={onClose}
 				communityData={communityData}
+				getCommunityData={getCommunityData}
 			/>
 		</Flex>
 	)

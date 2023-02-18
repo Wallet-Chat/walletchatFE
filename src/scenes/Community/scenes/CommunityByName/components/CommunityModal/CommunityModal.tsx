@@ -26,10 +26,12 @@ const CommunityModal = ({
 	isOpen,
 	onClose,
 	communityData,
+	getCommunityData,
 }: {
 	isOpen: boolean
 	onClose: () => void
 	communityData: CommunityType | undefined
+	getCommunityData: () => void
 }) => {
 	let navigate = useNavigate()
 
@@ -183,6 +185,7 @@ const CommunityModal = ({
 					{pageState === 'edit' && (
 						<CommunityModalEdit
 							communityData={communityData}
+							getCommunityData={getCommunityData}
 							setPageState={setPageState}
 						/>
 					)}
