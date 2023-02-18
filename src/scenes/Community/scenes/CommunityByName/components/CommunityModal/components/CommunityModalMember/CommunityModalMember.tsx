@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Flex } from '@chakra-ui/react'
+import { Avatar, Box, Button, Flex, Tag } from '@chakra-ui/react'
 import makeBlockie from 'ethereum-blockies-base64'
 import { Link } from 'react-router-dom'
 import { truncateAddress } from '../../../../../../../../helpers/text'
@@ -34,7 +34,17 @@ const CommunityModalMember = ({
 			</Box>
 			<Box>
 				<Box fontSize='md' flexGrow={1} fontWeight='bold'>
-					{member?.name}
+					{member?.name}{' '}
+					{member?.admin && (
+						<Tag
+							variant='outline'
+							colorScheme='darkgray'
+							size='sm'
+							ml={1}
+						>
+							Admin
+						</Tag>
+					)}
 				</Box>
 				<Box fontSize='sm' flexGrow={1} color='lightgray.700'>
 					{member?.address && truncateAddress(member.address)}
