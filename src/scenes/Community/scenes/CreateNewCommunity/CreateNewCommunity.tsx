@@ -77,8 +77,9 @@ const CreateNewCommunity = () => {
 				}),
 			}
 		)
+			.then((response) => response.json())
 			.then((slug) => {
-				console.log('✅[POST][Create Community]')
+				console.log('✅[POST][Create Community]', slug)
 				navigate(`/community/${slug}`)
 			})
 			.catch((error) => {
