@@ -244,7 +244,7 @@ export default function Sidebar() {
             <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0}></Box>
            
             {/* for an iFrame we only want DMs */}
-            {name !== null && window !== window.parent && (
+            {name !== null && (
                <>
                <LinkElem to={'/dm'}>
                   {/* <Box className="popup-text">Chat</Box> */}
