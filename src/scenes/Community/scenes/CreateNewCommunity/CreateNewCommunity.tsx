@@ -42,13 +42,13 @@ const CreateNewCommunity = () => {
 
 	const onSubmit = (values: any) => {
 		let social = []
-		if (values.twitter) {
+		if (values.twitter && twitterActive) {
 			social.push({
 				type: 'twitter',
 				name: values.twitter,
 			})
 		}
-		if (values.discord) {
+		if (values.discord && discordActive) {
 			social.push({
 				type: 'discord',
 				name: values.discord,
