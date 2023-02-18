@@ -242,25 +242,8 @@ export default function Sidebar() {
             <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0}></Box>
             <Divider />
             <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0}></Box>
-           
-            {/* for an iFrame we only want DMs */}
-            {name !== null && window !== window.parent && (
-               <>
-               <LinkElem to={'/dm'}>
-                  {/* <Box className="popup-text">Chat</Box> */}
-                  <Image src={IconDM} alt="" />
-                  {(unreadCount?.dm > 0 || unreadCount?.community > 0) && (
-                     <UnreadCountContainer>
-                        <Badge variant="blue" fontSize="md">
-                           {unreadCount?.dm}
-                        </Badge>
-                     </UnreadCountContainer>
-                  )}         
-               </LinkElem>
-               </>
-            )}
 
-            {name !== null && window === window.parent && (
+            {name !== null && (
                <>
                <LinkElem to={'/dm'}>
                   {/* <Box className="popup-text">Chat</Box> */}
