@@ -95,7 +95,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
                console.log('✅[GET][Verify Email]:', response)
                 setFetchError(false)
                 setIsVerifySuccess(true)
-                navigate('/me/verify-email')
+                navigate('/community/walletchat')
             })
             .catch((error) => {
                console.error('🚨[GET][Verify Email]:', error)
