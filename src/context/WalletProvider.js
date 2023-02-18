@@ -38,7 +38,7 @@ import {
  } from "@stacks/connect";
  import { openSignatureRequestPopup } from "@stacks/connect";
  import { StacksTestnet, StacksMainnet } from "@stacks/network";
- import { getAddressFromPublicKey, TransactionVersion } from "@stacks/transactions";
+ import { verifyMessageSignatureRsv } from '@stacks/encryption';
 
 // near wallet selector options
 import { setupWalletSelector } from '@near-wallet-selector/core';
@@ -973,23 +973,9 @@ const WalletProvider = React.memo(({ children }) => {
             onFinish: async () => 
             {
                let userData = userSession.loadUserData();
-               //console.log("yo yo STX user: ", userData.profile.stxAddress.mainnet)
+               console.log("yo yo STX user: ", userData.profile.stxAddress.mainnet)
                _account = userData.profile.stxAddress.mainnet
 
-               const message = 'Hello World \r\n kevin';
-               // await openSignatureRequestPopup({
-               //    message,
-               //    network: new StacksMainnet(),
-               //    appDetails: {
-               //       name: origin,
-               //       icon: window.location.origin + "/my-app-logo.svg",
-               //    },
-               //    onFinish(data) {
-               //       console.log("Signature of the message", data.signature)
-               //       console.log("Use public key:", data.publicKey)
-               //    }
-               // });
-               
                // check if JWT exists or is timed out:
                fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
                   method: 'GET',
@@ -1029,15 +1015,18 @@ const WalletProvider = React.memo(({ children }) => {
                               name: origin,
                               icon: window.location.origin + "/my-app-logo.svg",
                            },
-                           onFinish(data) {
-                              console.log("Signature of the message", data.signature)
-                              console.log("Use public key:", data.publicKey)
-                              _signatureSTX = data.signature
-                              _accountPubKey = data.publicKey
+                           onFinish({ publicKey, signature }) {
+                              console.log("Signature of the message 1", signature)
+                              console.log("Use public key 1:", publicKey)
+                              _signatureSTX = signature
+                              _accountPubKey = publicKey
                               // _account = getAddressFromPublicKey(fromHexString(data.publicKey), TransactionVersion.MainnetMultiSig)
                               // console.log("STX Addr:", _account)
+                              const verified = verifyMessageSignatureRsv({ message, publicKey, signature });
+                              console.log("********* Verify sig: ", verified)
+
                               fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                                 body: JSON.stringify({ "name": _account, "address": toHexString(_accountPubKey), "nonce": _nonce, "msg": message, "sig": toHexString(_signatureSTX) }),
+                                 body: JSON.stringify({ "name": _account, "address": _accountPubKey, "nonce": _nonce, "msg": message, "sig": _signatureSTX }),
                                  headers: {
                                  'Content-Type': 'application/json'
                                  },
@@ -1089,16 +1078,16 @@ const WalletProvider = React.memo(({ children }) => {
                            name: origin,
                            icon: window.location.origin + "/my-app-logo.svg",
                         },
-                        onFinish(data) {
-                           console.log("Signature of the message", data.signature)
-                           console.log("Use public key:", data.publicKey)
-                           _signatureSTX = data.signature
-                           _accountPubKey = data.publicKey
+                        onFinish({ publicKey, signature }) {
+                           console.log("Signature of the message 2", signature)
+                           console.log("Use public key 2:", publicKey)
                            // _account = getAddressFromPublicKey(fromHexString(data.publicKey), TransactionVersion.MainnetMultiSig)
                            // console.log("STX Addr:", _account)
+                           const verified = verifyMessageSignatureRsv({ message, publicKey, signature });
+                           console.log("********* Verify sig: ", verified)
 
                            fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                              body: JSON.stringify({ "name": _account, "address": toHexString(_accountPubKey), "nonce": _nonce, "msg": message, "sig": toHexString(_signatureSTX) }),
+                              body: JSON.stringify({ "name": _account, "address": publicKey, "nonce": _nonce, "msg": message, "sig": signature }),
                               headers: {
                                  'Content-Type': 'application/json'
                               },
