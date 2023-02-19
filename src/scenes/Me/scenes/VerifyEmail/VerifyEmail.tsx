@@ -55,7 +55,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
             console.log('✅[Get][VerifyEmail From Email Link]:', response)
              setFetchError(false)
              setIsVerifySuccess(true)
-             navigate('/me/verify-email')
+             navigate('/me/verify-success')
          })
          .catch((error) => {
             console.error('🚨[GET][Verify Email From Email Link]:', error)
