@@ -29,6 +29,7 @@ import ChangeName from './scenes/Me/scenes/ChangeName'
 import EnterEmail from './scenes/Me/scenes/EnterEmail'
 import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
+import VerifySuccess from './scenes/Me/scenes/VerifySuccess'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -268,6 +269,7 @@ export const App = () => {
                      <Route path="/me/change-name" element={<ChangeName />} />
                      <Route path="/me/change-email" element={<ChangeEmail account={account} />} />
                      <Route path="/me/verify-email" element={<VerifyEmail account={account} />} />
+                     <Route path="/me/verify-success" element={<VerifySuccess account={account} />} />
                      <Route
                         path="/nft"
                         element={
