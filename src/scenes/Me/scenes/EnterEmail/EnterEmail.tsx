@@ -102,7 +102,8 @@ const EnterEmail = ({ account }: { account: string }) => {
          })
    };
    const handleCancel = () => {
-      navigate('/community/walletchat')
+      let communityChat = process.env.REACT_APP_DEFAULT_COMMUNITY || "walletchat"
+      navigate(`/community/${communityChat}`)
   };
 
    const onSubmit = (values: any) => {
@@ -153,7 +154,7 @@ const EnterEmail = ({ account }: { account: string }) => {
       <Box p={6} pt={16} background="white" width="100%">
          <form onSubmit={handleSubmit(onSubmit)}>
             <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-                Notification Settings
+                Optional Notifications
                <br />
             </Text>
             <FormControl>

@@ -47,23 +47,18 @@ const VerifyEmail = ({ account }: { account: string }) => {
    const [fetchError, setFetchError] = useState(false)
    const [isVerifySuccess, setIsVerifySuccess] = useState(false)
    const callVerifyEmail = () => {
-      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/verify_email/${verificationemail}/${verificationcode}`, {
-         method: 'GET',
-         credentials: "include",
-         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-         },
+      fetch(` ${process.env.REACT_APP_REST_API}/verify_email/${verificationemail}/${verificationcode}`, {
+         method: 'GET'
       })
          .then((response) => response.json())
          .then((response) => {
-            console.log('✅[Get][VerifyEmail]:', response)
+            console.log('✅[Get][VerifyEmail From Email Link]:', response)
              setFetchError(false)
              setIsVerifySuccess(true)
              navigate('/me/verify-email')
          })
          .catch((error) => {
-            console.error('🚨[GET][Verify Email]:', error)
+            console.error('🚨[GET][Verify Email From Email Link]:', error)
             setFetchError(true)
             setIsVerifySuccess(false)
             navigate('/me/verify-email')
@@ -95,7 +90,8 @@ const VerifyEmail = ({ account }: { account: string }) => {
                console.log('✅[GET][Verify Email]:', response)
                 setFetchError(false)
                 setIsVerifySuccess(true)
-                navigate('/community/walletchat')
+                let communityChat = process.env.REACT_APP_DEFAULT_COMMUNITY || "walletchat"
+                navigate(`/community/${communityChat}`)
             })
             .catch((error) => {
                console.error('🚨[GET][Verify Email]:', error)
