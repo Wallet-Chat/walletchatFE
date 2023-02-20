@@ -1,4 +1,4 @@
-import { Box, Button,  Flex, Image, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Image, Text } from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
@@ -16,323 +16,313 @@ import * as ENV from '@/constants/env'
 import Avatar from '../Inbox/DM/Avatar'
 
 const MessageBox = styled.div`
-   position: relative;
-   width: auto;
-   min-width: 75px;
-   max-width: 80%;
-   height: auto;
-   background: #fff;
-   background: var(--chakra-colors-lightgray-300);
-   border-radius: var(--chakra-radii-md);
-   padding: var(--chakra-space-2) var(--chakra-space-3) var(--chakra-space-5);
-   font-size: var(--chakra-fontSizes-md);
-   clear: both;
-   word-break: break-word;
+	position: relative;
+	width: auto;
+	min-width: 75px;
+	max-width: 80%;
+	height: auto;
+	background: #fff;
+	background: var(--chakra-colors-lightgray-300);
+	border-radius: var(--chakra-radii-md);
+	padding: var(--chakra-space-2) var(--chakra-space-3) var(--chakra-space-5);
+	font-size: var(--chakra-fontSizes-md);
+	clear: both;
+	word-break: break-word;
 
-   .msg-img {
-      display: inline-block;
-   }
+	.msg-img {
+		display: inline-block;
+	}
 
-   .msg-bubble {
-      display: inline-block;
-   }
+	.msg-bubble {
+		display: inline-block;
+	}
 
-   .name {
-      color: var(--chakra-colors-information-600);
-   }
+	.name {
+		color: var(--chakra-colors-information-600);
+	}
 
-   &.left {
-      float: left;
-      background: #fff;
-   }
-   &.right {
-      float: left;
-      background: var(--chakra-colors-darkgray-800);
-      color: var(--chakra-colors-lightgray-100);
+	&.left {
+		float: left;
+		background: #fff;
+	}
+	&.right {
+		float: left;
+		background: var(--chakra-colors-darkgray-800);
+		color: var(--chakra-colors-lightgray-100);
 
-      .name {
-         color: var(--chakra-colors-white);
-      }
-      .chakra-menu__menu-list {
-         color: #000;
-      }
+		.name {
+			color: var(--chakra-colors-white);
+		}
+		.chakra-menu__menu-list {
+			color: #000;
+		}
 
-      .nft-context-btn {
-         background: var(--chakra-colors-darkgray-600);
-         color: var(--chakra-colors-lightgray-500);
-         color: var(--chakra-colors-white);
-         &:hover {
-            background: var(--chakra-colors-darkgray-500);
-            color: var(--chakra-colors-lightgray-500);
-         }
-      }
-   }
-   .timestamp {
-      display: block;
-      position: absolute;
-      /* right: var(--chakra-space-7); */
-      right: var(--chakra-space-2);
-      bottom: var(--chakra-space-2);
-      color: #aaa;
-      font-size: var(--chakra-fontSizes-sm);
-      user-select: none;
-      line-height: 1.2;
-   }
-   &.left {
-      .timestamp {
-         right: var(--chakra-space-2);
-      }
-   }
-   .read-status {
-      position: absolute;
-      right: var(--chakra-space-2);
-      bottom: var(--chakra-space-2);
-      svg {
-         stroke: var(--chakra-colors-lightgray-800);
-      }
-   }
-   &.read:not(.left) {
-      .timestamp {
-         color: darkgreen;
-         user-select: none;
-      }
-      .read-status {
-         svg {
-            stroke: darkgreen;
-         }
-      }
-   }
-   &.right {
-      &.read {
-         .timestamp {
-            color: var(--chakra-colors-success-500);
-            user-select: none;
-         }
-         .read-status {
-            svg {
-               stroke: var(--chakra-colors-success-500);
-            }
-         }
-      }
-   }
+		.nft-context-btn {
+			background: var(--chakra-colors-darkgray-600);
+			color: var(--chakra-colors-lightgray-500);
+			color: var(--chakra-colors-white);
+			&:hover {
+				background: var(--chakra-colors-darkgray-500);
+				color: var(--chakra-colors-lightgray-500);
+			}
+		}
+	}
+	.timestamp {
+		display: block;
+		position: absolute;
+		/* right: var(--chakra-space-7); */
+		right: var(--chakra-space-2);
+		bottom: var(--chakra-space-2);
+		color: #aaa;
+		font-size: var(--chakra-fontSizes-sm);
+		user-select: none;
+		line-height: 1.2;
+	}
+	&.left {
+		.timestamp {
+			right: var(--chakra-space-2);
+		}
+	}
+	.read-status {
+		position: absolute;
+		right: var(--chakra-space-2);
+		bottom: var(--chakra-space-2);
+		svg {
+			stroke: var(--chakra-colors-lightgray-800);
+		}
+	}
+	&.read:not(.left) {
+		.timestamp {
+			color: darkgreen;
+			user-select: none;
+		}
+		.read-status {
+			svg {
+				stroke: darkgreen;
+			}
+		}
+	}
+	&.right {
+		&.read {
+			.timestamp {
+				color: var(--chakra-colors-success-500);
+				user-select: none;
+			}
+			.read-status {
+				svg {
+					stroke: var(--chakra-colors-success-500);
+				}
+			}
+		}
+	}
 `
 
 const ChatMessage = ({
-   context,
-   account,
-   msg,
-   updateRead,
+  context,
+  account,
+  msg,
+  updateRead,
 }: {
-   context: 'dms' | 'nfts' | 'communities'
-   account: string | undefined
-   msg: MessageUIType
-   updateRead?: (data: MessageUIType) => void
+  context: 'dms' | 'nfts' | 'communities'
+  account: string | undefined
+  msg: MessageUIType
+  updateRead?: (data: MessageUIType) => void
 }) => {
-   const [nftData, setNftData] = useState<NFT>()
+  const [nftData, setNftData] = useState<NFT>()
 
-   const messageRef = useRef(null)
-   const isInViewport = useIsInViewport(messageRef)
+  const messageRef = useRef(null)
+  const isInViewport = useIsInViewport(messageRef)
+  const msgPosition =
+    msg.fromaddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
+      ? 'right'
+      : 'left'
 
-   useEffect(() => {
-      const getNftMetadata = () => {
-         if (!msg.nftAddr || !msg.nftId) {
-            // console.log('Missing contract address or id')
-            return
-         }
+  useEffect(() => {
+    const getNftMetadata = () => {
+      if (!msg.nftAddr || !msg.nftId) {
+        // console.log('Missing contract address or id')
+        return
+      }
 
-         const fetchFromOpenSea = () => {
-            if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-               console.log('Missing OpenSea API Key')
-               return
+      const fetchFromOpenSea = () => {
+        if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
+          console.log('Missing OpenSea API Key')
+          return
+        }
+        fetch(
+          `https://api.opensea.io/api/v1/asset/${msg.nftAddr}/${msg.nftId}?account_address=${account}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
+            },
+          }
+        )
+          .then((response) => response.json())
+          .then((result: OpenSeaNFT) => {
+            if (result?.collection?.name && !equal(result, nftData)) {
+              console.log(`✅[GET][NFT]:`, result)
+              setNftData(openseaToGeneralNFTType(result))
             }
-            fetch(
-               `https://api.opensea.io/api/v1/asset/${msg.nftAddr}/${msg.nftId}?account_address=${account}`,
-               {
-                  method: 'GET',
-                  headers: {
-                     Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
-                  },
-               }
-            )
-               .then((response) => response.json())
-               .then((result: OpenSeaNFT) => {
-                  if (result?.collection?.name && !equal(result, nftData)) {
-                     console.log(`✅[GET][NFT]:`, result)
-                     setNftData(openseaToGeneralNFTType(result))
-                  }
-               })
-               .catch((error) => {
-                  console.log(`🚨[GET][NFT Contract][OpenSea]:`, error)
-                  fetchFromAlchemy()
-               })
-         }
-
-         const fetchFromAlchemy = () => {
-            if (ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
-               console.log('Missing Alchemy API Key')
-               return
-            }
-            fetch(
-               `https://polygon-mainnet.g.alchemy.com/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${msg?.nftAddr}&tokenId=${msg?.nftId}`,
-               {
-                  method: 'GET',
-               }
-            )
-               .then((response) => response.json())
-               .then((data: AlchemyNFT) => {
-                  console.log('✅[GET][NFT Metadata]:', data)
-                  setNftData(alchemyToGeneralNFTType(data))
-               })
-               .catch((error) => console.log('error', error))
-         }
-
-         fetchFromOpenSea()
+          })
+          .catch((error) => {
+            console.log(`🚨[GET][NFT Contract][OpenSea]:`, error)
+            fetchFromAlchemy()
+          })
       }
-      if (context === 'dms') {
-         getNftMetadata()
-      }
-   }, [msg, account, context, nftData])
 
-   const setMessageAsRead = useCallback(() => {
-      if (msg.toAddr && msg.fromAddr && msg.timestamp) {
-         msg.read = true
-         fetch(
-            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_chatitem/${msg.fromAddr}/${msg.toAddr}}`,
-            {
-               method: 'PUT',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-               },
-               body: JSON.stringify({
-                  ...msg,
-                  read: true,
-               }),
-            }
-         )
-            .then((response) => response.json())
-            .then((data) => {
-               console.log('✅[PUT][Message]:', data)
-               updateRead && updateRead(data)
-            })
-            .catch((error) => {
-               console.error('🚨[PUT][Message]:', error)
-            })
+      const fetchFromAlchemy = () => {
+        if (ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
+          console.log('Missing Alchemy API Key')
+          return
+        }
+        fetch(
+          `https://polygon-mainnet.g.alchemy.com/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON}/getNFTMetadata?contractAddress=${msg?.nftAddr}&tokenId=${msg?.nftId}`,
+          {
+            method: 'GET',
+          }
+        )
+          .then((response) => response.json())
+          .then((data: AlchemyNFT) => {
+            console.log('✅[GET][NFT Metadata]:', data)
+            setNftData(alchemyToGeneralNFTType(data))
+          })
+          .catch((error) => console.log('error', error))
       }
-   }, [msg, updateRead])
 
-   useEffect(() => {
-      if (
-         context === 'dms' &&
-         isInViewport &&
-         msg?.read === false &&
-         msg?.toAddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
-      ) {
-         setMessageAsRead()
-      }
-   }, [
-      isInViewport,
-      account,
-      context,
-      msg?.read,
-      msg?.toAddr,
-      setMessageAsRead,
-   ])
+      fetchFromOpenSea()
+    }
+    if (context === 'dms') {
+      getNftMetadata()
+    }
+  }, [msg, account, context, nftData])
 
-   return (
-      <Flex
-         alignItems="flex-start"
-         margin="var(--chakra-space-3) var(--chakra-space-4)"
+  const setMessageAsRead = useCallback(() => {
+    if (msg.toaddr && msg.fromaddr && msg.timestamp) {
+      msg.read = true
+      fetch(
+        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_chatitem/${msg.fromaddr}/${msg.toaddr}}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+          },
+          body: JSON.stringify({
+            ...msg,
+            read: true,
+          }),
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('✅[PUT][Message]:', data)
+          updateRead && updateRead(data)
+        })
+        .catch((error) => {
+          console.error('🚨[PUT][Message]:', error)
+        })
+    }
+  }, [msg, updateRead])
+
+  useEffect(() => {
+    if (
+      context === 'dms' &&
+      isInViewport &&
+      msg?.read === false &&
+      msg?.toaddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
+    ) {
+      setMessageAsRead()
+    }
+  }, [isInViewport, account, context, msg?.read, msg?.toaddr, setMessageAsRead])
+
+  return (
+    <Flex
+      alignItems='flex-start'
+      margin='var(--chakra-space-3) var(--chakra-space-4)'
+    >
+      <Box
+        className='msg-img'
+        style={{ backgroundImage: `url(${msg.img})` }}
+        padding='var(--chakra-space-2) var(--chakra-space-3)'
       >
-         <Box
-            className="msg-img"
-            style={{ backgroundImage: `url(${msg.img})` }}
-            padding="var(--chakra-space-2) var(--chakra-space-3)"
-         >
-            {msg.fromAddr && (
-               <UserProfileContextMenu address={msg.fromAddr}>
-                  <Avatar account={msg.fromAddr} />
-               </UserProfileContextMenu>
-            )}
-         </Box>
+        {msg.fromaddr && (
+          <UserProfileContextMenu address={msg.fromaddr}>
+            <Avatar account={msg.fromaddr} />
+          </UserProfileContextMenu>
+        )}
+      </Box>
 
-         <MessageBox
-            className={`msg ${msg.position} ${msg.read && 'read'}`}
-            ref={messageRef}
-         >
-            <Box className="msg-bubble">
-               {msg?.sender_name && msg?.fromAddr && (
-                  <UserProfileContextMenu address={msg.fromAddr}>
-                     <Text fontSize="md" className="name">
-                        {msg.sender_name}
-                     </Text>
-                  </UserProfileContextMenu>
-               )}
-               <Box>{msg.message}</Box>
-               <Box
-                  d="inline-block"
-                  className="timestamp"
-                  style={{
-                     right: updateRead
-                        ? 'var(--chakra-space-7)'
-                        : 'var(--chakra-space-2)',
-                  }}
-               >
-                  {formatMessageDate(new Date(msg.timestamp))}
-               </Box>
+      <MessageBox
+        className={`msg ${msgPosition} ${msg.read && 'read'}`}
+        ref={messageRef}
+      >
+        <Box className='msg-bubble'>
+          {msg?.sender_name && msg?.fromaddr && (
+            <UserProfileContextMenu address={msg.fromaddr}>
+              <Text fontSize='md' className='name'>
+                {msg.sender_name}
+              </Text>
+            </UserProfileContextMenu>
+          )}
+          <Box>{msg.message}</Box>
+          <Box
+            d='inline-block'
+            className='timestamp'
+            style={{
+              right: updateRead
+                ? 'var(--chakra-space-7)'
+                : 'var(--chakra-space-2)',
+            }}
+          >
+            {formatMessageDate(new Date(msg.timestamp))}
+          </Box>
 
-               {msg.position === 'right' &&
-                  (msg.read === true || msg.read === false) && (
-                     <span className="read-status">
-                        {msg.read ? (
-                           <IconChecks size={15} />
-                        ) : (
-                           <IconCheck size={15} />
-                        )}
-                     </span>
-                  )}
-            </Box>
-            {msg.nftAddr && msg.nftId && account && (
-               <Box mb={1}>
-                  {nftData && (
-                     <RLink
-                        to={`/nft/ethereum/${msg.nftAddr}/${
-                           msg.nftId
-                        }?recipient=${
-                           msg.toAddr === account ? msg.fromAddr : msg.toAddr
-                        }`}
-                        style={{ textDecoration: 'none' }}
-                     >
-                        <Button p={2} height="auto" className="nft-context-btn">
-                           <Flex alignItems="center">
-                              {nftData?.image && (
-                                 <Image
-                                    src={nftData?.image}
-                                    alt=""
-                                    height="15px"
-                                    borderRadius="var(--chakra-radii-sm)"
-                                    mr={1}
-                                 />
-                              )}
-                              {nftData?.name && (
-                                 <Text mr={1} fontSize="sm">
-                                    {nftData?.name}
-                                 </Text>
-                              )}
-                              <IconExternalLink
-                                 size="13"
-                                 color="var(--chakra-colors-lightgray-900)"
-                              />
-                           </Flex>
-                        </Button>
-                     </RLink>
-                  )}
-               </Box>
+          {msgPosition === 'right' &&
+            (msg.read === true || msg.read === false) && (
+              <span className='read-status'>
+                {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
+              </span>
             )}
-         </MessageBox>
-      </Flex>
-   )
+        </Box>
+        {msg.nftAddr && msg.nftId && account && (
+          <Box mb={1}>
+            {nftData && (
+              <RLink
+                to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${msg.toaddr === account ? msg.fromaddr : msg.toAddr
+                  }`}
+                style={{ textDecoration: 'none' }}
+              >
+                <Button p={2} height='auto' className='nft-context-btn'>
+                  <Flex alignItems='center'>
+                    {nftData?.image && (
+                      <Image
+                        src={nftData?.image}
+                        alt=''
+                        height='15px'
+                        borderRadius='var(--chakra-radii-sm)'
+                        mr={1}
+                      />
+                    )}
+                    {nftData?.name && (
+                      <Text mr={1} fontSize='sm'>
+                        {nftData?.name}
+                      </Text>
+                    )}
+                    <IconExternalLink
+                      size='13'
+                      color='var(--chakra-colors-lightgray-900)'
+                    />
+                  </Flex>
+                </Button>
+              </RLink>
+            )}
+          </Box>
+        )}
+      </MessageBox>
+    </Flex>
+  )
 }
 
 export default memo(ChatMessage)

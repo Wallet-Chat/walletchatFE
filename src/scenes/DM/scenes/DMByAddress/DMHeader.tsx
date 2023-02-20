@@ -9,10 +9,10 @@ import {
 } from '@tabler/icons'
 import { isMobile } from 'react-device-detect'
 import { truncateAddress } from '../../../../helpers/truncateString'
-import {  useGetNameQuery } from '@/redux/reducers/dm'
+import { useGetNameQuery } from '@/redux/reducers/dm'
 import Avatar from '@/components/Inbox/DM/Avatar'
 
-const Header = () => {
+const DMHeader = () => {
 	const { address: toAddr = '' } = useParams()
 
 	const timerRef: { current: NodeJS.Timeout | null } = React.useRef(null)
@@ -122,4 +122,4 @@ const Header = () => {
 	)
 }
 
-export default Header
+export default DMHeader

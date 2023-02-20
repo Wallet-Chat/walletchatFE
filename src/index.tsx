@@ -12,22 +12,26 @@ import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
 
+declare global {
+  const chrome: any
+}
+
 ReactDOM.render(
-	<React.StrictMode>
-		<ColorModeScript />
-		<Provider store={store}>
-			<BrowserRouter>
-				<WalletProvider>
-					<UnreadCountProvider>
-						<ChakraProvider theme={theme}>
-							<App />
-						</ChakraProvider>
-					</UnreadCountProvider>
-				</WalletProvider>
-			</BrowserRouter>
-		</Provider>
-	</React.StrictMode>,
-	document.getElementById('root')
+  <React.StrictMode>
+    <ColorModeScript />
+    <Provider store={store}>
+      <BrowserRouter>
+        <WalletProvider>
+          <UnreadCountProvider>
+            <ChakraProvider theme={theme}>
+              <App />
+            </ChakraProvider>
+          </UnreadCountProvider>
+        </WalletProvider>
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('root')
 )
 
 // If you want your app to work offline and load faster, you can change

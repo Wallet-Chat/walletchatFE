@@ -1,17 +1,22 @@
-const createFetchCredentials = () => ({
-  credentials: 'include',
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-  },
-})
+const credentialsBody = { credentials: 'include' }
 
-export const getFetchOptions: any = () => ({
-  method: 'GET',
-  ...createFetchCredentials(),
-})
+export const getFetchBody = { method: 'GET', ...credentialsBody }
+export const postFetchBody = { method: 'POST', ...credentialsBody }
 
-export const postFetchOptions: any = () => ({
-  method: 'POST',
-  ...createFetchCredentials(),
-})
+export function prepareHeaderCredentials(headers: Headers) {
+  headers.set('Content-Type', 'application/json')
+  headers.set('authorization', `Bearer ${localStorage.getItem('jwt')}`)
+  return headers
+}
+
+export const getFetchOptions = () =>
+({
+  ...prepareHeaderCredentials(new Headers()),
+  ...getFetchBody,
+} as RequestInit)
+
+export const postFetchOptions = () =>
+({
+  ...prepareHeaderCredentials(new Headers()),
+  ...postFetchBody,
+} as RequestInit)
