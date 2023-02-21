@@ -6,8 +6,62 @@ import * as ENV from '@/constants/env'
 import { MessageType } from '@/types/Message'
 import storage from '@/utils/storage'
 import lit from '@/utils/lit'
+import { InboxItemType } from '@/types/InboxItem'
 
 const DM_DATA_LOCAL_STORAGE_KEY = 'dmData'
+const INBOX_DATA_LOCAL_STORAGE_KEY = 'inboxData'
+
+export async function decryptMessage(data: any[]) {
+  const fetchedData = JSON.parse(JSON.stringify(data))
+  const pendingMsgs: Promise<{ decryptedFile: any }>[] = []
+
+  console.log('✅[POST][Decrypt Messages initiated]')
+
+  // Get data from LIT and replace the message with the decrypted text
+  for (let i = 0; i < fetchedData.length; i += 1) {
+    if (fetchedData[i].encrypted_sym_lit_key) {
+      // only needed for mixed DB with plain and encrypted data
+      const accessControlConditions = JSON.parse(
+        fetchedData[i].lit_access_conditions
+      )
+
+      // after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+      // this is done to support legacy messages (new databases wouldn't need this)
+      if (String(fetchedData[i].lit_access_conditions).includes('evmBasic')) {
+        const rawmsg = lit.decryptString(
+          lit.b64toBlob(fetchedData[i].message),
+          fetchedData[i].encrypted_sym_lit_key,
+          accessControlConditions
+        )
+        pendingMsgs[i] = rawmsg
+      } else {
+        const rawmsg = lit.decryptStringOrig(
+          lit.b64toBlob(fetchedData[i].message),
+          fetchedData[i].encrypted_sym_lit_key,
+          accessControlConditions
+        )
+        pendingMsgs[i] = rawmsg
+      }
+    }
+  }
+
+  await Promise.allSettled(pendingMsgs).then((messages) => {
+    messages.forEach((result, i) => {
+      const rawmsg = (
+        result as unknown as {
+          status: string
+          value: { decryptedFile: string }
+        }
+      ).value
+
+      if (rawmsg?.decryptedFile?.toString()) {
+        fetchedData[i].message = rawmsg.decryptedFile.toString()
+      }
+    })
+  })
+
+  return fetchedData
+}
 
 export function getLocalDmDataForAccountToAddr(
   account: string,
@@ -52,7 +106,60 @@ function addLocalDmDataForAccountToAddr(
   const dmDataForAccountToAddr =
     dmDataForAccount?.[toAddr.toLocaleLowerCase()] || []
 
-  updateLocalDmDataForAccountToAddr(account, toAddr, [...dmDataForAccountToAddr, ...chatData])
+  updateLocalDmDataForAccountToAddr(account, toAddr, [
+    ...dmDataForAccountToAddr,
+    ...chatData,
+  ])
+}
+
+function getInboxChatPartner(account: string, inboxItem: InboxItemType) {
+  return inboxItem.fromaddr.toLocaleLowerCase() === account.toLocaleLowerCase()
+    ? inboxItem.toaddr
+    : inboxItem.fromaddr
+}
+
+interface InboxStore {
+  [context: string]: {
+    [from: string]: InboxItemType
+  }
+}
+
+export function getInboxDmDataForAccount(account: string) {
+  const localInboxData = storage.get(INBOX_DATA_LOCAL_STORAGE_KEY) || {}
+
+  const accountInboxData =
+    (localInboxData?.[account.toLocaleLowerCase()] as InboxStore) || {}
+
+  const inboxDataObj: InboxStore = {
+    dm: {},
+    community: {},
+    ...accountInboxData,
+  }
+
+  return inboxDataObj
+}
+
+function getInboxFrom(account: string, item: InboxItemType) {
+  const isCommunity = item.context_type === 'community'
+  const fromValue = isCommunity
+    ? item.nftaddr
+    : getInboxChatPartner(account, item)
+  return fromValue
+}
+
+function updateLocalInboxDataForAccount(
+  account: string,
+  inboxData: InboxItemType[]
+) {
+  const localInboxData = getInboxDmDataForAccount(account)
+
+  inboxData.forEach((item) => {
+    localInboxData[item.context_type][getInboxFrom(account, item)] = item
+  })
+
+  storage.set(INBOX_DATA_LOCAL_STORAGE_KEY, {
+    [account.toLocaleLowerCase()]: localInboxData,
+  })
 }
 
 type DMState = {
@@ -164,63 +271,11 @@ export const dmApi = createApi({
             console.log('✅[GET][New Chat items]')
           }
 
-          // START LIT ENCRYPTION
           dispatch(
             addDmDataEnc({ account, toAddr, data: JSON.stringify(data) })
           )
 
-          const fetchedData = JSON.parse(JSON.stringify(data))
-          const pendingMsgs: Promise<{ decryptedFile: any }>[] = []
-
-          console.log('✅[POST][Decrypt Messages initiated]')
-
-          // Get data from LIT and replace the message with the decrypted text
-          for (let i = 0; i < fetchedData.length; i += 1) {
-            if (fetchedData[i].encrypted_sym_lit_key) {
-              // only needed for mixed DB with plain and encrypted data
-              const accessControlConditions = JSON.parse(
-                fetchedData[i].lit_access_conditions
-              )
-
-              // after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
-              // this is done to support legacy messages (new databases wouldn't need this)
-              if (
-                String(fetchedData[i].lit_access_conditions).includes(
-                  'evmBasic'
-                )
-              ) {
-                const rawmsg = lit.decryptString(
-                  lit.b64toBlob(fetchedData[i].message),
-                  fetchedData[i].encrypted_sym_lit_key,
-                  accessControlConditions
-                )
-                pendingMsgs[i] = rawmsg
-              } else {
-                const rawmsg = lit.decryptStringOrig(
-                  lit.b64toBlob(fetchedData[i].message),
-                  fetchedData[i].encrypted_sym_lit_key,
-                  accessControlConditions
-                )
-                pendingMsgs[i] = rawmsg
-              }
-            }
-          }
-
-          await Promise.allSettled(pendingMsgs).then((messages) => {
-            messages.forEach((result, i) => {
-              const rawmsg = (
-                result as unknown as {
-                  status: string
-                  value: { decryptedFile: string }
-                }
-              ).value
-
-              if (rawmsg?.decryptedFile?.toString()) {
-                fetchedData[i].message = rawmsg.decryptedFile.toString()
-              }
-            })
-          })
-          // END LIT ENCRYPTION
+          const fetchedData = await decryptMessage(data)
 
           const allChats = localData.concat(fetchedData)
 
@@ -274,6 +329,57 @@ export const dmApi = createApi({
         return { data: JSON.stringify(newLocalData) }
       },
     }),
+
+    getInbox: builder.query({
+      queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
+        try {
+          const account = queryArgs
+
+          if (!ENV.REACT_APP_REST_API) {
+            throw new Error('REST API url not in .env')
+          }
+          if (!account) {
+            throw new Error('No account connected')
+          }
+
+          const data = (
+            await fetchWithBQ(
+              `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_inbox/${account}`
+            )
+          ).data as unknown as InboxItemType[]
+
+          console.log('✅[GET][Inbox]:', data)
+
+          if (!data) {
+            updateLocalInboxDataForAccount(account, [])
+            return { data: '' }
+          }
+
+          const storedInboxData = getInboxDmDataForAccount(account)
+
+          const newInboxData = data.filter((inboxItem) => {
+            const currentInbox =
+              storedInboxData[inboxItem.context_type][
+              getInboxFrom(account, inboxItem)
+              ]
+
+            return !currentInbox || inboxItem.timestamp > currentInbox.timestamp
+          })
+
+          if (newInboxData.length > 0) {
+            const fetchedData = await decryptMessage(newInboxData)
+
+            updateLocalInboxDataForAccount(account, fetchedData)
+            return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
+          }
+
+          return { data: '' }
+        } catch (error) {
+          console.error('🚨[GET][Chat items]:', error)
+          return { data: '' }
+        }
+      },
+    }),
   }),
 })
 
@@ -283,6 +389,7 @@ export const {
   useGetNameQuery,
   useGetChatDataQuery,
   useGetReadChatItemsQuery,
+  useGetInboxQuery,
 } = dmApi
 
 export default dmSlice.reducer
