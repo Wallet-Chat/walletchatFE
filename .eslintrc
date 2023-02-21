@@ -52,7 +52,8 @@
         ]
       }
     ],
-    "consistent-return": 0
+    "consistent-return": 0,
+    "no-restricted-exports": 0
   },
   "settings": {
     "react": {

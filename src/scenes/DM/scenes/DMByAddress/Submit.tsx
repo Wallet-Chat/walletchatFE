@@ -3,58 +3,39 @@ import { IconSend } from '@tabler/icons'
 import TextareaAutosize from 'react-textarea-autosize'
 import { FormControl, Button, Flex } from '@chakra-ui/react'
 import { postFetchOptions } from '@/helpers/fetch'
-import { MessageUIType } from '../../../../types/Message'
 import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
+import { updateQueryData } from '@/redux/reducers/dm'
+import { useAppDispatch } from '@/hooks/useDispatch'
+import { MessageUIType } from '@/types/Message'
 
 function Submit({
   delegate,
   loadedMsgs,
   toAddr,
-  setLoadedMsgs,
   account,
   scrollToBottomRef,
 }: {
   delegate: string
   loadedMsgs: any
   toAddr: string
-  setLoadedMsgs: any
   account: string
   scrollToBottomRef: any
 }) {
+  const dispatch = useAppDispatch()
   const [isSendingMessage, setIsSendingMessage] = React.useState(false)
   const [msgInput, setMsgInput] = React.useState<string>('')
 
-  const addMessageToUI = React.useCallback(
-    (
-      message: string,
-      fromAddr: string,
-      timestamp: string,
-      read: boolean,
-      position: string,
-      isFetching: boolean,
-      nftAddr: string | null,
-      nftId: string | null
-    ) => {
-      console.log(`Add message to UI: ${message}`)
-
-      const newMsg: MessageUIType = {
-        message,
-        fromAddr,
-        toAddr,
-        timestamp,
-        read,
-        position,
-        isFetching,
-        nftAddr,
-        nftId,
+  const addMessageToUI = (newMessage: MessageUIType) =>
+    updateQueryData(
+      'getChatData',
+      { account, toAddr },
+      (chatData) => {
+        const chatDataValue = JSON.parse(chatData)
+        chatDataValue.push(newMessage)
+        return JSON.stringify(chatDataValue)
       }
-      const newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
-      newLoadedMsgs.push(newMsg)
-      setLoadedMsgs(newLoadedMsgs)
-    },
-    [loadedMsgs]
-  )
+    )
 
   const sendMessage = async () => {
     if (msgInput.length <= 0) return
@@ -78,18 +59,17 @@ function Submit({
       read: false,
     }
 
-    addMessageToUI(
-      msgInputCopy,
-      account,
-      timestamp.toString(),
-      false,
-      'right',
-      true,
-      null,
-      null
-    )
+    const newMessage = {
+      Id: -1,
+      message: msgInputCopy,
+      fromaddr: account,
+      toaddr: toAddr,
+      timestamp: timestamp.toString(),
+    }
 
-    scrollToBottomRef.current?.scrollIntoView()
+    dispatch(addMessageToUI(newMessage))
+
+    scrollToBottomRef()
 
     // data.message = msgInputCopy
     const accessControlConditions = [
@@ -213,7 +193,7 @@ function Submit({
     setIsSendingMessage(true)
     fetch(
       ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
-      postFetchOptions()
+      postFetchOptions(data)
     )
       .then((response) => response.json())
       .then((responseData) => {
@@ -221,7 +201,7 @@ function Submit({
         // getChatData()
       })
       .catch((error) => {
-        console.error('🚨[POST][Send message]:', error, JSON.stringify(data))
+        console.error('🚨[POST][Send message]:', error, data)
       })
       .finally(() => {
         setIsSendingMessage(false)

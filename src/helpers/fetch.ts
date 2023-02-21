@@ -11,12 +11,13 @@ export function prepareHeaderCredentials(headers: Headers) {
 
 export const getFetchOptions = () =>
 ({
-  ...prepareHeaderCredentials(new Headers()),
   ...getFetchBody,
+  headers: prepareHeaderCredentials(new Headers()),
 } as RequestInit)
 
-export const postFetchOptions = () =>
+export const postFetchOptions = (data: object) =>
 ({
-  ...prepareHeaderCredentials(new Headers()),
   ...postFetchBody,
+  headers: prepareHeaderCredentials(new Headers()),
+  body: JSON.stringify(data),
 } as RequestInit)

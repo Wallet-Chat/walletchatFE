@@ -8,15 +8,6 @@ import storage from '@/utils/storage'
 import lit from '@/utils/lit'
 
 const DM_DATA_LOCAL_STORAGE_KEY = 'dmData'
-const GETALL_CHATITEMS_ENDPOINT_NAME = 'getChatData'
-
-const getAllChatItemsQueryArgs = (queryArgs: any) => {
-  const serializedQueryArgs = `${GETALL_CHATITEMS_ENDPOINT_NAME}(${JSON.stringify(
-    queryArgs
-  )})`
-
-  return serializedQueryArgs
-}
 
 export function getLocalDmDataForAccountToAddr(
   account: string,
@@ -35,7 +26,23 @@ export function getLocalDmDataForAccountToAddr(
   return dmDataForAccountToAddr || null
 }
 
-function setLocalDmDataForAccountToAddr(
+function updateLocalDmDataForAccountToAddr(
+  account: string,
+  toAddr: string,
+  chatData: MessageType[]
+) {
+  const dmDataObj = storage.get(DM_DATA_LOCAL_STORAGE_KEY)
+  const dmDataForAccount = dmDataObj?.[account.toLocaleLowerCase()] || {}
+
+  storage.set(DM_DATA_LOCAL_STORAGE_KEY, {
+    [account.toLocaleLowerCase()]: {
+      ...dmDataForAccount,
+      [toAddr.toLocaleLowerCase()]: chatData,
+    },
+  })
+}
+
+function addLocalDmDataForAccountToAddr(
   account: string,
   toAddr: string,
   chatData: MessageType[]
@@ -45,12 +52,7 @@ function setLocalDmDataForAccountToAddr(
   const dmDataForAccountToAddr =
     dmDataForAccount?.[toAddr.toLocaleLowerCase()] || []
 
-  storage.set(DM_DATA_LOCAL_STORAGE_KEY, {
-    [account.toLocaleLowerCase()]: {
-      ...dmDataForAccount,
-      [toAddr.toLocaleLowerCase()]: [...dmDataForAccountToAddr, ...chatData],
-    },
-  })
+  updateLocalDmDataForAccountToAddr(account, toAddr, [...dmDataForAccountToAddr, ...chatData])
 }
 
 type DMState = {
@@ -120,10 +122,7 @@ export const dmApi = createApi({
       transformErrorResponse: createErrorResponse('Name'),
     }),
 
-    [GETALL_CHATITEMS_ENDPOINT_NAME]: builder.query({
-      serializeQueryArgs: ({ queryArgs }) =>
-        getAllChatItemsQueryArgs(queryArgs),
-
+    getChatData: builder.query({
       queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
         try {
           const { account, toAddr } = queryArgs
@@ -170,34 +169,36 @@ export const dmApi = createApi({
             addDmDataEnc({ account, toAddr, data: JSON.stringify(data) })
           )
 
-          const replica = JSON.parse(JSON.stringify(data))
+          const fetchedData = JSON.parse(JSON.stringify(data))
           const pendingMsgs: Promise<{ decryptedFile: any }>[] = []
 
           console.log('✅[POST][Decrypt Messages initiated]')
 
           // Get data from LIT and replace the message with the decrypted text
-          for (let i = 0; i < replica.length; i += 1) {
-            if (replica[i].encrypted_sym_lit_key) {
+          for (let i = 0; i < fetchedData.length; i += 1) {
+            if (fetchedData[i].encrypted_sym_lit_key) {
               // only needed for mixed DB with plain and encrypted data
               const accessControlConditions = JSON.parse(
-                replica[i].lit_access_conditions
+                fetchedData[i].lit_access_conditions
               )
 
               // after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
               // this is done to support legacy messages (new databases wouldn't need this)
               if (
-                String(replica[i].lit_access_conditions).includes('evmBasic')
+                String(fetchedData[i].lit_access_conditions).includes(
+                  'evmBasic'
+                )
               ) {
                 const rawmsg = lit.decryptString(
-                  lit.b64toBlob(replica[i].message),
-                  replica[i].encrypted_sym_lit_key,
+                  lit.b64toBlob(fetchedData[i].message),
+                  fetchedData[i].encrypted_sym_lit_key,
                   accessControlConditions
                 )
                 pendingMsgs[i] = rawmsg
               } else {
                 const rawmsg = lit.decryptStringOrig(
-                  lit.b64toBlob(replica[i].message),
-                  replica[i].encrypted_sym_lit_key,
+                  lit.b64toBlob(fetchedData[i].message),
+                  fetchedData[i].encrypted_sym_lit_key,
                   accessControlConditions
                 )
                 pendingMsgs[i] = rawmsg
@@ -215,30 +216,73 @@ export const dmApi = createApi({
               ).value
 
               if (rawmsg?.decryptedFile?.toString()) {
-                replica[i].message = rawmsg.decryptedFile.toString()
+                fetchedData[i].message = rawmsg.decryptedFile.toString()
               }
             })
           })
           // END LIT ENCRYPTION
 
-          const allChats = localData.concat(replica)
-          const allChatsValue = JSON.stringify(allChats)
+          const allChats = localData.concat(fetchedData)
 
           // store so when user switches views, data is ready
-          setLocalDmDataForAccountToAddr(account, toAddr, allChats)
+          addLocalDmDataForAccountToAddr(account, toAddr, fetchedData)
 
           console.log('✅[GET][Chats decrypted]')
 
-          return { data: allChatsValue }
+          return { data: JSON.stringify(allChats) }
         } catch (error) {
           console.error('🚨[GET][Chat items]:', error)
           return { data: '' }
         }
       },
     }),
+
+    // TODO -- only call if all messages not yet read.
+    getReadChatItems: builder.query({
+      queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
+        const { account, toAddr } = queryArgs
+
+        const newLocalData = [
+          ...(getLocalDmDataForAccountToAddr(account, toAddr) || []),
+        ]
+        const hasUnreads =
+          newLocalData.length > 0 &&
+          !newLocalData[newLocalData.length - 1]?.read
+
+        if (!hasUnreads) {
+          return { data: JSON.stringify(newLocalData) }
+        }
+
+        const response = (
+          await fetchWithBQ(
+            `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`
+          )
+        ).data as unknown as MessageType[]
+
+        const unreadData = new Set(response)
+
+        newLocalData.forEach((chat, i) => {
+          if (unreadData.has(chat.Id)) {
+            newLocalData[i].read = true
+          }
+        })
+
+        console.log('✅[GET][Updated Read Items]:')
+
+        updateLocalDmDataForAccountToAddr(account, toAddr, newLocalData)
+
+        return { data: JSON.stringify(newLocalData) }
+      },
+    }),
   }),
 })
 
-export const { useGetPfpQuery, useGetNameQuery, useGetChatDataQuery } = dmApi
+export const {
+  util: { updateQueryData },
+  useGetPfpQuery,
+  useGetNameQuery,
+  useGetChatDataQuery,
+  useGetReadChatItemsQuery,
+} = dmApi
 
 export default dmSlice.reducer
