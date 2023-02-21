@@ -121,19 +121,18 @@ const ChatMessage = ({
   context,
   account,
   msg,
-  updateRead,
 }: {
   context: 'dms' | 'nfts' | 'communities'
   account: string | undefined
   msg: MessageUIType
-  updateRead?: (data: MessageUIType) => void
 }) => {
   const [nftData, setNftData] = useState<NFT>()
+  const fromAddr = msg?.fromaddr || msg?.fromAddr
 
   const messageRef = useRef(null)
   const isInViewport = useIsInViewport(messageRef)
   const msgPosition =
-    msg.fromaddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
+    fromAddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
       ? 'right'
       : 'left'
 
@@ -198,10 +197,9 @@ const ChatMessage = ({
   }, [msg, account, context, nftData])
 
   const setMessageAsRead = useCallback(() => {
-    if (msg.toaddr && msg.fromaddr && msg.timestamp) {
-      msg.read = true
+    if (msg.toaddr && fromAddr && msg.timestamp) {
       fetch(
-        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_chatitem/${msg.fromaddr}/${msg.toaddr}}`,
+        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_chatitem/${fromAddr}/${msg.toaddr}}`,
         {
           method: 'PUT',
           credentials: 'include',
@@ -218,13 +216,12 @@ const ChatMessage = ({
         .then((response) => response.json())
         .then((data) => {
           console.log('✅[PUT][Message]:', data)
-          updateRead && updateRead(data)
         })
         .catch((error) => {
           console.error('🚨[PUT][Message]:', error)
         })
     }
-  }, [msg, updateRead])
+  }, [msg])
 
   useEffect(() => {
     if (
@@ -247,9 +244,9 @@ const ChatMessage = ({
         style={{ backgroundImage: `url(${msg.img})` }}
         padding='var(--chakra-space-2) var(--chakra-space-3)'
       >
-        {msg.fromaddr && (
-          <UserProfileContextMenu address={msg.fromaddr}>
-            <Avatar account={msg.fromaddr} />
+        {fromAddr && (
+          <UserProfileContextMenu address={fromAddr}>
+            <Avatar account={fromAddr} />
           </UserProfileContextMenu>
         )}
       </Box>
@@ -259,8 +256,8 @@ const ChatMessage = ({
         ref={messageRef}
       >
         <Box className='msg-bubble'>
-          {msg?.sender_name && msg?.fromaddr && (
-            <UserProfileContextMenu address={msg.fromaddr}>
+          {msg?.sender_name && fromAddr && (
+            <UserProfileContextMenu address={fromAddr}>
               <Text fontSize='md' className='name'>
                 {msg.sender_name}
               </Text>
@@ -270,11 +267,7 @@ const ChatMessage = ({
           <Box
             d='inline-block'
             className='timestamp'
-            style={{
-              right: updateRead
-                ? 'var(--chakra-space-7)'
-                : 'var(--chakra-space-2)',
-            }}
+            style={{ right: 'var(--chakra-space-7)' }}
           >
             {formatMessageDate(new Date(msg.timestamp))}
           </Box>
@@ -290,7 +283,7 @@ const ChatMessage = ({
           <Box mb={1}>
             {nftData && (
               <RLink
-                to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${msg.toaddr === account ? msg.fromaddr : msg.toAddr
+                to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${msg.toaddr === account ? fromAddr : msg.toAddr
                   }`}
                 style={{ textDecoration: 'none' }}
               >
