@@ -24,6 +24,8 @@ const DMByAddress = ({
   account: string
   delegate: string
 }) => {
+  const didInitialScroll = React.useRef()
+
   const { address: toAddr = '' } = useParams()
 
   const { currentData: fetchedData, isFetching } = useGetChatDataQuery(
@@ -36,9 +38,15 @@ const DMByAddress = ({
     fetchedData || (cachedChatData && JSON.stringify(cachedChatData)) || ''
   const chatData = localChatData ? JSON.parse(localChatData) : []
 
-  const scrollToBottomRef = React.useCallback(
-    (node) => {
-      if (node) node.scrollIntoView({ smooth: true })
+  const scrollToBottomCb = React.useCallback(
+    (msg: MessageUIType) => (node: any) => {
+      if (node) {
+        const sentByMe = msg.fromaddr === account
+
+        if (!didInitialScroll.current || sentByMe) {
+          node.scrollIntoView({ smooth: true })
+        }
+      }
     },
     [toAddr]
   )
@@ -66,7 +74,6 @@ const DMByAddress = ({
           <Flex justifyContent='center' alignItems='center' height='100%'>
             <Spinner />
           </Flex>
-          <Box ref={scrollToBottomRef} float='left' style={{ clear: 'both' }} />
         </DottedBackground>
 
         <Submit
@@ -74,7 +81,6 @@ const DMByAddress = ({
           loadedMsgs={chatData}
           toAddr={toAddr}
           account={account}
-          scrollToBottomRef={scrollToBottomRef}
         />
       </Flex>
     )
@@ -100,11 +106,15 @@ const DMByAddress = ({
             </Flex>
           )}
 
-        {chatData.map((msg: MessageUIType) => (
-          <ChatMessage key={msg.Id} context='dms' account={account} msg={msg} />
-        ))}
+        {chatData.map((msg: MessageUIType, i: number) => {
+          const isLast = i === chatData.length - 1
 
-        <Box ref={scrollToBottomRef} float='left' style={{ clear: 'both' }} />
+          return (
+            <Box key={msg.Id} ref={isLast ? scrollToBottomCb(msg) : undefined}>
+              <ChatMessage context='dms' account={account} msg={msg} />
+            </Box>
+          )
+        })}
       </DottedBackground>
 
       <Submit
@@ -112,7 +122,6 @@ const DMByAddress = ({
         loadedMsgs={chatData}
         toAddr={toAddr}
         account={account}
-        scrollToBottomRef={scrollToBottomRef}
       />
     </Flex>
   )

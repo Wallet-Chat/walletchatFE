@@ -14,28 +14,22 @@ function Submit({
   loadedMsgs,
   toAddr,
   account,
-  scrollToBottomRef,
 }: {
   delegate: string
   loadedMsgs: any
   toAddr: string
   account: string
-  scrollToBottomRef: any
 }) {
   const dispatch = useAppDispatch()
   const [isSendingMessage, setIsSendingMessage] = React.useState(false)
   const [msgInput, setMsgInput] = React.useState<string>('')
 
   const addMessageToUI = (newMessage: MessageUIType) =>
-    updateQueryData(
-      'getChatData',
-      { account, toAddr },
-      (chatData) => {
-        const chatDataValue = JSON.parse(chatData)
-        chatDataValue.push(newMessage)
-        return JSON.stringify(chatDataValue)
-      }
-    )
+    updateQueryData('getChatData', { account, toAddr }, (chatData) => {
+      const chatDataValue = JSON.parse(chatData)
+      chatDataValue.push(newMessage)
+      return JSON.stringify(chatDataValue)
+    })
 
   const sendMessage = async () => {
     if (msgInput.length <= 0) return
@@ -68,8 +62,6 @@ function Submit({
     }
 
     dispatch(addMessageToUI(newMessage))
-
-    scrollToBottomRef()
 
     // data.message = msgInputCopy
     const accessControlConditions = [
