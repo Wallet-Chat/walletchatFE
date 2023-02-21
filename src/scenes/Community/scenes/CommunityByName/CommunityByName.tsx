@@ -37,10 +37,10 @@ const CommunityByName = ({ account }: { account: string }) => {
    const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
    const [isFetchingJoining, setIsFetchingJoining] = useState(false)
 
-
    useEffect(() => {
       getCommunityData()
-   }, [account])
+  }, [account, community])
+
 
    useEffect(() => {
       // Interval needs to reset else getChatData will use old state
