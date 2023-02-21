@@ -218,7 +218,7 @@ const CommunityGroupChat = ({
                   )
                } else if (msg.type && msg.type === 'welcome') {
                   return (
-                     <Box textAlign="center">
+                     <Box textAlign="center" key={msg.timestamp}>
                         <Text fontSize="sm" color="darkgray.200">
                            A warm welcome to{' '}
                            <RLink to={`/dm/${msg.fromAddr}`}>
@@ -232,7 +232,7 @@ const CommunityGroupChat = ({
                } else if (msg.message) {
                   return (
                      <ChatMessage
-                        key={`${msg.message}${msg.timestamp}${i}`}
+                        key={msg.timestamp}
                         context="communities"
                         account={account}
                         msg={msg}
