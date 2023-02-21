@@ -14,7 +14,6 @@ import Submit from './Submit'
 
 const QUERY_OPTS = {
   pollingInterval: 5000, // 5 sec
-  refetchOnMountOrArgChange: true,
 }
 
 const DMByAddress = ({

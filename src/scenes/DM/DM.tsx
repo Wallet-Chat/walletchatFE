@@ -9,7 +9,6 @@ import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
 
 const QUERY_OPTS = {
   pollingInterval: 5000, // 5 sec
-  refetchOnMountOrArgChange: true,
 }
 
 // TODO -- on submit new message, also update here

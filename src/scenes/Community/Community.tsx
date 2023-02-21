@@ -8,7 +8,6 @@ import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
 
 const QUERY_OPTS = {
   pollingInterval: 5000, // 5 sec
-  refetchOnMountOrArgChange: true,
 }
 
 const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
