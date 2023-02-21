@@ -38,7 +38,7 @@ import {
  } from "@stacks/connect";
  import { openSignatureRequestPopup } from "@stacks/connect";
  import { StacksTestnet, StacksMainnet } from "@stacks/network";
- import { verifyMessageSignatureRsv } from '@stacks/encryption';
+ import { hashMessage, verifyMessageSignatureRsv } from '@stacks/encryption';
 
 // near wallet selector options
 import { setupWalletSelector } from '@near-wallet-selector/core';
@@ -973,6 +973,7 @@ const WalletProvider = React.memo(({ children }) => {
             onFinish: async () => 
             {
                let userData = userSession.loadUserData();
+               console.log("STX userdata: ", userData)
                console.log("yo yo STX user: ", userData.profile.stxAddress.mainnet)
                _account = userData.profile.stxAddress.mainnet
 
@@ -1022,11 +1023,26 @@ const WalletProvider = React.memo(({ children }) => {
                               _accountPubKey = publicKey
                               // _account = getAddressFromPublicKey(fromHexString(data.publicKey), TransactionVersion.MainnetMultiSig)
                               // console.log("STX Addr:", _account)
-                              const verified = verifyMessageSignatureRsv({ message, publicKey, signature });
+                              const verified = verifyMessageSignatureRsv({ signature, message, publicKey });
                               console.log("********* Verify sig: ", verified)
 
+                              const chainPrefix = '\x17Stacks Signed Message:\n';
+                              const msgHash = hashMessage(message, chainPrefix)
+                              console.log("message hash", toHexString(msgHash))
+
+                              // const COORDINATE_BYTES = 32;
+                              // const v = signature.slice(-2)
+                              // const r = signature.slice(0, COORDINATE_BYTES * 2);
+                              // const s = signature.slice(0 + COORDINATE_BYTES * 2, -2);
+                              // _signatureSTX = v + r + s
+                              // //console.log("v, r, s ", v, r, s)
+                              // console.log("sending sig", _signatureSTX)
+
+                              // const verified2 = verifyMessageSignature({ signature: _signatureSTX, message, publicKey });
+                              // console.log("********* Verify sig2: ", verified2)
+
                               fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                                 body: JSON.stringify({ "name": _account, "address": _accountPubKey, "nonce": _nonce, "msg": message, "sig": _signatureSTX }),
+                                 body: JSON.stringify({ "name": _account, "address": publicKey, "nonce": _nonce, "msg": toHexString(msgHash), "sig": signature }),
                                  headers: {
                                  'Content-Type': 'application/json'
                                  },
@@ -1083,11 +1099,25 @@ const WalletProvider = React.memo(({ children }) => {
                            console.log("Use public key 2:", publicKey)
                            // _account = getAddressFromPublicKey(fromHexString(data.publicKey), TransactionVersion.MainnetMultiSig)
                            // console.log("STX Addr:", _account)
-                           const verified = verifyMessageSignatureRsv({ message, publicKey, signature });
+                           const verified = verifyMessageSignatureRsv({ signature, message, publicKey });
                            console.log("********* Verify sig: ", verified)
 
+                           const chainPrefix = '\x17Stacks Signed Message:\n';
+                           const msgHash = hashMessage(message, chainPrefix)
+                           console.log("message hash", toHexString(msgHash))
+
+                           // const COORDINATE_BYTES = 32;
+                           // const v = signature.slice(-2)
+                           // const r = signature.slice(0, COORDINATE_BYTES * 2);
+                           // const s = signature.slice(0 + COORDINATE_BYTES * 2, -2);
+                           // _signatureSTX = v + r + s
+                           // //console.log("v, r, s ", v, r, s)
+                           // console.log("sending sig", _signatureSTX)
+                           // const verified2 = verifyMessageSignature({ signature: _signatureSTX, message, publicKey });
+                           // console.log("********* Verify sig2: ", verified2)
+
                            fetch(`${process.env.REACT_APP_REST_API}/signin`, {
-                              body: JSON.stringify({ "name": _account, "address": publicKey, "nonce": _nonce, "msg": message, "sig": signature }),
+                              body: JSON.stringify({ "name": _account, "address": publicKey, "nonce": _nonce, "msg": toHexString(msgHash), "sig": signature }),
                               headers: {
                                  'Content-Type': 'application/json'
                               },
