@@ -46,6 +46,7 @@ export const App = () => {
       connectWallet,
       connectWalletTezos,
       connectWalletNEAR,
+      connectWalletSTX,
       name,
       isFetchingName,
       account,
@@ -161,6 +162,17 @@ export const App = () => {
                         w='220px'
                      >
                         Sign-in with NEAR
+                     </Button>
+                     <Button
+                        variant="black"
+                        onClick={() => {
+                           setBtnClicks(btnClicks + 1)
+                           connectWalletSTX()
+                        }}
+                        size="lg"
+                        w='220px'
+                     >
+                        Sign-in with Stacks
                      </Button>
                   </VStack>
                   {btnClicks > 0 && !error && (

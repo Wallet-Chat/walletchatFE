@@ -30,6 +30,15 @@ import MyNearIconUrl from '@near-wallet-selector/my-near-wallet/assets/my-near-w
 import NearIconUrl from '@near-wallet-selector/near-wallet/assets/near-wallet-icon.png';
 import WalletConnectIconUrl from "@near-wallet-selector/wallet-connect/assets/wallet-connect-icon.png";
 import SenderIconUrl from "@near-wallet-selector/sender/assets/sender-icon.png";
+import {
+   AppConfig,
+   UserSession,
+   AuthDetails,
+   showConnect,
+ } from "@stacks/connect";
+ import { openSignatureRequestPopup } from "@stacks/connect";
+ import { StacksTestnet, StacksMainnet } from "@stacks/network";
+ import { hashMessage, verifyMessageSignatureRsv } from '@stacks/encryption';
 
 // near wallet selector options
 import { setupWalletSelector } from '@near-wallet-selector/core';
@@ -928,6 +937,239 @@ const WalletProvider = React.memo(({ children }) => {
    }
    //end NEAR wallet sign-in
 
+   const fromHexString = (hexString) =>
+      Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+
+   //STX Wallet (Stacks)
+   const [message, setMessage] = useState("");
+   const [transactionId, setTransactionId] = useState("");
+   const [currentMessage, setCurrentMessage] = useState("");
+   const [userData, setUserData] = useState(undefined);
+   const appConfig = new AppConfig(["store_write"]);
+   const userSession = new UserSession({ appConfig });
+   const appDetails = {
+      name: "Hello Stacks",
+      icon: "https://freesvg.org/img/1541103084.png",
+    };  
+   useEffect(() => {
+      if (userSession.isSignInPending()) {
+        userSession.handlePendingSignIn().then((userData) => {
+          setUserData(userData);
+        });
+      } else if (userSession.isUserSignedIn()) {
+        setUserData(userSession.loadUserData());
+      }
+    }, []);
+   const connectWalletSTX = async () => {
+      console.log('connectWallet STX')
+      try {
+         let _provider, _account, _accountPubKey, _nonce, _signer
+         let _signedIn = false
+         let _network = "mainnet"
+         
+         showConnect({
+            appDetails,
+            onFinish: async () => 
+            {
+               let userData = userSession.loadUserData();
+               console.log("STX userdata: ", userData)
+               console.log("yo yo STX user: ", userData.profile.stxAddress.mainnet)
+               _account = userData.profile.stxAddress.mainnet
+
+               // check if JWT exists or is timed out:
+               fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
+                  method: 'GET',
+                  headers: {
+                     'Content-Type': 'application/json',
+                     Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
+                  },
+               })
+               .then((response) => response.json())
+               .then(async (data) => {
+                  console.log('✅[POST][Welcome]:', data.msg)
+                  //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
+                  if (!data.msg.includes(_account)) {
+                     //GET JWT
+                     fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+                        method: 'GET',
+                        headers: {
+                           'Content-Type': 'application/json',
+                        },
+                     })
+                     .then((response) => response.json())
+                     .then(async (data) => {
+                        console.log('✅[GET][Nonce]:', data)
+                        _nonce = data.Nonce
+                        //console.log('✅[GET][Data.nonce]:', data.Nonce)
+
+                        const origin = "https://walletchat.fun";
+                        const statement =
+                           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur';
+
+                        const message = origin + "\r\n" + statement + "\r\n" + _account + "\r\n" + _network + "\r\n" + _nonce;
+                        let _signatureSTX;
+                     await openSignatureRequestPopup({
+                        message,
+                           network: new StacksMainnet(),
+                           appDetails: {
+                              name: origin,
+                              icon: window.location.origin + "/my-app-logo.svg",
+                           },
+                           onFinish({ publicKey, signature }) {
+                              console.log("Signature of the message 1", signature)
+                              console.log("Use public key 1:", publicKey)
+                              _signatureSTX = signature
+                              _accountPubKey = publicKey
+                              // _account = getAddressFromPublicKey(fromHexString(data.publicKey), TransactionVersion.MainnetMultiSig)
+                              // console.log("STX Addr:", _account)
+                              const verified = verifyMessageSignatureRsv({ signature, message, publicKey });
+                              console.log("********* Verify sig: ", verified)
+
+                              const chainPrefix = '\x17Stacks Signed Message:\n';
+                              const msgHash = hashMessage(message, chainPrefix)
+                              console.log("message hash", toHexString(msgHash))
+
+                              // const COORDINATE_BYTES = 32;
+                              // const v = signature.slice(-2)
+                              // const r = signature.slice(0, COORDINATE_BYTES * 2);
+                              // const s = signature.slice(0 + COORDINATE_BYTES * 2, -2);
+                              // _signatureSTX = v + r + s
+                              // //console.log("v, r, s ", v, r, s)
+                              // console.log("sending sig", _signatureSTX)
+
+                              // const verified2 = verifyMessageSignature({ signature: _signatureSTX, message, publicKey });
+                              // console.log("********* Verify sig2: ", verified2)
+
+                              fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                                 body: JSON.stringify({ "name": _account, "address": publicKey, "nonce": _nonce, "msg": toHexString(msgHash), "sig": signature }),
+                                 headers: {
+                                 'Content-Type': 'application/json'
+                                 },
+                                 method: 'POST'
+                              })
+                              .then((response) => response.json())
+                              .then(async (data) => {
+                                 localStorage.setItem('jwt_' + _account, data.access);
+                                 //Used for LIT encryption authSign parameter
+                                 //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                                 //localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                                 console.log('✅[INFO][JWT]:', data.access)
+
+                                 setAppLoading(false)
+                                 setAuthenticated(true)
+                              })
+                           },
+                        })  
+                     })
+                     .catch((error) => {
+                        console.error('🚨[GET][Nonce]:', error)
+                     })
+                     //END JWT AUTH sequence
+
+                  //below part of /welcome check for existing token     
+                  }
+               })
+               .catch((error) => {
+                  console.error('🚨[POST][Welcome]:', error)
+                  //GET JWT
+                  fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
+                     method: 'GET',
+                     headers: {
+                        'Content-Type': 'application/json',
+                     },
+                  })
+                  .then((response) => response.json())
+                  .then(async (data) => {
+                     console.log('✅[GET][Nonce]:', data)
+                     _nonce = data.Nonce
+
+                     const origin = "https://walletchat.fun";
+                     const statement =
+                        'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur';
+
+                     const message = origin + "\r\n" + statement + "\r\n" + _account + "\r\n" + _network + "\r\n" + _nonce;
+                     let _signatureSTX
+                     await openSignatureRequestPopup({
+                        message,
+                        network: new StacksMainnet(),
+                        appDetails: {
+                           name: origin,
+                           icon: window.location.origin + "/my-app-logo.svg",
+                        },
+                        onFinish({ publicKey, signature }) {
+                           console.log("Signature of the message 2", signature)
+                           console.log("Use public key 2:", publicKey)
+                           // _account = getAddressFromPublicKey(fromHexString(data.publicKey), TransactionVersion.MainnetMultiSig)
+                           // console.log("STX Addr:", _account)
+                           const verified = verifyMessageSignatureRsv({ signature, message, publicKey });
+                           console.log("********* Verify sig: ", verified)
+
+                           const chainPrefix = '\x17Stacks Signed Message:\n';
+                           const msgHash = hashMessage(message, chainPrefix)
+                           console.log("message hash", toHexString(msgHash))
+
+                           // const COORDINATE_BYTES = 32;
+                           // const v = signature.slice(-2)
+                           // const r = signature.slice(0, COORDINATE_BYTES * 2);
+                           // const s = signature.slice(0 + COORDINATE_BYTES * 2, -2);
+                           // _signatureSTX = v + r + s
+                           // //console.log("v, r, s ", v, r, s)
+                           // console.log("sending sig", _signatureSTX)
+                           // const verified2 = verifyMessageSignature({ signature: _signatureSTX, message, publicKey });
+                           // console.log("********* Verify sig2: ", verified2)
+
+                           fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                              body: JSON.stringify({ "name": _account, "address": publicKey, "nonce": _nonce, "msg": toHexString(msgHash), "sig": signature }),
+                              headers: {
+                                 'Content-Type': 'application/json'
+                              },
+                              method: 'POST'
+                           })
+                           .then((response) => response.json())
+                           .then(async (data) => {
+                              localStorage.setItem('jwt_' + _account, data.access);
+                              //Used for LIT encryption authSign parameter
+                              // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                              // localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                              console.log('✅[INFO][JWT]:', data.access)
+
+                              setAppLoading(false)
+                              setAuthenticated(true)
+                           })
+                           .catch((error) => {
+                              console.error('🚨[GET][Sign-In Failed]:', error)
+                           })
+                        },
+                     })
+                  })
+                  .catch((error) => {
+                     console.error('🚨[GET][Nonce]:', error)
+                  })
+                  //END JWT AUTH sequence
+               })
+
+               if (_account) {
+                  setAppLoading(true)
+                  setAccount(_account)
+                  setChainId(chainId)
+                  setAuthenticated(true)
+                  getName(_account)
+                  getSettings(_account)
+                  //setWeb3(_web3)
+               }
+            },             
+            userSession,
+         });
+      } catch (error) {
+         console.log('🚨connectWallet', error)
+         if (error.message === "User Rejected") {
+            setError("Your permission is needed to continue. Please try signing in again.")
+         }
+      } finally {
+         setAppLoading(false)
+      }
+   }
+   //end STX wallet sign-in
    const disconnectWallet = async () => {
       console.log('** disconnectWallet **')
       try {
