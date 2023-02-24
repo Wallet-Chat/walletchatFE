@@ -5,7 +5,9 @@ import viteTsconfigPaths from 'vite-tsconfig-paths'
 import svgrPlugin from 'vite-plugin-svgr'
 import path from 'path'
 
-// https://vitejs.dev/config/
+const env = process.env.APP_ENV
+const isExtensionEnv = env === 'ext'
+
 export default defineConfig({
 	plugins: [react(), viteTsconfigPaths(), svgrPlugin(), nodePolyfills()],
 
@@ -13,19 +15,21 @@ export default defineConfig({
 		alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
 	},
 
-	build: {
-		rollupOptions: {
-			input: {
-				index: './index.html',
-				main: 'src/index.tsx',
-				background: 'src/chrome/background.ts',
-				content: 'src/chrome/content.ts',
-			},
-			output: {
-				format: 'es',
-				dir: 'dist',
-				entryFileNames: 'assets/[name].js',
-			},
-		},
-	},
+	build: !isExtensionEnv
+		? undefined
+		: {
+				rollupOptions: {
+					input: {
+						index: './index.html',
+						main: 'src/index.tsx',
+						background: 'src/chrome/background.ts',
+						content: 'src/chrome/content.ts',
+					},
+					output: {
+						format: 'es',
+						dir: 'dist',
+						entryFileNames: 'assets/[name].js',
+					},
+				},
+		  },
 })
