@@ -1235,6 +1235,7 @@ const WalletProvider = React.memo(({ children }) => {
             connectWallet,
             connectWalletTezos,
             connectWalletNEAR,
+            connectWalletSTX,
             isAuthenticated,
             appLoading,
             web3,
