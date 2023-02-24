@@ -1,5 +1,5 @@
+import React from 'react';
 import { ColorModeScript, ChakraProvider } from '@chakra-ui/react'
-import * as React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -12,9 +12,6 @@ import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
 
-declare global {
-  const chrome: any
-}
 
 ReactDOM.render(
   <React.StrictMode>

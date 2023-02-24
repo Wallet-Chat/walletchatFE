@@ -4,13 +4,13 @@ import createMetaMaskProvider from 'metamask-extension-provider'
 import Web3 from 'web3'
 //import Web3Modal from 'web3modal'
 import Web3Modal from '@0xsequence/web3modal'
-import WalletConnectProvider from '@walletconnect/web3-provider'
+import { EthereumProvider } from '@walletconnect/ethereum-provider'
 import { sequence } from '0xsequence'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import { getNormalizeAddress } from '.'
 
 import { EthereumEvents } from '../utils/events'
-import storage from '../utils/storage'
+import storage from '../utils/extension-storage'
 import { ethers } from 'ethers'
 import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom'
 
 const providerOptions = {
   walletconnect: {
-    package: WalletConnectProvider, // required
+    package: EthereumProvider, // required
     options: {
       infuraId: ENV.REACT_APP_INFURA_ID, // required
     },

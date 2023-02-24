@@ -1,0 +1,13 @@
+diff --git a/node_modules/webextension-polyfill/dist/browser-polyfill.js b/node_modules/webextension-polyfill/dist/browser-polyfill.js
+index 8e732a2..7afae9a 100644
+--- a/node_modules/webextension-polyfill/dist/browser-polyfill.js
++++ b/node_modules/webextension-polyfill/dist/browser-polyfill.js
+@@ -23,7 +23,7 @@
+   "use strict";
+ 
+   if (!globalThis.chrome?.runtime?.id) {
+-    throw new Error("This script should only be loaded in a browser extension.");
++    return;
+   }
+ 
+   if (typeof globalThis.browser === "undefined" || Object.getPrototypeOf(globalThis.browser) !== Object.prototype) {

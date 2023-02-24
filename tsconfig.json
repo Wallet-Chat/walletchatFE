@@ -32,9 +32,14 @@
     }
   },
   "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".eslintrc",
     "src",
     "vite.config.ts",
     "vite-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
