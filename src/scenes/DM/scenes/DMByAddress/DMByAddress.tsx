@@ -68,6 +68,9 @@ const DMByAddress = ({
 
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
 
+   const supportWallet = process.env.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
+   const supportHeader = process.env.REACT_APP_SUPPORT_HEADER || 'We welcome all feedback and bug reports. Thank you! 😊'
+
    let semaphore = false;
    //let isFetchingDataFirstTime = true;
 
@@ -634,38 +637,6 @@ const DMByAddress = ({
          .finally(() => {
             setIsSendingMessage(false)
          })
-
-      if (toAddr.toLocaleLowerCase() === '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()) {
-         if (!process.env.REACT_APP_SLEEKPLAN_API_KEY) {
-            console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
-         } else {
-            fetch(`https://api.sleekplan.com/v1/post`, {
-               method: 'POST',
-               credentials: "include",
-               headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${process.env.REACT_APP_SLEEKPLAN_API_KEY}`,
-               },
-               body: JSON.stringify({
-                  title: account,
-                  type: 'feedback',
-                  description: msgInputCopy,
-                  user: 347112,
-               }),
-            })
-               .then((response) => response.json())
-               .then((data) => {
-                  console.log('✅[POST][Feedback]:', data)
-               })
-               .catch((error) => {
-                  console.error(
-                     '🚨[POST][Feedback]:',
-                     error,
-                     JSON.stringify(data)
-                  )
-               })
-         }
-      }
    }
 
    const updateRead = useCallback(
@@ -850,7 +821,7 @@ const DMByAddress = ({
                   <Spinner />
                </Flex>
             )}
-            {toAddr === '0x17FA0A61bf1719D12C08c61F211A063a58267A19' && (
+            {toAddr === supportWallet && (
                <Flex
                   justifyContent="center"
                   alignItems="center"
@@ -859,7 +830,7 @@ const DMByAddress = ({
                   p={4}
                >
                   <Box fontSize="md">
-                     We welcome all feedback and bug reports. Thank you! 😊
+                     {supportHeader}
                   </Box>
                </Flex>
             )}

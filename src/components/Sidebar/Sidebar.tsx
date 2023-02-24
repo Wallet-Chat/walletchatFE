@@ -46,6 +46,7 @@ import { useUnreadCount } from '../../context/UnreadCountProvider'
 import IconDM from '../../images/icon-dm.svg'
 import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
+import IconSupport from '../../images/support.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 
 interface URLChangedEvent extends Event {
@@ -69,6 +70,8 @@ export default function Sidebar() {
 
    const {disconnectWallet, name, account, walletRequestPermissions } =
       useWallet()
+
+   const supportWallet = process.env.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
 
    useEffect(() => {
       if (isChromeExtension()) {
@@ -278,6 +281,16 @@ export default function Sidebar() {
                         </Badge>
                      </UnreadCountContainer>
                   )}
+               </LinkElem>
+               <LinkElem to={`/dm/${supportWallet}`}>
+                  <Image src={IconSupport} alt="" />
+                  {/* {unreadCount?.community > 0 && (
+                     <UnreadCountContainer>
+                        <Badge variant="blue" fontSize="md">
+                           {unreadCount?.community}
+                        </Badge>
+                     </UnreadCountContainer>
+                  )} */}
                </LinkElem>
                </>
             )} 
