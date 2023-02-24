@@ -1055,6 +1055,9 @@ const WalletProvider = React.memo(({ children }) => {
                                  //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                                  //localStorage.setItem('lit-web3-provider', _provider.connection.url);
                                  console.log('✅[INFO][JWT]:', data.access)
+
+                                 setAppLoading(false)
+                                 setAuthenticated(true)
                               })
                            },
                         })  
@@ -1130,6 +1133,9 @@ const WalletProvider = React.memo(({ children }) => {
                               // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                               // localStorage.setItem('lit-web3-provider', _provider.connection.url);
                               console.log('✅[INFO][JWT]:', data.access)
+
+                              setAppLoading(false)
+                              setAuthenticated(true)
                            })
                            .catch((error) => {
                               console.error('🚨[GET][Sign-In Failed]:', error)
