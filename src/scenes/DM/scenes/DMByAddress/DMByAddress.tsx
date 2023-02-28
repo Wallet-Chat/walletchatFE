@@ -1,6 +1,8 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react'
 import React from 'react'
 import { useParams } from 'react-router-dom'
+import { useAppSelector } from '@/hooks/useSelector'
+import { useAppDispatch } from '@/hooks/useDispatch'
 import { MessageUIType } from '../../../../types/Message'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
@@ -9,6 +11,10 @@ import {
   useGetChatDataQuery,
   getLocalDmDataForAccountToAddr,
   useGetReadChatItemsQuery,
+  decryptMessage,
+  addDmDataEnc,
+  updateLocalDmDataForAccountToAddr,
+  updateQueryData,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
 
@@ -23,9 +29,22 @@ const DMByAddress = ({
   account: string
   delegate: string
 }) => {
-  const didInitialScroll = React.useRef()
+  const dispatch = useAppDispatch()
+  const prevToAddr = React.useRef('')
 
   const { address: toAddr = '' } = useParams()
+
+  const dmDataEncByAccountByAddr = useAppSelector(
+    (state) => state.dm.dmDataEncByAccountByAddr
+  )
+  const encryptedDms =
+    dmDataEncByAccountByAddr &&
+    dmDataEncByAccountByAddr[account] &&
+    dmDataEncByAccountByAddr[account][toAddr]
+
+  // for effect deps, makes sure it won't re-calculate many times even with the same value
+  // so it will only retry when the array changes like removing some
+  const encryptedDmsStr = encryptedDms && JSON.stringify(encryptedDms)
 
   const { currentData: fetchedData, isFetching } = useGetChatDataQuery(
     { account, toAddr },
@@ -42,8 +61,9 @@ const DMByAddress = ({
       if (node) {
         const sentByMe = msg.fromaddr === account
 
-        if (!didInitialScroll.current || sentByMe) {
+        if (prevToAddr.current !== toAddr || sentByMe) {
           node.scrollIntoView({ smooth: true })
+          prevToAddr.current = toAddr
         }
       }
     },
@@ -52,7 +72,65 @@ const DMByAddress = ({
 
   useGetReadChatItemsQuery({ account, toAddr }, QUERY_OPTS)
 
-  // TODO: if already has encrypted chats, show skeletons
+  React.useEffect(() => {
+    const newEncryptedDms = encryptedDmsStr && JSON.parse(encryptedDmsStr)
+
+    if (localChatData && newEncryptedDms && newEncryptedDms.length > 0) {
+      const retryFailed = async () => {
+        const newChatData = localChatData ? JSON.parse(localChatData) : []
+        const failedDms = newChatData.filter((msg: MessageUIType) =>
+          newEncryptedDms.includes(msg.Id)
+        )
+
+        const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
+          failedDms
+        )
+
+        fetchedMessages.forEach((msg: MessageUIType) => {
+          newChatData[
+            newChatData.findIndex((dm: MessageUIType) => dm.Id === msg.Id)
+          ] = msg
+        })
+
+        updateLocalDmDataForAccountToAddr(account, toAddr, newChatData)
+
+        dispatch(
+          updateQueryData('getChatData', { account, toAddr }, () =>
+            JSON.stringify(newChatData)
+          )
+        )
+        dispatch(addDmDataEnc({ account, toAddr, data: failedDecryptMsgs }))
+      }
+
+      retryFailed()
+    }
+  }, [localChatData, encryptedDmsStr])
+
+  // TODO: when some DMs are still encrypted due to fail or pending, show skeleton
+  // instead of error message
+  if (encryptedDms && encryptedDms.length > 0) {
+    return (
+      <Flex background='white' height='100vh' flexDirection='column' flex='1'>
+        <DMHeader />
+
+        <DottedBackground className='custom-scrollbar'>
+          <Flex
+            justifyContent='center'
+            alignItems='center'
+            borderRadius='lg'
+            background='red.200'
+            p={4}
+          >
+            <Box fontSize='md'>Failed to decrypt messages, retrying...</Box>
+          </Flex>
+          <Flex justifyContent='center' alignItems='center' height='100%'>
+            <Spinner />
+          </Flex>
+        </DottedBackground>
+      </Flex>
+    )
+  }
+
   if (isFetching && chatData.length === 0) {
     return (
       <Flex background='white' height='100vh' flexDirection='column' flex='1'>
@@ -74,13 +152,6 @@ const DMByAddress = ({
             <Spinner />
           </Flex>
         </DottedBackground>
-
-        <Submit
-          delegate={delegate}
-          loadedMsgs={chatData}
-          toAddr={toAddr}
-          account={account}
-        />
       </Flex>
     )
   }
@@ -92,18 +163,18 @@ const DMByAddress = ({
       <DottedBackground className='custom-scrollbar'>
         {toAddr ===
           '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase() && (
-            <Flex
-              justifyContent='center'
-              alignItems='center'
-              borderRadius='lg'
-              background='green.200'
-              p={4}
-            >
-              <Box fontSize='md'>
-                We welcome all feedback and bug reports. Thank you! 😊
-              </Box>
-            </Flex>
-          )}
+          <Flex
+            justifyContent='center'
+            alignItems='center'
+            borderRadius='lg'
+            background='green.200'
+            p={4}
+          >
+            <Box fontSize='md'>
+              We welcome all feedback and bug reports. Thank you! 😊
+            </Box>
+          </Flex>
+        )}
 
         {chatData.map((msg: MessageUIType, i: number) => {
           const isLast = i === chatData.length - 1
