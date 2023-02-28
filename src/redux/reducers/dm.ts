@@ -132,6 +132,7 @@ export function getInboxDmDataForAccount(account: string) {
 
   const inboxDataObj: InboxStore = {
     dm: {},
+    nft: {},
     community: {},
     ...accountInboxData,
   }
@@ -140,8 +141,8 @@ export function getInboxDmDataForAccount(account: string) {
 }
 
 function getInboxFrom(account: string, item: InboxItemType) {
-  const isCommunity = item.context_type === 'community'
-  const fromValue = isCommunity
+  const isCommunityOrNFT = item.context_type === 'community' || item.context_type === 'nft'
+  const fromValue = isCommunityOrNFT
     ? item.nftaddr
     : getInboxChatPartner(account, item)
   return fromValue
