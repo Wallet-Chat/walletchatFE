@@ -2,22 +2,8 @@ import { Box, Heading, Flex } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 import Web3 from 'web3'
 import InboxList from '../../components/Inbox/InboxList'
-import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
-import { POLLING_QUERY_OPTS } from '@/constants'
-// import InboxSearchInput from './components/InboxSearchInput'
-import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
 
 const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
-  const { currentData: fetchedData, isFetching: isFetchingInboxData } =
-    useGetInboxQuery(account, POLLING_QUERY_OPTS)
-  const storedData = getInboxDmDataForAccount(account)
-  const inboxData = fetchedData ? JSON.parse(fetchedData) : storedData
-  const communities = Object.values(inboxData.community)
-
-  if (isFetchingInboxData && inboxData.length === 0) {
-    return <InboxListLoadingSkeleton />
-  }
-
   return (
     <Box
       background='white'
