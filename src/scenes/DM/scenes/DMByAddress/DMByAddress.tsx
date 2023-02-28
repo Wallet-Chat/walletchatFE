@@ -169,6 +169,10 @@ const DMByAddress = ({
             borderRadius='lg'
             background='green.200'
             p={4}
+            position='sticky'
+            top={0}
+            right={0}
+            zIndex={1}
           >
             <Box fontSize='md'>
               We welcome all feedback and bug reports. Thank you! 😊
