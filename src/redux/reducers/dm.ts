@@ -358,6 +358,8 @@ export const dmApi = createApi({
           const storedInboxData = getInboxDmDataForAccount(account)
 
           const newInboxData = data.filter((inboxItem) => {
+            if (!storedInboxData[inboxItem.context_type]) return true
+
             const currentInbox =
               storedInboxData[inboxItem.context_type][
               getInboxFrom(account, inboxItem)
@@ -375,7 +377,7 @@ export const dmApi = createApi({
 
           return { data: '' }
         } catch (error) {
-          console.error('🚨[GET][Chat items]:', error)
+          console.error('🚨[GET][Inbox]:', error)
           return { data: '' }
         }
       },
