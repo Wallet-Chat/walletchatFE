@@ -5,19 +5,9 @@ import Web3 from 'web3'
 import InboxSearchInput from './components/InboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
 // import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
-import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
-
-const QUERY_OPTS = {
-  pollingInterval: 5000, // 5 sec
-}
 
 // TODO -- on submit new message, also update here
 const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
-  const { currentData: fetchedData } = useGetInboxQuery(account, QUERY_OPTS)
-  const storedData = getInboxDmDataForAccount(account)
-  const inboxData = fetchedData ? JSON.parse(fetchedData) : storedData
-  const dms = Object.values(inboxData.dm)
-
   // const communities = React.useMemo(() => inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')), [inboxData])
 
   // const [encryptedChatData, setEncChatData] = useState<InboxItemType[]>(
@@ -66,7 +56,7 @@ const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
         <InboxSearchInput />
       </Box>
 
-      <InboxList context='dms' data={dms} web3={web3} account={account} />
+      <InboxList context='dm' web3={web3} account={account} />
     </Box>
   )
 }

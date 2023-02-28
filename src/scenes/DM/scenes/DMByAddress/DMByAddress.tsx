@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { createSelector } from '@reduxjs/toolkit'
 import { useAppSelector } from '@/hooks/useSelector'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import { POLLING_QUERY_OPTS } from '@/constants'
 import { MessageUIType } from '../../../../types/Message'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
@@ -20,10 +21,6 @@ import {
 import Submit from './Submit'
 
 const PAGE_SIZE = 25
-
-const QUERY_OPTS = {
-  pollingInterval: 5000, // 5 sec
-}
 
 const DMByAddress = ({
   account,
@@ -80,7 +77,7 @@ const DMByAddress = ({
   const { currentData: fetchedData, isFetching } = useGetChatDataQuery(
     { account, toAddr },
     {
-      ...QUERY_OPTS,
+      ...POLLING_QUERY_OPTS,
       selectFromResult: (options) => ({
         ...options,
         currentData: selectPostsForUser(options, page),
@@ -130,7 +127,7 @@ const DMByAddress = ({
     }
   }, [page])
 
-  useGetReadChatItemsQuery({ account, toAddr }, QUERY_OPTS)
+  useGetReadChatItemsQuery({ account, toAddr }, POLLING_QUERY_OPTS)
 
   React.useEffect(() => {
     const newEncryptedDms = encryptedDmsStr && JSON.parse(encryptedDmsStr)
