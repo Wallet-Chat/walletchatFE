@@ -1,6 +1,7 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react'
 import React from 'react'
 import { useParams } from 'react-router-dom'
+import { createSelector } from '@reduxjs/toolkit'
 import { useAppSelector } from '@/hooks/useSelector'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { MessageUIType } from '../../../../types/Message'
@@ -18,6 +19,8 @@ import {
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
 
+const PAGE_SIZE = 25
+
 const QUERY_OPTS = {
   pollingInterval: 5000, // 5 sec
 }
@@ -29,6 +32,9 @@ const DMByAddress = ({
   account: string
   delegate: string
 }) => {
+  const bodyRef = React.useRef()
+  const maxPages = React.useRef(1)
+
   const dispatch = useAppDispatch()
   const prevToAddr = React.useRef('')
 
@@ -42,13 +48,44 @@ const DMByAddress = ({
     dmDataEncByAccountByAddr[account] &&
     dmDataEncByAccountByAddr[account][toAddr]
 
+  const [page, setPage] = React.useState(1)
+
+  const selectPostsForUser = React.useMemo(
+    () =>
+      createSelector(
+        (options: any) => options.currentData,
+        (options: any, pg: number) => pg,
+        (currentData, pg) => {
+          if (!currentData) return currentData
+
+          const currentDataValue = [...JSON.parse(currentData)]
+          maxPages.current = Math.ceil(currentDataValue.length / PAGE_SIZE)
+
+          if (currentDataValue.length <= PAGE_SIZE) {
+            return JSON.stringify(currentDataValue)
+          }
+
+          const currentDataForPage = currentDataValue.slice(-PAGE_SIZE * page)
+
+          return JSON.stringify(currentDataForPage)
+        }
+      ),
+    [page]
+  )
+
   // for effect deps, makes sure it won't re-calculate many times even with the same value
   // so it will only retry when the array changes like removing some
   const encryptedDmsStr = encryptedDms && JSON.stringify(encryptedDms)
 
   const { currentData: fetchedData, isFetching } = useGetChatDataQuery(
     { account, toAddr },
-    QUERY_OPTS
+    {
+      ...QUERY_OPTS,
+      selectFromResult: (options) => ({
+        ...options,
+        currentData: selectPostsForUser(options, page),
+      }),
+    }
   )
 
   const cachedChatData = getLocalDmDataForAccountToAddr(account, toAddr)
@@ -64,11 +101,34 @@ const DMByAddress = ({
         if (prevToAddr.current !== toAddr || sentByMe) {
           node.scrollIntoView({ smooth: true })
           prevToAddr.current = toAddr
+          setPage(1)
         }
       }
     },
     [toAddr]
   )
+
+  React.useEffect(() => {
+    if (bodyRef.current) {
+      const bodyElem = bodyRef.current
+
+      const autoScrollPagination = () => {
+        if (page < maxPages.current) {
+          const scrollThreshold = 200
+          const scrollTop = bodyElem.scrollTop || 0
+
+          if (scrollTop <= scrollThreshold) {
+            // Fetch more items here
+            setPage((prev) => prev + 1)
+          }
+        }
+      }
+
+      bodyElem.addEventListener('scroll', autoScrollPagination)
+
+      return () => bodyElem.removeEventListener('scroll', autoScrollPagination)
+    }
+  }, [page])
 
   useGetReadChatItemsQuery({ account, toAddr }, QUERY_OPTS)
 
@@ -155,12 +215,11 @@ const DMByAddress = ({
       </Flex>
     )
   }
-
   return (
     <Flex background='white' height='100vh' flexDirection='column' flex='1'>
       <DMHeader />
 
-      <DottedBackground className='custom-scrollbar'>
+      <DottedBackground ref={bodyRef} className='custom-scrollbar'>
         {toAddr ===
           '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase() && (
           <Flex
