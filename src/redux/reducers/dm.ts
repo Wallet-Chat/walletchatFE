@@ -148,7 +148,8 @@ export function getInboxDmDataForAccount(account: string) {
 }
 
 function getInboxFrom(account: string, item: InboxItemType) {
-  const isCommunityOrNFT = item.context_type === 'community' || item.context_type === 'nft'
+  const isCommunityOrNFT =
+    item.context_type === 'community' || item.context_type === 'nft'
   const fromValue = isCommunityOrNFT
     ? item.nftaddr
     : getInboxChatPartner(account, item)
@@ -168,6 +169,69 @@ function updateLocalInboxDataForAccount(
   storage.set(INBOX_DATA_LOCAL_STORAGE_KEY, {
     [account.toLocaleLowerCase()]: localInboxData,
   })
+}
+
+async function fetchAndStoreChatData(
+  queryArgs: any,
+  { dispatch }: any,
+  extraOptions: any,
+  fetchWithBQ: any
+) {
+  try {
+    const { account, toAddr } = queryArgs
+
+    if (!ENV.REACT_APP_REST_API) {
+      throw new Error('REST API url not in .env')
+    }
+    if (!account) {
+      throw new Error('No account connected')
+    }
+    if (!toAddr) {
+      throw new Error('Recipient address is not available')
+    }
+
+    const localData = getLocalDmDataForAccountToAddr(account, toAddr) || []
+    const hasLocalData = localData && localData.length > 0
+
+    let lastTimeMsg
+    if (hasLocalData) {
+      lastTimeMsg = localData[localData.length - 1].timestamp
+    }
+
+    const data = (
+      await fetchWithBQ(
+        `${ENV.REACT_APP_REST_API}/${
+          ENV.REACT_APP_API_VERSION
+        }/getall_chatitems/${account}/${toAddr}${
+          lastTimeMsg ? `/${lastTimeMsg}` : ''
+        }`
+      )
+    ).data as unknown as MessageType[]
+
+    if (data.length === 0) {
+      return { data: JSON.stringify(localData) }
+    }
+
+    if (!hasLocalData) {
+      console.log('✅[GET][Chat items]')
+    } else {
+      console.log('✅[GET][New Chat items]')
+    }
+
+    const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(data)
+
+    dispatch(addDmDataEnc({ account, toAddr, data: failedDecryptMsgs }))
+
+    const allChats = localData.concat(fetchedMessages)
+
+    // store so when user switches views, data is ready
+    addLocalDmDataForAccountToAddr(account, toAddr, fetchedMessages)
+
+    return { data: JSON.stringify(allChats) }
+  } catch (error) {
+    console.error('🚨[GET][Chat items]:', error)
+    return { data: '' }
+  }
 }
 
 type DMState = {
@@ -240,66 +304,7 @@ export const dmApi = createApi({
     }),
 
     getChatData: builder.query({
-      queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
-        try {
-          const { account, toAddr } = queryArgs
-
-          if (!ENV.REACT_APP_REST_API) {
-            throw new Error('REST API url not in .env')
-          }
-          if (!account) {
-            throw new Error('No account connected')
-          }
-          if (!toAddr) {
-            throw new Error('Recipient address is not available')
-          }
-
-          const localData =
-            getLocalDmDataForAccountToAddr(account, toAddr) || []
-          const hasLocalData = localData && localData.length > 0
-
-          let lastTimeMsg
-          if (hasLocalData) {
-            lastTimeMsg = localData[localData.length - 1].timestamp
-          }
-
-          const data = (
-            await fetchWithBQ(
-              `${ENV.REACT_APP_REST_API}/${
-                ENV.REACT_APP_API_VERSION
-              }/getall_chatitems/${account}/${toAddr}${
-                lastTimeMsg ? `/${lastTimeMsg}` : ''
-              }`
-            )
-          ).data as unknown as MessageType[]
-
-          if (data.length === 0) {
-            return { data: JSON.stringify(localData) }
-          }
-
-          if (!hasLocalData) {
-            console.log('✅[GET][Chat items]')
-          } else {
-            console.log('✅[GET][New Chat items]')
-          }
-
-          const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
-            data
-          )
-
-          dispatch(addDmDataEnc({ account, toAddr, data: failedDecryptMsgs }))
-
-          const allChats = localData.concat(fetchedMessages)
-
-          // store so when user switches views, data is ready
-          addLocalDmDataForAccountToAddr(account, toAddr, fetchedMessages)
-
-          return { data: JSON.stringify(allChats) }
-        } catch (error) {
-          console.error('🚨[GET][Chat items]:', error)
-          return { data: '' }
-        }
-      },
+      queryFn: fetchAndStoreChatData,
     }),
 
     // TODO -- only call if all messages not yet read.
@@ -382,6 +387,18 @@ export const dmApi = createApi({
             const { fetchedMessages } = await decryptMessage(newInboxData)
 
             updateLocalInboxDataForAccount(account, fetchedMessages)
+
+            fetchedMessages.forEach(
+              (msg: InboxItemType) =>
+                msg.toaddr &&
+                fetchAndStoreChatData(
+                  { account, toAddr: msg.toaddr },
+                  { dispatch },
+                  {},
+                  fetchWithBQ
+                )
+            )
+
             return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
           }
 
