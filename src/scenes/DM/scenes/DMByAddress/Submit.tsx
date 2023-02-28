@@ -4,6 +4,7 @@ import TextareaAutosize from 'react-textarea-autosize'
 import { FormControl, Button, Flex } from '@chakra-ui/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
+import { useWallet } from '@/context/WalletProvider'
 import * as ENV from '@/constants/env'
 import { updateQueryData } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
@@ -20,6 +21,8 @@ function Submit({
   toAddr: string
   account: string
 }) {
+  const { name }: any = useWallet()
+
   const dispatch = useAppDispatch()
   const [isSendingMessage, setIsSendingMessage] = React.useState(false)
   const [msgInput, setMsgInput] = React.useState<string>('')
@@ -59,6 +62,7 @@ function Submit({
       fromaddr: account,
       toaddr: toAddr,
       timestamp: timestamp.toString(),
+      sender_name: name
     }
 
     dispatch(addMessageToUI(newMessage))

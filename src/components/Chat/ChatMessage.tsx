@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Image, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Image, Spinner, Text } from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
@@ -16,105 +16,105 @@ import * as ENV from '@/constants/env'
 import Avatar from '../Inbox/DM/Avatar'
 
 const MessageBox = styled.div`
-	position: relative;
-	width: auto;
-	min-width: 75px;
-	max-width: 80%;
-	height: auto;
-	background: #fff;
-	background: var(--chakra-colors-lightgray-300);
-	border-radius: var(--chakra-radii-md);
-	padding: var(--chakra-space-2) var(--chakra-space-3) var(--chakra-space-5);
-	font-size: var(--chakra-fontSizes-md);
-	clear: both;
-	word-break: break-word;
+  position: relative;
+  width: auto;
+  min-width: 75px;
+  max-width: 80%;
+  height: auto;
+  background: #fff;
+  background: var(--chakra-colors-lightgray-300);
+  border-radius: var(--chakra-radii-md);
+  padding: var(--chakra-space-2) var(--chakra-space-3) var(--chakra-space-5);
+  font-size: var(--chakra-fontSizes-md);
+  clear: both;
+  word-break: break-word;
 
-	.msg-img {
-		display: inline-block;
-	}
+  .msg-img {
+    display: inline-block;
+  }
 
-	.msg-bubble {
-		display: inline-block;
-	}
+  .msg-bubble {
+    display: inline-block;
+  }
 
-	.name {
-		color: var(--chakra-colors-information-600);
-	}
+  .name {
+    color: var(--chakra-colors-information-600);
+  }
 
-	&.left {
-		float: left;
-		background: #fff;
-	}
-	&.right {
-		float: left;
-		background: var(--chakra-colors-darkgray-800);
-		color: var(--chakra-colors-lightgray-100);
+  &.left {
+    float: left;
+    background: #fff;
+  }
+  &.right {
+    float: left;
+    background: var(--chakra-colors-darkgray-800);
+    color: var(--chakra-colors-lightgray-100);
 
-		.name {
-			color: var(--chakra-colors-white);
-		}
-		.chakra-menu__menu-list {
-			color: #000;
-		}
+    .name {
+      color: var(--chakra-colors-white);
+    }
+    .chakra-menu__menu-list {
+      color: #000;
+    }
 
-		.nft-context-btn {
-			background: var(--chakra-colors-darkgray-600);
-			color: var(--chakra-colors-lightgray-500);
-			color: var(--chakra-colors-white);
-			&:hover {
-				background: var(--chakra-colors-darkgray-500);
-				color: var(--chakra-colors-lightgray-500);
-			}
-		}
-	}
-	.timestamp {
-		display: block;
-		position: absolute;
-		/* right: var(--chakra-space-7); */
-		right: var(--chakra-space-2);
-		bottom: var(--chakra-space-2);
-		color: #aaa;
-		font-size: var(--chakra-fontSizes-sm);
-		user-select: none;
-		line-height: 1.2;
-	}
-	&.left {
-		.timestamp {
-			right: var(--chakra-space-2);
-		}
-	}
-	.read-status {
-		position: absolute;
-		right: var(--chakra-space-2);
-		bottom: var(--chakra-space-2);
-		svg {
-			stroke: var(--chakra-colors-lightgray-800);
-		}
-	}
-	&.read:not(.left) {
-		.timestamp {
-			color: darkgreen;
-			user-select: none;
-		}
-		.read-status {
-			svg {
-				stroke: darkgreen;
-			}
-		}
-	}
-	&.right {
-		&.read {
-			.timestamp {
-				color: var(--chakra-colors-success-500);
-				user-select: none;
-			}
-			.read-status {
-				svg {
-					stroke: var(--chakra-colors-success-500);
-				}
-			}
-		}
-	}
+    .nft-context-btn {
+      background: var(--chakra-colors-darkgray-600);
+      color: var(--chakra-colors-lightgray-500);
+      color: var(--chakra-colors-white);
+      &:hover {
+        background: var(--chakra-colors-darkgray-500);
+        color: var(--chakra-colors-lightgray-500);
+      }
+    }
+  }
+  .timestamp {
+    display: block;
+    position: absolute;
+    /* right: var(--chakra-space-7); */
+    right: var(--chakra-space-2);
+    bottom: var(--chakra-space-2);
+    color: #aaa;
+    font-size: var(--chakra-fontSizes-sm);
+    user-select: none;
+    line-height: 1.2;
+  }
+  &.left {
+    .timestamp {
+      right: var(--chakra-space-2);
+    }
+  }
+  .read-status {
+    position: absolute;
+    right: var(--chakra-space-2);
+    bottom: var(--chakra-space-2);
+    svg {
+      stroke: var(--chakra-colors-lightgray-800);
+    }
+  }
+  &.read:not(.left) {
+    .timestamp {
+      color: darkgreen;
+      user-select: none;
+    }
+    .read-status {
+      svg {
+        stroke: darkgreen;
+      }
+    }
+  }
+  &.right {
+    &.read {
+      .timestamp {
+        color: var(--chakra-colors-success-500);
+        user-select: none;
+      }
+      .read-status {
+        svg {
+          stroke: var(--chakra-colors-success-500);
+        }
+      }
+    }
+  }
 `
 
 const ChatMessage = ({
@@ -273,18 +273,21 @@ const ChatMessage = ({
           </Box>
 
           {msgPosition === 'right' &&
-            (msg.read === true || msg.read === false) && (
+            (msg.read === true || msg.read === false || msg.Id !== -1 ? (
               <span className='read-status'>
                 {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
               </span>
-            )}
+            ) : (
+              <Spinner size='xs' className='read-status' />
+            ))}
         </Box>
         {msg.nftAddr && msg.nftId && account && (
           <Box mb={1}>
             {nftData && (
               <RLink
-                to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${msg.toaddr === account ? fromAddr : msg.toAddr
-                  }`}
+                to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${
+                  msg.toaddr === account ? fromAddr : msg.toAddr
+                }`}
                 style={{ textDecoration: 'none' }}
               >
                 <Button p={2} height='auto' className='nft-context-btn'>
