@@ -191,7 +191,7 @@ const DMByAddress = ({
     )
   }
 
-  if (isFetching && chatData.length === 0) {
+  if (isFetching && !cachedChatData) {
     return (
       <Flex background='white' height='100vh' flexDirection='column' flex='1'>
         <DMHeader />

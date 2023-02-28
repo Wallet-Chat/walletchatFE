@@ -171,6 +171,43 @@ function updateLocalInboxDataForAccount(
   })
 }
 
+type DMState = {
+  dmDataEncByAccountByAddr: {
+    [account: string]: { [toAddr: string]: number[] }
+  }
+}
+
+const initialState: DMState = {
+  dmDataEncByAccountByAddr: {},
+}
+
+export const dmSlice = createSlice({
+  name: 'dm',
+  initialState,
+  reducers: {
+    addDmDataEnc: (state, action) => {
+      const { account, toAddr, data } = action.payload
+      const accountData = state.dmDataEncByAccountByAddr[account] || {}
+
+      if (!accountData) {
+        state.dmDataEncByAccountByAddr = {
+          [account]: {
+            [toAddr]: data,
+          },
+        }
+      } else if (!accountData[toAddr]) {
+        state.dmDataEncByAccountByAddr[account] = {
+          [toAddr]: data,
+        }
+      } else {
+        state.dmDataEncByAccountByAddr[account][toAddr] = data
+      }
+    },
+  },
+})
+
+export const { addDmDataEnc } = dmSlice.actions
+
 async function fetchAndStoreChatData(
   queryArgs: any,
   { dispatch }: any,
@@ -208,14 +245,15 @@ async function fetchAndStoreChatData(
       )
     ).data as unknown as MessageType[]
 
-    if (data.length === 0) {
-      return { data: JSON.stringify(localData) }
-    }
-
     if (!hasLocalData) {
       console.log('✅[GET][Chat items]')
     } else {
       console.log('✅[GET][New Chat items]')
+    }
+
+    if (data.length === 0) {
+      addLocalDmDataForAccountToAddr(account, toAddr, [])
+      return { data: JSON.stringify(localData) }
     }
 
     const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(data)
@@ -233,43 +271,6 @@ async function fetchAndStoreChatData(
     return { data: '' }
   }
 }
-
-type DMState = {
-  dmDataEncByAccountByAddr: {
-    [account: string]: { [toAddr: string]: number[] }
-  }
-}
-
-const initialState: DMState = {
-  dmDataEncByAccountByAddr: {},
-}
-
-export const dmSlice = createSlice({
-  name: 'dm',
-  initialState,
-  reducers: {
-    addDmDataEnc: (state, action) => {
-      const { account, toAddr, data } = action.payload
-      const accountData = state.dmDataEncByAccountByAddr[account] || {}
-
-      if (!accountData) {
-        state.dmDataEncByAccountByAddr = {
-          [account]: {
-            [toAddr]: data,
-          },
-        }
-      } else if (!accountData[toAddr]) {
-        state.dmDataEncByAccountByAddr[account] = {
-          [toAddr]: data,
-        }
-      } else {
-        state.dmDataEncByAccountByAddr[account][toAddr] = data
-      }
-    },
-  },
-})
-
-export const { addDmDataEnc } = dmSlice.actions
 
 export const dmApi = createApi({
   reducerPath: 'dmApi',
