@@ -14,9 +14,10 @@ import {
   getLocalDmDataForAccountToAddr,
   useGetReadChatItemsQuery,
   decryptMessage,
-  addDmDataEnc,
+  addEncryptedDmIds,
   updateLocalDmDataForAccountToAddr,
   updateQueryData,
+  selectEncryptedDmIds,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
 
@@ -34,18 +35,13 @@ const DMByAddress = ({
   const pageRef = React.useRef<number>(1)
 
   const dispatch = useAppDispatch()
-  const prevToAddr = React.useRef('')
+  const prevLastMsg = React.useRef<number | undefined>()
 
   const { address: toAddr = '' } = useParams()
 
-  const dmDataEncByAccountByAddr = useAppSelector(
-    (state) => state.dm.dmDataEncByAccountByAddr
+  const encryptedDms = useAppSelector((state) =>
+    selectEncryptedDmIds(state, account, toAddr)
   )
-  const encryptedDms =
-    dmDataEncByAccountByAddr &&
-    dmDataEncByAccountByAddr[account] &&
-    dmDataEncByAccountByAddr[account][toAddr]
-
   const [page, setPage] = React.useState<number>(pageRef.current)
 
   const selectChatDataForPage = React.useMemo(
@@ -104,9 +100,9 @@ const DMByAddress = ({
       if (node) {
         // TODO: const sentByMe = msg.fromaddr === account
 
-        if (prevToAddr.current !== toAddr) {
+        if (prevLastMsg.current !== msg.Id) {
           node.scrollIntoView({ smooth: true })
-          prevToAddr.current = toAddr
+          prevLastMsg.current = msg.Id
           setPage(1)
           pageRef.current = 1
         }
@@ -150,7 +146,9 @@ const DMByAddress = ({
         )
 
         const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
-          failedDms
+          failedDms,
+          account,
+          toAddr
         )
 
         fetchedMessages.forEach((msg: MessageUIType) => {
@@ -166,7 +164,9 @@ const DMByAddress = ({
             JSON.stringify(newChatData)
           )
         )
-        dispatch(addDmDataEnc({ account, toAddr, data: failedDecryptMsgs }))
+        dispatch(
+          addEncryptedDmIds({ account, toAddr, data: failedDecryptMsgs })
+        )
       }
 
       retryFailed()
@@ -253,7 +253,7 @@ const DMByAddress = ({
 
           return (
             <Box key={msg.Id} ref={isLast ? scrollToBottomCb(msg) : undefined}>
-              <ChatMessage context='dms' account={account} msg={msg} />
+              <ChatMessage context='dm' account={account} msg={msg} />
             </Box>
           )
         })}

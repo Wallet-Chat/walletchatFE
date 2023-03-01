@@ -6,17 +6,15 @@ import { InboxItemType } from '../../types/InboxItem'
 import CommunityInboxItem from './Community/CommunityInboxListItem'
 import StartConversationWithAddress from '../StartConversationWithAddress'
 import DMInboxItem from './DM/DMInboxListItem'
-import { POLLING_QUERY_OPTS } from '@/constants'
+import { POLLING_QUERY_OPTS, CHAT_CONTEXT_TYPES } from '@/constants'
 import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
-
-export const INBOX_CONTEXT_TYPES = ['dm', 'community', 'nft'] as const
 
 const InboxList = ({
   context,
   account,
   web3,
 }: {
-  context: typeof INBOX_CONTEXT_TYPES[number]
+  context: (typeof CHAT_CONTEXT_TYPES)[number]
   account: string
   web3: Web3
 }) => {
@@ -64,7 +62,7 @@ const InboxList = ({
         }
         return <Box></Box>
       })}
-      {inboxList?.length === 0 && (context === 'dm') && (
+      {inboxList?.length === 0 && context === 'dm' && (
         <Box p={5}>
           <Text mb={4} fontSize='md'>
             You have no messages.

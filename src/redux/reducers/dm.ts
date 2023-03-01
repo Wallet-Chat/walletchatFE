@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { createErrorResponse } from '@/redux/reducers/helpers'
 import { prepareHeaderCredentials } from '@/helpers/fetch'
 import * as ENV from '@/constants/env'
+import { RootState } from '@/redux/store'
 import { MessageType } from '@/types/Message'
 import storage from '@/utils/storage'
 import lit from '@/utils/lit'
@@ -10,9 +11,47 @@ import { InboxItemType } from '@/types/InboxItem'
 
 const DM_DATA_LOCAL_STORAGE_KEY = 'dmData'
 const INBOX_DATA_LOCAL_STORAGE_KEY = 'inboxData'
+const ENC_DM_DATA_LOCAL_STORAGE_KEY = 'encDmData'
 
-// TODO: enc to localStorage so it's not stuck on a broken state due to redux refresh
-export async function decryptMessage(data: MessageType[] | InboxItemType[]) {
+export function getLocalEncDmIdsByAddrByAcc(account: string, toAddr: string) {
+  const encDmIdsByAddrByAcc = storage.get(ENC_DM_DATA_LOCAL_STORAGE_KEY)
+
+  if (!encDmIdsByAddrByAcc) return null
+
+  const encIdsDataByAddr = encDmIdsByAddrByAcc[account.toLocaleLowerCase()]
+
+  if (!encIdsDataByAddr) return null
+
+  const encDmIds = encIdsDataByAddr[toAddr.toLocaleLowerCase()]
+
+  return encDmIds || null
+}
+
+// Stores encrypted DM IDs in localStorage in the case of failures
+// to decrypt, and the page is refreshed/closed and memory state is lost
+// this is going to be used to retrieve what local DM messages still need
+// to be decrypted
+export function updateLocalEncDmIdsByAddrByAcc(
+  account: string,
+  toAddr: string,
+  encDms: number[]
+) {
+  const encDmDataObj = storage.get(ENC_DM_DATA_LOCAL_STORAGE_KEY)
+  const encDmDataForAccount = encDmDataObj?.[account.toLocaleLowerCase()] || {}
+
+  storage.set(ENC_DM_DATA_LOCAL_STORAGE_KEY, {
+    [account.toLocaleLowerCase()]: {
+      ...encDmDataForAccount,
+      [toAddr.toLocaleLowerCase()]: encDms,
+    },
+  })
+}
+
+export async function decryptMessage(
+  data: MessageType[] | InboxItemType[],
+  account: string,
+  toAddr: string
+) {
   const fetchedMessages = JSON.parse(JSON.stringify(data))
   const pendingMsgs: Promise<{ decryptedFile: any }>[] = []
 
@@ -48,7 +87,7 @@ export async function decryptMessage(data: MessageType[] | InboxItemType[]) {
     }
   }
 
-  const failedDecryptMsgs: string[] = []
+  const failedDecryptMsgs: number[] = []
   await Promise.allSettled(pendingMsgs).then((messages) => {
     messages.forEach((result, i) => {
       const rawmsg = (
@@ -68,6 +107,7 @@ export async function decryptMessage(data: MessageType[] | InboxItemType[]) {
 
   console.log('✅[POST][Decrypt DMs]')
 
+  updateLocalEncDmIdsByAddrByAcc(account, toAddr, failedDecryptMsgs)
   return { fetchedMessages, failedDecryptMsgs }
 }
 
@@ -172,42 +212,63 @@ function updateLocalInboxDataForAccount(
   })
 }
 
+const selectState = (state: RootState) => state.dm
+const selectEncryptedDmIdsByAddrByAcc = (state: RootState) =>
+  selectState(state).encryptedDmIdsByAddrByAcc
+const selectEncryptedDmIdsByAddr = (state: RootState, account: string) => {
+  const encryptedDmIdsByAddrByAcc = selectEncryptedDmIdsByAddrByAcc(state)
+  return encryptedDmIdsByAddrByAcc?.[account.toLocaleLowerCase()]
+}
+export const selectEncryptedDmIds = (
+  state: RootState,
+  account: string,
+  toAddr: string
+) => {
+  const dmDataEncByAddrForAccount = selectEncryptedDmIdsByAddr(state, account)
+  return (
+    dmDataEncByAddrForAccount?.[toAddr.toLocaleLowerCase()] ||
+    getLocalEncDmIdsByAddrByAcc(account, toAddr)
+  )
+}
+
 type DMState = {
-  dmDataEncByAccountByAddr: {
+  encryptedDmIdsByAddrByAcc: {
     [account: string]: { [toAddr: string]: number[] }
   }
 }
 
 const initialState: DMState = {
-  dmDataEncByAccountByAddr: {},
+  encryptedDmIdsByAddrByAcc: {},
 }
 
 export const dmSlice = createSlice({
   name: 'dm',
   initialState,
   reducers: {
-    addDmDataEnc: (state, action) => {
+    addEncryptedDmIds: (state, action) => {
       const { account, toAddr, data } = action.payload
-      const accountData = state.dmDataEncByAccountByAddr[account] || {}
+      const accountData = state.encryptedDmIdsByAddrByAcc[account] || {}
 
       if (!accountData) {
-        state.dmDataEncByAccountByAddr = {
+        state.encryptedDmIdsByAddrByAcc = {
           [account]: {
             [toAddr]: data,
           },
         }
       } else if (!accountData[toAddr]) {
-        state.dmDataEncByAccountByAddr[account] = {
+        state.encryptedDmIdsByAddrByAcc[account] = {
           [toAddr]: data,
         }
       } else {
-        state.dmDataEncByAccountByAddr[account][toAddr] = data
+        state.encryptedDmIdsByAddrByAcc[account][toAddr] = data
       }
+
+      updateLocalEncDmIdsByAddrByAcc(account, toAddr, data)
     },
   },
 })
 
-export const { addDmDataEnc } = dmSlice.actions
+export const { addEncryptedDmIds } = dmSlice.actions
 
 async function fetchAndStoreChatData(
   queryArgs: any,
@@ -247,20 +308,24 @@ async function fetchAndStoreChatData(
         )
       ).data as unknown as MessageType[]) || []
 
+    if (data.length === 0) {
+      addLocalDmDataForAccountToAddr(account, toAddr, [])
+      return { data: JSON.stringify(localData) }
+    }
+
     if (!hasLocalData) {
       console.log('✅[GET][Chat items]')
     } else {
       console.log('✅[GET][New Chat items]')
     }
 
-    if (data.length === 0) {
-      addLocalDmDataForAccountToAddr(account, toAddr, [])
-      return { data: JSON.stringify(localData) }
-    }
+    const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
+      data,
+      account,
+      toAddr
+    )
 
-    const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(data)
-
-    dispatch(addDmDataEnc({ account, toAddr, data: failedDecryptMsgs }))
+    dispatch(addEncryptedDmIds({ account, toAddr, data: failedDecryptMsgs }))
 
     const allChats = localData.concat(fetchedMessages)
 
@@ -366,8 +431,6 @@ export const dmApi = createApi({
             )
           ).data as unknown as InboxItemType[]
 
-          console.log('✅[GET][Inbox]:', data)
-
           if (!data) {
             updateLocalInboxDataForAccount(account, [])
             return { data: '' }
@@ -387,20 +450,26 @@ export const dmApi = createApi({
           })
 
           if (newInboxData.length > 0) {
-            const { fetchedMessages } = await decryptMessage(newInboxData)
+            console.log('✅[GET][Inbox]:', data)
 
-            updateLocalInboxDataForAccount(account, fetchedMessages)
+            newInboxData.forEach(async (msg) => {
+              const toAddr = msg.toaddr
 
-            fetchedMessages.forEach(
-              (msg: InboxItemType) =>
-                msg.toaddr &&
-                fetchAndStoreChatData(
-                  { account, toAddr: msg.toaddr },
-                  { dispatch },
-                  {},
-                  fetchWithBQ
-                )
-            )
+              const { fetchedMessages } = await decryptMessage(
+                [msg],
+                account,
+                toAddr
+              )
+
+              updateLocalInboxDataForAccount(account, fetchedMessages)
+
+              fetchAndStoreChatData(
+                { account, toAddr: msg.toaddr },
+                { dispatch },
+                {},
+                fetchWithBQ
+              )
+            })
 
             return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
           }

@@ -4,6 +4,8 @@ export const POLLING_QUERY_OPTS = {
   pollingInterval: 5000, // 5 sec
 }
 
+export const CHAT_CONTEXT_TYPES = ['dm', 'community', 'nft'] as const
+
 export const currencyList = [
   { name: 'US Dollar', code: 'USD', symbol: '$' },
   { name: 'Australian Dollar', code: 'AUD', symbol: '$' },

@@ -7,6 +7,7 @@ import { SiweMessage } from 'siwe'
 import storage from '../utils/extension-storage'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
+import { getFetchOptions } from '@/helpers/fetch'
 
 export const WalletContext = React.createContext<any>(null)
 export const useWallet = () => React.useContext(WalletContext)
@@ -20,18 +21,23 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const network = wagmi.getNetwork()
 
   const [account, setAccount] = React.useState(wagmi.getAccount())
-  const [accountAddress, setAccountAddress] = React.useState(
-    account && account.address
-  )
+  const [accountAddress, setAccountAddress] = React.useState(account?.address)
   const [nonce, setNonce] = React.useState<string | null>()
   const [name, setName] = useState<string | undefined | null>(undefined)
   const [email, setEmail] = useState(null)
   const [notifyDM, setNotifyDM] = useState('true')
   const [notify24, setNotify24] = useState('true')
-  const [isAuthenticated, setAuthenticated] = useState(signedIn.current)
+  const [isAuthenticated, setAuthenticated] = useState(
+    Boolean(signedIn.current && network && network.chain)
+  )
   const [delegate, setDelegate] = useState<null | string>(null)
 
   wagmi.watchAccount((wagmiAccount) => setAccount(wagmiAccount))
+  wagmi.watchNetwork((wagmiNetwork) =>
+    !wagmiNetwork.chain
+      ? setAuthenticated(false)
+      : signedIn.current && setAuthenticated(true)
+  )
 
   const getName = (address: string) => {
     if (name) return
@@ -135,16 +141,13 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
 
       didWelcome.current = true
 
-      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-        },
-      })
+      fetch(
+        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,
+        getFetchOptions()
+      )
         .then((response) => response.json())
         .then(async (welcomeData) => {
-          console.log('✅[POST][Welcome]:', welcomeData.msg)
+          console.log('✅[GET][Welcome]:', welcomeData.msg)
 
           if (!welcomeData.msg.includes(address.toLocaleLowerCase())) {
             getNonce(address)
@@ -155,7 +158,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
           }
         })
         .catch((welcomeError) => {
-          console.error('🚨[POST][Welcome]:', welcomeError)
+          console.error('🚨[GET][Welcome]:', welcomeError)
           getNonce(address)
         })
     }

@@ -4,7 +4,11 @@ import styled from 'styled-components'
 import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
 import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
-
+import {
+  updateLocalDmDataForAccountToAddr,
+  updateQueryData,
+} from '@/redux/reducers/dm'
+import { CHAT_CONTEXT_TYPES } from '@/constants'
 import { formatMessageDate } from '../../helpers/date'
 import { MessageUIType } from '../../types/Message'
 import NFT from '../../types/NFT'
@@ -14,6 +18,7 @@ import UserProfileContextMenu from '../UserProfileContextMenu'
 import { useIsInViewport } from '../../helpers/useIsInViewport'
 import * as ENV from '@/constants/env'
 import Avatar from '../Inbox/DM/Avatar'
+import { useAppDispatch } from '@/hooks/useDispatch'
 
 const MessageBox = styled.div`
   position: relative;
@@ -122,19 +127,21 @@ const ChatMessage = ({
   account,
   msg,
 }: {
-  context: 'dms' | 'nfts' | 'communities'
+  context: (typeof CHAT_CONTEXT_TYPES)[number]
   account: string | undefined
   msg: MessageUIType
 }) => {
+  const dispatch = useAppDispatch()
+
   const [nftData, setNftData] = useState<NFT>()
   const fromAddr = msg?.fromaddr || msg?.fromAddr
 
   const messageRef = useRef(null)
   const isInViewport = useIsInViewport(messageRef)
-  const msgPosition =
+
+  const msgSentByMe =
     fromAddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
-      ? 'right'
-      : 'left'
+  const msgPosition = msgSentByMe ? 'right' : 'left'
 
   useEffect(() => {
     const getNftMetadata = () => {
@@ -191,13 +198,13 @@ const ChatMessage = ({
 
       fetchFromOpenSea()
     }
-    if (context === 'dms') {
+    if (context === 'nft') {
       getNftMetadata()
     }
   }, [msg, account, context, nftData])
 
   const setMessageAsRead = useCallback(() => {
-    if (msg.toaddr && fromAddr && msg.timestamp) {
+    if (msg.toaddr && fromAddr && msg.timestamp && account) {
       fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_chatitem/${fromAddr}/${msg.toaddr}}`,
         {
@@ -207,15 +214,36 @@ const ChatMessage = ({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('jwt')}`,
           },
-          body: JSON.stringify({
-            ...msg,
-            read: true,
-          }),
+          body: JSON.stringify({ ...msg, read: true }),
         }
       )
         .then((response) => response.json())
         .then((data) => {
           console.log('✅[PUT][Message]:', data)
+
+          dispatch(
+            updateQueryData(
+              'getChatData',
+              { account, toAddr: fromAddr },
+              (chatData) => {
+                const chatDataValue = JSON.parse(chatData)
+
+                chatDataValue.forEach((dataMsg: MessageUIType, i: number) => {
+                  if (dataMsg.Id === msg.Id) {
+                    chatDataValue[i] = { ...chatDataValue[i], read: true }
+                  }
+                })
+
+                updateLocalDmDataForAccountToAddr(
+                  account,
+                  fromAddr,
+                  chatDataValue
+                )
+
+                return JSON.stringify(chatDataValue)
+              }
+            )
+          )
         })
         .catch((error) => {
           console.error('🚨[PUT][Message]:', error)
@@ -225,14 +253,14 @@ const ChatMessage = ({
 
   useEffect(() => {
     if (
-      context === 'dms' &&
+      context === 'dm' &&
       isInViewport &&
       msg?.read === false &&
-      msg?.toaddr?.toLocaleLowerCase() === account?.toLocaleLowerCase()
+      !msgSentByMe
     ) {
       setMessageAsRead()
     }
-  }, [isInViewport, account, context, msg?.read, msg?.toaddr, setMessageAsRead])
+  }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
 
   return (
     <Flex
@@ -267,7 +295,11 @@ const ChatMessage = ({
           <Box
             d='inline-block'
             className='timestamp'
-            style={{ right: 'var(--chakra-space-7)' }}
+            style={{
+              right: msgSentByMe
+                ? 'var(--chakra-space-7)'
+                : 'var(--chakra-space-2)',
+            }}
           >
             {formatMessageDate(new Date(msg.timestamp))}
           </Box>
@@ -286,7 +318,7 @@ const ChatMessage = ({
             {nftData && (
               <RLink
                 to={`/nft/ethereum/${msg.nftAddr}/${msg.nftId}?recipient=${
-                  msg.toaddr === account ? fromAddr : msg.toAddr
+                  !msgSentByMe ? fromAddr : msg.toAddr
                 }`}
                 style={{ textDecoration: 'none' }}
               >
