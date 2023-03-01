@@ -31,6 +31,7 @@ const DMByAddress = ({
 }) => {
   const bodyRef = React.useRef()
   const maxPages = React.useRef(1)
+  const pageRef = React.useRef<number>(1)
 
   const dispatch = useAppDispatch()
   const prevToAddr = React.useRef('')
@@ -45,29 +46,34 @@ const DMByAddress = ({
     dmDataEncByAccountByAddr[account] &&
     dmDataEncByAccountByAddr[account][toAddr]
 
-  const [page, setPage] = React.useState(1)
+  const [page, setPage] = React.useState<number>(pageRef.current)
 
-  const selectPostsForUser = React.useMemo(
+  const selectChatDataForPage = React.useMemo(
     () =>
       createSelector(
-        (options: any) => options.currentData,
-        (options: any, pg: number) => pg,
-        (currentData, pg) => {
-          if (!currentData) return currentData
+        (chatData: MessageUIType[]) => chatData,
+        (chatData) => {
+          if (!chatData) return chatData
 
-          const currentDataValue = [...JSON.parse(currentData)]
-          maxPages.current = Math.ceil(currentDataValue.length / PAGE_SIZE)
-
-          if (currentDataValue.length <= PAGE_SIZE) {
-            return JSON.stringify(currentDataValue)
+          if (chatData.length <= PAGE_SIZE) {
+            return JSON.stringify(chatData)
           }
 
-          const currentDataForPage = currentDataValue.slice(-PAGE_SIZE * page)
+          const newChatData = [...chatData]
+          maxPages.current = Math.ceil(newChatData.length / PAGE_SIZE)
+
+          if (newChatData.length <= PAGE_SIZE) {
+            return JSON.stringify(newChatData)
+          }
+
+          const currentDataForPage = newChatData.slice(
+            -PAGE_SIZE * pageRef.current
+          )
 
           return JSON.stringify(currentDataForPage)
         }
       ),
-    [page]
+    []
   )
 
   // for effect deps, makes sure it won't re-calculate many times even with the same value
@@ -78,27 +84,31 @@ const DMByAddress = ({
     { account, toAddr },
     {
       ...POLLING_QUERY_OPTS,
-      selectFromResult: (options) => ({
-        ...options,
-        currentData: selectPostsForUser(options, page),
-      }),
+      selectFromResult: (options) => {
+        const cachedData = getLocalDmDataForAccountToAddr(account, toAddr)
+
+        return {
+          ...options,
+          currentData: selectChatDataForPage(
+            options.currentData ? JSON.parse(options.currentData) : cachedData
+          ),
+        }
+      },
     }
   )
 
-  const cachedChatData = getLocalDmDataForAccountToAddr(account, toAddr)
-  const localChatData =
-    fetchedData || (cachedChatData && JSON.stringify(cachedChatData)) || ''
-  const chatData = localChatData ? JSON.parse(localChatData) : []
+  const chatData = fetchedData ? JSON.parse(fetchedData) : []
 
   const scrollToBottomCb = React.useCallback(
     (msg: MessageUIType) => (node: any) => {
       if (node) {
-        const sentByMe = msg.fromaddr === account
+        // TODO: const sentByMe = msg.fromaddr === account
 
-        if (prevToAddr.current !== toAddr || sentByMe) {
+        if (prevToAddr.current !== toAddr) {
           node.scrollIntoView({ smooth: true })
           prevToAddr.current = toAddr
           setPage(1)
+          pageRef.current = 1
         }
       }
     },
@@ -115,7 +125,7 @@ const DMByAddress = ({
           const scrollTop = bodyElem.scrollTop || 0
 
           if (scrollTop <= scrollThreshold) {
-            // Fetch more items here
+            pageRef.current += 1
             setPage((prev) => prev + 1)
           }
         }
@@ -132,9 +142,9 @@ const DMByAddress = ({
   React.useEffect(() => {
     const newEncryptedDms = encryptedDmsStr && JSON.parse(encryptedDmsStr)
 
-    if (localChatData && newEncryptedDms && newEncryptedDms.length > 0) {
+    if (fetchedData && newEncryptedDms && newEncryptedDms.length > 0) {
       const retryFailed = async () => {
-        const newChatData = localChatData ? JSON.parse(localChatData) : []
+        const newChatData = fetchedData ? JSON.parse(fetchedData) : []
         const failedDms = newChatData.filter((msg: MessageUIType) =>
           newEncryptedDms.includes(msg.Id)
         )
@@ -161,7 +171,33 @@ const DMByAddress = ({
 
       retryFailed()
     }
-  }, [localChatData, encryptedDmsStr])
+  }, [fetchedData, encryptedDmsStr, account, toAddr])
+
+  // TODO: 'back to bottom' button
+  if (isFetching && !fetchedData) {
+    return (
+      <Flex background='white' height='100vh' flexDirection='column' flex='1'>
+        <DMHeader />
+
+        <DottedBackground className='custom-scrollbar'>
+          <Flex
+            justifyContent='center'
+            alignItems='center'
+            borderRadius='lg'
+            background='green.200'
+            p={4}
+          >
+            <Box fontSize='md'>
+              Decrypting Your Messages, Please Wait and Do Not Refresh 😊
+            </Box>
+          </Flex>
+          <Flex justifyContent='center' alignItems='center' height='100%'>
+            <Spinner />
+          </Flex>
+        </DottedBackground>
+      </Flex>
+    )
+  }
 
   // TODO: when some DMs are still encrypted due to fail or pending, show skeleton
   // instead of error message
@@ -188,30 +224,6 @@ const DMByAddress = ({
     )
   }
 
-  if (isFetching && !cachedChatData) {
-    return (
-      <Flex background='white' height='100vh' flexDirection='column' flex='1'>
-        <DMHeader />
-
-        <DottedBackground className='custom-scrollbar'>
-          <Flex
-            justifyContent='center'
-            alignItems='center'
-            borderRadius='lg'
-            background='green.200'
-            p={4}
-          >
-            <Box fontSize='md'>
-              Decrypting Your Messages, Please Wait and Do Not Refresh 😊
-            </Box>
-          </Flex>
-          <Flex justifyContent='center' alignItems='center' height='100%'>
-            <Spinner />
-          </Flex>
-        </DottedBackground>
-      </Flex>
-    )
-  }
   return (
     <Flex background='white' height='100vh' flexDirection='column' flex='1'>
       <DMHeader />

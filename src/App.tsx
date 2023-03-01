@@ -1,14 +1,6 @@
 import { Route, Routes, Navigate, Outlet } from 'react-router-dom'
-import {
-  Button,
-  Box,
-  Flex,
-  Image,
-  Heading,
-  Spinner,
-  Alert,
-  Tag,
-} from '@chakra-ui/react'
+import { Box, Flex, Image, Heading, Spinner, Tag } from '@chakra-ui/react'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
 import logoThumb from './images/logo-thumb.svg'
@@ -35,23 +27,11 @@ import CommunityByName from './scenes/Community/scenes/CommunityByName'
 import ExtensionCloseButton from './components/ExtensionCloseButton'
 
 export const App = () => {
-  const {
-    appLoading,
-    isAuthenticated,
-    connectWallet,
-    name,
-    isFetchingName,
-    account,
-    delegate,
-    web3,
-    error,
-    btnClicks,
-    setBtnClicks,
-  }: any = useWallet()
+  const { isAuthenticated, name, account, web3, delegate }: any = useWallet()
 
   const isMobileView = useIsMobileView()
 
-  if (appLoading || !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <Flex
         p={2}
@@ -62,52 +42,26 @@ export const App = () => {
         left='10px'
         right='10px'
       >
-        {/* <Header /> */}
-
         {isChromeExtension() && <ExtensionCloseButton />}
 
-        {appLoading ? (
-          <Flex w='100vw' h='100vh' justifyContent='center' alignItems='center'>
-            <Spinner />
-          </Flex>
-        ) : (
-          <Box
-            borderRadius='lg'
-            className='bg-pattern'
-            padding='70px 40px'
-            flexGrow={1}
-          >
-            <Image src={logoThumb} mb={5} width='40px' />
-            <Heading size='2xl' mb={8}>
-              Login to start chatting
-            </Heading>
-            <Button
-              variant='black'
-              onClick={() => {
-                setBtnClicks(btnClicks + 1)
-                connectWallet()
-              }}
-              size='lg'
-            >
-              Sign in using wallet
-            </Button>
-            {btnClicks > 0 && !error && (
-              <Alert status='success' variant='solid' mt={4}>
-                Check the your wallet for signature prompt to continue
-              </Alert>
-            )}
-            {error && (
-              <Alert status='error' variant='solid' mt={4}>
-                {error}
-              </Alert>
-            )}
-          </Box>
-        )}
+        <Box
+          borderRadius='lg'
+          className='bg-pattern'
+          padding='70px 40px'
+          flexGrow={1}
+        >
+          <Image src={logoThumb} mb={5} width='40px' />
+          <Heading size='2xl' mb={8}>
+            Login to start chatting
+          </Heading>
+
+          <ConnectButton chainStatus='none' showBalance={false} />
+        </Box>
       </Flex>
     )
   }
 
-  if (isAuthenticated && name === null) {
+  if (isAuthenticated && !name) {
     return (
       <Box>
         <Flex>
@@ -115,7 +69,7 @@ export const App = () => {
 
           <Sidebar />
 
-          {isFetchingName ? (
+          {name === undefined ? (
             <Flex
               justifyContent='center'
               alignItems='center'
@@ -194,9 +148,7 @@ export const App = () => {
 
                 <Route
                   path=':address'
-                  element={
-                    <DMByAddress account={account} delegate={delegate} />
-                  }
+                  element={<DMByAddress account={account} delegate={delegate} />}
                 />
               </Route>
             </Route>
@@ -225,11 +177,7 @@ export const App = () => {
               path='/nft_error'
               element={
                 <Flex>
-                  <NFT
-                    account={account}
-                    web3={web3}
-                    isAuthenticated={isAuthenticated}
-                  />
+                  <NFT account={account} web3={web3} />
                   {!isMobileView && (
                     <Flex
                       background='lightgray.200'
@@ -252,11 +200,7 @@ export const App = () => {
                 index
                 element={
                   <Flex>
-                    <NFT
-                      account={account}
-                      web3={web3}
-                      isAuthenticated={isAuthenticated}
-                    />
+                    <NFT account={account} web3={web3} />
 
                     {!isMobileView && (
                       <Flex
@@ -275,13 +219,7 @@ export const App = () => {
               <Route
                 element={
                   <Flex>
-                    {!isMobileView && (
-                      <NFT
-                        account={account}
-                        web3={web3}
-                        isAuthenticated={isAuthenticated}
-                      />
-                    )}
+                    {!isMobileView && <NFT account={account} web3={web3} />}
 
                     <Outlet />
                   </Flex>

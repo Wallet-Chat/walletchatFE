@@ -11,6 +11,7 @@ import { InboxItemType } from '@/types/InboxItem'
 const DM_DATA_LOCAL_STORAGE_KEY = 'dmData'
 const INBOX_DATA_LOCAL_STORAGE_KEY = 'inboxData'
 
+// TODO: enc to localStorage so it's not stuck on a broken state due to redux refresh
 export async function decryptMessage(data: MessageType[] | InboxItemType[]) {
   const fetchedMessages = JSON.parse(JSON.stringify(data))
   const pendingMsgs: Promise<{ decryptedFile: any }>[] = []
@@ -235,15 +236,16 @@ async function fetchAndStoreChatData(
       lastTimeMsg = localData[localData.length - 1].timestamp
     }
 
-    const data = (
-      await fetchWithBQ(
-        `${ENV.REACT_APP_REST_API}/${
-          ENV.REACT_APP_API_VERSION
-        }/getall_chatitems/${account}/${toAddr}${
-          lastTimeMsg ? `/${lastTimeMsg}` : ''
-        }`
-      )
-    ).data as unknown as MessageType[]
+    const data =
+      ((
+        await fetchWithBQ(
+          `${ENV.REACT_APP_REST_API}/${
+            ENV.REACT_APP_API_VERSION
+          }/getall_chatitems/${account}/${toAddr}${
+            lastTimeMsg ? `/${lastTimeMsg}` : ''
+          }`
+        )
+      ).data as unknown as MessageType[]) || []
 
     if (!hasLocalData) {
       console.log('✅[GET][Chat items]')

@@ -146,71 +146,55 @@ export default function Sidebar() {
 
   return (
     <Flex
-      justifyContent="space-between"
-      alignItems="center"
+      justifyContent='space-between'
+      alignItems='center'
       flexDirection={isMobile ? 'row' : 'column'}
-      borderRight="1px solid var(--chakra-colors-lightgray-400)"
-      background="white"
+      borderRight='1px solid var(--chakra-colors-lightgray-400)'
+      background='white'
       height={isMobile ? 'auto' : '100vh'}
       py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
       px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
       order={isMobile ? 2 : 0}
-      zIndex="5000"
+      zIndex='5000'
     >
-      <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
+      <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
         <Popover>
           <PopoverTrigger>
             <Box
-              padding="0.8rem"
-              cursor="pointer"
-              borderRadius="md"
+              padding='0.8rem'
+              cursor='pointer'
+              borderRadius='md'
               _hover={{ background: 'lightgray.400' }}
             >
-              <Image src={logoThumb} alt="" width="30px" />
+              <Image src={logoThumb} alt='' width='30px' />
             </Box>
           </PopoverTrigger>
-          <PopoverContent _focus={{ boxShadow: 'none' }} width="150px">
+          <PopoverContent _focus={{ boxShadow: 'none' }} width='150px'>
             <PopoverArrow />
-            <PopoverBody textAlign="left" p={5}>
-              <Text fontSize="md" fontWeight="bold">
+            <PopoverBody textAlign='left' p={5}>
+              <Text fontSize='md' fontWeight='bold'>
                 WalletChat
               </Text>
-              <CDivider my="1" />
-              <Flex alignItems="center">
-                <CLink
-                  href="https://twitter.com/wallet_chat"
-                  target="_blank"
-                >
+              <CDivider my='1' />
+              <Flex alignItems='center'>
+                <CLink href='https://twitter.com/wallet_chat' target='_blank'>
                   <IconBrandTwitter
                     stroke={1.5}
-                    color="white"
-                    fill="var(--chakra-colors-lightgray-800)"
+                    color='white'
+                    fill='var(--chakra-colors-lightgray-800)'
                   />
                 </CLink>
-                <CLink
-                  href="http://discord.gg/S47CDmDtdf"
-                  target="_blank"
-                >
-                  <Image
-                    src={IconDiscord}
-                    alt=""
-                    height="24px"
-                    width="24px"
-                  />
+                <CLink href='http://discord.gg/S47CDmDtdf' target='_blank'>
+                  <Image src={IconDiscord} alt='' height='24px' width='24px' />
                 </CLink>
                 <CLink
-                  href="https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c"
-                  target="_blank"
+                  href='https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c'
+                  target='_blank'
                 >
-                  <Image
-                    src={IconPrivacy}
-                    alt=""
-                    height="24px"
-                    width="24px"
-                  />
+                  <Image src={IconPrivacy} alt='' height='24px' width='24px' />
                 </CLink>
               </Flex>
-              <Text fontSize="sm" mt={2} color="lightgray.900">
+              <Text fontSize='sm' mt={2} color='lightgray.900'>
                 Ver. {ENV.REACT_APP_VERSION}
               </Text>
             </PopoverBody>
@@ -224,31 +208,30 @@ export default function Sidebar() {
           <>
             <LinkElem to={'/dm'}>
               {/* <Box className="popup-text">Chat</Box> */}
-              <Image src={IconDM} alt="" />
+              <Image src={IconDM} alt='' />
               {(unreadCount?.dm > 0 || unreadCount?.community > 0) && (
                 <UnreadCountContainer>
-                  <Badge variant="blue" fontSize="md">
+                  <Badge variant='blue' fontSize='md'>
                     {unreadCount?.dm}
                   </Badge>
                 </UnreadCountContainer>
               )}
-
             </LinkElem>
             <LinkElem to={'/nft'}>
-              <Image src={IconNFT} alt="" />
+              <Image src={IconNFT} alt='' />
               {unreadCount?.nft > 0 && (
                 <UnreadCountContainer>
-                  <Badge variant="blue" fontSize="md">
+                  <Badge variant='blue' fontSize='md'>
                     {unreadCount?.nft}
                   </Badge>
                 </UnreadCountContainer>
               )}
             </LinkElem>
             <LinkElem to={'/community'}>
-              <Image src={IconCommunity} alt="" />
+              <Image src={IconCommunity} alt='' />
               {unreadCount?.community > 0 && (
                 <UnreadCountContainer>
-                  <Badge variant="blue" fontSize="md">
+                  <Badge variant='blue' fontSize='md'>
                     {unreadCount?.community}
                   </Badge>
                 </UnreadCountContainer>
@@ -263,18 +246,18 @@ export default function Sidebar() {
               <Image
                 src={imageUrl}
                 fallbackSrc={animatedPlaceholder}
-                alt=""
-                height="40px"
-                borderRadius="var(--chakra-radii-xl)"
+                alt=''
+                height='40px'
+                borderRadius='var(--chakra-radii-xl)'
               />
             )}
             {nftNotificationCount > 0 && (
               <Badge
-                variant="black"
-                position="absolute"
-                bottom="0"
-                right="0"
-                fontSize="lg"
+                variant='black'
+                position='absolute'
+                bottom='0'
+                right='0'
+                fontSize='lg'
               >
                 {nftNotificationCount}
               </Badge>
@@ -282,7 +265,7 @@ export default function Sidebar() {
           </LinkElem2>
         )}
       </Flex>
-      <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems="center">
+      <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
         {/* <Button
                size="sm"
                background="lightgray.200"
@@ -317,17 +300,17 @@ export default function Sidebar() {
               </>
             )}
           </MenuButton>
-          <MenuList pb={0} borderColor="darkgray.100">
+          <MenuList pb={0} borderColor='darkgray.100'>
             <MenuGroup
               title={name || (account && truncateAddress(account))}
-              fontSize="lg"
+              fontSize='lg'
             >
               <MenuItem
                 as={NavLink}
-                to="/me/change-name"
+                to='/me/change-name'
                 icon={
                   <Box>
-                    <IconPencil stroke="1.5" />
+                    <IconPencil stroke='1.5' />
                   </Box>
                 }
                 _hover={{ textDecoration: 'none' }}
@@ -336,10 +319,10 @@ export default function Sidebar() {
               </MenuItem>
               <MenuItem
                 as={NavLink}
-                to="/me/change-email"
+                to='/me/change-email'
                 icon={
                   <Box>
-                    <IconBell stroke="1.5" />
+                    <IconBell stroke='1.5' />
                   </Box>
                 }
                 _hover={{ textDecoration: 'none' }}
@@ -350,81 +333,66 @@ export default function Sidebar() {
                 onClick={() => disconnectWallet()}
                 icon={
                   <Box>
-                    <IconLogout stroke="1.5" />
+                    <IconLogout stroke='1.5' />
                   </Box>
                 }
               >
                 Sign out
               </MenuItem>
             </MenuGroup>
-            <>
-              <MenuDivider />
-              <MenuItem
-                onClick={() => walletRequestPermissions()}
-                icon={
-                  <Box>
-                    <IconSwitchHorizontal stroke="1.5" />
-                  </Box>
-                }
-              >
-                Switch Accounts
-                <Text fontSize="sm" color="darkgray.400">
-                  First selected account will be used
-                </Text>
-              </MenuItem>
-            </>
-            <MenuDivider borderColor="lightgray.500" />
+            <MenuDivider borderColor='lightgray.500' />
             <MenuGroup>
               <MenuItem
                 as={NavLink}
-                to="/dm/0x17FA0A61bf1719D12C08c61F211A063a58267A19"
+                to='/dm/0x17FA0A61bf1719D12C08c61F211A063a58267A19'
                 icon={
                   <Box>
-                    <IconMessagePlus stroke="1.5" />
+                    <IconMessagePlus stroke='1.5' />
                   </Box>
                 }
                 _hover={{ textDecoration: 'none' }}
               >
                 Feedback &amp; Suggestions
               </MenuItem>
-              <Flex justifyContent="space-between" alignItems="center" px={3} background="lightgray.300" pb={1} borderRadius="md" mt={2}>
-                <Text fontSize="sm" mt={2} color="lightgray.900">
+              <Flex
+                justifyContent='space-between'
+                alignItems='center'
+                px={3}
+                background='lightgray.300'
+                pb={1}
+                borderRadius='md'
+                mt={2}
+              >
+                <Text fontSize='sm' mt={2} color='lightgray.900'>
                   WalletChat Ver. {ENV.REACT_APP_VERSION}
                 </Text>
-                <Flex alignItems="center">
-                  <CLink
-                    href="https://twitter.com/wallet_chat"
-                    target="_blank"
-                  >
+                <Flex alignItems='center'>
+                  <CLink href='https://twitter.com/wallet_chat' target='_blank'>
                     <IconBrandTwitter
-                      fill="var(--chakra-colors-lightgray-800)"
-                      stroke="none"
+                      fill='var(--chakra-colors-lightgray-800)'
+                      stroke='none'
                     />
                   </CLink>
-                  <CLink
-                    href="http://discord.gg/S47CDmDtdf"
-                    target="_blank"
-                  >
+                  <CLink href='http://discord.gg/S47CDmDtdf' target='_blank'>
                     <Image
                       src={IconDiscord}
-                      alt=""
-                      height="24px"
-                      width="24px"
+                      alt=''
+                      height='24px'
+                      width='24px'
                     />
                   </CLink>
                   <CLink
-                    href="https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c"
-                    target="_blank"
+                    href='https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c'
+                    target='_blank'
                   >
                     <Image
                       src={IconPrivacy}
-                      alt=""
-                      height="24px"
-                      width="24px"
+                      alt=''
+                      height='24px'
+                      width='24px'
                     />
                   </CLink>
                 </Flex>
-
               </Flex>
             </MenuGroup>
           </MenuList>
@@ -435,117 +403,117 @@ export default function Sidebar() {
 }
 
 const LinkElem = styled(NavLink)`
-   position: relative;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   width: 60px;
-   height: 60px;
-   padding: var(--chakra-space-2);
-   margin-bottom: 0.2rem;
-   border-radius: 0.5rem;
-   text-align: center;
-   box-sizing: border-box;
-   background: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  padding: var(--chakra-space-2);
+  margin-bottom: 0.2rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  box-sizing: border-box;
+  background: #fff;
 
-   &::before {
-      content: '';
-      width: 5px;
-      height: 35%;
-      position: absolute;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
-      background: transparent;
-      border-top-right-radius: 0.2rem;
-      border-bottom-right-radius: 0.2rem;
-   }
+  &::before {
+    content: '';
+    width: 5px;
+    height: 35%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: transparent;
+    border-top-right-radius: 0.2rem;
+    border-bottom-right-radius: 0.2rem;
+  }
 
-   img {
-      opacity: 0.6;
-   }
+  img {
+    opacity: 0.6;
+  }
 
-   &:hover,
-   &.active {
-      background: var(--chakra-colors-lightgray-400);
+  &:hover,
+  &.active {
+    background: var(--chakra-colors-lightgray-400);
 
-      &::before {
-         background: var(--chakra-colors-darkgray-900);
-      }
-
-      svg {
-         stroke: var(--chakra-colors-darkgray-900);
-      }
-      img {
-         opacity: 1;
-      }
-   }
-
-   &:hover {
-      .popup-text {
-         transform: translateY(20%);
-         opacity: 1;
-      }
-   }
-
-   .popup-text {
-      position: absolute;
-      left: 0;
-      bottom: 0;
+    &::before {
       background: var(--chakra-colors-darkgray-900);
-      color: white;
-      transform: translateY(50%);
-      border-radius: 0.5rem;
-      width: 100%;
-      opacity: 0;
-      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-      font-size: var(--chakra-fontSizes-md);
-   }
+    }
+
+    svg {
+      stroke: var(--chakra-colors-darkgray-900);
+    }
+    img {
+      opacity: 1;
+    }
+  }
+
+  &:hover {
+    .popup-text {
+      transform: translateY(20%);
+      opacity: 1;
+    }
+  }
+
+  .popup-text {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: var(--chakra-colors-darkgray-900);
+    color: white;
+    transform: translateY(50%);
+    border-radius: 0.5rem;
+    width: 100%;
+    opacity: 0;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    font-size: var(--chakra-fontSizes-md);
+  }
 `
 const LinkElem2 = styled(LinkElem)`
-   background: var(--chakra-colors-lightgray-200);
+  background: var(--chakra-colors-lightgray-200);
 `
 const AccountInfo = styled.button`
-   padding: 0.6rem 0.8rem;
-   border-radius: var(--chakra-radii-md);
-   /* border-bottom-left-radius: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--chakra-radii-md);
+  /* border-bottom-left-radius: 0.5rem;
    border-bottom-right-radius: 0.5rem; */
-   margin-bottom: .3rem;
-   text-align: center;
-   background: var(--chakra-colors-lightgray-400);
-   border: 1px solid var(--chakra-colors-lightgray-900);
-   /* border-top: none; */
+  margin-bottom: 0.3rem;
+  text-align: center;
+  background: var(--chakra-colors-lightgray-400);
+  border: 1px solid var(--chakra-colors-lightgray-900);
+  /* border-top: none; */
 
-   & > span {
-      display: flex;
-      flex-flow: column nowrap;
-      align-items: center;
-   }
+  & > span {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+  }
 
-   &:hover {
-      background: var(--chakra-colors-lightgray-500);
-   }
+  &:hover {
+    background: var(--chakra-colors-lightgray-500);
+  }
 `
 const Divider = styled.div`
-   display: block;
-   width: ${isMobile ? '1px' : '100%'};
-   height: ${isMobile ? '100%' : '1px'};
-   &::before {
-      content: '';
-      display: block;
-      margin: 0 auto;
-      width: ${isMobile ? '1px' : '40px'};
-      height: ${isMobile ? '40px' : '1px'};
-      border-bottom: 1px solid #cbcbcb;
-      border-right: 1px solid #cbcbcb;
-   }
+  display: block;
+  width: ${isMobile ? '1px' : '100%'};
+  height: ${isMobile ? '100%' : '1px'};
+  &::before {
+    content: '';
+    display: block;
+    margin: 0 auto;
+    width: ${isMobile ? '1px' : '40px'};
+    height: ${isMobile ? '40px' : '1px'};
+    border-bottom: 1px solid #cbcbcb;
+    border-right: 1px solid #cbcbcb;
+  }
 `
 const UnreadCountContainer = styled.div`
-   position: absolute;
-   top: 0;
-   right: 0;
-   overflow: hidden;
-   background: var(--chakra-colors-information-400);
-   border-radius: var(--chakra-radii-md);
-   border: 2px solid #fff;
+  position: absolute;
+  top: 0;
+  right: 0;
+  overflow: hidden;
+  background: var(--chakra-colors-information-400);
+  border-radius: var(--chakra-radii-md);
+  border: 2px solid #fff;
 `

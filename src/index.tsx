@@ -1,7 +1,14 @@
-import React from 'react';
+import React from 'react'
 import { ColorModeScript, ChakraProvider } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
+
+import '@rainbow-me/rainbowkit/styles.css'
+import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { configureChains, createClient, WagmiConfig } from 'wagmi'
+import { mainnet, polygon, optimism } from 'wagmi/chains'
+import { infuraProvider } from '@wagmi/core/providers/infura'
+import { publicProvider } from 'wagmi/providers/public'
 
 import { Provider } from 'react-redux'
 import { App } from './App'
@@ -11,20 +18,40 @@ import WalletProvider from './context/WalletProvider'
 import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
+import * as ENV from '@/constants/env'
 
+const { chains, provider } = configureChains(
+  [mainnet, polygon, optimism],
+  [infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }), publicProvider()]
+)
+
+const { connectors } = getDefaultWallets({
+  appName: 'WalletChat',
+  chains,
+})
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider,
+})
 
 ReactDOM.render(
   <React.StrictMode>
     <ColorModeScript />
     <Provider store={store}>
       <BrowserRouter>
-        <WalletProvider>
-          <UnreadCountProvider>
-            <ChakraProvider theme={theme}>
-              <App />
-            </ChakraProvider>
-          </UnreadCountProvider>
-        </WalletProvider>
+        <WagmiConfig client={wagmiClient}>
+          <RainbowKitProvider chains={chains}>
+            <WalletProvider>
+              <UnreadCountProvider>
+                <ChakraProvider theme={theme}>
+                  <App />
+                </ChakraProvider>
+              </UnreadCountProvider>
+            </WalletProvider>
+          </RainbowKitProvider>
+        </WagmiConfig>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,
