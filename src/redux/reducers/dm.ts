@@ -4,7 +4,7 @@ import { createErrorResponse } from '@/redux/reducers/helpers'
 import { prepareHeaderCredentials } from '@/helpers/fetch'
 import * as ENV from '@/constants/env'
 import { RootState } from '@/redux/store'
-import { MessageType } from '@/types/Message'
+import { MessageType, MessageUIType } from '@/types/Message'
 import storage from '@/utils/storage'
 import lit from '@/utils/lit'
 import { InboxItemType } from '@/types/InboxItem'
@@ -48,7 +48,7 @@ export function updateLocalEncDmIdsByAddrByAcc(
 }
 
 export async function decryptMessage(
-  data: MessageType[] | InboxItemType[],
+  data: MessageType[] | InboxItemType[] | MessageUIType[],
   account: string,
   toAddr: string
 ) {
@@ -309,7 +309,6 @@ async function fetchAndStoreChatData(
       ).data as unknown as MessageType[]) || []
 
     if (data.length === 0) {
-      addLocalDmDataForAccountToAddr(account, toAddr, [])
       return { data: JSON.stringify(localData) }
     }
 

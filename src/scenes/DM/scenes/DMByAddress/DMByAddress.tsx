@@ -5,7 +5,7 @@ import { createSelector } from '@reduxjs/toolkit'
 import { useAppSelector } from '@/hooks/useSelector'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { POLLING_QUERY_OPTS } from '@/constants'
-import { MessageUIType } from '../../../../types/Message'
+import { MessageUIType } from '@/types/Message'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import DMHeader from './DMHeader'
@@ -33,6 +33,7 @@ const DMByAddress = ({
   const bodyRef = React.useRef()
   const maxPages = React.useRef(1)
   const pageRef = React.useRef<number>(1)
+  const fullChatData = React.useRef<undefined | MessageUIType[]>()
 
   const dispatch = useAppDispatch()
   const prevLastMsg = React.useRef<number | undefined>()
@@ -82,6 +83,8 @@ const DMByAddress = ({
       ...POLLING_QUERY_OPTS,
       selectFromResult: (options) => {
         const cachedData = getLocalDmDataForAccountToAddr(account, toAddr)
+        fullChatData.current =
+          options.currentData && JSON.parse(options.currentData)
 
         return {
           ...options,
@@ -108,7 +111,7 @@ const DMByAddress = ({
         }
       }
     },
-    [toAddr]
+    []
   )
 
   React.useEffect(() => {
@@ -137,10 +140,11 @@ const DMByAddress = ({
 
   React.useEffect(() => {
     const newEncryptedDms = encryptedDmsStr && JSON.parse(encryptedDmsStr)
+    const allDms = fullChatData.current
 
-    if (fetchedData && newEncryptedDms && newEncryptedDms.length > 0) {
+    if (allDms && newEncryptedDms && newEncryptedDms.length > 0) {
       const retryFailed = async () => {
-        const newChatData = fetchedData ? JSON.parse(fetchedData) : []
+        const newChatData = allDms || []
         const failedDms = newChatData.filter((msg: MessageUIType) =>
           newEncryptedDms.includes(msg.Id)
         )
@@ -171,7 +175,7 @@ const DMByAddress = ({
 
       retryFailed()
     }
-  }, [fetchedData, encryptedDmsStr, account, toAddr])
+  }, [encryptedDmsStr, account, toAddr])
 
   // TODO: 'back to bottom' button
   if (isFetching && !fetchedData) {
@@ -252,7 +256,10 @@ const DMByAddress = ({
           const isLast = i === chatData.length - 1
 
           return (
-            <Box key={msg.Id} ref={isLast ? scrollToBottomCb(msg) : undefined}>
+            <Box
+              key={`${toAddr}_${msg.Id}`}
+              ref={isLast ? scrollToBottomCb(msg) : undefined}
+            >
               <ChatMessage context='dm' account={account} msg={msg} />
             </Box>
           )
