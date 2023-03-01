@@ -151,8 +151,7 @@ const DMByAddress = ({
 
         const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
           failedDms,
-          account,
-          toAddr
+          account
         )
 
         fetchedMessages.forEach((msg: MessageUIType) => {
@@ -257,7 +256,7 @@ const DMByAddress = ({
 
           return (
             <Box
-              key={`${toAddr}_${msg.Id}`}
+              key={`${String(i)}_${msg.Id}`}
               ref={isLast ? scrollToBottomCb(msg) : undefined}
             >
               <ChatMessage context='dm' account={account} msg={msg} />

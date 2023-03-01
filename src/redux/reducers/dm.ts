@@ -49,8 +49,7 @@ export function updateLocalEncDmIdsByAddrByAcc(
 
 export async function decryptMessage(
   data: MessageType[] | InboxItemType[] | MessageUIType[],
-  account: string,
-  toAddr: string
+  account: string
 ) {
   const fetchedMessages = JSON.parse(JSON.stringify(data))
   const pendingMsgs: Promise<{ decryptedFile: any }>[] = []
@@ -87,7 +86,7 @@ export async function decryptMessage(
     }
   }
 
-  const failedDecryptMsgs: number[] = []
+  const failedDecryptMsgs: any[] = []
   await Promise.allSettled(pendingMsgs).then((messages) => {
     messages.forEach((result, i) => {
       const rawmsg = (
@@ -100,14 +99,23 @@ export async function decryptMessage(
       if (rawmsg?.decryptedFile?.toString()) {
         fetchedMessages[i].message = rawmsg.decryptedFile.toString()
       } else {
-        failedDecryptMsgs.push(fetchedMessages[i].Id)
+        failedDecryptMsgs.push(fetchedMessages[i])
       }
     })
   })
 
   console.log('✅[POST][Decrypt DMs]')
 
-  updateLocalEncDmIdsByAddrByAcc(account, toAddr, failedDecryptMsgs)
+  failedDecryptMsgs.forEach((msg, i) => {
+    updateLocalEncDmIdsByAddrByAcc(
+      account,
+      msg.toaddr === account ? msg.fromaddr : msg.toaddr,
+      failedDecryptMsgs[i]
+    )
+
+    failedDecryptMsgs[i] = failedDecryptMsgs[i].Id
+  })
+
   return { fetchedMessages, failedDecryptMsgs }
 }
 
@@ -320,8 +328,7 @@ async function fetchAndStoreChatData(
 
     const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
       data,
-      account,
-      toAddr
+      account
     )
 
     dispatch(addEncryptedDmIds({ account, toAddr, data: failedDecryptMsgs }))
@@ -333,7 +340,7 @@ async function fetchAndStoreChatData(
 
     return { data: JSON.stringify(allChats) }
   } catch (error) {
-    console.error('🚨[GET][Chat items]:', error)
+    console.log('🚨[GET][Chat items]:', error)
     return { data: '' }
   }
 }
@@ -451,31 +458,18 @@ export const dmApi = createApi({
           if (newInboxData.length > 0) {
             console.log('✅[GET][Inbox]:', data)
 
-            newInboxData.forEach(async (msg) => {
-              const toAddr = msg.toaddr
+            const { fetchedMessages } = await decryptMessage(
+              newInboxData,
+              account
+            )
 
-              const { fetchedMessages } = await decryptMessage(
-                [msg],
-                account,
-                toAddr
-              )
-
-              updateLocalInboxDataForAccount(account, fetchedMessages)
-
-              fetchAndStoreChatData(
-                { account, toAddr: msg.toaddr },
-                { dispatch },
-                {},
-                fetchWithBQ
-              )
-            })
-
+            updateLocalInboxDataForAccount(account, fetchedMessages)
             return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
           }
 
           return { data: '' }
         } catch (error) {
-          console.error('🚨[GET][Inbox]:', error)
+          console.log('🚨[GET][Inbox]:', error)
           return { data: '' }
         }
       },
