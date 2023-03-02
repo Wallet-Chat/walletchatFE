@@ -324,7 +324,7 @@ const WalletProvider = React.memo(({ children }) => {
             .then(async (data) => {
                console.log('✅[POST][Welcome]:', data.msg)
                //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
-               if (!data.msg.includes(_account.toLocaleLowerCase())) {
+               if (!data.msg.includes(_account.toLocaleLowerCase()) && !_account.includes(localStorage.getItem('delegate')) ) {
                   //GET JWT
                   fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
                      method: 'GET',
@@ -390,6 +390,7 @@ const WalletProvider = React.memo(({ children }) => {
                         const walletInJWT = parseJwt(data.access).sub
                         if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
                            console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                           localStorage.setItem('delegate', _account)
                            setDelegate(_account) //not sure this is used anymore
                            _account = walletInJWT
                         }
@@ -483,6 +484,7 @@ const WalletProvider = React.memo(({ children }) => {
                      const walletInJWT = parseJwt(data.access).sub
                      if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
                         console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                        localStorage.setItem('delegate', _account)
                         setDelegate(_account) //not sure this is used anymore
                         _account = walletInJWT
                      }
