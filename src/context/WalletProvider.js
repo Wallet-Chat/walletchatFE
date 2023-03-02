@@ -416,6 +416,18 @@ const WalletProvider = React.memo(({ children }) => {
                 //"Welcome:" + addrnameDB.Name + ":Addr:" + Authuser.Address (backend response)
                 setName(data.msg.toString().split(':')[1])
                 console.log('✅[Name: ]:', name)
+                const walletInJWT = parseJwt(localStorage.getItem('jwt')).sub
+               if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase() &&
+                   _account.toLocaleLowerCase() === localStorage.getItem('delegate').toLocaleLowerCase()) {
+                  console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                  localStorage.setItem('delegate', _account)
+                  setDelegate(_account) //not sure this is used anymore
+                  _account = walletInJWT
+                  setAccount(_account)
+                  getName(_account)
+                  setAuthenticated(true)
+                  getSettings(_account)
+               }
              }
             })
             .catch((error) => {
