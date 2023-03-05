@@ -22,6 +22,7 @@ import MyNFTs from './components/MyNFTs'
 import NFTInboxSearchInput from './components/NFTInboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
+import lit from '../../utils/lit'
 
 
 const NFTInbox = ({
@@ -118,15 +119,47 @@ const NFTInbox = ({
          },
       })
          .then((response) => response.json())
-         .then((data: InboxItemType[]) => {
+       .then(async (data: InboxItemType[]) => {
             if (data === null) {
                setInboxData([])
-               localStorage['inbox_' + account] = JSON.stringify([])
-            } else if (equal(inboxData, data) !== true) {
-               console.log('✅[GET][Inbox]:', data, inboxData, equal(inboxData, data))
-               setInboxData(data)
-               localStorage['inbox_' + account] = JSON.stringify(data) //replica)
-            }
+               localStorage['inbox_' + account] =  JSON.stringify([])
+            } else {
+	    	if (account.includes(".eth") || account.startsWith("0x")) {  //only encrypt ethereum for now
+			if (!localStorage['inboxEnc_' + account] || equal(JSON.parse(localStorage['inboxEnc_' + account]), data) !== true) {
+	               console.log('✅[GET][Inbox]:', data)
+	               //setEncChatData(data)
+	               localStorage['inboxEnc_' + account] = JSON.stringify(data)
+
+	               const replica = JSON.parse(JSON.stringify(data));
+	               // Get data from LIT and replace the message with the decrypted text
+	               for (let i = 0; i < replica.length; i++) {
+	                  if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+	                     const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+                     
+	                     console.log('✅[POST][Decrypt GetInbox Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+	                     const blob = lit.b64toBlob(replica[i].message)
+	                     //after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+	                     //this is done to support legacy messages (new databases wouldn't need this)
+	                     if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
+	                        const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+	                        replica[i].message = rawmsg.decryptedFile.toString()
+	                     } else {
+	                        const rawmsg = await lit.decryptStringOrig(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+	                        replica[i].message = rawmsg.decryptedFile.toString()
+	                     }
+	                  }
+	               }
+	               setInboxData(replica)
+	               //setInboxData(data)
+	               localStorage['inbox_' + account] = JSON.stringify(replica)
+	            }
+		} else if (equal(inboxData, data) !== true) {
+	               console.log('✅[GET][Inbox]:', data)
+	               setInboxData(data)
+	               localStorage['inbox_' + account] = JSON.stringify(data)
+	            }
+	    }
+
             setIsFetchingInboxData(false)
             semaphore = false;
          })

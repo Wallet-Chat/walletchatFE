@@ -95,21 +95,33 @@ const Inbox = ({
                //setEncChatData(data)
                localStorage['inboxEnc_' + account] = JSON.stringify(data)
  
-               // const replica = JSON.parse(JSON.stringify(data));
-               // // Get data from LIT and replace the message with the decrypted text
-               // for (let i = 0; i < replica.length; i++) {
-               //    if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-               //       const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+ 	if (account.includes(".eth") || account.startsWith("0x")) {  //only encrypt ethereum for now
+               const replica = JSON.parse(JSON.stringify(data));
+               // Get data from LIT and replace the message with the decrypted text
+               for (let i = 0; i < replica.length; i++) {
+                  if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+                     const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
                      
-               //       console.log('✅[POST][Decrypt GetInbox Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-               //       const blob = lit.b64toBlob(replica[i].message)
-               //       const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
-               //       replica[i].message = rawmsg.decryptedFile.toString()
-               //    }
-               // }
-               // setInboxData(replica)
+                     console.log('✅[POST][Decrypt GetInbox Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                     const blob = lit.b64toBlob(replica[i].message)
+
+                     //after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+                     //this is done to support legacy messages (new databases wouldn't need this)
+                     if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
+                        const rawmsg = await lit.decryptString(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        replica[i].message = rawmsg.decryptedFile.toString()
+                     } else {
+                        const rawmsg = await lit.decryptStringOrig(blob, replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                        replica[i].message = rawmsg.decryptedFile.toString()
+                     }
+                  }
+               }
+                setInboxData(replica)
+		localStorage['inbox_' + account] = JSON.stringify(replica)
+	       } else {
                setInboxData(data)
                localStorage['inbox_' + account] = JSON.stringify(data) //replica)
+	       }
             }
             setIsFetchingInboxData(false)
             semaphore = false;

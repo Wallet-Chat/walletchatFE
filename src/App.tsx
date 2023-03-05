@@ -50,6 +50,7 @@ export const App = () => {
       name,
       isFetchingName,
       account,
+      delegate,
       web3,
       error,
       setRedirectUrl,
@@ -250,6 +251,7 @@ export const App = () => {
                               {!isMobileView && inbox}
                               <Chat
                                  account={account}
+                                 delegate={delegate}
                                  web3={web3}
                                  isAuthenticated={isAuthenticated}
                               />
