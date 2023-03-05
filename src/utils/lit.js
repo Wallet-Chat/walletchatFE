@@ -54,7 +54,8 @@ class Lit {
       await this.connect()
     }
   }
-  async encryptString(str, accessControlConditions) {
+
+  async encryptString(str, unifiedAccessControlConditions) {
     if (!this.litNodeClient) {
       await this.connect()
     }
@@ -68,7 +69,7 @@ class Lit {
     const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(str)
 
     const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
-      accessControlConditions: accessControlConditions,
+      unifiedAccessControlConditions: unifiedAccessControlConditions,
       symmetricKey,
       authSig,
       chain,
@@ -80,7 +81,7 @@ class Lit {
     }
   }
 
-  async decryptString(encryptedStr, encryptedSymmetricKey, accessControlConditionz) {
+  async decryptString(encryptedStr, encryptedSymmetricKey, unifiedAccessControlConditions) {
     if (!this.litNodeClient) {
       await this.connect()
     }
@@ -91,7 +92,36 @@ class Lit {
       authSig = JSON.parse(authSig);
     }
     const symmetricKey = await this.litNodeClient.getEncryptionKey({
-      accessControlConditions: accessControlConditionz,
+      unifiedAccessControlConditions: unifiedAccessControlConditions,
+      toDecrypt: encryptedSymmetricKey,
+      chain,
+      authSig
+    })
+    const decryptedFile = await LitJsSdk.decryptString(
+      encryptedStr,
+      symmetricKey
+    );
+    // eslint-disable-next-line no-console
+    // console.log({
+    //   decryptedFile
+    // })
+    return { decryptedFile }
+  }
+
+  //when delegate.cash was added, the contract call condition changed the access control condition type
+  //this is here to support legacy messages
+  async decryptStringOrig(encryptedStr, encryptedSymmetricKey, _accessControlConditions) {
+    if (!this.litNodeClient) {
+      await this.connect()
+    }
+    let authSig = localStorage.getItem("lit-auth-signature");
+    if (!authSig) {
+     authSig = await LitJsSdk.checkAndSignAuthMessage({ chain })
+    } else {
+      authSig = JSON.parse(authSig);
+    }
+    const symmetricKey = await this.litNodeClient.getEncryptionKey({
+      accessControlConditions: _accessControlConditions,
       toDecrypt: encryptedSymmetricKey,
       chain,
       authSig

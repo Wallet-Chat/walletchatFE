@@ -105,6 +105,7 @@ const WalletProvider = React.memo(({ children }) => {
    const [notify24, setNotify24] = useState('true')
    const [isFetchingName, setIsFetchingName] = useState(true)
    const [account, setAccount] = useState(null)
+   const [delegate, setDelegate] = useState(null)
    const [accounts, setAccounts] = useState(null)
    const [web3, setWeb3] = useState(null)
    const [isAuthenticated, setAuthenticated] = useState(false)
@@ -306,7 +307,21 @@ const WalletProvider = React.memo(({ children }) => {
   
       return JSON.parse(jsonPayload);
    }
+   const walletRequestPermissions = async () => {
+      const instance = await web3Modal.connect()
+            setWeb3ModalProvider(instance)
+            let _provider = new ethers.providers.Web3Provider(instance)
+            let _account = await _provider.getSigner().getAddress()
 
+         await _provider.provider.request({
+            method: 'wallet_requestPermissions',
+            params: [
+               {
+                  eth_accounts: {},
+               },
+            ],
+         })
+   }
    const connectWallet = async () => {
       console.log('connectWallet')
       try {
@@ -347,7 +362,7 @@ const WalletProvider = React.memo(({ children }) => {
             .then(async (data) => {
                console.log('✅[POST][Welcome]:', data.msg)
                //console.log('msg log: ', data.msg.toString().includes(_account.toLocaleLowerCase()), _account.toString())
-               if (!data.msg.includes(_account.toLocaleLowerCase())) {
+               if (!data.msg.includes(_account.toLocaleLowerCase()) && !_account.includes(localStorage.getItem('delegate')) ) {
                   //GET JWT
                   fetch(` ${process.env.REACT_APP_REST_API}/users/${_account}/nonce`, {
                      method: 'GET',
@@ -412,19 +427,26 @@ const WalletProvider = React.memo(({ children }) => {
                      .then(async (data) => {
                         localStorage.setItem('jwt', data.access);
                         //Used for LIT encryption authSign parameter
-                        //localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
-                        //localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                        localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
+                        localStorage.setItem('lit-web3-provider', _provider.connection.url)
+                        Lit.connectManual()
                         console.log('✅[INFO][JWT]:', data.access)
 
                         //if we log in with a full delegate, act as the vault
                         const walletInJWT = parseJwt(data.access).sub
                         if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
                            console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                           localStorage.setItem('delegate', _account)
+                           setDelegate(_account) //not sure this is used anymore
                            _account = walletInJWT
-                           setAccount(_account)
-                           getName(_account)
-                           getSettings(_account)
                         }
+
+                        setAccount(_account)
+                        // setChainId(chainId)
+                        getName(_account)
+                        setAuthenticated(true)
+                        getSettings(_account)
+                        setWeb3(_web3)
                      })
                   })
                   .catch((error) => {
@@ -433,6 +455,25 @@ const WalletProvider = React.memo(({ children }) => {
                   //END JWT AUTH sequence
 
              //below part of /welcome check for existing token     
+             }
+             else {
+                //already logged in
+                console.log('✅[POST][Welcome]:', data.msg)
+                //"Welcome:" + addrnameDB.Name + ":Addr:" + Authuser.Address (backend response)
+                setName(data.msg.toString().split(':')[1])
+                console.log('✅[Name: ]:', name)
+                const walletInJWT = parseJwt(localStorage.getItem('jwt')).sub
+               if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase() &&
+                   _account.toLocaleLowerCase() === localStorage.getItem('delegate').toLocaleLowerCase()) {
+                  console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                  localStorage.setItem('delegate', _account)
+                  setDelegate(_account) //not sure this is used anymore
+                  _account = walletInJWT
+                  setAccount(_account)
+                  getName(_account)
+                  setAuthenticated(true)
+                  getSettings(_account)
+               }
              }
             })
             .catch((error) => {
@@ -493,19 +534,26 @@ const WalletProvider = React.memo(({ children }) => {
                   .then(async (data) => {
                      localStorage.setItem('jwt', data.access);
                      //Used for LIT encryption authSign parameter
-                     // localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
-                     // localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                     localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                     localStorage.setItem('lit-web3-provider', _provider.connection.url);
+                     Lit.connectManual()
                      console.log('✅[INFO][JWT]:', data.access)
-
                      //if we log in with a full delegate, act as the vault
                      const walletInJWT = parseJwt(data.access).sub
                      if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase()) {
                         console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
+                        localStorage.setItem('delegate', _account)
+                        setDelegate(_account) //not sure this is used anymore
                         _account = walletInJWT
-                        setAccount(_account)
-                        getName(_account)
-                        getSettings(_account)
                      }
+
+                     setAccount(_account)
+                     // setChainId(chainId)
+                     getName(_account)
+                     setAuthenticated(true)
+                     getSettings(_account)
+                     setWeb3(_web3)
+                     
                   })
                   .catch((error) => {
                      console.error('🚨[GET][Sign-In Failed]:', error)
@@ -534,8 +582,8 @@ const WalletProvider = React.memo(({ children }) => {
             setAppLoading(true)
             setAccount(_account)
             // setChainId(chainId)
-            setAuthenticated(true)
             getName(_account)
+            setAuthenticated(true)
             getSettings(_account)
             setWeb3(_web3)
 
@@ -556,21 +604,7 @@ const WalletProvider = React.memo(({ children }) => {
       }
    }
 
-   const walletRequestPermissions = async () => {
-      const instance = await web3Modal.connect()
-            setWeb3ModalProvider(instance)
-            let _provider = new ethers.providers.Web3Provider(instance)
-            let _account = await _provider.getSigner().getAddress()
 
-         await _provider.provider.request({
-            method: 'wallet_requestPermissions',
-            params: [
-               {
-                  eth_accounts: {},
-               },
-            ],
-         })
-   }
 
    const connectWalletTezos = async () => {
       console.log('connectWallet Tezos')
@@ -989,6 +1023,7 @@ const WalletProvider = React.memo(({ children }) => {
             isFetchingName,
             account,
             accounts,
+            delegate, //delegateCash wallet with FULL delegation (type 1)
             walletRequestPermissions,
             disconnectWallet,
             connectWallet,

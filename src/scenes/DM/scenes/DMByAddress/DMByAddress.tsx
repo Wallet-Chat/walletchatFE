@@ -36,10 +36,12 @@ import ScrollToBottom from 'react-scroll-to-bottom';
 
 const DMByAddress = ({
    account,
+   delegate,
    web3,
    isAuthenticated,
 }: {
    account: string
+   delegate: string
    web3: Web3
    isAuthenticated: boolean
 }) => {
@@ -227,51 +229,76 @@ const DMByAddress = ({
          .then(async (data: MessageType[]) => {
             if (chatData.length > 0) {
                if (data.length > 0) {
-                  // //START LIT ENCRYPTION
-                  // localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(encryptedChatData.concat(data))
-                  // setEncChatData(encryptedChatData.concat(data))
+                  let allChats = chatData
+                  if (account.includes(".eth") || account.startsWith("0x")) {  //only encrypt ethereum for now
+                        //START LIT ENCRYPTION
+                        localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(encryptedChatData.concat(data))
+                        setEncChatData(encryptedChatData.concat(data))
 
-                  // const replica = JSON.parse(JSON.stringify(data));
-                  // // Get data from LIT and replace the message with the decrypted text
-                  // for (let i = 0; i < replica.length; i++) {
-                  //    if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-                  //       const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
-                        
-                  //       //console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                  //       const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                  //       replica[i].message = rawmsg.decryptedFile.toString()
-                  //    }
-                  // }
-                  // //END LIT ENCRYPTION
-                  let allChats = chatData.concat(data) //replica)
+                        const replica = JSON.parse(JSON.stringify(data));
+                        // Get data from LIT and replace the message with the decrypted text
+                        for (let i = 0; i < replica.length; i++) {
+                           if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+                              const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+                              
+                              //console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                              //after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+                              //this is done to support legacy messages (new databases wouldn't need this)
+                              if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
+                                 //console.log('✅[INFO][Using Orig Decrypt Conditions]')
+                                 const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                                 replica[i].message = rawmsg.decryptedFile.toString()
+                              } else {
+                                 const rawmsg = await lit.decryptStringOrig(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                                 replica[i].message = rawmsg.decryptedFile.toString()
+                              }
+                           }
+                        }
+                     allChats = chatData.concat(replica)
+                  } else {
+                     //END LIT ENCRYPTION
+                     allChats = chatData.concat(data) //replica)
+                  }
                   setChatData(allChats)
                   localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(allChats) //store so when user switches views, data is ready
                   console.log('✅[GET][New Chat items]:', data)
                }
             } else {
-               //if (equal(data, encryptedChatData) === false) {
-               if (equal(data, chatData) === false) {
-                  console.log('✅[GET][Chat items]:', data)
-                  // //START LIT ENCRYPTION
-                  // localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data)
-                  // setEncChatData(data)
+               if (account.includes(".eth") || account.startsWith("0x")) {  //only encrypt ethereum for now
+                     if (equal(data, encryptedChatData) === false) {
+                        console.log('✅[GET][Chat items]:', data)
+                        //START LIT ENCRYPTION
+                        localStorage["dmDataEnc_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data)
+                        setEncChatData(data)
 
-                  // const replica = JSON.parse(JSON.stringify(data));
-                  // // Get data from LIT and replace the message with the decrypted text
-                  // for (let i = 0; i < replica.length; i++) {
-                  //    if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
-                  //       const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
-                        
-                  //       console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                  //       const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
-                  //       replica[i].message = rawmsg.decryptedFile.toString()
-                  //    }
-                  // }
-                  // setChatData(replica)
-                  // localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(replica) 
+                        const replica = JSON.parse(JSON.stringify(data));
+                        // Get data from LIT and replace the message with the decrypted text
+                        for (let i = 0; i < replica.length; i++) {
+                           if(replica[i].encrypted_sym_lit_key){  //only needed for mixed DB with plain and encrypted data
+                              const _accessControlConditions = JSON.parse(replica[i].lit_access_conditions)
+                           
+                              //console.log('✅[POST][Decrypt Message]:', replica[i], replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                              //after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+                              //this is done to support legacy messages (new databases wouldn't need this)
+                              if (String(replica[i].lit_access_conditions).includes('evmBasic')) {
+                                 //console.log('✅[INFO][Using Orig Decrypt Conditions]')
+                                 const rawmsg = await lit.decryptString(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                                 replica[i].message = rawmsg.decryptedFile.toString()
+                              } else {
+                                 const rawmsg = await lit.decryptStringOrig(lit.b64toBlob(replica[i].message), replica[i].encrypted_sym_lit_key, _accessControlConditions)
+                                 replica[i].message = rawmsg.decryptedFile.toString()
+                              }
+                           }
+                        }
+                        setChatData(replica)
+                        localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(replica)
+                     } 
+               } else {
                   // //END LIT ENCRYPTION
-                  setChatData(data)  //use when not using encryption
-                  localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data) 
+		  if (equal(data, chatData) === false) {
+                     setChatData(data)  //use when not using encryption
+                     localStorage["dmData_" + account + "_" + toAddr.toLowerCase()] = JSON.stringify(data) 
+		  }
                }
             }
             setIsFetchingChatData(false)
@@ -480,43 +507,123 @@ const DMByAddress = ({
          null
       )
 
-      data.message = msgInputCopy
-      // const _accessControlConditions = [
-      //    {
-      //      contractAddress: '',
-      //      standardContractType: '',
-      //      chain: 'ethereum',
-      //      method: '',
-      //      parameters: [
-      //        ':userAddress',
-      //      ],
-      //      returnValueTest: {
-      //        comparator: '=',
-      //        value: data.toAddr
-      //      }
-      //    },
-      //    {"operator": "or"},
-      //    {
-      //      contractAddress: '',
-      //      standardContractType: '',
-      //      chain: 'ethereum',
-      //      method: '',
-      //      parameters: [
-      //        ':userAddress',
-      //      ],
-      //      returnValueTest: {
-      //        comparator: '=',
-      //        value: data.fromAddr
-      //      }
-      //    }
-      //  ]     
+	if (account.includes(".eth") || account.startsWith("0x")) {  //only encrypt ethereum for now
+      const _accessControlConditions = [
+         {
+           conditionType: 'evmBasic',
+           contractAddress: '',
+           standardContractType: '',
+           chain: 'ethereum',
+           method: '',
+           parameters: [
+             ':userAddress',
+           ],
+           returnValueTest: {
+             comparator: '=',
+             value: data.toAddr
+           }
+         },
+         {"operator": "or"},
+         {
+           conditionType: 'evmBasic',
+           contractAddress: '',
+           standardContractType: '',
+           chain: 'ethereum',
+           method: '',
+           parameters: [
+             ':userAddress',
+           ],
+           returnValueTest: {
+             comparator: '=',
+             value: data.fromAddr
+           }
+         },
+         {"operator": "or"}, //delegate.cash full wallet delegation
+         {
+            conditionType: "evmContract",
+            contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
+            functionName: "checkDelegateForAll",
+            functionParams: [":userAddress", data.toAddr],
+            functionAbi: {
+               inputs: [
+               {
+                  name: "delegate",
+                  type: "address",
+                  internalType: "address",
+               },
+               {
+                  name: "vault",
+                  type: "address",
+                  internalType: "address",
+               },
+               ],
+               name: "checkDelegateForAll",
+               outputs: [
+               {
+                  name: "",
+                  type: "bool",
+               },
+               ],
+               payable: false,
+               stateMutability: "view",
+               type: "function",
+            },
+            chain: "ethereum",
+            returnValueTest: {
+               key: "",
+               comparator: "=",
+               value: 'true',
+            },
+         },
+         {"operator": "or"}, //delegate.cash full wallet delegation
+         {
+            conditionType: "evmContract",
+            contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
+            functionName: "checkDelegateForAll",
+            functionParams: [":userAddress", data.fromAddr],
+            functionAbi: {
+               inputs: [
+               {
+                  name: "delegate",
+                  type: "address",
+                  internalType: "address",
+               },
+               {
+                  name: "vault",
+                  type: "address",
+                  internalType: "address",
+               },
+               ],
+               name: "checkDelegateForAll",
+               outputs: [
+               {
+                  name: "",
+                  type: "bool",
+               },
+               ],
+               payable: false,
+               stateMutability: "view",
+               type: "function",
+            },
+            chain: "ethereum",
+            returnValueTest: {
+               key: "",
+               comparator: "=",
+               value: 'true',
+            },
+         },
+       ]
+      console.log('✅[TEST][Delegate Wallet]:', delegate)
 
-      // console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
-      // const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
-      // data.message = await lit.blobToB64(encrypted.encryptedFile)
-      // data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-      // data.lit_access_conditions = JSON.stringify(_accessControlConditions)
-      // console.log('✅[POST][Encrypted Message]:', data)
+      console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
+      const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
+      data.message = await lit.blobToB64(encrypted.encryptedFile)
+      data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
+      data.lit_access_conditions = JSON.stringify(_accessControlConditions)
+      console.log('✅[POST][Encrypted Message]:', data)
+      } else {
+      	data.message = msgInputCopy
+      }
 
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
