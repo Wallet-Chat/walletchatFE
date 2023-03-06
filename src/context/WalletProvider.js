@@ -155,7 +155,7 @@ const WalletProvider = React.memo(({ children }) => {
                   })
                   .then((response) => response.json())
                   .then(async (returnData) => {
-                  localStorage.setItem('jwt_' + _account, returnData.access);
+                  localStorage.setItem('jwt_' + data.address, returnData.access);
                   //Used for LIT encryption authSign parameter
                   const authSig = {
                      sig: data.signature,
