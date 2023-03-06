@@ -139,6 +139,57 @@ const WalletProvider = React.memo(({ children }) => {
    }, [web3Modal])
 
    useEffect(() => {
+      window.addEventListener("message", (e) => {
+        var data = e.data;
+        console.log("WalletChat RECEIVED message from PARENT to CHILD ");
+        console.log(data);
+        if(data["target"] == 'sign_in'){
+         data = data.data
+         try {
+            fetch(`${process.env.REACT_APP_REST_API}/signin`, {
+                  body: JSON.stringify({ "name": data.chainId.toString(), "address": data.address, "nonce": data.nonce, "msg": data.messageToSign, "sig": data.signature }),
+                  headers: {
+                  'Content-Type': 'application/json'
+                  },
+                  method: 'POST'
+                  })
+                  .then((response) => response.json())
+                  .then(async (returnData) => {
+                  localStorage.setItem('jwt', returnData.access);
+                  //Used for LIT encryption authSign parameter
+                  const authSig = {
+                     sig: data.signature,
+                     derivedVia: "web3.eth.personal.sign",
+                     signedMessage: data.messageToSign,
+                     address: data.address.toLocaleLowerCase(),
+                   };
+                  localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
+                  localStorage.setItem('lit-web3-provider', data.provider);
+                  console.log('✅[INFO][JWT]:', returnData.access)
+                  const walletInJWT = parseJwt(returnData.access).sub
+                  if (walletInJWT.toLocaleLowerCase() !== data.address.toLocaleLowerCase()) {
+                     console.log('✅[Using Full Delegate Wallet]:', walletInJWT, data.address)
+                     localStorage.setItem('delegate', data.address)
+                     setDelegate(data.address) //not sure this is used anymore
+                     data.address = walletInJWT
+                  }
+
+                  setAccount(data.address)
+                  setChainId(data.chainId)
+                  getName(data.address)
+                  setAuthenticated(true)
+                  getSettings(data.address)
+                  let _web3 = new Web3(provider)
+                  setWeb3(_web3)
+               })
+            } catch (error) {
+               console.log('iframe sign-in error via postMessage', error)
+            } 
+        }
+      });
+    }, []);
+
+   useEffect(() => {
       if (web3ModalProvider?.on) {
          const handleAccountsChanged = (accounts) => {
             console.log('handleAccountsChanged', accounts)
