@@ -155,7 +155,7 @@ const WalletProvider = React.memo(({ children }) => {
                   })
                   .then((response) => response.json())
                   .then(async (returnData) => {
-                  localStorage.setItem('jwt', returnData.access);
+                  localStorage.setItem('jwt_' + _account, returnData.access);
                   //Used for LIT encryption authSign parameter
                   const authSig = {
                      sig: data.signature,
@@ -522,7 +522,7 @@ const WalletProvider = React.memo(({ children }) => {
                 //"Welcome:" + addrnameDB.Name + ":Addr:" + Authuser.Address (backend response)
                 setName(data.msg.toString().split(':')[1])
                 console.log('✅[Name: ]:', name)
-                const walletInJWT = parseJwt(localStorage.getItem('jwt')).sub
+                const walletInJWT = parseJwt(localStorage.getItem('jwt_' + _account)).sub
                if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase() &&
                    _account.toLocaleLowerCase() === localStorage.getItem('delegate').toLocaleLowerCase()) {
                   console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
