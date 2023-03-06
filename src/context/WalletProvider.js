@@ -1262,17 +1262,8 @@ const WalletProvider = React.memo(({ children }) => {
             console.log('Disconnect Wallet Chrome Extension True')
             storage.set('metamask-connected', { connected: false })
          } else {
-            if (web3 != null) {
-               console.log(web3ModalProvider.close)
-               if (web3ModalProvider.close) {
-                  await web3ModalProvider.close()
-                  await web3Modal.clearCachedProvider()
-                  setProvider(null)
-               }
-            }
             console.log('Deleting Login LocalStorage Items')
             localStorage.clear(); //all items 
-
             // TODO: was trying to leave decrypted chat history here, but got complicated as I was adding new wallets/chains.  Revist when stable
             // localStorage.removeItem('jwt_' + account)
             // localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
@@ -1287,6 +1278,15 @@ const WalletProvider = React.memo(({ children }) => {
             // localStorage.removeItem('near_app_wallet_auth_key')
             // localStorage.removeItem('near-wallet-selector:contract')
             // //localStorage.removeItem('near-api-js:keystore:'+name+':mainnet')
+
+            if (web3 != null && web3ModalProvider != null) {
+               console.log(web3ModalProvider.close)
+               if (web3ModalProvider.close) {
+                  await web3ModalProvider.close()
+                  await web3Modal.clearCachedProvider()
+                  setProvider(null)
+               }
+            }
          }
          storage.set('current-address', { address: null })
          setAccount(null)
