@@ -39,10 +39,10 @@ export default function NFTInboxSearchInput() {
       if (web3 == null) {
          return
       }
-      if (!web3.utils.isAddress(address)) {
-         console.log('Invalid contract address')
-         return
-      }
+      // if (!web3.utils.isAddress(address)) {
+      //    console.log('Invalid contract address')
+      //    return
+      // }
 
       fetchEthereumContract(address)
    }

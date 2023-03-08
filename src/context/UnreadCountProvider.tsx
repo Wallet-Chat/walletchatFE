@@ -4,7 +4,7 @@ import { useWallet } from './WalletProvider'
 import * as ENV from '@/constants/env'
 
 export const UnreadCountContext = React.createContext()
-export const useUnreadCount = () => React.useContext(UnreadCountContext)
+export const useUnreadCount = () => React.useContext<any>(UnreadCountContext)
 
 export function withUnreadCount(Component) {
   const WalletComponent = (props) => (

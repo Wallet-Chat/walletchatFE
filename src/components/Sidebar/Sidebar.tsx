@@ -25,19 +25,17 @@ import {
   IconMessagePlus,
   IconPencil,
   IconBell,
-  IconSwitchHorizontal,
+  IconBrandTwitter,
 } from '@tabler/icons'
-import Blockies from 'react-blockies'
 import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
-import { IconBrandTwitter } from '@tabler/icons'
 
 import * as ENV from '@/constants/env'
 import IconDiscord from '../../images/icon-products/icon-discord.svg'
 import IconPrivacy from '../../images/privacy-policy.png'
 import logoThumb from '../../images/logo-thumb.svg'
 import { getContractAddressAndNFTId } from '../../helpers/contract'
-import NFTPortNFT from '../../types/NFTPort/NFT'
+import NFTPortNFTResponse from '../../types/NFTPort/NFT'
 import animatedPlaceholder from '../../images/animated-placeholder.gif'
 import { useWallet } from '../../context/WalletProvider'
 import { truncateAddress } from '../../helpers/truncateString'
@@ -48,6 +46,7 @@ import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
+import { getIsWidgetContext } from '@/utils/context'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -59,14 +58,51 @@ export default function Sidebar() {
   const [nftContractAddr, setNftContractAddr] = useState<string>()
   const [nftId, setNftId] = useState<string>()
   const [chainName, setChainName] = useState('ethereum')
-  const [nftData, setNftData] = useState<NFTPortNFT>()
+  const [nftData, setNftData] = useState<NFTPortNFTResponse>()
   const [imageUrl, setImageUrl] = useState<string>()
   const { unreadCount } = useUnreadCount()
 
   const { metadata } = nftData?.nft || {}
 
-  const { disconnectWallet, name, account, walletRequestPermissions } =
-    useWallet()
+  const { disconnectWallet, name, account } = useWallet()
+
+  const getNftMetadata = (
+    nftContractAddr: string,
+    nftId: string,
+    chain: string
+  ) => {
+    if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
+      console.log('Missing NFT Port API Key')
+      return
+    }
+    if (!nftContractAddr || !nftId) {
+      console.log('Missing contract address or id')
+      return
+    }
+    fetch(
+      `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=${chain}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((result: NFTPortNFTResponse) => {
+        console.log('✅[GET][NFT Metadata]:', result)
+
+        setNftData(result)
+
+        const responseUrl = result.nft?.cached_file_url
+        if (responseUrl?.includes('ipfs://')) {
+          setImageUrl(convertIpfsUriToUrl(responseUrl))
+        } else if (responseUrl !== null) {
+          setImageUrl(responseUrl)
+        }
+      })
+      .catch((error) => console.log('error', error))
+  }
 
   useEffect(() => {
     if (isChromeExtension()) {
@@ -92,8 +128,31 @@ export default function Sidebar() {
     }
   }, [])
 
+  // -- Widget iFrame API for receiving NFT data --
   useEffect(() => {
-    if (url) {
+    window.addEventListener('message', (e) => {
+      const data = e.data
+
+      const { contractAddress, itemId, network } = data
+
+      if (
+        contractAddress !== undefined &&
+        itemId !== undefined &&
+        network !== undefined
+      ) {
+        setNftContractAddr(contractAddress)
+        setNftId(itemId)
+        setChainName(network)
+
+        if (contractAddress?.startsWith('0x')) {
+          getNftMetadata(contractAddress, itemId, network)
+        }
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (url && getIsWidgetContext()) {
       const [contractAddress, nftId, chain] = getContractAddressAndNFTId(url)
       if (contractAddress && nftId !== null && chain) {
         setNftContractAddr(contractAddress)
@@ -105,44 +164,6 @@ export default function Sidebar() {
       }
     }
   }, [url])
-
-  const getNftMetadata = (
-    nftContractAddr: string,
-    nftId: string,
-    chain: string
-  ) => {
-    if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
-      console.log('Missing NFT Port API Key')
-      return
-    }
-    if (!nftContractAddr || !nftId) {
-      console.log('Missing contract address or id')
-      return
-    }
-    fetch(
-      `https://api.nftport.xyz/v0/nfts/${nftContractAddr}/${nftId}?chain=${chain}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
-        },
-      }
-    )
-      .then((response) => response.json())
-      .then((result: NFTPortNFT) => {
-        console.log('✅[GET][NFT Metadata]:', result)
-
-        setNftData(result)
-
-        let url = result.nft?.cached_file_url
-        if (url?.includes('ipfs://')) {
-          setImageUrl(convertIpfsUriToUrl(url))
-        } else if (url !== null) {
-          setImageUrl(url)
-        }
-      })
-      .catch((error) => console.log('error', error))
-  }
 
   return (
     <Flex
@@ -330,7 +351,7 @@ export default function Sidebar() {
                 Notifications
               </MenuItem>
               <MenuItem
-                onClick={() => disconnectWallet()}
+                onClick={disconnectWallet}
                 icon={
                   <Box>
                     <IconLogout stroke='1.5' />

@@ -1,28 +1,28 @@
-export function getContractAddressAndNFTId (url: string) {
-    if (url.includes("opensea.io")) {
-        let parts = url.split("/")
-        let length = parts.length
-        if (length >= 5) {
-            if (parts[length - 3] === 'ethereum') {
-                return [parts[length - 2], parts[length - 1], "ethereum"]
-            } else if (parts[length - 3] === 'polygon') {
-                return [parts[length - 2], parts[length - 1], "polygon"]
-            }
-        }
-    } else if (url.includes("looksrare.org")) {
-        let parts = url.split("/")
-        let length = parts.length
-        if (length >= 4) {
-            return [parts[length - 2], parts[length - 1], "ethereum"]
-        }
-    } else if (url.includes("x2y2.io")) {
-        let parts = url.split("/")
-        let length = parts.length
-        if (length >= 4) {
-            if (parts[length - 3] === 'eth') {
-                return [parts[length - 2], parts[length - 1], "ethereum"]
-            }
-        }
+export function getContractAddressAndNFTId(url: string) {
+  const urlWithoutProtocol = url.replace('https://', '').replace('http://', '')
+  const parts = urlWithoutProtocol.split('/')
+  const length = parts.length
+
+  // Assuming url..../0x....../12345, the itemId will always come last,
+  // and the contract address will always come before that
+  const itemId = parts[length - 1]
+  const contractAddress = parts[length - 2]
+
+  if (url.startsWith('looksrare.org')) {
+    return { itemId, contractAddress, chain: 'ethereum' } 
+  }
+
+  const network = parts[length - 3]
+
+  if (length >= 4) {
+    return { itemId, contractAddress, network }
+  }
+
+  if (url.startsWith('x2y2.io')) {
+    if (network === 'eth') {
+      return { itemId, contractAddress, network: 'ethereum' }
     }
-    return [null, null]
+  }
+
+  return {}
 }

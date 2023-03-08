@@ -1,13 +1,15 @@
 import { Box, Heading, Flex, Button } from '@chakra-ui/react'
-import { isMobile } from 'react-device-detect'
 import { Link } from 'react-router-dom'
 import Web3 from 'web3'
+import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import InboxSearchInput from './components/InboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
 // import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 
 // TODO -- on submit new message, also update here
 const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
+  const isSmallLayout = useIsSmallLayout()
+
   // const communities = React.useMemo(() => inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')), [inboxData])
 
   // const [encryptedChatData, setEncChatData] = useState<InboxItemType[]>(
@@ -22,9 +24,9 @@ const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
   return (
     <Box
       background='white'
-      height={isMobile ? 'unset' : '100vh'}
+      height={isSmallLayout ? 'unset' : '100vh'}
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
-      width='360px'
+      width={isSmallLayout ? '100vh' : '360px'}
       maxW='100%'
       overflowY='scroll'
       className='custom-scrollbar'

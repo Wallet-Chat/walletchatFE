@@ -1,17 +1,19 @@
 import { Flex } from '@chakra-ui/react'
-import { isMobile } from 'react-device-detect'
+import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import StartConversationWithAddress from '../../components/StartConversationWithAddress'
 
 const NewConversation = ({ web3 }: { web3: any }) => {
+  const isSmallLayout = useIsSmallLayout()
+
    return (
       <Flex
          px={5}
          py={10}
          background="white"
-         minHeight={isMobile ? 'unset' : '100vh'}
+         minHeight={isSmallLayout ? 'unset' : '100vh'}
          justifyContent="center"
          alignItems="center"
-         width="360px"
+         width={isSmallLayout ? '100vh' : '360px'}
       >
          <StartConversationWithAddress web3={web3} />
       </Flex>

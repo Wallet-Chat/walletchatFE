@@ -1,6 +1,5 @@
 import { Box,Flex, Heading, Text } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import equal from 'fast-deep-equal/es6'
 
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'

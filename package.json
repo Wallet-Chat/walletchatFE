@@ -80,6 +80,7 @@
   },
   "scripts": {
     "start": "vite",
+    "dev": "vite",
     "build": "cross-env APP_ENV=web vite build",
     "build:ext": "cross-env APP_ENV=ext vite build",
     "preview": "vite preview",

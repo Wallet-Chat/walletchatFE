@@ -1,6 +1,8 @@
+import { getIsWidgetContext } from '@/utils/context'
 import React from 'react'
+import { isMobile } from 'react-device-detect'
 
-function useIsMobileView() {
+function useIsSmallLayout() {
 	const [size, setSize] = React.useState({
 		width: window.innerWidth,
 		height: window.innerHeight,
@@ -15,8 +17,9 @@ function useIsMobileView() {
 	}, [])
 
 	const isMobileView = size.width <= 600
+  const isSmallLayout = isMobileView || isMobile || getIsWidgetContext()
 
-	return isMobileView
+	return isSmallLayout
 }
 
-export default useIsMobileView
+export default useIsSmallLayout

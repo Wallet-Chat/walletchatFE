@@ -7,12 +7,14 @@ import {
 	IconCopy,
 	IconExternalLink,
 } from '@tabler/icons'
-import { isMobile } from 'react-device-detect'
+import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { useGetNameQuery } from '@/redux/reducers/dm'
 import Avatar from '@/components/Inbox/DM/Avatar'
 
 const DMHeader = () => {
+  const isSmallLayout = useIsSmallLayout()
+
 	const { address: toAddr = '' } = useParams()
 
 	const timerRef: { current: NodeJS.Timeout | null } = React.useRef(null)
@@ -47,7 +49,7 @@ const DMHeader = () => {
 			pb={3}
 			borderBottom='1px solid var(--chakra-colors-lightgray-400)'
 		>
-			{isMobile && (
+			{isSmallLayout && (
 				<Box mb={4}>
 					<Link to='/dm' style={{ textDecoration: 'none' }}>
 						<Button colorScheme='gray' background='lightgray.300' size='sm'>

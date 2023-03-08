@@ -11,7 +11,7 @@ import DMByAddress from './scenes/DM/scenes/DMByAddress'
 import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar/Sidebar'
 import { useWallet } from './context/WalletProvider'
-import useIsMobileView from './context/IsMobileViewProvider'
+import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import EnterName from './scenes/Me/scenes/EnterName'
 import ChangeName from './scenes/Me/scenes/ChangeName'
 import EnterEmail from './scenes/Me/scenes/EnterEmail'
@@ -29,7 +29,7 @@ import ExtensionCloseButton from './components/ExtensionCloseButton'
 export const App = () => {
   const { isAuthenticated, name, account, web3, delegate }: any = useWallet()
 
-  const isMobileView = useIsMobileView()
+  const isSmallLayout = useIsSmallLayout()
 
   if (!isAuthenticated) {
     return (
@@ -90,7 +90,7 @@ export const App = () => {
     <Box>
       <Flex
         flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
-        minHeight={isMobile ? '100vh' : 'unset'}
+        minHeight={isSmallLayout ? '100vh' : 'unset'}
       >
         {isChromeExtension() && <ExtensionCloseButton />}
 
@@ -104,7 +104,7 @@ export const App = () => {
                 element={
                   <Flex>
                     <NewConversation web3={web3} />
-                    {!isMobileView && (
+                    {!isSmallLayout && (
                       <Flex
                         background='lightgray.200'
                         flex='1'
@@ -121,17 +121,12 @@ export const App = () => {
               />
 
               <Route
+                index
                 element={
                   <Flex>
                     <Inbox account={account} web3={web3} />
-                    <Outlet />
-                  </Flex>
-                }
-              >
-                <Route
-                  index
-                  element={
-                    !isMobileView && (
+
+                    {!isSmallLayout && (
                       <Flex
                         background='lightgray.200'
                         flex='1'
@@ -142,15 +137,21 @@ export const App = () => {
                           Select a chat to start messaging
                         </Tag>
                       </Flex>
-                    )
-                  }
-                />
+                    )}
+                  </Flex>
+                }
+              />
 
-                <Route
-                  path=':address'
-                  element={<DMByAddress account={account} delegate={delegate} />}
-                />
-              </Route>
+              <Route
+                path=':address'
+                element={
+                  <Flex>
+                    {!isSmallLayout && <Inbox account={account} web3={web3} />}
+
+                    <DMByAddress account={account} delegate={delegate} />
+                  </Flex>
+                }
+              />
             </Route>
 
             <Route path={`/${PAGES.ME}`}>
@@ -178,7 +179,7 @@ export const App = () => {
               element={
                 <Flex>
                   <NFT account={account} web3={web3} />
-                  {!isMobileView && (
+                  {!isSmallLayout && (
                     <Flex
                       background='lightgray.200'
                       flex='1'
@@ -202,7 +203,7 @@ export const App = () => {
                   <Flex>
                     <NFT account={account} web3={web3} />
 
-                    {!isMobileView && (
+                    {!isSmallLayout && (
                       <Flex
                         background='lightgray.200'
                         flex='1'
@@ -219,7 +220,7 @@ export const App = () => {
               <Route
                 element={
                   <Flex>
-                    {!isMobileView && <NFT account={account} web3={web3} />}
+                    {!isSmallLayout && <NFT account={account} web3={web3} />}
 
                     <Outlet />
                   </Flex>
@@ -252,7 +253,7 @@ export const App = () => {
                   <Flex>
                     <Community account={account} web3={web3} />
 
-                    {!isMobileView && (
+                    {!isSmallLayout && (
                       <Flex
                         background='lightgray.200'
                         flex='1'
@@ -272,7 +273,7 @@ export const App = () => {
                 path=':community'
                 element={
                   <Flex>
-                    {!isMobileView && (
+                    {!isSmallLayout && (
                       <Community account={account} web3={web3} />
                     )}
                     <CommunityByName account={account} />

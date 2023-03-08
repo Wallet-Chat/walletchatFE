@@ -10,9 +10,9 @@ import {
   Badge,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import Web3 from 'web3'
 import equal from 'fast-deep-equal/es6'
+import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { InboxItemType } from '../../types/InboxItem'
 import { chains } from '../../constants'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
@@ -36,6 +36,8 @@ const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
   const [chainFilters, setChainFilters] = useState([''])
   const [tabIndex, setTabIndex] = useState(0)
   const { unreadCount } = useUnreadCount()
+
+  const isSmallLayout = useIsSmallLayout()
 
   // useEffect(() => {
   //   console.log(1000, inboxData)
@@ -87,9 +89,9 @@ const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
   return (
     <Box
       background='white'
-      height={isMobile ? 'unset' : '100vh'}
+      height={isSmallLayout ? 'unset' : '100vh'}
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
-      width='360px'
+      width={isSmallLayout ? '100vh' : '360px'}
       maxW='100%'
       overflowY='scroll'
       className='custom-scrollbar'
