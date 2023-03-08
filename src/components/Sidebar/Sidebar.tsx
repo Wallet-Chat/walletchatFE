@@ -19,7 +19,7 @@ import {
   PopoverBody,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   IconLogout,
   IconMessagePlus,
@@ -53,6 +53,8 @@ interface URLChangedEvent extends Event {
 }
 
 export default function Sidebar() {
+  const navigate = useNavigate()
+
   const nftNotificationCount = 0
   const [url, setUrl] = useState<string | undefined>('')
   const [nftContractAddr, setNftContractAddr] = useState<string>()
@@ -133,7 +135,7 @@ export default function Sidebar() {
     window.addEventListener('message', (e) => {
       const data = e.data
 
-      const { contractAddress, itemId, network } = data
+      const { contractAddress, itemId, network, redirect } = data
 
       if (
         contractAddress !== undefined &&
@@ -146,6 +148,10 @@ export default function Sidebar() {
 
         if (contractAddress?.startsWith('0x')) {
           getNftMetadata(contractAddress, itemId, network)
+        }
+
+        if (redirect) {
+          navigate(`/nft/${network}/${contractAddress}/${itemId}`)
         }
       }
     })
