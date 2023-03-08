@@ -135,7 +135,7 @@ export default function Sidebar() {
     window.addEventListener('message', (e) => {
       const data = e.data
 
-      const { contractAddress, itemId, network, redirect } = data
+      const { contractAddress, itemId, network, redirect, ownerAddress } = data
 
       if (
         contractAddress !== undefined &&
@@ -151,8 +151,14 @@ export default function Sidebar() {
         }
 
         if (redirect) {
-          navigate(`/nft/${network}/${contractAddress}/${itemId}`)
+          navigate(
+            `/nft/${network}/${contractAddress}/${itemId}${
+              ownerAddress ? '/dm' : ''
+            }`
+          )
         }
+      } else if (ownerAddress) {
+        navigate(`/dm/${ownerAddress}`)
       }
     })
   }, [])

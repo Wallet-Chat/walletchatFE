@@ -238,7 +238,7 @@ export const App = () => {
                       element={<NFTByContract account={account} />}
                     />
                     <Route
-                      path=':nftId'
+                      path=':nftId*'
                       element={<NFTByContractAndId account={account} />}
                     />
                   </Route>

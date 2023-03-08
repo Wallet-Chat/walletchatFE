@@ -44,9 +44,11 @@ import { useHover } from '../../../../helpers/useHover'
 const tokenType = 'erc721'
 
 const NFTByContractAndId = ({ account }: { account: string }) => {
-  const { nftContractAddr = '', nftId = '', chain = '' } = useParams()
+  const params = useParams()
+  const { nftContractAddr = '', nftId = '', chain = '' } = params
   const [searchParams] = useSearchParams()
 
+  const [tabIndex, setTabIndex] = useState<number>(params['*'] === 'dm' ? 2 : 0)
   const [nftData, setNftData] = useState<NFT>()
   const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()
 
@@ -62,6 +64,20 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
   const [unreadCount, setUnreadCount] = useState<number>(0)
   const [tweetCount, setTweetCount] = useState<number>(0)
+
+  useEffect(() => {
+    window.addEventListener('message', (e) => {
+      const data = e.data
+
+      const { contractAddress, itemId, network, redirect, ownerAddress } = data
+
+      if (contractAddress && itemId && network && ownerAddress) {
+        if (redirect) {
+          setTabIndex(2)
+        }
+      }
+    })
+  }, [])
 
   const getJoinStatus = () => {
     fetch(
@@ -471,6 +487,8 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
         flexGrow={1}
         variant='enclosed'
         isLazy
+        index={tabIndex}
+        onChange={setTabIndex}
       >
         <TabList padding='0 var(--chakra-space-5)'>
           <Tab>
