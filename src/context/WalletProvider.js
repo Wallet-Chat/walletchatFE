@@ -413,7 +413,7 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(network.chainId)
             const _w3 = new Web3(_provider)
 
-            analytics.track('ConnectWallet', {
+            analytics.track('ConnectWallet:ClearText', {
                site: document.referrer,
                account: _account
              });
@@ -516,6 +516,7 @@ const WalletProvider = React.memo(({ children }) => {
                         setWeb3(_web3)
                         
                         analytics.identify(_account, {
+                           source: "ClearText",
                            name: name,
                            email: email
                          });
@@ -546,6 +547,7 @@ const WalletProvider = React.memo(({ children }) => {
                   setAuthenticated(true)
                   getSettings(_account)
                   analytics.identify(_account, {
+                     source: "ClearText",
                      name: name,
                      email: email
                    });
@@ -631,6 +633,7 @@ const WalletProvider = React.memo(({ children }) => {
                      setWeb3(_web3)
                      
                      analytics.identify(_account, {
+                        source: "ClearText",
                         name: name,
                         email: email
                       });
