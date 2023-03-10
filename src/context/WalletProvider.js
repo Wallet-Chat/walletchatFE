@@ -18,8 +18,6 @@ import Lit from '../utils/lit'
 import { useNavigate } from 'react-router-dom'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 
-const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY })
-
 const providerOptions = {
    walletconnect: {
       package: WalletConnectProvider, // required
@@ -84,6 +82,8 @@ const WalletProvider = React.memo(({ children }) => {
    const [error, setError] = useState()
    const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
    let navigate = useNavigate()
+
+   const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY })
 
    React.useEffect(() => {
       const connectEagerly = async () => {
