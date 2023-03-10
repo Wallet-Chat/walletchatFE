@@ -51,10 +51,7 @@ import { setupWalletConnect } from '@near-wallet-selector/wallet-connect';
 import { setupNearWallet } from '@near-wallet-selector/near-wallet';
 const THIRTY_TGAS = '30000000000000';
 const NO_DEPOSIT = '0';
-
 //end NEAR wallet imports/declarations
-
-const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY })
 
 const providerOptions = {
    walletconnect: {
@@ -126,6 +123,8 @@ const WalletProvider = React.memo(({ children }) => {
    const [error, setError] = useState()
    const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
    let navigate = useNavigate()
+
+   const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY })
 
    React.useEffect(() => {
       const connectEagerly = async () => {
