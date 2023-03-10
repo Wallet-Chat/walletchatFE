@@ -15,6 +15,7 @@
       "@ensdomains/ensjs": "^2.1.0",
       "@ensdomains/eth-ens-namehash": "^2.0.15",
       "@fontsource/roboto": "^4.5.3",
+      "@segment/analytics-next": "^1.51.2",
       "@tabler/icons": "^1.54.0",
       "@testing-library/jest-dom": "^5.16.2",
       "@testing-library/react": "^10.4.9",

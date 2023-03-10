@@ -16,6 +16,9 @@ import { isChromeExtension } from '../helpers/chrome'
 import { SiweMessage } from 'siwe'
 import Lit from '../utils/lit'
 import { useNavigate } from 'react-router-dom'
+import { AnalyticsBrowser } from '@segment/analytics-next'
+
+const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY })
 
 const providerOptions = {
    walletconnect: {
@@ -363,6 +366,11 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(network.chainId)
             const _w3 = new Web3(_provider)
 
+            analytics.track('ConnectWallet', {
+               site: document.referrer,
+               account: _account
+             });
+
             // check if JWT exists or is timed out:
             fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
                method: 'GET',
@@ -452,6 +460,11 @@ const WalletProvider = React.memo(({ children }) => {
                         setAuthenticated(true)
                         getSettings(_account)
                         setWeb3(_web3)
+
+                        analytics.identify(_account, {
+                           name: name,
+                           email: email
+                         });
                      })
                   })
                   .catch((error) => {
@@ -478,6 +491,12 @@ const WalletProvider = React.memo(({ children }) => {
                   getName(_account)
                   setAuthenticated(true)
                   getSettings(_account)
+
+
+                  analytics.identify(_account, {
+                     name: name,
+                     email: email
+                   });
                }
              }
             })
@@ -558,6 +577,12 @@ const WalletProvider = React.memo(({ children }) => {
                      setAuthenticated(true)
                      getSettings(_account)
                      setWeb3(_web3)
+
+
+                     analytics.identify(_account, {
+                        name: name,
+                        email: email
+                      });
                   })
                   .catch((error) => {
                      console.error('🚨[GET][Sign-In Failed]:', error)
