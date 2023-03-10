@@ -34,6 +34,7 @@
       "@near-wallet-selector/sender": "^7.5.0",
       "@near-wallet-selector/wallet-connect": "^7.5.0",
       "@near-wallet-selector/welldone-wallet": "^7.4.0",
+      "@segment/analytics-next": "^1.51.2",
       "@stakenow/siwt": "^0.0.6",
       "@tabler/icons": "^1.54.0",
       "@taquito/rpc": "^15.0.0",
