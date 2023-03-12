@@ -19,6 +19,8 @@ import { DottedBackground } from '../../../../../../styled/DottedBackground'
 
 import { GroupMessageType, MessageUIType } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
+import { AnalyticsBrowser } from '@segment/analytics-next'
+const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY as string })
 
 const CommunityGroupChat = ({
    account,
@@ -92,6 +94,11 @@ const CommunityGroupChat = ({
    }
 
    const sendMessage = async () => {
+      analytics.track('SendCommunityMessage', {
+         site: document.referrer,
+         community: community,
+         account: account
+       });
       if (msgInput.length <= 0) return
       if (!account) {
          console.log('No account connected')

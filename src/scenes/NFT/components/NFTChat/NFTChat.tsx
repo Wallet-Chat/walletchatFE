@@ -21,7 +21,7 @@ import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
-
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const NFTChat = ({
    recipientAddr,
@@ -41,6 +41,8 @@ const NFTChat = ({
       new Array<MessageType>()
    )
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+
+   const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY as string })
 
    // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
 
@@ -108,6 +110,10 @@ const NFTChat = ({
    }
 
    const sendMessage = async () => {
+      analytics.track('SendNftMessage', {
+         site: document.referrer,
+         account: account
+       });
       if (msgInput.length <= 0) return
 
       // Make a copy and clear input field
