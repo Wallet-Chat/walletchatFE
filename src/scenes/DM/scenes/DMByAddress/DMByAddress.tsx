@@ -33,6 +33,7 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 //import sigUtil from 'eth-sig-util'
 import lit from "../../../../utils/lit";
 import ScrollToBottom from 'react-scroll-to-bottom';
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const DMByAddress = ({
    account,
@@ -70,6 +71,7 @@ const DMByAddress = ({
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
    let semaphore = false;
    //let isFetchingDataFirstTime = true;
+   const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY as string })
 
    useEffect(() => {
       console.log('useEffect scroll')
@@ -472,6 +474,10 @@ const DMByAddress = ({
    )
 
    const sendMessage = async () => {
+      analytics.track('SendMessage:Ledger', {
+         site: document.referrer,
+         account: account
+       });
       setSentMsg(true)
       console.log('sendMessage')
       if (msgInput.length <= 0) return

@@ -19,6 +19,7 @@ import { DottedBackground } from '../../../../../../styled/DottedBackground'
 
 import { GroupMessageType, MessageUIType } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const CommunityGroupChat = ({
    account,
@@ -37,6 +38,7 @@ const CommunityGroupChat = ({
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
+   const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY as string })
 
    useEffect(() => {
       const toAddToUI = [] as MessageUIType[]
@@ -92,6 +94,11 @@ const CommunityGroupChat = ({
    }
 
    const sendMessage = async () => {
+      analytics.track('SendCommunityMessage:Ledger', {
+         site: document.referrer,
+         community: community,
+         account: account
+       });
       if (msgInput.length <= 0) return
       if (!account) {
          console.log('No account connected')
