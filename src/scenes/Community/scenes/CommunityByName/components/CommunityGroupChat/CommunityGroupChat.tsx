@@ -20,7 +20,6 @@ import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import { GroupMessageType, MessageUIType } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY as string })
 
 const CommunityGroupChat = ({
    account,
@@ -39,6 +38,7 @@ const CommunityGroupChat = ({
    const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
+   const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY as string })
 
    useEffect(() => {
       const toAddToUI = [] as MessageUIType[]
