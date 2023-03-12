@@ -515,7 +515,7 @@ const WalletProvider = React.memo(({ children }) => {
                         setWeb3(_web3)
                         
                         analytics.identify(_account, {
-                           source: "ClearText",
+                           source: "Beta",
                            name: name,
                            email: email
                          });
@@ -546,7 +546,7 @@ const WalletProvider = React.memo(({ children }) => {
                   setAuthenticated(true)
                   getSettings(_account)
                   analytics.identify(_account, {
-                     source: "ClearText",
+                     source: "Beta",
                      name: name,
                      email: email
                    });
@@ -632,7 +632,7 @@ const WalletProvider = React.memo(({ children }) => {
                      setWeb3(_web3)
                      
                      analytics.identify(_account, {
-                        source: "ClearText",
+                        source: "Beta",
                         name: name,
                         email: email
                       });
