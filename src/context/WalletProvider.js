@@ -412,7 +412,7 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(network.chainId)
             const _w3 = new Web3(_provider)
 
-            analytics.track('ConnectWallet:ClearText', {
+            analytics.track('ConnectWallet:Beta', {
                site: document.referrer,
                account: _account
              });

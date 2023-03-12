@@ -9,6 +9,7 @@ import generateItems from '../../helpers/generateGroupedByDays'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const NFTGroupChat = ({
    account,
@@ -25,6 +26,7 @@ const NFTGroupChat = ({
    const [userPfpImage, setUserPfpImage] = useState<PfpType[]>([])
    let navigate = useNavigate()
    const scrollToBottomRef = useRef<HTMLDivElement>(null)
+   const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY as string })
 
    useEffect(() => {
       getChatData()
@@ -75,6 +77,10 @@ const NFTGroupChat = ({
    }
 
    const sendMessage = async (msgInput: string) => {
+      analytics.track('SendNftGroupMessage:Beta', {
+         site: document.referrer,
+         account: account
+       });
       if (msgInput.length <= 0) return
       if (!account) {
          console.log('No account connected')
