@@ -4,27 +4,52 @@ import { createErrorResponse } from '@/redux/reducers/helpers'
 import { prepareHeaderCredentials } from '@/helpers/fetch'
 import * as ENV from '@/constants/env'
 import { RootState } from '@/redux/store'
-import { MessageType, MessageUIType } from '@/types/Message'
 import storage from '@/utils/storage'
 import lit from '@/utils/lit'
-import { InboxItemType } from '@/types/InboxItem'
+import { ChatMessageType, InboxMessageType } from '@/types/Message'
 
-const DM_DATA_LOCAL_STORAGE_KEY = 'dmData'
-const INBOX_DATA_LOCAL_STORAGE_KEY = 'inboxData'
-const ENC_DM_DATA_LOCAL_STORAGE_KEY = 'encDmData'
+export const STORAGE_KEYS = Object.freeze({
+  DM_DATA: 'dmData',
+  INBOX_DATA: 'inboxData',
+  ENC_DM_IDS: 'encDmIds',
+})
+
+export function getSessionDataByAccount(key: string) {
+  try {
+    const sessionDataByAccount = sessionStorage.getItem(key)
+    return sessionDataByAccount ? JSON.parse(sessionDataByAccount) : null
+  } catch (error: any) {
+    return null
+  }
+}
+
+export function getSessionData(account: string, key: string) {
+  const sessionDataByAccount = getSessionDataByAccount(key)
+  if (!sessionDataByAccount) return null
+
+  const sessionData = sessionDataByAccount[account.toLocaleLowerCase()]
+  return sessionData || null
+}
+
+export function getLocalDataByAccount(key: string) {
+  const localDataByAccount = storage.get(key)
+  return localDataByAccount || null
+}
+
+export function getLocalData(account: string, key: string) {
+  const localDataByAccount = getLocalDataByAccount(key)
+  if (!localDataByAccount) return null
+
+  const localData = localDataByAccount[account.toLocaleLowerCase()]
+  return localData || null
+}
 
 export function getLocalEncDmIdsByAddrByAcc(account: string, toAddr: string) {
-  const encDmIdsByAddrByAcc = storage.get(ENC_DM_DATA_LOCAL_STORAGE_KEY)
+  const localEncDmIdsByAddr = getLocalData(account, STORAGE_KEYS.ENC_DM_IDS)
+  if (!localEncDmIdsByAddr) return null
 
-  if (!encDmIdsByAddrByAcc) return null
-
-  const encIdsDataByAddr = encDmIdsByAddrByAcc[account.toLocaleLowerCase()]
-
-  if (!encIdsDataByAddr) return null
-
-  const encDmIds = encIdsDataByAddr[toAddr.toLocaleLowerCase()]
-
-  return encDmIds || null
+  const localEncDmIds = localEncDmIdsByAddr[toAddr.toLocaleLowerCase()]
+  return localEncDmIds || null
 }
 
 // Stores encrypted DM IDs in localStorage in the case of failures
@@ -36,10 +61,10 @@ export function updateLocalEncDmIdsByAddrByAcc(
   toAddr: string,
   encDms: number[]
 ) {
-  const encDmDataObj = storage.get(ENC_DM_DATA_LOCAL_STORAGE_KEY)
+  const encDmDataObj = storage.get(STORAGE_KEYS.ENC_DM_IDS)
   const encDmDataForAccount = encDmDataObj?.[account.toLocaleLowerCase()] || {}
 
-  storage.set(ENC_DM_DATA_LOCAL_STORAGE_KEY, {
+  storage.set(STORAGE_KEYS.ENC_DM_IDS, {
     [account.toLocaleLowerCase()]: {
       ...encDmDataForAccount,
       [toAddr.toLocaleLowerCase()]: encDms,
@@ -48,7 +73,7 @@ export function updateLocalEncDmIdsByAddrByAcc(
 }
 
 export async function decryptMessage(
-  data: MessageType[] | InboxItemType[] | MessageUIType[],
+  data: ChatMessageType[] | InboxMessageType[],
   account: string
 ) {
   const fetchedMessages = JSON.parse(JSON.stringify(data))
@@ -119,32 +144,59 @@ export async function decryptMessage(
   return { fetchedMessages, failedDecryptMsgs }
 }
 
+export function getSessionDmDataForAccountToAddr(
+  account: string,
+  toAddr: string
+) {
+  const sessionDmDataByAddr = getSessionData(account, STORAGE_KEYS.DM_DATA)
+  if (!sessionDmDataByAddr) return null
+
+  const sessionDmData = sessionDmDataByAddr[toAddr.toLocaleLowerCase()]
+
+  return sessionDmData || null
+}
+
 export function getLocalDmDataForAccountToAddr(
   account: string,
   toAddr: string
 ) {
-  const dmDataObj = storage.get(DM_DATA_LOCAL_STORAGE_KEY)
+  const localDmDataByAddr = getLocalData(account, STORAGE_KEYS.DM_DATA) || {}
+  const sessionDmDataByAddr =
+    getSessionData(account, STORAGE_KEYS.DM_DATA) || {}
 
-  if (!dmDataObj) return null
+  const localDmData = localDmDataByAddr[toAddr.toLocaleLowerCase()] || []
+  const sessionDmData = sessionDmDataByAddr[toAddr.toLocaleLowerCase()] || []
+  return [...localDmData, ...sessionDmData]
+}
 
-  const dmDataForAccount = dmDataObj[account.toLocaleLowerCase()]
+export function updateSessionDmDataForAccountToAddr(
+  account: string,
+  toAddr: string,
+  chatData: ChatMessageType[]
+) {
+  const sessionDmDataByAddr =
+    getSessionData(account, STORAGE_KEYS.DM_DATA) || []
 
-  if (!dmDataForAccount) return null
-
-  const dmDataForAccountToAddr = dmDataForAccount[toAddr.toLocaleLowerCase()]
-
-  return dmDataForAccountToAddr || null
+  sessionStorage.setItem(
+    STORAGE_KEYS.DM_DATA,
+    JSON.stringify({
+      [account.toLocaleLowerCase()]: {
+        ...sessionDmDataByAddr,
+        [toAddr.toLocaleLowerCase()]: chatData,
+      },
+    })
+  )
 }
 
 export function updateLocalDmDataForAccountToAddr(
   account: string,
   toAddr: string,
-  chatData: MessageType[]
+  chatData: ChatMessageType[]
 ) {
-  const dmDataObj = storage.get(DM_DATA_LOCAL_STORAGE_KEY)
+  const dmDataObj = storage.get(STORAGE_KEYS.DM_DATA)
   const dmDataForAccount = dmDataObj?.[account.toLocaleLowerCase()] || {}
 
-  storage.set(DM_DATA_LOCAL_STORAGE_KEY, {
+  storage.set(STORAGE_KEYS.DM_DATA, {
     [account.toLocaleLowerCase()]: {
       ...dmDataForAccount,
       [toAddr.toLocaleLowerCase()]: chatData,
@@ -152,23 +204,33 @@ export function updateLocalDmDataForAccountToAddr(
   })
 }
 
-function addLocalDmDataForAccountToAddr(
+export function addSessionDmDataForAccountToAddr(
   account: string,
   toAddr: string,
-  chatData: MessageType[]
+  chatData: ChatMessageType[]
 ) {
-  const dmDataObj = storage.get(DM_DATA_LOCAL_STORAGE_KEY)
-  const dmDataForAccount = dmDataObj?.[account.toLocaleLowerCase()] || {}
-  const dmDataForAccountToAddr =
-    dmDataForAccount?.[toAddr.toLocaleLowerCase()] || []
+  const sessionDmData = getSessionDmDataForAccountToAddr(account, toAddr) || []
 
-  updateLocalDmDataForAccountToAddr(account, toAddr, [
-    ...dmDataForAccountToAddr,
+  updateSessionDmDataForAccountToAddr(account, toAddr, [
+    ...sessionDmData,
     ...chatData,
   ])
 }
 
-function getInboxChatPartner(account: string, inboxItem: InboxItemType) {
+export function addLocalDmDataForAccountToAddr(
+  account: string,
+  toAddr: string,
+  chatData: ChatMessageType[]
+) {
+  const localDmData = getLocalDmDataForAccountToAddr(account, toAddr)
+
+  updateLocalDmDataForAccountToAddr(account, toAddr, [
+    ...localDmData,
+    ...chatData,
+  ])
+}
+
+function getInboxChatPartner(account: string, inboxItem: InboxMessageType) {
   return inboxItem.fromaddr.toLocaleLowerCase() === account.toLocaleLowerCase()
     ? inboxItem.toaddr
     : inboxItem.fromaddr
@@ -176,12 +238,12 @@ function getInboxChatPartner(account: string, inboxItem: InboxItemType) {
 
 interface InboxStore {
   [context: string]: {
-    [from: string]: InboxItemType
+    [from: string]: InboxMessageType
   }
 }
 
 export function getInboxDmDataForAccount(account: string) {
-  const localInboxData = storage.get(INBOX_DATA_LOCAL_STORAGE_KEY) || {}
+  const localInboxData = storage.get(STORAGE_KEYS.INBOX_DATA) || {}
 
   const accountInboxData =
     (localInboxData?.[account.toLocaleLowerCase()] as InboxStore) || {}
@@ -196,7 +258,7 @@ export function getInboxDmDataForAccount(account: string) {
   return inboxDataObj
 }
 
-function getInboxFrom(account: string, item: InboxItemType) {
+function getInboxFrom(account: string, item: InboxMessageType) {
   const isCommunityOrNFT =
     item.context_type === 'community' || item.context_type === 'nft'
   const fromValue = isCommunityOrNFT
@@ -207,7 +269,7 @@ function getInboxFrom(account: string, item: InboxItemType) {
 
 function updateLocalInboxDataForAccount(
   account: string,
-  inboxData: InboxItemType[]
+  inboxData: InboxMessageType[]
 ) {
   const localInboxData = getInboxDmDataForAccount(account)
 
@@ -215,7 +277,7 @@ function updateLocalInboxDataForAccount(
     localInboxData[item.context_type][getInboxFrom(account, item)] = item
   })
 
-  storage.set(INBOX_DATA_LOCAL_STORAGE_KEY, {
+  storage.set(STORAGE_KEYS.INBOX_DATA, {
     [account.toLocaleLowerCase()]: localInboxData,
   })
 }
@@ -314,7 +376,7 @@ async function fetchAndStoreChatData(
             lastTimeMsg ? `/${lastTimeMsg}` : ''
           }`
         )
-      ).data as unknown as MessageType[]) || []
+      ).data as unknown as ChatMessageType[]) || []
 
     if (data.length === 0) {
       return { data: JSON.stringify(localData) }
@@ -401,7 +463,7 @@ export const dmApi = createApi({
           await fetchWithBQ(
             `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`
           )
-        ).data as unknown as MessageType[]
+        ).data as unknown as ChatMessageType[]
 
         const unreadData = new Set(response)
 
@@ -435,7 +497,7 @@ export const dmApi = createApi({
             await fetchWithBQ(
               `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_inbox/${account}`
             )
-          ).data as unknown as InboxItemType[]
+          ).data as unknown as InboxMessageType[]
 
           if (!data) {
             updateLocalInboxDataForAccount(account, [])

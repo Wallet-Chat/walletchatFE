@@ -6,203 +6,112 @@ import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import { useWallet } from '@/context/WalletProvider'
 import * as ENV from '@/constants/env'
-import { updateQueryData } from '@/redux/reducers/dm'
+import {
+  updateQueryData,
+  updateLocalDmDataForAccountToAddr,
+  addLocalDmDataForAccountToAddr,
+} from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
-import { MessageUIType } from '@/types/Message'
+import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
+import { getAccessControlConditions } from '@/helpers/lit'
 
-function Submit({
-  delegate,
-  loadedMsgs,
-  toAddr,
-  account,
-}: {
-  delegate: string
-  loadedMsgs: any
-  toAddr: string
-  account: string
-}) {
-  const { name }: any = useWallet()
+function Submit({ toAddr, account }: { toAddr: string; account: string }) {
+  const { name } = useWallet()
 
   const dispatch = useAppDispatch()
-  const [isSendingMessage, setIsSendingMessage] = React.useState(false)
-  const [msgInput, setMsgInput] = React.useState<string>('')
 
-  const addMessageToUI = (newMessage: MessageUIType) =>
+  const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
+  const msgInput = React.useRef<string>('')
+
+  const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
       updateQueryData('getChatData', { account, toAddr }, (chatData) => {
         const chatDataValue = JSON.parse(chatData)
         chatDataValue.push(newMessage)
+        addLocalDmDataForAccountToAddr(account, toAddr, [newMessage])
+        return JSON.stringify(chatDataValue)
+      })
+    )
+
+  const updateSentMessage = (message: ChatMessageType, timestamp: string) =>
+    dispatch(
+      updateQueryData('getChatData', { account, toAddr }, (chatData) => {
+        const chatDataValue = JSON.parse(chatData)
+
+        const index = chatDataValue.findIndex(
+          (chat: ChatMessageType) => chat.timestamp === timestamp
+        )
+        chatDataValue[index] = {
+          ...message,
+          message: chatDataValue[index].message,
+        }
+
+        updateLocalDmDataForAccountToAddr(account, toAddr, chatDataValue)
         return JSON.stringify(chatDataValue)
       })
     )
 
   const sendMessage = async () => {
-    if (msgInput.length <= 0) return
+    const value = msgInput.current
 
-    // Make a copy and clear input field
-    const msgInputCopy = ` ${msgInput}`.slice(1)
-    setMsgInput('')
+    if (value.length <= 0) return
 
-    const timestamp = new Date()
+    // clear input field
+    if (textAreaRef.current) textAreaRef.current.value = ''
 
-    const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
-
-    const data = {
-      message: msgInputCopy,
-      fromAddr: account.toLocaleLowerCase(),
-      toAddr: toAddr.toLocaleLowerCase(),
-      timestamp,
+    const createMessageData: CreateChatMessageType = {
+      message: value,
+      fromaddr: account.toLocaleLowerCase(),
+      toaddr: toAddr.toLocaleLowerCase(),
       nftid: '0',
-      encrypted_sym_lit_key: '',
       lit_access_conditions: '',
-      read: false,
+      encrypted_sym_lit_key: '',
     }
 
-    const newMessage = {
+    const timestamp = new Date().toString()
+
+    const newMessage: ChatMessageType = {
+      ...createMessageData,
       Id: -1,
-      message: msgInputCopy,
-      fromaddr: account,
-      toaddr: toAddr,
-      timestamp: timestamp.toString(),
+      timestamp,
+      timestamp_dtm: timestamp,
       sender_name: name,
+      read: false,
+      nftaddr: '',
     }
 
-    addMessageToUI(newMessage)
+    // Already show message on the UI with the spinner as Loading
+    // because it will begin to encrypt the message and only confirm
+    // it was sent after a successful response
+    addPendingMessageToUI(newMessage)
 
-    // data.message = msgInputCopy
-    const accessControlConditions = [
-      {
-        conditionType: 'evmBasic',
-        contractAddress: '',
-        standardContractType: '',
-        chain: 'ethereum',
-        method: '',
-        parameters: [':userAddress'],
-        returnValueTest: {
-          comparator: '=',
-          value: data.toAddr,
-        },
-      },
-      { operator: 'or' },
-      {
-        conditionType: 'evmBasic',
-        contractAddress: '',
-        standardContractType: '',
-        chain: 'ethereum',
-        method: '',
-        parameters: [':userAddress'],
-        returnValueTest: {
-          comparator: '=',
-          value: data.fromAddr,
-        },
-      },
-      { operator: 'or' }, // delegate.cash full wallet delegation
-      {
-        conditionType: 'evmContract',
-        contractAddress: '0x00000000000076A84feF008CDAbe6409d2FE638B',
-        functionName: 'checkDelegateForAll',
-        functionParams: [':userAddress', data.toAddr],
-        functionAbi: {
-          inputs: [
-            {
-              name: 'delegate',
-              type: 'address',
-              internalType: 'address',
-            },
-            {
-              name: 'vault',
-              type: 'address',
-              internalType: 'address',
-            },
-          ],
-          name: 'checkDelegateForAll',
-          outputs: [
-            {
-              name: '',
-              type: 'bool',
-            },
-          ],
-          payable: false,
-          stateMutability: 'view',
-          type: 'function',
-        },
-        chain: 'ethereum',
-        returnValueTest: {
-          key: '',
-          comparator: '=',
-          value: 'true',
-        },
-      },
-      { operator: 'or' }, // delegate.cash full wallet delegation
-      {
-        conditionType: 'evmContract',
-        contractAddress: '0x00000000000076A84feF008CDAbe6409d2FE638B',
-        functionName: 'checkDelegateForAll',
-        functionParams: [':userAddress', data.fromAddr],
-        functionAbi: {
-          inputs: [
-            {
-              name: 'delegate',
-              type: 'address',
-              internalType: 'address',
-            },
-            {
-              name: 'vault',
-              type: 'address',
-              internalType: 'address',
-            },
-          ],
-          name: 'checkDelegateForAll',
-          outputs: [
-            {
-              name: '',
-              type: 'bool',
-            },
-          ],
-          payable: false,
-          stateMutability: 'view',
-          type: 'function',
-        },
-        chain: 'ethereum',
-        returnValueTest: {
-          key: '',
-          comparator: '=',
-          value: 'true',
-        },
-      },
-    ]
+    const accessControlConditions = getAccessControlConditions(
+      createMessageData.fromaddr,
+      createMessageData.toaddr
+    )
 
-    console.log('✅[TEST][Delegate Wallet]:', delegate)
+    console.log('ℹ️[POST][Encrypting Message]', value, accessControlConditions)
 
-    console.log(
-      '✅[POST][Encrypting Message]:',
-      msgInputCopy,
+    const encrypted = await lit.encryptString(value, accessControlConditions)
+    createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
+    createMessageData.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
+    createMessageData.lit_access_conditions = JSON.stringify(
       accessControlConditions
     )
-    const encrypted = await lit.encryptString(
-      msgInputCopy,
-      accessControlConditions
-    )
-    data.message = await lit.blobToB64(encrypted.encryptedFile)
-    data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-    data.lit_access_conditions = JSON.stringify(accessControlConditions)
-    console.log('✅[POST][Encrypted Message]:', data)
 
-    setIsSendingMessage(true)
+    console.log('✅[POST][Encrypted Message]:', createMessageData)
+
     fetch(
       ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
-      postFetchOptions(data)
+      postFetchOptions(createMessageData)
     )
       .then((response) => response.json())
       .then((responseData) => {
-        console.log('✅[POST][Send Message]:', responseData, latestLoadedMsgs)
-        // getChatData()
+        console.log('✅[POST][Send Message]:', responseData)
+        updateSentMessage(responseData, timestamp)
       })
       .catch((error) => {
-        console.error('🚨[POST][Send message]:', error, data)
-      })
-      .finally(() => {
-        setIsSendingMessage(false)
+        console.error('🚨[POST][Send message]:', error, createMessageData)
       })
 
     if (
@@ -222,7 +131,7 @@ function Submit({
           body: JSON.stringify({
             title: account,
             type: 'feedback',
-            description: msgInputCopy,
+            description: value,
             user: 347112,
           }),
         })
@@ -231,7 +140,11 @@ function Submit({
             console.log('✅[POST][Feedback]:', responseData)
           })
           .catch((error) => {
-            console.error('🚨[POST][Feedback]:', error, JSON.stringify(data))
+            console.error(
+              '🚨[POST][Feedback]:',
+              error,
+              JSON.stringify(createMessageData)
+            )
           })
       }
     }
@@ -249,8 +162,10 @@ function Submit({
       <FormControl style={{ flexGrow: 1 }}>
         <TextareaAutosize
           placeholder='Write a message...'
-          value={msgInput}
-          onChange={(e) => setMsgInput(e.target.value)}
+          ref={textAreaRef}
+          onChange={(e) => {
+            msgInput.current = e.target.value
+          }}
           onKeyPress={(e) => handleKeyPress(e)}
           className='custom-scrollbar'
           style={{
@@ -266,12 +181,7 @@ function Submit({
         />
       </FormControl>
       <Flex alignItems='flex-end'>
-        <Button
-          variant='black'
-          height='100%'
-          onClick={() => sendMessage()}
-          isLoading={isSendingMessage}
-        >
+        <Button variant='black' height='100%' onClick={sendMessage}>
           <IconSend size='20' />
         </Button>
       </Flex>

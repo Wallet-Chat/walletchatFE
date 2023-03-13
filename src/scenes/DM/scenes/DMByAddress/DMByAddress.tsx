@@ -265,12 +265,7 @@ const DMByAddress = ({
         })}
       </DottedBackground>
 
-      <Submit
-        delegate={delegate}
-        loadedMsgs={chatData}
-        toAddr={toAddr}
-        account={account}
-      />
+      <Submit toAddr={toAddr} account={account} />
     </Flex>
   )
 }

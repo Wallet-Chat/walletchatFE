@@ -7,6 +7,7 @@ import equal from 'fast-deep-equal/es6'
 import {
   updateLocalDmDataForAccountToAddr,
   updateQueryData,
+  useGetNameQuery,
 } from '@/redux/reducers/dm'
 import { CHAT_CONTEXT_TYPES } from '@/constants'
 import { formatMessageDate } from '../../helpers/date'
@@ -19,6 +20,7 @@ import { useIsInViewport } from '../../helpers/useIsInViewport'
 import * as ENV from '@/constants/env'
 import Avatar from '../Inbox/DM/Avatar'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import { truncateAddressMore } from '@/helpers/truncateString'
 
 const MessageBox = styled.div`
   position: relative;
@@ -131,6 +133,13 @@ const ChatMessage = ({
   account: string | undefined
   msg: MessageUIType
 }) => {
+  const sender = msg?.fromaddr
+  const { data: senderName } = useGetNameQuery(sender, {
+    selectFromResult: (options) =>
+      // TODO: use localStorage, for own account, use same value for account name
+      ({ ...options, data: options.data || truncateAddressMore(sender) }),
+  })
+
   const dispatch = useAppDispatch()
 
   const [nftData, setNftData] = useState<NFT>()
@@ -284,10 +293,10 @@ const ChatMessage = ({
         ref={messageRef}
       >
         <Box className='msg-bubble'>
-          {msg?.sender_name && fromAddr && (
+          {senderName && fromAddr && (
             <UserProfileContextMenu address={fromAddr}>
               <Text fontSize='md' className='name'>
-                {msg.sender_name}
+                {senderName}
               </Text>
             </UserProfileContextMenu>
           )}
@@ -305,7 +314,7 @@ const ChatMessage = ({
           </Box>
 
           {msgPosition === 'right' &&
-            (msg.read === true || msg.read === false || msg.Id !== -1 ? (
+            (msg.Id !== -1 ? (
               <span className='read-status'>
                 {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
               </span>
