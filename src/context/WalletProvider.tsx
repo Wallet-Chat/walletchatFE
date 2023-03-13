@@ -8,12 +8,16 @@ import storage from '../utils/extension-storage'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
+import { endpoints, upsertQueryData } from '@/redux/reducers/dm'
+import { useAppDispatch } from '@/hooks/useDispatch'
 
 export const WalletContext = React.createContext<any>(null)
 export const useWallet = () => React.useContext(WalletContext)
 
 /* eslint-disable react/display-name */
 const WalletProvider = React.memo(({ children }: { children: any }) => {
+  const dispatch = useAppDispatch()
+
   const didWelcome = React.useRef(false)
   const signedIn = React.useRef(Boolean(storage.get('jwt')))
 
@@ -23,7 +27,6 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const [account, setAccount] = React.useState(wagmi.getAccount())
   const [accountAddress, setAccountAddress] = React.useState(account?.address)
   const [nonce, setNonce] = React.useState<string | null>()
-  const [name, setName] = useState<string | undefined | null>(undefined)
   const [email, setEmail] = useState(null)
   const [notifyDM, setNotifyDM] = useState('true')
   const [notify24, setNotify24] = useState('true')
@@ -32,42 +35,21 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   )
   const [delegate, setDelegate] = useState<null | string>(null)
 
+  const { data: name } = endpoints.getName.useQueryState(
+    accountAddress?.toLocaleLowerCase()
+  )
+
+  const setName = (newName: string) =>
+    dispatch(
+      upsertQueryData('getName', accountAddress?.toLocaleLowerCase(), newName)
+    )
+
   wagmi.watchAccount((wagmiAccount) => setAccount(wagmiAccount))
   wagmi.watchNetwork((wagmiNetwork) =>
     !wagmiNetwork.chain
       ? setAuthenticated(false)
       : signedIn.current && setAuthenticated(true)
   )
-
-  const getName = (address: string) => {
-    if (name) return
-
-    fetch(
-      ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/name/${address}`,
-      {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-        },
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('✅[GET][Name]:', data)
-
-        if (data[0]?.name) {
-          setName(data[0].name)
-        } else {
-          setName(null)
-        }
-      })
-      .catch((error: any) => {
-        console.error('🚨[GET][Name]:', error)
-        setName(null)
-      })
-  }
 
   const getSettings = (address: string) => {
     if (email) return
@@ -229,7 +211,11 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
               setAccountAddress(walletInJWT)
             }
 
-            getName(accountAddress)
+            const getName = dispatch(
+              endpoints.getName.initiate(accountAddress?.toLocaleLowerCase())
+            )
+            getName.unsubscribe()
+
             getSettings(accountAddress)
           })
 

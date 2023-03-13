@@ -543,7 +543,8 @@ export const dmApi = createApi({
 })
 
 export const {
-  util: { updateQueryData },
+  util: { updateQueryData, upsertQueryData },
+  endpoints,
   useGetPfpQuery,
   useGetNameQuery,
   useGetChatDataQuery,
