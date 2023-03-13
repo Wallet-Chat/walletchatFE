@@ -258,7 +258,7 @@ export function getInboxDmDataForAccount(account: string) {
   return inboxDataObj
 }
 
-function getInboxFrom(account: string, item: InboxMessageType) {
+export function getInboxFrom(account: string, item: InboxMessageType) {
   const isCommunityOrNFT =
     item.context_type === 'community' || item.context_type === 'nft'
   const fromValue = isCommunityOrNFT
@@ -267,7 +267,7 @@ function getInboxFrom(account: string, item: InboxMessageType) {
   return fromValue
 }
 
-function updateLocalInboxDataForAccount(
+export function updateLocalInboxDataForAccount(
   account: string,
   inboxData: InboxMessageType[]
 ) {
@@ -481,6 +481,9 @@ export const dmApi = createApi({
       },
     }),
 
+    // TODO: if unread count provider returns a higher value, fetch & update inbox data
+    // TODO: make inbox use same chat msg as chat data to avoid 
+    // having to decrypt twice
     getInbox: builder.query({
       queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
         try {

@@ -5,7 +5,10 @@ import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
 import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
 import {
+  getInboxDmDataForAccount,
+  getInboxFrom,
   updateLocalDmDataForAccountToAddr,
+  updateLocalInboxDataForAccount,
   updateQueryData,
   useGetNameQuery,
 } from '@/redux/reducers/dm'
@@ -253,6 +256,29 @@ const ChatMessage = ({
               }
             )
           )
+
+          if (account !== fromAddr) {
+            dispatch(
+              updateQueryData('getInbox', account, () => {
+                const storedInboxData = getInboxDmDataForAccount(account)
+                const unreadInbox =
+                  storedInboxData.dm[getInboxFrom(account, data)]
+
+                const newInboxItem = unreadInbox &&
+                  unreadInbox.read === false && {
+                    ...unreadInbox,
+                    read: true,
+                    unread: 0,
+                  }
+
+                if (newInboxItem) {
+                  updateLocalInboxDataForAccount(account, [newInboxItem])
+                }
+
+                return JSON.stringify(getInboxDmDataForAccount(account))
+              })
+            )
+          }
         })
         .catch((error) => {
           console.error('🚨[PUT][Message]:', error)

@@ -28,6 +28,7 @@ const InboxList = ({
     : storedData
   const inboxList = Object.values(inboxData[context])
 
+  // TODO: use unread counts from unread count provider instead
   return (
     <Box>
       {inboxList?.map((conversation, i) => {
