@@ -156,6 +156,8 @@ import {
              body: JSON.stringify({
                 name: values.name,
                 address: account,
+                signupsite: document.referrer,
+                domain: document.domain
              }),
           })
              .then((response) => response.json())
