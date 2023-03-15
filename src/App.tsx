@@ -42,7 +42,7 @@ export const App = () => {
         left='10px'
         right='10px'
       >
-        {isChromeExtension() && <ExtensionCloseButton />}
+        <ExtensionCloseButton />
 
         <Box
           borderRadius='lg'
@@ -65,7 +65,7 @@ export const App = () => {
     return (
       <Box>
         <Flex>
-          {isChromeExtension() && <ExtensionCloseButton />}
+          <ExtensionCloseButton />
 
           <Sidebar />
 
@@ -92,7 +92,7 @@ export const App = () => {
         flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
         minHeight={isSmallLayout ? '100vh' : 'unset'}
       >
-        {isChromeExtension() && <ExtensionCloseButton />}
+        <ExtensionCloseButton />
 
         <Sidebar />
 
