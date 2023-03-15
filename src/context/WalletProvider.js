@@ -83,7 +83,9 @@ const WalletProvider = React.memo(({ children }) => {
    const [redirectUrl, setRedirectUrl] = useState('/community/walletchat')
    let navigate = useNavigate()
 
+   //help debug issues and watch for high traffic conditions
    const analytics = AnalyticsBrowser.load({ writeKey: process.env.REACT_APP_SEGMENT_KEY })
+   const OneDay = (1 * 24 * 60 * 60 * 1000)
 
    React.useEffect(() => {
       const connectEagerly = async () => {
@@ -366,10 +368,17 @@ const WalletProvider = React.memo(({ children }) => {
             setChainId(network.chainId)
             const _w3 = new Web3(_provider)
 
-            analytics.track('ConnectWallet', {
-               site: document.referrer,
-               account: _account
-             });
+            //limit wallet connection recording to once per day
+            var lastTimestamp = await storage.get('last-wallet-connection-timestamp')
+            var currentTime = new Date().getTime()
+            if (currentTime - lastTimestamp > OneDay) {
+               console.log("Connect Wallet Daily")
+               analytics.track('ConnectWallet', {
+                  site: document.referrer,
+                  account: _account
+               });
+               storage.set('last-wallet-connection-timestamp', currentTime)
+            }
 
             // check if JWT exists or is timed out:
             fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/welcome`, {
