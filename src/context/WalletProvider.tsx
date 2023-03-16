@@ -42,9 +42,15 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   )
 
   const setName = React.useCallback(
-    (newName: string) =>
+    (newName: string, address: undefined | string) =>
       dispatch(
-        upsertQueryData('getName', accountAddress?.toLocaleLowerCase(), newName)
+        upsertQueryData(
+          'getName',
+          address
+            ? address.toLocaleLowerCase()
+            : accountAddress?.toLocaleLowerCase(),
+          newName
+        )
       ),
     [accountAddress, dispatch]
   )
@@ -170,7 +176,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
             getNonce(address)
           } else {
             const newName = welcomeData.msg.toString().split(':')[1]
-            setName(newName)
+            setName(newName, address)
             console.log('✅[Name]:', newName)
 
             // safe to pass jwt here because we know it exists due to
