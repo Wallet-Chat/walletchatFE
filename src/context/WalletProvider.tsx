@@ -22,7 +22,9 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const signedIn = React.useRef(Boolean(storage.get('jwt')))
 
   const provider = wagmi.getProvider()
-  const network = wagmi.getNetwork()
+
+  const [network, setNetwork] = React.useState(wagmi.getNetwork())
+  const chainId = network?.chain?.id
 
   const [account, setAccount] = React.useState(wagmi.getAccount())
   const [accountAddress, setAccountAddress] = React.useState(account?.address)
@@ -39,21 +41,26 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
     accountAddress?.toLocaleLowerCase()
   )
 
-  const setName = (newName: string) =>
-    dispatch(
-      upsertQueryData('getName', accountAddress?.toLocaleLowerCase(), newName)
-    )
-
-  wagmi.watchAccount((wagmiAccount) => setAccount(wagmiAccount))
-  wagmi.watchNetwork((wagmiNetwork) =>
-    !wagmiNetwork.chain
-      ? setAuthenticated(false)
-      : signedIn.current && setAuthenticated(true)
+  const setName = React.useCallback(
+    (newName: string) =>
+      dispatch(
+        upsertQueryData('getName', accountAddress?.toLocaleLowerCase(), newName)
+      ),
+    [accountAddress, dispatch]
   )
 
-  const getSettings = (address: string) => {
-    if (email) return
+  wagmi.watchAccount((wagmiAccount) => setAccount(wagmiAccount))
+  wagmi.watchNetwork((wagmiNetwork) => {
+    setNetwork(wagmiNetwork)
 
+    if (!wagmiNetwork.chain) {
+      setAuthenticated(false)
+    } else if (signedIn.current) {
+      setAuthenticated(true)
+    }
+  })
+
+  const getSettings = React.useCallback((address: string) => {
     fetch(
       ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${address}`,
       {
@@ -84,7 +91,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
       .catch((error: any) => {
         console.error('🚨[GET][Setting]:', error)
       })
-  }
+  }, [])
 
   function parseJwt(token: string) {
     const base64Url = token.split('.')[1]
@@ -98,6 +105,34 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
     )
     return JSON.parse(jsonPayload)
   }
+
+  const signIn = React.useCallback(
+    (address: string, jwt: string) => {
+      Lit.connectManual()
+
+      console.log('✅[INFO][JWT]:', jwt)
+
+      // if we log in with a full delegate, act as the vault
+      const walletInJWT = parseJwt(jwt).sub
+      if (walletInJWT.toLocaleLowerCase() !== address.toLocaleLowerCase()) {
+        console.log(
+          '✅[Using Full Delegate Wallet]:',
+          walletInJWT,
+          accountAddress
+        )
+        setDelegate(address) // not sure this is used anymore
+        setAccountAddress(walletInJWT)
+      }
+
+      const getName = dispatch(
+        endpoints.getName.initiate(accountAddress?.toLocaleLowerCase())
+      )
+      getName.unsubscribe()
+
+      getSettings(address)
+    },
+    [accountAddress, dispatch, getSettings]
+  )
 
   function getNonce(address: string) {
     fetch(` ${ENV.REACT_APP_REST_API}/users/${address}/nonce`, {
@@ -137,6 +172,11 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
             const newName = welcomeData.msg.toString().split(':')[1]
             setName(newName)
             console.log('✅[Name]:', newName)
+
+            // safe to pass jwt here because we know it exists due to
+            // successful welcome call, the extra || '' is just to
+            // satisfy typescript
+            signIn(address, localStorage.getItem('jwt') || '')
           }
         })
         .catch((welcomeError) => {
@@ -144,10 +184,10 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
           getNonce(address)
         })
     }
-  }, [account])
+  }, [account, setName, signIn])
 
   React.useEffect(() => {
-    if (accountAddress && nonce && network && network.chain) {
+    if (accountAddress && nonce && chainId) {
       const doSignIn = async () => {
         if (signedIn.current) return
 
@@ -162,7 +202,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
           statement,
           uri: origin,
           version: '1',
-          chainId: network.chain?.id,
+          chainId,
           nonce,
         })
 
@@ -181,7 +221,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
 
         fetch(`${ENV.REACT_APP_REST_API}/signin`, {
           body: JSON.stringify({
-            name: network.chain?.id.toString(),
+            name: chainId.toString(),
             address: accountAddress,
             nonce,
             msg: messageToSign,
@@ -194,29 +234,8 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
           .then(async (signInData) => {
             localStorage.setItem('jwt', signInData.access)
             localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
-            Lit.connectManual()
-            console.log('✅[INFO][JWT]:', signInData.access)
-            // if we log in with a full delegate, act as the vault
-            const walletInJWT = parseJwt(signInData.access).sub
-            if (
-              walletInJWT.toLocaleLowerCase() !==
-              accountAddress.toLocaleLowerCase()
-            ) {
-              console.log(
-                '✅[Using Full Delegate Wallet]:',
-                walletInJWT,
-                accountAddress
-              )
-              setDelegate(accountAddress) // not sure this is used anymore
-              setAccountAddress(walletInJWT)
-            }
 
-            const getName = dispatch(
-              endpoints.getName.initiate(accountAddress?.toLocaleLowerCase())
-            )
-            getName.unsubscribe()
-
-            getSettings(accountAddress)
+            signIn(accountAddress, signInData.access)
           })
 
         signedIn.current = true
@@ -225,7 +244,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
 
       doSignIn()
     }
-  }, [accountAddress, network, nonce, provider])
+  }, [accountAddress, chainId, nonce, provider, signIn])
 
   const disconnectWallet = async () => {
     wagmi.disconnect()
