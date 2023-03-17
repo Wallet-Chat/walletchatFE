@@ -43,9 +43,9 @@ import { truncateAddress } from '../../helpers/truncateString'
 import { useIsMobileView } from '../../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../../helpers/ipfs'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
-import IconDM from '../../images/icon-dm.svg'
-import IconCommunity from '../../images/icon-community.svg'
-import IconNFT from '../../images/icon-nft.svg'
+import IconDM from '../../images/dm.svg'
+import IconCommunity from '../../images/community.svg'
+import IconNFT from '../../images/nft.png'
 import { isChromeExtension } from '../../helpers/chrome'
 
 interface URLChangedEvent extends Event {
