@@ -1,5 +1,14 @@
 import { Route, Routes, Navigate, Outlet } from 'react-router-dom'
-import { Box, Flex, Image, Heading, Spinner, Tag } from '@chakra-ui/react'
+import * as wagmi from '@wagmi/core'
+import {
+  Box,
+  Flex,
+  Image,
+  Heading,
+  Spinner,
+  Tag,
+  Button,
+} from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
@@ -25,6 +34,65 @@ import NFTByContract from './scenes/NFT/scenes/NFTByContract'
 import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
 import ExtensionCloseButton from './components/ExtensionCloseButton'
+import { getIsWidgetContext } from './utils/context'
+
+const isWidget = getIsWidgetContext()
+
+const CustomConnectButton = () => {
+  const { siweFailed, parentProvider, isSigningIn, doRequestSiwe } = useWallet()
+
+  // TODO: allow changing sign-in method after already selected wallet
+  return (
+    <ConnectButton.Custom>
+      {({ account, chain }) => {
+        const connected = account && chain
+
+        return (() => {
+          if (isWidget && isSigningIn) {
+            return (
+              <Button variant='black' size='lg' w='220px'>
+                <Spinner />
+              </Button>
+            )
+          }
+
+          if (isWidget && parentProvider) {
+            return (
+              <Flex direction='column' gap={2} alignItems='start'>
+                <Button
+                  variant='black'
+                  size='lg'
+                  onClick={() =>
+                    siweFailed
+                      ? doRequestSiwe()
+                      : wagmi.connect({ connector: parentProvider.connector })
+                  }
+                >
+                  <Tag variant='solid' colorScheme='green' mr={2}>
+                    Connected
+                  </Tag>
+                  <Box>Log In</Box>
+                </Button>
+
+                {siweFailed && (
+                  <Tag variant='solid' colorScheme='red'>
+                    Signature failed or rejected, please try again
+                  </Tag>
+                )}
+              </Flex>
+            )
+          }
+
+          if (connected) {
+            return null
+          }
+
+          return <ConnectButton chainStatus='none' showBalance={false} />
+        })()
+      }}
+    </ConnectButton.Custom>
+  )
+}
 
 export const App = () => {
   const { isAuthenticated, name, account, web3, delegate }: any = useWallet()
@@ -55,7 +123,7 @@ export const App = () => {
             Login to start chatting
           </Heading>
 
-          <ConnectButton chainStatus='none' showBalance={false} />
+          <CustomConnectButton />
         </Box>
       </Flex>
     )

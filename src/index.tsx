@@ -19,6 +19,9 @@ import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
 import * as ENV from '@/constants/env'
+import { getIsWidgetContext } from './utils/context'
+
+const isWidget = getIsWidgetContext()
 
 const { chains, provider } = configureChains(
   [mainnet, polygon, optimism],
@@ -31,7 +34,7 @@ const { connectors } = getDefaultWallets({
 })
 
 const wagmiClient = createClient({
-  autoConnect: true,
+  autoConnect: !isWidget,
   connectors,
   provider,
 })

@@ -1,4 +1,5 @@
 import * as wagmi from '@wagmi/core'
+import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect'
 
 import React, { useState } from 'react'
 import Web3 from 'web3'
@@ -10,9 +11,12 @@ import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
 import { endpoints, upsertQueryData } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import { getIsWidgetContext } from '@/utils/context'
 
 export const WalletContext = React.createContext<any>(null)
 export const useWallet = () => React.useContext(WalletContext)
+
+const isWidget = getIsWidgetContext()
 
 /* eslint-disable react/display-name */
 const WalletProvider = React.memo(({ children }: { children: any }) => {
@@ -23,8 +27,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
 
   const provider = wagmi.getProvider()
 
-  const [network, setNetwork] = React.useState(wagmi.getNetwork())
-  const chainId = network?.chain?.id
+  const [chainId, setChainId] = React.useState(wagmi.getNetwork()?.chain?.id)
 
   const [account, setAccount] = React.useState(wagmi.getAccount())
   const [accountAddress, setAccountAddress] = React.useState(account?.address)
@@ -33,9 +36,14 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const [notifyDM, setNotifyDM] = useState('true')
   const [notify24, setNotify24] = useState('true')
   const [isAuthenticated, setAuthenticated] = useState(
-    Boolean(signedIn.current && network && network.chain)
+    Boolean(signedIn.current && chainId)
   )
   const [delegate, setDelegate] = useState<null | string>(null)
+  const [isSigningIn, setIsSigningIn] = React.useState(false)
+  const [siweFailed, setSiweFailed] = React.useState(false)
+
+  const [parentProvider, setParentProvider] = React.useState<null | any>()
+  const [widgetOpen, setWidgetOpen] = React.useState(false)
 
   const { data: name } = endpoints.getName.useQueryState(
     accountAddress?.toLocaleLowerCase()
@@ -57,7 +65,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
 
   wagmi.watchAccount((wagmiAccount) => setAccount(wagmiAccount))
   wagmi.watchNetwork((wagmiNetwork) => {
-    setNetwork(wagmiNetwork)
+    setChainId(wagmiNetwork?.chain?.id)
 
     if (!wagmiNetwork.chain) {
       setAuthenticated(false)
@@ -136,6 +144,14 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
       getName.unsubscribe()
 
       getSettings(address)
+
+      if (isWidget) {
+        window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
+      }
+
+      signedIn.current = true
+      setAuthenticated(true)
+      setIsSigningIn(false)
     },
     [accountAddress, dispatch, getSettings]
   )
@@ -156,101 +172,170 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   }
 
   React.useEffect(() => {
+    setIsSigningIn(true)
+
     const address = account && account.address
-    if (address) {
+    if (address && (!isWidget || widgetOpen)) {
       setAccountAddress(address)
 
-      if (didWelcome.current) return
+      if (!didWelcome.current) {
+        didWelcome.current = true
 
-      didWelcome.current = true
+        fetch(
+          ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,
+          getFetchOptions()
+        )
+          .then((response) => response.json())
+          .then(async (welcomeData) => {
+            console.log('✅[GET][Welcome]:', welcomeData.msg)
 
-      fetch(
-        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,
-        getFetchOptions()
-      )
-        .then((response) => response.json())
-        .then(async (welcomeData) => {
-          console.log('✅[GET][Welcome]:', welcomeData.msg)
+            if (!welcomeData.msg.includes(address.toLocaleLowerCase())) {
+              getNonce(address)
+            } else {
+              const newName = welcomeData.msg.toString().split(':')[1]
+              setName(newName, address)
+              console.log('✅[Name]:', newName)
 
-          if (!welcomeData.msg.includes(address.toLocaleLowerCase())) {
+              // safe to pass jwt here because we know it exists due to
+              // successful welcome call, the extra || '' is just to
+              // satisfy typescript
+              signIn(address, localStorage.getItem('jwt') || '')
+            }
+          })
+          .catch((welcomeError) => {
+            console.error('🚨[GET][Welcome]:', welcomeError)
             getNonce(address)
-          } else {
-            const newName = welcomeData.msg.toString().split(':')[1]
-            setName(newName, address)
-            console.log('✅[Name]:', newName)
-
-            // safe to pass jwt here because we know it exists due to
-            // successful welcome call, the extra || '' is just to
-            // satisfy typescript
-            signIn(address, localStorage.getItem('jwt') || '')
-          }
-        })
-        .catch((welcomeError) => {
-          console.error('🚨[GET][Welcome]:', welcomeError)
-          getNonce(address)
-        })
+          })
+      }
+    } else if (isWidget && widgetOpen && !address) {
+      window.parent.postMessage({ data: false, target: 'sign_in' }, '*')
+    } else if (isWidget && !widgetOpen && address) {
+      // notify the widget that we are signed in
+      window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
     }
-  }, [account, setName, signIn])
+
+    setIsSigningIn(false)
+  }, [account, setName, signIn, widgetOpen])
 
   React.useEffect(() => {
-    if (accountAddress && nonce && chainId) {
-      const doSignIn = async () => {
-        if (signedIn.current) return
+    if (!isWidget) return
 
-        const domain = 'walletchat.fun'
-        const origin = 'https://walletchat.fun'
-        const statement =
-          'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
+    window.addEventListener('message', (e) => {
+      const data = e.data
 
-        const siweMessage = new SiweMessage({
-          domain,
-          address: accountAddress,
-          statement,
-          uri: origin,
-          version: '1',
-          chainId,
-          nonce,
-        })
+      const {
+        data: messageData,
+        target,
+      }: {
+        data:
+          | undefined
+          | null
+          | {
+              isInjected: boolean
+              connectorOptions: null | {
+                projectId: string
+                address: string
+                chainId: number
+              }
+            }
+        target: undefined | string
+      } = data
 
-        const messageToSign = siweMessage.prepareMessage()
-        const signer = await wagmi.fetchSigner()
-        const signature = await signer?.signMessage(messageToSign)
-
-        const authSig = {
-          sig: signature,
-          derivedVia: 'web3.eth.personal.sign',
-          signedMessage: messageToSign,
-          address: accountAddress.toLocaleLowerCase(),
-        }
-
-        console.log('✅[INFO][AuthSig]:', authSig)
-
-        fetch(`${ENV.REACT_APP_REST_API}/signin`, {
-          body: JSON.stringify({
-            name: chainId.toString(),
-            address: accountAddress,
-            nonce,
-            msg: messageToSign,
-            sig: signature,
-          }),
-          headers: { 'Content-Type': 'application/json' },
-          method: 'POST',
-        })
-          .then((response) => response.json())
-          .then(async (signInData) => {
-            localStorage.setItem('jwt', signInData.access)
-            localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
-
-            signIn(accountAddress, signInData.access)
-          })
-
-        signedIn.current = true
-        setAuthenticated(true)
+      if (target === 'widget_open') {
+        setWidgetOpen(true)
       }
 
-      doSignIn()
+      if (target === 'sign_in') {
+        if (messageData) {
+          if (messageData.isInjected) {
+            setParentProvider({ connector: new wagmi.InjectedConnector() })
+          } else if (messageData.connectorOptions) {
+            setParentProvider({
+              connector: new WalletConnectConnector({
+                options: {
+                  projectId: messageData.connectorOptions.projectId,
+                },
+              }),
+            })
+          }
+        } else if (messageData === null) {
+          setParentProvider(null)
+        }
+      }
+    })
+  }, [])
+
+  const doRequestSiwe = React.useCallback(async () => {
+    if (accountAddress && nonce && chainId && !signedIn.current) {
+      setIsSigningIn(true)
+
+      const domain = 'walletchat.fun'
+      const origin = 'https://walletchat.fun'
+      const statement =
+        'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
+
+      const siweMessage = new SiweMessage({
+        domain,
+        address: accountAddress,
+        statement,
+        uri: origin,
+        version: '1',
+        chainId,
+        nonce,
+      })
+
+      const messageToSign = siweMessage.prepareMessage()
+      const signer = await wagmi.fetchSigner()
+
+      let signature
+      try {
+        signature = await signer?.signMessage(messageToSign)
+      } catch (error) {
+        console.error('🚨[SIWE][Failed or Rejected]:', error)
+      }
+
+      if (!signature) {
+        setIsSigningIn(false)
+        setSiweFailed(true)
+        return
+      }
+
+      const authSig = {
+        sig: signature,
+        derivedVia: 'web3.eth.personal.sign',
+        signedMessage: messageToSign,
+        address: accountAddress.toLocaleLowerCase(),
+      }
+
+      console.log('✅[INFO][AuthSig]:', authSig)
+
+      fetch(`${ENV.REACT_APP_REST_API}/signin`, {
+        body: JSON.stringify({
+          name: chainId.toString(),
+          address: accountAddress,
+          nonce,
+          msg: messageToSign,
+          sig: signature,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+        .then((response) => response.json())
+        .then(async (signInData) => {
+          localStorage.setItem('jwt', signInData.access)
+          localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
+
+          signIn(accountAddress, signInData.access)
+        })
+
+      signedIn.current = true
+      setAuthenticated(true)
     }
-  }, [accountAddress, chainId, nonce, provider, signIn])
+  }, [accountAddress, chainId, nonce, signIn])
+
+  React.useEffect(() => {
+    doRequestSiwe()
+  }, [doRequestSiwe])
 
   const disconnectWallet = async () => {
     wagmi.disconnect()
@@ -259,10 +344,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
     localStorage.clear()
     if (rkRecent) localStorage.setItem('rk-recent', rkRecent)
 
-    didWelcome.current = false
-    signedIn.current = false
-    setNonce(null)
-    setAuthenticated(false)
+    document.location.reload()
   }
 
   const contextValue = React.useMemo(
@@ -281,6 +363,10 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
       web3: provider && new Web3(provider),
       provider,
       delegate,
+      isSigningIn,
+      parentProvider,
+      siweFailed,
+      doRequestSiwe,
     }),
     [
       accountAddress,
@@ -291,6 +377,11 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
       notify24,
       notifyDM,
       provider,
+      setName,
+      isSigningIn,
+      parentProvider,
+      siweFailed,
+      doRequestSiwe,
     ]
   )
 
