@@ -43,9 +43,10 @@ import { truncateAddress } from '../../helpers/truncateString'
 import { useIsMobileView } from '../../context/IsMobileViewProvider'
 import { convertIpfsUriToUrl } from '../../helpers/ipfs'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
-import IconDM from '../../images/dm.svg'
-import IconCommunity from '../../images/community.svg'
-import IconNFT from '../../images/nft.png'
+import IconDM from '../../images/icon-dm.svg'
+import IconCommunity from '../../images/icon-community.svg'
+import IconNFT from '../../images/icon-nft.svg'
+import IconSupport from '../../images/icon-feedback.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 
 interface URLChangedEvent extends Event {
@@ -62,6 +63,8 @@ export default function Sidebar() {
    const [imageUrl, setImageUrl] = useState<string>()
    const [pfpData, setPfpData] = useState<string>()
    const { unreadCount } = useUnreadCount()
+
+   const supportWallet = process.env.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
 
    const { isMobileView } = useIsMobileView()
 
@@ -279,6 +282,9 @@ export default function Sidebar() {
                      </UnreadCountContainer>
                   )}
                </LinkElem>
+               <LinkElem to={`/dm/${supportWallet}`}>
+                  <Image src={IconSupport} alt="" />
+               </LinkElem>
                </>
             )} 
             
@@ -434,7 +440,7 @@ export default function Sidebar() {
                   <MenuGroup>
                      <MenuItem
                         as={NavLink}
-                        to="/dm/0x17FA0A61bf1719D12C08c61F211A063a58267A19"
+                        to={`/dm/${supportWallet}`}
                         icon={
                            <Box>
                               <IconMessagePlus stroke="1.5" />
