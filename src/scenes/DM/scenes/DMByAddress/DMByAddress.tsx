@@ -5,7 +5,7 @@ import { createSelector } from '@reduxjs/toolkit'
 import { useAppSelector } from '@/hooks/useSelector'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { POLLING_QUERY_OPTS } from '@/constants'
-import { MessageUIType } from '@/types/Message'
+import { ChatMessageType } from '@/types/Message'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import DMHeader from './DMHeader'
@@ -23,20 +23,36 @@ import Submit from './Submit'
 
 const PAGE_SIZE = 25
 
-const DMByAddress = ({
-  account,
-  delegate,
+const AlertBubble = ({
+  children,
+  color,
 }: {
-  account: string
-  delegate: string
-}) => {
-  const bodyRef = React.useRef()
+  children: string
+  color: 'green' | 'red'
+}) => (
+  <Flex
+    justifyContent='center'
+    alignItems='center'
+    borderRadius='lg'
+    background={color === 'green' ? 'green.200' : 'red.200'}
+    p={4}
+    position='sticky'
+    top={0}
+    right={0}
+    zIndex={1}
+  >
+    <Box fontSize='md'>{children}</Box>
+  </Flex>
+)
+
+const DMByAddress = ({ account }: { account: string }) => {
+  const bodyRef = React.useRef<any>(null)
   const maxPages = React.useRef(1)
   const pageRef = React.useRef<number>(1)
-  const fullChatData = React.useRef<undefined | MessageUIType[]>()
+  const fullChatData = React.useRef<undefined | ChatMessageType[]>()
+  const prevLastMsg = React.useRef<string | undefined>()
 
   const dispatch = useAppDispatch()
-  const prevLastMsg = React.useRef<number | undefined>()
 
   const { address: toAddr = '' } = useParams()
 
@@ -48,7 +64,7 @@ const DMByAddress = ({
   const selectChatDataForPage = React.useMemo(
     () =>
       createSelector(
-        (chatData: MessageUIType[]) => chatData,
+        (chatData: ChatMessageType[]) => chatData,
         (chatData) => {
           if (!chatData) return chatData
 
@@ -99,25 +115,27 @@ const DMByAddress = ({
   const chatData = fetchedData ? JSON.parse(fetchedData) : []
 
   const scrollToBottomCb = React.useCallback(
-    (msg: MessageUIType) => (node: any) => {
-      if (node) {
-        // TODO: const sentByMe = msg.fromaddr === account
+    (msg: ChatMessageType, useSmooth?: boolean) => (node: HTMLElement) => {
+      const previousScrolledMsg = prevLastMsg.current
+      const previousAddr = previousScrolledMsg?.split(':')[0]
+      const previousMsgId = previousScrolledMsg?.split(':')[1]
 
-        if (prevLastMsg.current !== msg.Id) {
-          node.scrollIntoView({ smooth: true })
-          prevLastMsg.current = msg.Id
-          setPage(1)
-          pageRef.current = 1
-        }
+      if (node && previousMsgId !== String(msg.Id)) {
+        const isNewPage = previousAddr !== toAddr
+
+        node.scrollIntoView({ behavior: !isNewPage ? 'smooth' : 'auto' })
+        prevLastMsg.current = `${toAddr}:${String(msg.Id)}`
+        setPage(1)
+        pageRef.current = 1
       }
     },
-    []
+    [toAddr]
   )
 
   React.useEffect(() => {
-    if (bodyRef.current) {
-      const bodyElem = bodyRef.current
+    const bodyElem = bodyRef.current
 
+    if (bodyElem) {
       const autoScrollPagination = () => {
         if (page < maxPages.current) {
           const scrollThreshold = 200
@@ -145,7 +163,7 @@ const DMByAddress = ({
     if (allDms && newEncryptedDms && newEncryptedDms.length > 0) {
       const retryFailed = async () => {
         const newChatData = allDms || []
-        const failedDms = newChatData.filter((msg: MessageUIType) =>
+        const failedDms = newChatData.filter((msg: ChatMessageType) =>
           newEncryptedDms.includes(msg.Id)
         )
 
@@ -154,9 +172,9 @@ const DMByAddress = ({
           account
         )
 
-        fetchedMessages.forEach((msg: MessageUIType) => {
+        fetchedMessages.forEach((msg: ChatMessageType) => {
           newChatData[
-            newChatData.findIndex((dm: MessageUIType) => dm.Id === msg.Id)
+            newChatData.findIndex((dm: ChatMessageType) => dm.Id === msg.Id)
           ] = msg
         })
 
@@ -174,26 +192,19 @@ const DMByAddress = ({
 
       retryFailed()
     }
-  }, [encryptedDmsStr, account, toAddr])
+  }, [dispatch, encryptedDmsStr, account, toAddr])
 
   // TODO: 'back to bottom' button
-  if (isFetching && !fetchedData) {
+  if (isFetching && !encryptedDmsStr && chatData.length === 0) {
     return (
       <Flex background='white' height='100vh' flexDirection='column' flex='1'>
         <DMHeader />
 
-        <DottedBackground className='custom-scrollbar'>
-          <Flex
-            justifyContent='center'
-            alignItems='center'
-            borderRadius='lg'
-            background='green.200'
-            p={4}
-          >
-            <Box fontSize='md'>
-              Decrypting Your Messages, Please Wait and Do Not Refresh 😊
-            </Box>
-          </Flex>
+        <DottedBackground className='custom-scrollbar' overflow='hidden'>
+          <AlertBubble color='green'>
+            Decrypting Your Messages, Please Wait and Do Not Refresh 😊
+          </AlertBubble>
+
           <Flex justifyContent='center' alignItems='center' height='100%'>
             <Spinner />
           </Flex>
@@ -209,16 +220,11 @@ const DMByAddress = ({
       <Flex background='white' height='100vh' flexDirection='column' flex='1'>
         <DMHeader />
 
-        <DottedBackground className='custom-scrollbar'>
-          <Flex
-            justifyContent='center'
-            alignItems='center'
-            borderRadius='lg'
-            background='red.200'
-            p={4}
-          >
-            <Box fontSize='md'>Failed to decrypt messages, retrying...</Box>
-          </Flex>
+        <DottedBackground className='custom-scrollbar' overflow='hidden'>
+          <AlertBubble color='red'>
+            Failed to decrypt messages, retrying...
+          </AlertBubble>
+
           <Flex justifyContent='center' alignItems='center' height='100%'>
             <Spinner />
           </Flex>
@@ -234,30 +240,18 @@ const DMByAddress = ({
       <DottedBackground ref={bodyRef} className='custom-scrollbar'>
         {toAddr ===
           '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase() && (
-          <Flex
-            justifyContent='center'
-            alignItems='center'
-            borderRadius='lg'
-            background='green.200'
-            p={4}
-            position='sticky'
-            top={0}
-            right={0}
-            zIndex={1}
-          >
-            <Box fontSize='md'>
-              We welcome all feedback and bug reports. Thank you! 😊
-            </Box>
-          </Flex>
+          <AlertBubble color='green'>
+            We welcome all feedback and bug reports. Thank you! 😊
+          </AlertBubble>
         )}
 
-        {chatData.map((msg: MessageUIType, i: number) => {
+        {chatData.map((msg: ChatMessageType, i: number) => {
           const isLast = i === chatData.length - 1
 
           return (
             <Box
               key={`${String(i)}_${msg.Id}`}
-              ref={isLast ? scrollToBottomCb(msg) : undefined}
+              ref={isLast ? (scrollToBottomCb(msg) as any) : undefined}
             >
               <ChatMessage context='dm' account={account} msg={msg} />
             </Box>
