@@ -17,7 +17,9 @@ import {
   PopoverContent,
   PopoverArrow,
   PopoverBody,
+  Button,
 } from '@chakra-ui/react'
+import { AddIcon } from '@chakra-ui/icons'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
@@ -53,6 +55,27 @@ interface URLChangedEvent extends Event {
   detail?: string
 }
 
+const UnreadBadge = ({ children }: { children: string }) => (
+  <Box
+    position='absolute'
+    top={0}
+    right={0}
+    overflow='hidden'
+    background='black'
+    borderRadius='full'
+    border='2px solid #fff'
+    display='flex'
+    alignItems='center'
+    justifyContent='center'
+    width='1.5rem'
+    height='1.5rem'
+  >
+    <Badge variant='black' fontSize='sm'>
+      {children}
+    </Badge>
+  </Box>
+)
+
 export default function Sidebar() {
   const navigate = useNavigate()
 
@@ -64,8 +87,9 @@ export default function Sidebar() {
   const [nftData, setNftData] = useState<NFTPortNFTResponse>()
   const [imageUrl, setImageUrl] = useState<string>()
   const { unreadCount } = useUnreadCount()
-  
-  const supportWallet = ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
+
+  const supportWallet =
+    ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
 
   const { metadata } = nftData?.nft || {}
 
@@ -245,36 +269,24 @@ export default function Sidebar() {
             <LinkElem to={'/dm'}>
               {/* <Box className="popup-text">Chat</Box> */}
               <Image src={IconDM} alt='' />
-              {(unreadCount?.dm > 0 || unreadCount?.community > 0) && (
-                <UnreadCountContainer>
-                  <Badge variant='blue' fontSize='md'>
-                    {unreadCount?.dm}
-                  </Badge>
-                </UnreadCountContainer>
+              {unreadCount?.dm > 0 && (
+                <UnreadBadge>{unreadCount?.dm}</UnreadBadge>
               )}
             </LinkElem>
             <LinkElem to={'/nft'}>
               <Image src={IconNFT} alt='' />
               {unreadCount?.nft > 0 && (
-                <UnreadCountContainer>
-                  <Badge variant='blue' fontSize='md'>
-                    {unreadCount?.nft}
-                  </Badge>
-                </UnreadCountContainer>
+                <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
               )}
             </LinkElem>
             <LinkElem to={'/community'}>
               <Image src={IconCommunity} alt='' />
               {unreadCount?.community > 0 && (
-                <UnreadCountContainer>
-                  <Badge variant='blue' fontSize='md'>
-                    {unreadCount?.community}
-                  </Badge>
-                </UnreadCountContainer>
+                <UnreadBadge>{unreadCount?.community}</UnreadBadge>
               )}
             </LinkElem>
             <LinkElem to={`/dm/${supportWallet}`}>
-              <Image src={IconSupport} alt="" />
+              <Image src={IconSupport} alt='' />
             </LinkElem>
           </>
         )}
@@ -320,6 +332,23 @@ export default function Sidebar() {
                   <Text fontSize="sm">My NFTs</Text>
                </Link>
             </Button> */}
+
+        <LinkElem to={`/dm/new`}>
+          <Button
+            size='sm'
+            variant='outline'
+            borderRadius='full'
+            w='100%'
+            h='100%'
+            _hover={{
+              textDecoration: 'none',
+              backgroundColor: 'var(--chakra-colors-lightgray-300)',
+            }}
+          >
+            <AddIcon boxSize='4' />
+          </Button>
+        </LinkElem>
+
         <Menu isLazy>
           <MenuButton as={AccountInfo}>
             {account && (
@@ -517,7 +546,6 @@ const AccountInfo = styled.button`
   border-radius: var(--chakra-radii-md);
   /* border-bottom-left-radius: 0.5rem;
    border-bottom-right-radius: 0.5rem; */
-  margin-bottom: 0.3rem;
   text-align: center;
   background: var(--chakra-colors-lightgray-400);
   border: 1px solid var(--chakra-colors-lightgray-900);
@@ -546,13 +574,4 @@ const Divider = styled.div`
     border-bottom: 1px solid #cbcbcb;
     border-right: 1px solid #cbcbcb;
   }
-`
-const UnreadCountContainer = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  overflow: hidden;
-  background: var(--chakra-colors-information-400);
-  border-radius: var(--chakra-radii-md);
-  border: 2px solid #fff;
 `

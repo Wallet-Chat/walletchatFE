@@ -146,10 +146,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
         setAccountAddress(walletInJWT)
       }
 
-      const getName = dispatch(
-        endpoints.getName.initiate(accountAddress?.toLocaleLowerCase())
-      )
-      getName.unsubscribe()
+      dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
 
       getSettings(address)
 

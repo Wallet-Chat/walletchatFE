@@ -1,6 +1,6 @@
 import React from 'react'
 import { IconSend } from '@tabler/icons'
-import TextareaAutosize from 'react-textarea-autosize'
+import { Textarea } from '@chakra-ui/react'
 import { FormControl, Button, Flex } from '@chakra-ui/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
@@ -23,9 +23,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const msgInput = React.useRef<string>('')
-  const supportWallet = ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
-  const supportHeader = ENV.REACT_APP_SUPPORT_HEADER || 'We welcome all feedback and bug reports. Thank you! 😊'
-  const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
+  const supportWallet =
+    ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
+  const supportHeader =
+    ENV.REACT_APP_SUPPORT_HEADER ||
+    'We welcome all feedback and bug reports. Thank you! 😊'
+  const analytics = AnalyticsBrowser.load({
+    writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
+  })
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
@@ -61,9 +66,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     if (value.length <= 0) return
 
     analytics.track('SendMessage', {
-       site: document.referrer,
-       account
-     });
+      site: document.referrer,
+      account,
+    })
 
     // clear input field
     if (textAreaRef.current) textAreaRef.current.value = ''
@@ -167,31 +172,36 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   }
 
   return (
-    <Flex>
-      <FormControl style={{ flexGrow: 1 }}>
-        <TextareaAutosize
-          placeholder='Write a message...'
-          ref={textAreaRef}
-          onChange={(e) => {
-            msgInput.current = e.target.value
-          }}
-          onKeyPress={(e) => handleKeyPress(e)}
-          className='custom-scrollbar'
-          style={{
-            resize: 'none',
-            padding: '.5rem 1rem',
-            width: '100%',
-            fontSize: 'var(--chakra-fontSizes-md)',
-            background: 'var(--chakra-colors-lightgray-400)',
-            borderRadius: '0.3rem',
-            marginBottom: '-6px',
-          }}
-          maxRows={8}
-        />
-      </FormControl>
+    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+      <Textarea
+        placeholder='Write a message...'
+        ref={textAreaRef}
+        onChange={(e) => {
+          msgInput.current = e.target.value
+        }}
+        onKeyPress={handleKeyPress}
+        minH='full'
+        resize='none'
+        px='3'
+        py='3'
+        w='100%'
+        fontSize='md'
+        background='lightgray.400'
+        borderRadius='xl'
+      />
+
       <Flex alignItems='flex-end'>
-        <Button variant='black' height='100%' onClick={sendMessage}>
-          <IconSend size='20' />
+        <Button
+          variant='black'
+          onClick={sendMessage}
+          borderRadius='full'
+          minH='full'
+          px='0'
+          py='0'
+          w='12'
+          h='12'
+        >
+          <IconSend size='22' />
         </Button>
       </Flex>
     </Flex>

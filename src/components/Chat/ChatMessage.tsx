@@ -57,7 +57,7 @@ const MessageBox = styled.div`
   }
   &.right {
     float: left;
-    background: var(--chakra-colors-darkgray-800);
+    background: var(--chakra-colors-black);
     color: var(--chakra-colors-lightgray-100);
 
     .name {
