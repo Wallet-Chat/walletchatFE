@@ -12,6 +12,7 @@ import { getFetchOptions } from '@/helpers/fetch'
 import { endpoints, upsertQueryData } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { getIsWidgetContext } from '@/utils/context'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 export const WalletContext = React.createContext<any>(null)
 export const useWallet = () => React.useContext(WalletContext)
@@ -48,6 +49,12 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const { data: name } = endpoints.getName.useQueryState(
     accountAddress?.toLocaleLowerCase()
   )
+
+  // help debug issues and watch for high traffic conditions
+  const analytics = AnalyticsBrowser.load({
+    writeKey: ENV.REACT_APP_SEGMENT_KEY,
+  })
+  const OneDay = 1 * 24 * 60 * 60 * 1000
 
   const setName = React.useCallback(
     (newName: string, address: undefined | string) =>
@@ -134,6 +141,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
           walletInJWT,
           accountAddress
         )
+        storage.set('delegate', address)
         setDelegate(address) // not sure this is used anymore
         setAccountAddress(walletInJWT)
       }
@@ -155,6 +163,12 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
     },
     [accountAddress, dispatch, getSettings]
   )
+
+  React.useEffect(() => {
+    if (analytics && accountAddress && name && email) {
+      analytics.identify(accountAddress, { name, email })
+    }
+  }, [accountAddress, analytics, email, name])
 
   function getNonce(address: string) {
     fetch(` ${ENV.REACT_APP_REST_API}/users/${address}/nonce`, {
@@ -181,6 +195,21 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
       if (!didWelcome.current) {
         didWelcome.current = true
 
+        // limit wallet connection recording to once per day
+        ;(async () => {
+          const lastTimestamp = await storage.get(
+            'last-wallet-connection-timestamp'
+          )
+          const currentTime = new Date().getTime()
+          if (currentTime - lastTimestamp > OneDay) {
+            analytics.track('ConnectWallet', {
+              site: document.referrer,
+              account: address,
+            })
+            storage.set('last-wallet-connection-timestamp', currentTime)
+          }
+        })()
+
         fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,
           getFetchOptions()
@@ -189,7 +218,10 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
           .then(async (welcomeData) => {
             console.log('✅[GET][Welcome]:', welcomeData.msg)
 
-            if (!welcomeData.msg.includes(address.toLocaleLowerCase())) {
+            if (
+              !welcomeData.msg.includes(address.toLocaleLowerCase()) &&
+              !address.includes(storage.get('delegate'))
+            ) {
               getNonce(address)
             } else {
               const newName = welcomeData.msg.toString().split(':')[1]

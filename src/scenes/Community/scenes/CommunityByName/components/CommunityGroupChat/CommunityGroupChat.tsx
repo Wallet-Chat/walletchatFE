@@ -23,6 +23,7 @@ import {
   MessageUIType,
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const CommunityGroupChat = ({
   account,
@@ -41,6 +42,7 @@ const CommunityGroupChat = ({
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+  const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -101,6 +103,12 @@ const CommunityGroupChat = ({
       console.log('No account connected')
       return
     }
+
+    analytics.track('SendCommunityMessage', {
+       site: document.referrer,
+       community,
+       account
+     });
 
     // Make a copy and clear input field
     const msgInputCopy = (' ' + msgInput).slice(1)

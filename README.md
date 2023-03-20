@@ -25,4 +25,4 @@ The extension should now be installed.
 
 [https://github.com/cryptoKevinL/restWalletChat](https://github.com/cryptoKevinL/restWalletChat)
 
-The back-end consists of the IPFS, a centralized database and REST API for interacting with the front-end. We use a server for speed so as to improve user experience, with the decentralized IPFS for storing and pinning messages that can be retrieved by users. Messages are protected by a decentralized encryption method.
+The back-end consists of IPFS, an SQL database and REST API for interacting with the front-end. We use a server for speed so as to improve user experience, with the decentralized IPFS for storing and pinning messages that can be retrieved by users. Messages are protected by a decentralized encryption method.

@@ -26,6 +26,7 @@ import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const NFTChat = ({
   recipientAddr,
@@ -38,13 +39,15 @@ const NFTChat = ({
   nftContractAddr: string
   nftId: string
 }) => {
-  const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
-  const [msgInput, setMsgInput] = useState<string>('')
-  const [isSendingMessage, setIsSendingMessage] = useState(false)
-  const [chatData, setChatData] = useState<MessageType[]>(
-    new Array<MessageType>()
-  )
-  const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+   const [copiedAddr, setCopiedAddr] = useState<boolean>(false)
+   const [msgInput, setMsgInput] = useState<string>('')
+   const [isSendingMessage, setIsSendingMessage] = useState(false)
+   const [chatData, setChatData] = useState<MessageType[]>(
+      new Array<MessageType>()
+   )
+   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+
+   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
 
   // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
 
@@ -109,8 +112,12 @@ const NFTChat = ({
     }
   }
 
-  const sendMessage = async () => {
-    if (msgInput.length <= 0) return
+   const sendMessage = async () => {
+      analytics.track('SendNftMessage', {
+         site: document.referrer,
+         account: account
+       });
+      if (msgInput.length <= 0) return
 
     // Make a copy and clear input field
     const msgInputCopy = (' ' + msgInput).slice(1)

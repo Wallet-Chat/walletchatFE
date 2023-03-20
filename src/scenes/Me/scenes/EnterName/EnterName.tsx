@@ -184,6 +184,8 @@ const EnterName = ({ account }: { account: string }) => {
             body: JSON.stringify({
                name: values.name,
                address: account,
+               signupsite: document.referrer,
+               domain: document.domain
             }),
             }
          )

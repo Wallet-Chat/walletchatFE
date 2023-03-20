@@ -44,6 +44,7 @@ import { useUnreadCount } from '../../context/UnreadCountProvider'
 import IconDM from '../../images/icon-dm.svg'
 import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
+import IconSupport from '../../images/icon-feedback.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
 import { getIsWidgetContext } from '@/utils/context'
@@ -63,6 +64,8 @@ export default function Sidebar() {
   const [nftData, setNftData] = useState<NFTPortNFTResponse>()
   const [imageUrl, setImageUrl] = useState<string>()
   const { unreadCount } = useUnreadCount()
+  
+  const supportWallet = ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
 
   const { metadata } = nftData?.nft || {}
 
@@ -269,6 +272,9 @@ export default function Sidebar() {
                   </Badge>
                 </UnreadCountContainer>
               )}
+            </LinkElem>
+            <LinkElem to={`/dm/${supportWallet}`}>
+              <Image src={IconSupport} alt="" />
             </LinkElem>
           </>
         )}

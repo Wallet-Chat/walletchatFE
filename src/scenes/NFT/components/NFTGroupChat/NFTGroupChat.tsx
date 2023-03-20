@@ -14,6 +14,7 @@ import generateItems from '../../helpers/generateGroupedByDays'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 const NFTGroupChat = ({
   account,
@@ -22,14 +23,16 @@ const NFTGroupChat = ({
   account: string | undefined
   nftContractAddr: string
 }) => {
-  const [firstLoad, setFirstLoad] = useState(true)
-  // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
-  const [isSendingMessage, setIsSendingMessage] = useState(false)
-  const [chatData, setChatData] = useState<GroupMessageType[]>([])
-  const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-  const [userPfpImage, setUserPfpImage] = useState<PfpType[]>([])
-  let navigate = useNavigate()
-  const scrollToBottomRef = useRef<HTMLDivElement>(null)
+   const [firstLoad, setFirstLoad] = useState(true)
+   // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
+   const [isSendingMessage, setIsSendingMessage] = useState(false)
+   const [chatData, setChatData] = useState<GroupMessageType[]>([])
+   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+   const [userPfpImage, setUserPfpImage] = useState<PfpType[]>([])
+   let navigate = useNavigate()
+   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+
+   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
 
   useEffect(() => {
     getChatData()
@@ -79,12 +82,16 @@ const NFTGroupChat = ({
     // .finally(() => setIsFetchingMessages(false))
   }
 
-  const sendMessage = async (msgInput: string) => {
-    if (msgInput.length <= 0) return
-    if (!account) {
-      console.log('No account connected')
-      return
-    }
+   const sendMessage = async (msgInput: string) => {
+      analytics.track('SendNftGroupMessage', {
+         site: document.referrer,
+         account: account
+       });
+      if (msgInput.length <= 0) return
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
 
     // Make a copy
     const msgInputCopy = (' ' + msgInput).slice(1)

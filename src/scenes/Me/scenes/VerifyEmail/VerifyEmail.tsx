@@ -91,7 +91,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
                console.log('✅[GET][Verify Email]:', response)
                 setFetchError(false)
                 setIsVerifySuccess(true)
-                let communityChat = process.env.REACT_APP_DEFAULT_COMMUNITY || "walletchat"
+                let communityChat = ENV.REACT_APP_DEFAULT_COMMUNITY || "walletchat"
                 navigate(`/community/${communityChat}`)
             })
             .catch((error) => {

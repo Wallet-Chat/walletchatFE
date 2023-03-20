@@ -107,7 +107,7 @@ const EnterEmail = ({ account }: { account: string }) => {
    };
    
    const handleCancel = () => {
-      let communityChat = process.env.REACT_APP_DEFAULT_COMMUNITY || "walletchat"
+      let communityChat = ENV.REACT_APP_DEFAULT_COMMUNITY || "walletchat"
       navigate(`/community/${communityChat}`)
   };
 

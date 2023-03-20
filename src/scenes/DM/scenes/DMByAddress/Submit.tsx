@@ -14,6 +14,7 @@ import {
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { getAccessControlConditions } from '@/helpers/lit'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { name } = useWallet()
@@ -22,6 +23,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const msgInput = React.useRef<string>('')
+  const supportWallet = ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
+  const supportHeader = ENV.REACT_APP_SUPPORT_HEADER || 'We welcome all feedback and bug reports. Thank you! 😊'
+  const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
@@ -55,6 +59,11 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     const value = msgInput.current
 
     if (value.length <= 0) return
+
+    analytics.track('SendMessage', {
+       site: document.referrer,
+       account
+     });
 
     // clear input field
     if (textAreaRef.current) textAreaRef.current.value = ''
