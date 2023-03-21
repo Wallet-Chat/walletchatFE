@@ -8,6 +8,7 @@ import {
   Spinner,
   Tag,
   Button,
+  Alert,
 } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { isMobile } from 'react-device-detect'
@@ -44,15 +45,17 @@ const CustomConnectButton = () => {
   // TODO: allow changing sign-in method after already selected wallet
   return (
     <ConnectButton.Custom>
-      {({ account, chain }) => {
-        const connected = account && chain
-
+      {() => {
         return (() => {
           if (isWidget && isSigningIn) {
             return (
-              <Button variant='black' size='lg' w='220px'>
+              <>
                 <Spinner />
-              </Button>
+
+                <Alert status='success' variant='solid' mt={4}>
+                  You must sign the pending message in your connected wallet
+                </Alert>
+              </>
             )
           }
 
@@ -81,10 +84,6 @@ const CustomConnectButton = () => {
                 )}
               </Flex>
             )
-          }
-
-          if (connected) {
-            return null
           }
 
           return <ConnectButton chainStatus='none' showBalance={false} />
