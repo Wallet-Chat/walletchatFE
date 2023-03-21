@@ -57,7 +57,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const OneDay = 1 * 24 * 60 * 60 * 1000
 
   const setName = React.useCallback(
-    (newName: string, address: undefined | string) =>
+    (newName: null | string, address: undefined | string) =>
       dispatch(
         upsertQueryData(
           'getName',
@@ -221,9 +221,14 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
             ) {
               getNonce(address)
             } else {
-              const newName = welcomeData.msg.toString().split(':')[1]
-              setName(newName, address)
-              console.log('✅[Name]:', newName)
+              const currentName = welcomeData.msg.toString().split(':')[1]
+
+              if (currentName) {
+                setName(currentName, address)
+                console.log('✅[Name]:', currentName)
+              } else {
+                setName(null, address)
+              }
 
               // safe to pass jwt here because we know it exists due to
               // successful welcome call, the extra || '' is just to

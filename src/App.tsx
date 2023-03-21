@@ -129,7 +129,7 @@ export const App = () => {
     )
   }
 
-  if (isAuthenticated && !name) {
+  if (isAuthenticated && name === undefined) {
     return (
       <Box>
         <Flex>
