@@ -122,14 +122,18 @@ const DMByAddress = ({ account }: { account: string }) => {
 
       if (node && previousMsgId !== String(msg.Id)) {
         const isNewPage = previousAddr !== toAddr
+        const lastMsgMine = previousAddr === account
 
-        node.scrollIntoView({ behavior: !isNewPage ? 'smooth' : 'auto' })
+        if (isNewPage || lastMsgMine) {
+          node.scrollIntoView({ behavior: !isNewPage ? 'smooth' : 'auto' })
+        }
+
         prevLastMsg.current = `${toAddr}:${String(msg.Id)}`
         setPage(1)
         pageRef.current = 1
       }
     },
-    [toAddr]
+    [account, toAddr]
   )
 
   React.useEffect(() => {
