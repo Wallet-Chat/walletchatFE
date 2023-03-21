@@ -361,7 +361,7 @@ export default function Sidebar() {
           {unreadCount?.dm > 0 && <UnreadBadge>{unreadCount?.dm}</UnreadBadge>}
         </SidebarLink>
 
-        <SidebarLink to='/nft'>
+        <SidebarLink to='/nft' end={!!metadata}>
           <Image src={IconNFT} alt='' />
           {unreadCount?.nft > 0 && (
             <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
