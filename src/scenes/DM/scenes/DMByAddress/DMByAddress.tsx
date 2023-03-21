@@ -20,6 +20,7 @@ import {
   selectEncryptedDmIds,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
+import { walletChatEth } from '@/constants/wallets'
 
 const PAGE_SIZE = 25
 
@@ -242,8 +243,7 @@ const DMByAddress = ({ account }: { account: string }) => {
       <DMHeader />
 
       <DottedBackground ref={bodyRef} className='custom-scrollbar'>
-        {toAddr ===
-          '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase() && (
+        {toAddr.toLocaleLowerCase() === walletChatEth && (
           <AlertBubble color='green'>
             We welcome all feedback and bug reports. Thank you! 😊
           </AlertBubble>

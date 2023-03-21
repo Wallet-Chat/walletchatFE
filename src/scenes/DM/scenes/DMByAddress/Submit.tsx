@@ -23,8 +23,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const msgInput = React.useRef<string>('')
-  const supportWallet =
-    ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
   const supportHeader =
     ENV.REACT_APP_SUPPORT_HEADER ||
     'We welcome all feedback and bug reports. Thank you! 😊'

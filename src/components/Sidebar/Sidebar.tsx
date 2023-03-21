@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
 import { useEffect, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import {
   IconLogout,
   IconMessagePlus,
@@ -36,7 +36,6 @@ import * as ENV from '@/constants/env'
 import IconDiscord from '../../images/icon-products/icon-discord.svg'
 import IconPrivacy from '../../images/privacy-policy.png'
 import logoThumb from '../../images/logo-thumb.svg'
-import { getContractAddressAndNFTId } from '../../helpers/contract'
 import NFTPortNFTResponse from '../../types/NFTPort/NFT'
 import animatedPlaceholder from '../../images/animated-placeholder.gif'
 import { useWallet } from '../../context/WalletProvider'
@@ -49,11 +48,118 @@ import IconNFT from '../../images/icon-nft.svg'
 import IconSupport from '../../images/icon-feedback.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
-import { getIsWidgetContext } from '@/utils/context'
+import { supportWallet } from '@/constants/wallets'
 
 interface URLChangedEvent extends Event {
   detail?: string
 }
+
+const SidebarLink = styled(
+  ({
+    children,
+    className,
+    to,
+    end,
+  }: {
+    children: any
+    className?: string
+    to: string
+    end?: boolean
+  }) => {
+    return (
+      <NavLink to={to} end={!!end} className={className}>
+        {children}
+      </NavLink>
+    )
+  }
+)`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  padding: var(--chakra-space-2);
+  margin-bottom: 0.2rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  box-sizing: border-box;
+  background: #fff;
+
+  &::before {
+    content: '';
+    width: 5px;
+    height: 35%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: transparent;
+    border-top-right-radius: 0.2rem;
+    border-bottom-right-radius: 0.2rem;
+  }
+
+  img {
+    opacity: 0.6;
+  }
+
+  &:hover,
+  &.active {
+    background: var(--chakra-colors-lightgray-400);
+
+    &::before {
+      background: var(--chakra-colors-darkgray-900);
+    }
+
+    svg {
+      stroke: var(--chakra-colors-darkgray-900);
+    }
+    img {
+      opacity: 1;
+    }
+  }
+`
+const NFTSidebarLink = styled(SidebarLink)`
+  background: var(--chakra-colors-lightgray-200);
+`
+const Divider = () => (
+  <Box
+    display='block'
+    w={isMobile ? 'px' : 'full'}
+    h={isMobile ? 'full' : 'px'}
+    _before={{
+      content: '""',
+      display: 'block',
+      my: '0',
+      mx: 'auto',
+      w: isMobile ? 'px' : '10',
+      h: isMobile ? '10' : 'px',
+      borderBottom: '1px solid #cbcbcb',
+      borderRight: '1px solid #cbcbcb',
+    }}
+  />
+)
+
+const AccountInfo = styled.button`
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--chakra-radii-md);
+  /* border-bottom-left-radius: 0.5rem;
+   border-bottom-right-radius: 0.5rem; */
+  text-align: center;
+  background: var(--chakra-colors-lightgray-400);
+  border: 1px solid var(--chakra-colors-lightgray-900);
+  /* border-top: none; */
+
+  & > span {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+  }
+
+  &:hover {
+    background: var(--chakra-colors-lightgray-500);
+  }
+`
 
 const UnreadBadge = ({ children }: { children: string }) => (
   <Box
@@ -78,6 +184,9 @@ const UnreadBadge = ({ children }: { children: string }) => (
 
 export default function Sidebar() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isSupportPage = location.pathname.includes(supportWallet)
+  const isNewDMPage = location.pathname.startsWith('/dm/new')
 
   const nftNotificationCount = 0
   const [url, setUrl] = useState<string | undefined>('')
@@ -87,9 +196,6 @@ export default function Sidebar() {
   const [nftData, setNftData] = useState<NFTPortNFTResponse>()
   const [imageUrl, setImageUrl] = useState<string>()
   const { unreadCount } = useUnreadCount()
-
-  const supportWallet =
-    ENV.REACT_APP_SUPPORT_WALLET || '0x17FA0A61bf1719D12C08c61F211A063a58267A19'
 
   const { metadata } = nftData?.nft || {}
 
@@ -188,21 +294,7 @@ export default function Sidebar() {
         navigate(`/dm/${ownerAddress}`)
       }
     })
-  }, [])
-
-  useEffect(() => {
-    if (url && getIsWidgetContext()) {
-      const [contractAddress, nftId, chain] = getContractAddressAndNFTId(url)
-      if (contractAddress && nftId !== null && chain) {
-        setNftContractAddr(contractAddress)
-        setNftId(nftId)
-        setChainName(chain)
-        if (contractAddress.startsWith('0x')) {
-          getNftMetadata(contractAddress, nftId, chain)
-        }
-      }
-    }
-  }, [url])
+  }, [navigate])
 
   return (
     <Flex
@@ -260,39 +352,35 @@ export default function Sidebar() {
             </PopoverBody>
           </PopoverContent>
         </Popover>
-        <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0}></Box>
+        <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0} />
         <Divider />
-        <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0}></Box>
+        <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0} />
 
-        {name !== null && (
-          <>
-            <LinkElem to={'/dm'}>
-              {/* <Box className="popup-text">Chat</Box> */}
-              <Image src={IconDM} alt='' />
-              {unreadCount?.dm > 0 && (
-                <UnreadBadge>{unreadCount?.dm}</UnreadBadge>
-              )}
-            </LinkElem>
-            <LinkElem to={'/nft'}>
-              <Image src={IconNFT} alt='' />
-              {unreadCount?.nft > 0 && (
-                <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
-              )}
-            </LinkElem>
-            <LinkElem to={'/community'}>
-              <Image src={IconCommunity} alt='' />
-              {unreadCount?.community > 0 && (
-                <UnreadBadge>{unreadCount?.community}</UnreadBadge>
-              )}
-            </LinkElem>
-            <LinkElem to={`/dm/${supportWallet}`}>
-              <Image src={IconSupport} alt='' />
-            </LinkElem>
-          </>
-        )}
+        <SidebarLink to='/dm' end={isSupportPage || isNewDMPage}>
+          <Image src={IconDM} alt='' />
+          {unreadCount?.dm > 0 && <UnreadBadge>{unreadCount?.dm}</UnreadBadge>}
+        </SidebarLink>
+
+        <SidebarLink to='/nft'>
+          <Image src={IconNFT} alt='' />
+          {unreadCount?.nft > 0 && (
+            <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
+          )}
+        </SidebarLink>
+
+        <SidebarLink to='/community'>
+          <Image src={IconCommunity} alt='' />
+          {unreadCount?.community > 0 && (
+            <UnreadBadge>{unreadCount?.community}</UnreadBadge>
+          )}
+        </SidebarLink>
+
+        <SidebarLink to={`/dm/${supportWallet}`}>
+          <Image src={IconSupport} alt='' />
+        </SidebarLink>
 
         {metadata && (
-          <LinkElem2 to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
+          <NFTSidebarLink to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
             {imageUrl && (
               <Image
                 src={imageUrl}
@@ -313,27 +401,11 @@ export default function Sidebar() {
                 {nftNotificationCount}
               </Badge>
             )}
-          </LinkElem2>
+          </NFTSidebarLink>
         )}
       </Flex>
       <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
-        {/* <Button
-               size="sm"
-               background="lightgray.200"
-               px={2}
-               width="100%"
-               borderEndStartRadius="0"
-               borderEndEndRadius="0"
-               border="1px solid var(--chakra-colors-lightgray-900)"
-               borderBottom="none"
-               _hover={{ background: 'lightgray.500' }}
-            >
-               <Link to="/me/nfts" style={{ textDecoration: 'none' }}>
-                  <Text fontSize="sm">My NFTs</Text>
-               </Link>
-            </Button> */}
-
-        <LinkElem to={`/dm/new`}>
+        <SidebarLink to='/dm/new'>
           <Button
             size='sm'
             variant='outline'
@@ -347,7 +419,7 @@ export default function Sidebar() {
           >
             <AddIcon boxSize='4' />
           </Button>
-        </LinkElem>
+        </SidebarLink>
 
         <Menu isLazy>
           <MenuButton as={AccountInfo}>
@@ -469,109 +541,3 @@ export default function Sidebar() {
     </Flex>
   )
 }
-
-const LinkElem = styled(NavLink)`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 60px;
-  height: 60px;
-  padding: var(--chakra-space-2);
-  margin-bottom: 0.2rem;
-  border-radius: 0.5rem;
-  text-align: center;
-  box-sizing: border-box;
-  background: #fff;
-
-  &::before {
-    content: '';
-    width: 5px;
-    height: 35%;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    background: transparent;
-    border-top-right-radius: 0.2rem;
-    border-bottom-right-radius: 0.2rem;
-  }
-
-  img {
-    opacity: 0.6;
-  }
-
-  &:hover,
-  &.active {
-    background: var(--chakra-colors-lightgray-400);
-
-    &::before {
-      background: var(--chakra-colors-darkgray-900);
-    }
-
-    svg {
-      stroke: var(--chakra-colors-darkgray-900);
-    }
-    img {
-      opacity: 1;
-    }
-  }
-
-  &:hover {
-    .popup-text {
-      transform: translateY(20%);
-      opacity: 1;
-    }
-  }
-
-  .popup-text {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    background: var(--chakra-colors-darkgray-900);
-    color: white;
-    transform: translateY(50%);
-    border-radius: 0.5rem;
-    width: 100%;
-    opacity: 0;
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-    font-size: var(--chakra-fontSizes-md);
-  }
-`
-const LinkElem2 = styled(LinkElem)`
-  background: var(--chakra-colors-lightgray-200);
-`
-const AccountInfo = styled.button`
-  padding: 0.6rem 0.8rem;
-  border-radius: var(--chakra-radii-md);
-  /* border-bottom-left-radius: 0.5rem;
-   border-bottom-right-radius: 0.5rem; */
-  text-align: center;
-  background: var(--chakra-colors-lightgray-400);
-  border: 1px solid var(--chakra-colors-lightgray-900);
-  /* border-top: none; */
-
-  & > span {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-  }
-
-  &:hover {
-    background: var(--chakra-colors-lightgray-500);
-  }
-`
-const Divider = styled.div`
-  display: block;
-  width: ${isMobile ? '1px' : '100%'};
-  height: ${isMobile ? '100%' : '1px'};
-  &::before {
-    content: '';
-    display: block;
-    margin: 0 auto;
-    width: ${isMobile ? '1px' : '40px'};
-    height: ${isMobile ? '40px' : '1px'};
-    border-bottom: 1px solid #cbcbcb;
-    border-right: 1px solid #cbcbcb;
-  }
-`
