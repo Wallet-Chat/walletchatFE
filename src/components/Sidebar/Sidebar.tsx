@@ -310,58 +310,75 @@ export default function Sidebar() {
       zIndex='5000'
     >
       <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
-        <Popover>
-          <PopoverTrigger>
-            <Box
-              padding='0.8rem'
-              cursor='pointer'
-              borderRadius='md'
-              _hover={{ background: 'lightgray.400' }}
-            >
-              <Image src={logoThumb} alt='' width='30px' />
-            </Box>
-          </PopoverTrigger>
-          <PopoverContent _focus={{ boxShadow: 'none' }} width='150px'>
-            <PopoverArrow />
-            <PopoverBody textAlign='left' p={5}>
-              <Text fontSize='md' fontWeight='bold'>
-                WalletChat
-              </Text>
-              <CDivider my='1' />
-              <Flex alignItems='center'>
-                <CLink href='https://twitter.com/wallet_chat' target='_blank'>
-                  <IconBrandTwitter
-                    stroke={1.5}
-                    color='white'
-                    fill='var(--chakra-colors-lightgray-800)'
-                  />
-                </CLink>
-                <CLink href='http://discord.gg/S47CDmDtdf' target='_blank'>
-                  <Image src={IconDiscord} alt='' height='24px' width='24px' />
-                </CLink>
-                <CLink
-                  href='https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c'
-                  target='_blank'
+        {!isMobile && (
+          <>
+            <Popover>
+              <PopoverTrigger>
+                <Box
+                  padding='0.8rem'
+                  cursor='pointer'
+                  borderRadius='md'
+                  _hover={{ background: 'lightgray.400' }}
                 >
-                  <Image src={IconPrivacy} alt='' height='24px' width='24px' />
-                </CLink>
-              </Flex>
-              <Text fontSize='sm' mt={2} color='lightgray.900'>
-                Ver. {ENV.REACT_APP_VERSION}
-              </Text>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-        <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0} />
-        <Divider />
-        <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0} />
+                  <Image src={logoThumb} alt='' width='30px' />
+                </Box>
+              </PopoverTrigger>
+              <PopoverContent _focus={{ boxShadow: 'none' }} width='150px'>
+                <PopoverArrow />
+                <PopoverBody textAlign='left' p={5}>
+                  <Text fontSize='md' fontWeight='bold'>
+                    WalletChat
+                  </Text>
+                  <CDivider my='1' />
+                  <Flex alignItems='center'>
+                    <CLink
+                      href='https://twitter.com/wallet_chat'
+                      target='_blank'
+                    >
+                      <IconBrandTwitter
+                        stroke={1.5}
+                        color='white'
+                        fill='var(--chakra-colors-lightgray-800)'
+                      />
+                    </CLink>
+                    <CLink href='http://discord.gg/S47CDmDtdf' target='_blank'>
+                      <Image
+                        src={IconDiscord}
+                        alt=''
+                        height='24px'
+                        width='24px'
+                      />
+                    </CLink>
+                    <CLink
+                      href='https://www.freeprivacypolicy.com/live/28f2eb52-46cc-4346-b7dd-a989aa6b680c'
+                      target='_blank'
+                    >
+                      <Image
+                        src={IconPrivacy}
+                        alt=''
+                        height='24px'
+                        width='24px'
+                      />
+                    </CLink>
+                  </Flex>
+                  <Text fontSize='sm' mt={2} color='lightgray.900'>
+                    Ver. {ENV.REACT_APP_VERSION}
+                  </Text>
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
+            <Box mt={isMobile ? 0 : 2} ml={isMobile ? 2 : 0} />
+            <Divider />
+            <Box mb={isMobile ? 0 : 5} mr={isMobile ? 5 : 0} />
+          </>
+        )}
 
         <SidebarLink to='/dm' end={isSupportPage || isNewDMPage}>
           <Image src={IconDM} alt='' />
           {unreadCount?.dm > 0 && <UnreadBadge>{unreadCount?.dm}</UnreadBadge>}
         </SidebarLink>
 
-        <SidebarLink to='/nft' end={!!metadata}>
+        <SidebarLink to='/nft' end={!metadata}>
           <Image src={IconNFT} alt='' />
           {unreadCount?.nft > 0 && (
             <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
