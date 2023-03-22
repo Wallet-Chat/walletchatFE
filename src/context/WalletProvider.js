@@ -408,8 +408,8 @@ const WalletProvider = React.memo(({ children }) => {
                      //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
 
                      //SIWE and setup LIT authSig struct
-                     const domain = "walletchat.fun";
-                     const origin = "https://walletchat.fun";
+                     const domain = "app.walletchat.fun";
+                     const origin = "https://app.walletchat.fun";
                      const statement =
                        "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
                      
