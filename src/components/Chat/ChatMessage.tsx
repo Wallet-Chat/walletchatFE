@@ -137,7 +137,7 @@ const ChatMessage = ({
   account: string | undefined
   msg: MessageUIType
 }) => {
-  const sender = msg?.fromaddr
+  const sender = msg?.fromaddr || msg?.fromAddr
   const { data: senderName } = useGetNameQuery(sender, {
     selectFromResult: (options) =>
       // TODO: use localStorage, for own account, use same value for account name
