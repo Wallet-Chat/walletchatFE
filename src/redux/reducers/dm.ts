@@ -302,12 +302,14 @@ export const selectEncryptedDmIds = (
 }
 
 type DMState = {
+  account: undefined | string
   encryptedDmIdsByAddrByAcc: {
     [account: string]: { [toAddr: string]: number[] }
   }
 }
 
 const initialState: DMState = {
+  account: undefined,
   encryptedDmIdsByAddrByAcc: {},
 }
 
@@ -315,6 +317,10 @@ export const dmSlice = createSlice({
   name: 'dm',
   initialState,
   reducers: {
+    setAccount: (state, action) => {
+      state.account = action.payload
+    },
+
     addEncryptedDmIds: (state, action) => {
       const { account, toAddr, data } = action.payload
       const accountData = state.encryptedDmIdsByAddrByAcc[account] || {}
@@ -338,7 +344,7 @@ export const dmSlice = createSlice({
   },
 })
 
-export const { addEncryptedDmIds } = dmSlice.actions
+export const { setAccount, addEncryptedDmIds } = dmSlice.actions
 
 async function fetchAndStoreChatData(
   queryArgs: any,
@@ -411,7 +417,12 @@ export const dmApi = createApi({
   reducerPath: 'dmApi',
   baseQuery: fetchBaseQuery({
     baseUrl: `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/`,
-    prepareHeaders: prepareHeaderCredentials,
+    prepareHeaders: (headers: Headers, { getState }) => {
+      const state = selectState(getState() as any) as DMState
+      const account = state.account
+
+      return prepareHeaderCredentials(headers, account)
+    },
   }),
 
   endpoints: (builder) => ({
@@ -422,7 +433,7 @@ export const dmApi = createApi({
 
         const base64data = response[0]?.base64data
 
-        return base64data
+        return base64data || null
       },
       transformErrorResponse: createErrorResponse('Image'),
     }),
@@ -434,7 +445,7 @@ export const dmApi = createApi({
 
         const name = response[0]?.name
 
-        return name
+        return name || null
       },
       transformErrorResponse: createErrorResponse('Name'),
     }),
@@ -482,7 +493,7 @@ export const dmApi = createApi({
     }),
 
     // TODO: if unread count provider returns a higher value, fetch & update inbox data
-    // TODO: make inbox use same chat msg as chat data to avoid 
+    // TODO: make inbox use same chat msg as chat data to avoid
     // having to decrypt twice
     getInbox: builder.query({
       queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
@@ -543,7 +554,7 @@ export const dmApi = createApi({
 })
 
 export const {
-  util: { updateQueryData, upsertQueryData },
+  util: { updateQueryData, upsertQueryData, prefetch },
   endpoints,
   useGetPfpQuery,
   useGetNameQuery,

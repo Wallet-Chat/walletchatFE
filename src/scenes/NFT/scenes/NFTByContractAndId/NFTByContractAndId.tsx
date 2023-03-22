@@ -40,6 +40,7 @@ import IconPolygon from '../../../../images/icon-chains/icon-polygon.svg'
 import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import { useHover } from '../../../../helpers/useHover'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 const tokenType = 'erc721'
 
@@ -87,7 +88,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+          Authorization: `Bearer ${getJwtForAccount(account)}`,
         },
       }
     )
@@ -110,7 +111,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+          Authorization: `Bearer ${getJwtForAccount(account)}`,
         },
         body: JSON.stringify({
           walletaddr: account,
@@ -138,7 +139,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+          Authorization: `Bearer ${getJwtForAccount(account)}`,
         },
         body: JSON.stringify({
           walletaddr: account,
@@ -166,7 +167,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
           },
         }
       )
@@ -192,7 +193,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
           },
         }
       )

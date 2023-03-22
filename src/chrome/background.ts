@@ -147,7 +147,7 @@ chrome.runtime.onInstalled.addListener((details: any) => {
 // 				credentials: 'include',
 // 				headers: {
 // 					'Content-Type': 'application/json',
-// 					Authorization: `Bearer ${storage.get('jwt')}`,
+// 					Authorization: `Bearer ${}`,
 // 				},
 // 			}
 // 		)

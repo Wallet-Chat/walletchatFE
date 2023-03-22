@@ -115,7 +115,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     fetch(
       ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
-      postFetchOptions(createMessageData)
+      postFetchOptions(createMessageData, account)
     )
       .then((response) => response.json())
       .then((responseData) => {

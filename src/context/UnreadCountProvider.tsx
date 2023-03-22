@@ -2,6 +2,7 @@ import React, { useCallback, useEffect } from 'react'
 import equal from 'fast-deep-equal/es6'
 import { useWallet } from './WalletProvider'
 import * as ENV from '@/constants/env'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 export const UnreadCountContext = React.createContext()
 export const useUnreadCount = () => React.useContext<any>(UnreadCountContext)
@@ -29,7 +30,7 @@ const UnreadCountProvider = React.memo(({ children }) => {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
           },
         }
       )

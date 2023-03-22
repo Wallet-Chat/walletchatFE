@@ -24,6 +24,7 @@ import * as ENV from '@/constants/env'
 import Avatar from '../Inbox/DM/Avatar'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { truncateAddressMore } from '@/helpers/truncateString'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 const MessageBox = styled.div`
   position: relative;
@@ -224,7 +225,7 @@ const ChatMessage = ({
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
           },
           body: JSON.stringify({ ...msg, read: true }),
         }

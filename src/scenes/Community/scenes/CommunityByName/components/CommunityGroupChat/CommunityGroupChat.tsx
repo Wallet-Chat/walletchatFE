@@ -24,6 +24,7 @@ import {
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
 import { AnalyticsBrowser } from '@segment/analytics-next'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 const CommunityGroupChat = ({
   account,
@@ -144,7 +145,7 @@ const CommunityGroupChat = ({
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        Authorization: `Bearer ${getJwtForAccount(account)}`,
       },
       body: JSON.stringify(data),
     })
