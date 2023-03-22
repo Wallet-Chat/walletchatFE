@@ -60,9 +60,11 @@ const WalletProvider = React.memo(
     const [parentProvider, setParentProvider] = React.useState<null | any>()
     const [widgetOpen, setWidgetOpen] = React.useState(false)
 
-    const { data: name } = endpoints.getName.useQueryState(
+    const { currentData: reduxName } = endpoints.getName.useQueryState(
       accountAddress?.toLocaleLowerCase()
     )
+
+    const [name, setName] = React.useState(reduxName)
 
     // help debug issues and watch for high traffic conditions
     const analytics = AnalyticsBrowser.load({
@@ -70,8 +72,10 @@ const WalletProvider = React.memo(
     })
     const OneDay = 1 * 24 * 60 * 60 * 1000
 
-    const setName = React.useCallback(
-      (newName: null | string, address: undefined | string) =>
+    const updateName = React.useCallback(
+      (newName: null | string, address: undefined | string) => {
+        setName(newName)
+
         dispatch(
           upsertQueryData(
             'getName',
@@ -80,7 +84,8 @@ const WalletProvider = React.memo(
               : accountAddress?.toLocaleLowerCase(),
             newName
           )
-        ),
+        )
+      },
       [accountAddress, dispatch]
     )
 
@@ -230,10 +235,10 @@ const WalletProvider = React.memo(
                 const currentName = welcomeData.msg.toString().split(':')[1]
 
                 if (currentName) {
-                  setName(currentName, address)
+                  updateName(currentName, address)
                   console.log('✅[Name]:', currentName)
                 } else {
-                  setName(null, address)
+                  updateName(null, address)
                 }
 
                 // safe to pass jwt here because we know it exists due to
@@ -255,7 +260,7 @@ const WalletProvider = React.memo(
       }
 
       setIsSigningIn(false)
-    }, [OneDay, analytics, account, setName, signIn, widgetOpen])
+    }, [OneDay, analytics, account, updateName, signIn, widgetOpen])
 
     React.useEffect(() => {
       if (!isWidget) return
@@ -393,7 +398,7 @@ const WalletProvider = React.memo(
         email,
         notifyDM,
         notify24,
-        setName,
+        setName: updateName,
         setEmail,
         setNotifyDM,
         setNotify24,
@@ -417,7 +422,7 @@ const WalletProvider = React.memo(
         notify24,
         notifyDM,
         provider,
-        setName,
+        updateName,
         isSigningIn,
         parentProvider,
         siweFailed,
