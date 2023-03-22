@@ -384,8 +384,8 @@ const WalletProvider = React.memo(({ children }) => {
                      //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
 
                      //SIWE and setup LIT authSig struct
-                     const domain = "walletchat.fun";
-                     const origin = "https://walletchat.fun";
+                     const domain = window.location.hostname;
+                     const origin = window.location.protocol + domain;
                      const statement =
                        "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
                      
@@ -509,33 +509,33 @@ const WalletProvider = React.memo(({ children }) => {
                   //const signature = await _signer.signMessage("Sign to Log in to WalletChat: " + _nonce)
 
                   //SIWE and setup LIT authSig struct
-                  const domain = "walletchat.fun";
-                     const origin = "https://walletchat.fun";
-                     const statement =
-                       "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
-                     
-                     const _siweMessage = new SiweMessage({
-                       domain,
-                       address: _account,
-                       statement,
-                       uri: origin,
-                       version: "1",
-                       chainId: network.chainId,
-                       nonce: _nonce,
-                     });
-                     
-                     const messageToSign = _siweMessage.prepareMessage();
-                     const signature = await _signer.signMessage(messageToSign); 
-                     //console.log("signature", signature);                  
-                     //const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
-                     
-                     const authSig = {
-                       sig: signature,
-                       derivedVia: "web3.eth.personal.sign",
-                       signedMessage: messageToSign,
-                       address: _account.toLocaleLowerCase(),
-                     };
-                     //end SIWE and authSig
+                  const domain = window.location.hostname;
+                  const origin = window.location.protocol + domain;
+                  const statement =
+                     "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
+                  
+                  const _siweMessage = new SiweMessage({
+                     domain,
+                     address: _account,
+                     statement,
+                     uri: origin,
+                     version: "1",
+                     chainId: network.chainId,
+                     nonce: _nonce,
+                  });
+                  
+                  const messageToSign = _siweMessage.prepareMessage();
+                  const signature = await _signer.signMessage(messageToSign); 
+                  //console.log("signature", signature);                  
+                  //const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+                  
+                  const authSig = {
+                     sig: signature,
+                     derivedVia: "web3.eth.personal.sign",
+                     signedMessage: messageToSign,
+                     address: _account.toLocaleLowerCase(),
+                  };
+                  //end SIWE and authSig
                   //const signature = await _signer.signMessage(_nonce)
                   console.log('✅[INFO][Signature]:', signature)
 
@@ -682,7 +682,7 @@ const WalletProvider = React.memo(({ children }) => {
 
                   // create the message to be signed
                   const messagePayload = siwt.createMessagePayload({
-                     dappUrl: 'https://walletchat.fun',
+                     dappUrl: 'https://ledger.walletchat.fun',
                      nonce: _nonce,
                      pkh: _account,
                   })
@@ -731,7 +731,7 @@ const WalletProvider = React.memo(({ children }) => {
 
                // create the message to be signed
                const messagePayload = siwt.createMessagePayload({
-                  dappUrl: 'walletchat.fun',
+                  dappUrl: 'https://ledger.walletchat.fun',
                   nonce: _nonce,
                   pkh: _account,
                })
@@ -868,7 +868,8 @@ const WalletProvider = React.memo(({ children }) => {
                   _nonce = data.Nonce
                   //console.log('✅[GET][Data.nonce]:', data.Nonce)
 
-                  const origin = "https://walletchat.fun";
+                  const domain = window.location.hostname;
+                  const origin = window.location.protocol + domain;
                   const statement =
                        "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
 
@@ -922,7 +923,8 @@ const WalletProvider = React.memo(({ children }) => {
                console.log('✅[GET][Nonce]:', data)
                _nonce = data.Nonce
 
-               const origin = "https://walletchat.fun";
+               const domain = window.location.hostname;
+               const origin = window.location.protocol + domain;
                const statement =
                     "You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.";
                // MyNearWallet
