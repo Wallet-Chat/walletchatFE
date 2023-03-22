@@ -17,6 +17,8 @@ import { AnalyticsBrowser } from '@segment/analytics-next'
 export const WalletContext = React.createContext<any>(null)
 export const useWallet = () => React.useContext(WalletContext)
 
+const getHasJwt = () => Boolean(storage.get('jwt'))
+
 const isWidget = getIsWidgetContext()
 
 /* eslint-disable react/display-name */
@@ -24,7 +26,6 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const dispatch = useAppDispatch()
 
   const didWelcome = React.useRef(false)
-  const signedIn = React.useRef(Boolean(storage.get('jwt')))
 
   const provider = wagmi.getProvider()
 
@@ -37,7 +38,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   const [notifyDM, setNotifyDM] = useState('true')
   const [notify24, setNotify24] = useState('true')
   const [isAuthenticated, setAuthenticated] = useState(
-    Boolean(signedIn.current && chainId)
+    Boolean(getHasJwt() && chainId)
   )
   const [delegate, setDelegate] = useState<null | string>(null)
   const [isSigningIn, setIsSigningIn] = React.useState(false)
@@ -76,7 +77,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
 
     if (!wagmiNetwork.chain) {
       setAuthenticated(false)
-    } else if (signedIn.current) {
+    } else if (getHasJwt()) {
       setAuthenticated(true)
     }
   })
@@ -154,7 +155,6 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
         window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
       }
 
-      signedIn.current = true
       setAuthenticated(true)
       setIsSigningIn(false)
     },
@@ -300,7 +300,7 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
   }, [])
 
   const doRequestSiwe = React.useCallback(async () => {
-    if (accountAddress && nonce && chainId && !signedIn.current) {
+    if (accountAddress && nonce && chainId && !isAuthenticated) {
       setIsSigningIn(true)
 
       const domain = 'walletchat.fun'
@@ -362,7 +362,6 @@ const WalletProvider = React.memo(({ children }: { children: any }) => {
           signIn(accountAddress, signInData.access)
         })
 
-      signedIn.current = true
       setAuthenticated(true)
     }
   }, [accountAddress, chainId, nonce, signIn])
