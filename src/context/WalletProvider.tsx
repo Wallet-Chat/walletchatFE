@@ -313,8 +313,8 @@ const WalletProvider = React.memo(
         !siwePendingRef.current &&
         prevNonce.current !== nonce
       ) {
-        const domain = 'walletchat.fun'
-        const origin = 'https://walletchat.fun'
+        const domain = window.location.hostname;
+        const origin = window.location.protocol + domain;
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
 
