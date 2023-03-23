@@ -279,10 +279,7 @@ const WalletProvider = React.memo(
             } else if (messageData.connectorOptions) {
               setParentProvider({
                 connector: new WalletConnectConnector({
-                  options: {
-                    projectId: messageData.connectorOptions.projectId,
-                    version: '2',
-                  },
+                  options: {},
                 }),
               })
             }
@@ -313,8 +310,8 @@ const WalletProvider = React.memo(
         !siwePendingRef.current &&
         prevNonce.current !== nonce
       ) {
-        const domain = window.location.hostname;
-        const origin = window.location.protocol + domain;
+        const domain = window.location.hostname
+        const origin = window.location.protocol + domain
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
 
