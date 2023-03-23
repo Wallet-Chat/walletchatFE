@@ -11,11 +11,7 @@ import storage from '../utils/extension-storage'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
-import {
-  endpoints,
-  setAccount as setAccountAddress,
-  upsertQueryData,
-} from '@/redux/reducers/dm'
+import { endpoints, setAccount, upsertQueryData } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { getIsWidgetContext } from '@/utils/context'
 import {
@@ -37,34 +33,35 @@ const WalletProvider = React.memo(
   ({ children }: { children: React.ReactElement }) => {
     const dispatch = useAppDispatch()
 
-    const prevAccount = React.useRef<string>()
+    const prevAccount = React.useRef<null | string>()
+    const prevNonce = React.useRef<null | string>()
+    const siwePendingRef = React.useRef<boolean>(false)
 
     const provider = wagmi.getProvider()
 
     const [chainId, setChainId] = React.useState(wagmi.getNetwork()?.chain?.id)
 
-    const [account, setAccount] = React.useState(wagmi.getAccount())
     const accountAddress = useAppSelector((state) => state.dm.account)
+    const accountAuthenticated =
+      accountAddress && chainId ? getHasJwtForAccount(accountAddress) : null
+
+    const [isAuthenticated, setAuthenticated] = useState(accountAuthenticated)
+
     const [nonce, setNonce] = React.useState<string | null>()
     const [email, setEmail] = useState(null)
     const [notifyDM, setNotifyDM] = useState('true')
     const [notify24, setNotify24] = useState('true')
-    const [isAuthenticated, setAuthenticated] = useState(
-      Boolean(accountAddress && getHasJwtForAccount(accountAddress) && chainId)
-    )
     const [delegate, setDelegate] = useState<null | string>(null)
 
-    const [isSigningIn, setIsSigningIn] = React.useState(false)
+    const [siwePending, setSiwePending] = React.useState<boolean>(false)
     const [siweFailed, setSiweFailed] = React.useState(false)
 
     const [parentProvider, setParentProvider] = React.useState<null | any>()
     const [widgetOpen, setWidgetOpen] = React.useState(false)
 
-    const { currentData: reduxName } = endpoints.getName.useQueryState(
+    const { currentData: name } = endpoints.getName.useQueryState(
       accountAddress?.toLocaleLowerCase()
     )
-
-    const [name, setName] = React.useState(reduxName)
 
     // help debug issues and watch for high traffic conditions
     const analytics = AnalyticsBrowser.load({
@@ -73,9 +70,7 @@ const WalletProvider = React.memo(
     const OneDay = 1 * 24 * 60 * 60 * 1000
 
     const updateName = React.useCallback(
-      (newName: null | string, address: undefined | string) => {
-        setName(newName)
-
+      (newName: null | string, address: undefined | string) =>
         dispatch(
           upsertQueryData(
             'getName',
@@ -84,25 +79,16 @@ const WalletProvider = React.memo(
               : accountAddress?.toLocaleLowerCase(),
             newName
           )
-        )
-      },
+        ),
       [accountAddress, dispatch]
     )
 
-    wagmi.watchAccount((wagmiAccount) => {
-      setAccount(wagmiAccount)
-      dispatch(setAccountAddress(wagmiAccount?.address))
-    })
-    wagmi.watchNetwork((wagmiNetwork) => {
-      const newChainId = wagmiNetwork?.chain?.id
-      setChainId(newChainId)
-
-      if (!newChainId) {
-        setAuthenticated(false)
-      } else {
-        setAuthenticated(true)
-      }
-    })
+    const accountUnwatch = wagmi.watchAccount((wagmiAccount) =>
+      dispatch(setAccount(wagmiAccount?.address))
+    )
+    const networkUnwatch = wagmi.watchNetwork((wagmiNetwork) =>
+      setChainId(wagmiNetwork?.chain?.id)
+    )
 
     const getSettings = React.useCallback((address: string) => {
       fetch(
@@ -153,7 +139,7 @@ const WalletProvider = React.memo(
           )
           storage.set('delegate', address)
           setDelegate(address) // not sure this is used anymore
-          setAccountAddress(walletInJWT)
+          setAccount(walletInJWT)
         }
 
         dispatch(
@@ -165,12 +151,13 @@ const WalletProvider = React.memo(
         if (isWidget) {
           window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
         }
-
-        setAuthenticated(true)
-        setIsSigningIn(false)
       },
       [accountAddress, dispatch, getSettings]
     )
+
+    React.useEffect(() => {
+      setAuthenticated(accountAuthenticated)
+    }, [accountAuthenticated])
 
     React.useEffect(() => {
       if (analytics && accountAddress && name && email) {
@@ -194,14 +181,11 @@ const WalletProvider = React.memo(
     }
 
     React.useEffect(() => {
-      setIsSigningIn(true)
+      if (accountAddress && (!isWidget || widgetOpen)) {
+        setAccount(accountAddress)
 
-      const address = account && account.address
-      if (address && (!isWidget || widgetOpen)) {
-        setAccountAddress(address)
-
-        if (prevAccount.current !== address.toString()) {
-          prevAccount.current = address.toString()
+        if (prevAccount.current !== accountAddress.toString()) {
+          prevAccount.current = accountAddress.toString()
 
           // limit wallet connection recording to once per day
           ;(async () => {
@@ -212,7 +196,7 @@ const WalletProvider = React.memo(
             if (currentTime - lastTimestamp > OneDay) {
               analytics.track('ConnectWallet', {
                 site: document.referrer,
-                account: address,
+                account: accountAddress,
               })
               storage.set('last-wallet-connection-timestamp', currentTime)
             }
@@ -220,47 +204,45 @@ const WalletProvider = React.memo(
 
           fetch(
             ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,
-            getFetchOptions(address)
+            getFetchOptions(accountAddress)
           )
             .then((response) => response.json())
             .then(async (welcomeData) => {
               console.log('✅[GET][Welcome]:', welcomeData.msg)
 
               if (
-                !welcomeData.msg.includes(address.toLocaleLowerCase()) &&
-                !address.includes(storage.get('delegate'))
+                !welcomeData.msg.includes(accountAddress.toLocaleLowerCase()) &&
+                !accountAddress.includes(storage.get('delegate'))
               ) {
-                getNonce(address)
+                getNonce(accountAddress)
               } else {
                 const currentName = welcomeData.msg.toString().split(':')[1]
 
                 if (currentName) {
-                  updateName(currentName, address)
+                  updateName(currentName, accountAddress)
                   console.log('✅[Name]:', currentName)
                 } else {
-                  updateName(null, address)
+                  updateName(null, accountAddress)
                 }
 
                 // safe to pass jwt here because we know it exists due to
                 // successful welcome call, the extra || '' is just to
                 // satisfy typescript
-                signIn(address, getJwtForAccount(address) || '')
+                signIn(accountAddress, getJwtForAccount(accountAddress) || '')
               }
             })
             .catch((welcomeError) => {
               console.log('🚨[GET][Welcome]:', welcomeError)
-              getNonce(address)
+              getNonce(accountAddress)
             })
         }
-      } else if (isWidget && widgetOpen && !address) {
+      } else if (isWidget && widgetOpen && !accountAddress) {
         window.parent.postMessage({ data: false, target: 'sign_in' }, '*')
-      } else if (isWidget && !widgetOpen && address) {
+      } else if (isWidget && !widgetOpen && accountAddress) {
         // notify the widget that we are signed in
         window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
       }
-
-      setIsSigningIn(false)
-    }, [OneDay, analytics, account, updateName, signIn, widgetOpen])
+    }, [OneDay, analytics, accountAddress, updateName, signIn, widgetOpen])
 
     React.useEffect(() => {
       if (!isWidget) return
@@ -311,14 +293,33 @@ const WalletProvider = React.memo(
       })
     }, [])
 
-    const doRequestSiwe = React.useCallback(async () => {
-      if (accountAddress && nonce && chainId) {
-        setIsSigningIn(true)
+    React.useEffect(() => {
+      return () => {
+        if (accountUnwatch) {
+          accountUnwatch()
+        }
+        if (networkUnwatch) {
+          networkUnwatch()
+        }
+      }
+    }, [accountUnwatch, networkUnwatch])
 
+    const doRequestSiwe = React.useCallback(async () => {
+      if (
+        accountAddress &&
+        nonce &&
+        chainId &&
+        !getHasJwtForAccount(accountAddress) &&
+        !siwePendingRef.current &&
+        prevNonce.current !== nonce
+      ) {
         const domain = 'walletchat.fun'
         const origin = 'https://walletchat.fun'
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
+
+        setSiwePending(true)
+        siwePendingRef.current = true
 
         const siweMessage = new SiweMessage({
           domain,
@@ -340,11 +341,15 @@ const WalletProvider = React.memo(
           console.log('🚨[SIWE][Failed or Rejected]:', error)
         }
 
+        setSiwePending(false)
+        siwePendingRef.current = false
+
         if (!signature) {
-          setIsSigningIn(false)
           setSiweFailed(true)
           return
         }
+
+        setSiweFailed(false)
 
         const authSig = {
           sig: signature,
@@ -369,12 +374,13 @@ const WalletProvider = React.memo(
           .then((response) => response.json())
           .then(async (signInData) => {
             storeJwtForAccount(accountAddress, signInData.access)
+            setAuthenticated(true)
             localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
 
             signIn(accountAddress, signInData.access)
           })
 
-        setAuthenticated(true)
+        prevNonce.current = nonce
       }
     }, [accountAddress, chainId, nonce, signIn])
 
@@ -382,15 +388,19 @@ const WalletProvider = React.memo(
       doRequestSiwe()
     }, [doRequestSiwe])
 
-    const disconnectWallet = async () => {
+    const disconnectWallet = React.useCallback(async () => {
+      accountUnwatch()
+      networkUnwatch()
       wagmi.disconnect()
 
       const rkRecent = localStorage.getItem('rk-recent')
       localStorage.clear()
       if (rkRecent) localStorage.setItem('rk-recent', rkRecent)
 
-      document.location.reload()
-    }
+      prevAccount.current = null
+      setNonce(null)
+      setSiweFailed(false)
+    }, [accountUnwatch, networkUnwatch])
 
     const contextValue = React.useMemo(
       () => ({
@@ -408,9 +418,9 @@ const WalletProvider = React.memo(
         web3: provider && new Web3(provider),
         provider,
         delegate,
-        isSigningIn,
         parentProvider,
         siweFailed,
+        siwePending,
         doRequestSiwe,
       }),
       [
@@ -423,10 +433,11 @@ const WalletProvider = React.memo(
         notifyDM,
         provider,
         updateName,
-        isSigningIn,
         parentProvider,
         siweFailed,
+        siwePending,
         doRequestSiwe,
+        disconnectWallet,
       ]
     )
 

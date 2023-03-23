@@ -40,14 +40,20 @@ import { getIsWidgetContext } from './utils/context'
 const isWidget = getIsWidgetContext()
 
 const CustomConnectButton = () => {
-  const { siweFailed, parentProvider, isSigningIn, doRequestSiwe } = useWallet()
+  const {
+    siweFailed,
+    siwePending,
+    parentProvider,
+    isAuthenticated,
+    doRequestSiwe,
+  } = useWallet()
 
   // TODO: allow changing sign-in method after already selected wallet
   return (
     <ConnectButton.Custom>
       {() => {
         return (() => {
-          if (isWidget && isSigningIn) {
+          if (siwePending || isAuthenticated === undefined) {
             return (
               <>
                 <Spinner />
@@ -59,7 +65,7 @@ const CustomConnectButton = () => {
             )
           }
 
-          if (isWidget && parentProvider) {
+          if (siweFailed || (isWidget && parentProvider)) {
             return (
               <Flex direction='column' gap={2} alignItems='start'>
                 <Button
