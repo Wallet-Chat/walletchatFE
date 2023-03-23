@@ -48,6 +48,7 @@ import NFTPortNFTCollection, {
 import NFTCollection from '../../../../types/NFTCollection'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { isMobile } from 'react-device-detect'
 
 const NFTByContract = ({ account }: { account: string }) => {
   let { nftContractAddr = '', chain = '' } = useParams()
@@ -277,7 +278,12 @@ const NFTByContract = ({ account }: { account: string }) => {
   }
 
   return (
-    <Flex flexDirection='column' background='white' height='100vh' flex='1'>
+    <Flex
+      flexDirection='column'
+      background='white'
+      height={isMobile ? '85vh' : '100vh'}
+      flex='1'
+    >
       <Flex alignItems='center' px={5} pt={4} pb={2}>
         <Flex alignItems='flex-start' p={2} borderRadius='md'>
           {nftData?.image_url && (

@@ -41,6 +41,7 @@ import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import { useHover } from '../../../../helpers/useHover'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { isMobile } from 'react-device-detect'
 
 const tokenType = 'erc721'
 
@@ -355,7 +356,12 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
   }, [account, ownerAddr])
 
   return (
-    <Flex flexDirection='column' background='white' height='100vh' flex='1'>
+    <Flex
+      flexDirection='column'
+      background='white'
+      height={isMobile ? '85vh' : '100vh'}
+      flex='1'
+    >
       <Flex alignItems='center' px={5} pt={4} pb={2}>
         <Flex alignItems='flex-start' p={2} borderRadius='md'>
           {nftData?.image && (

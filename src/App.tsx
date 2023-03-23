@@ -158,6 +158,7 @@ export const App = () => {
       <Flex
         flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
         minHeight={isSmallLayout ? '100vh' : 'unset'}
+        width='100vw'
       >
         <ExtensionCloseButton />
 

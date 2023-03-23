@@ -422,23 +422,21 @@ export default function Sidebar() {
         )}
       </Flex>
       <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
-        {!isMobile && (
-          <SidebarLink to='/dm/new'>
-            <Button
-              size='sm'
-              variant='outline'
-              borderRadius='full'
-              w='100%'
-              h='100%'
-              _hover={{
-                textDecoration: 'none',
-                backgroundColor: 'var(--chakra-colors-lightgray-300)',
-              }}
-            >
-              <AddIcon boxSize='4' />
-            </Button>
-          </SidebarLink>
-        )}
+        <SidebarLink to='/dm/new'>
+          <Button
+            size='sm'
+            variant='outline'
+            borderRadius='full'
+            w='100%'
+            h='100%'
+            _hover={{
+              textDecoration: 'none',
+              backgroundColor: 'var(--chakra-colors-lightgray-300)',
+            }}
+          >
+            <AddIcon boxSize='4' />
+          </Button>
+        </SidebarLink>
 
         <Menu isLazy>
           <MenuButton as={AccountInfo}>

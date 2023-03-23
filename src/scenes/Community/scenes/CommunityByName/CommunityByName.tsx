@@ -26,6 +26,7 @@ import { useHover } from '../../../../helpers/useHover'
 import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
 import CommunityType from '../../../../types/Community'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { isMobile } from 'react-device-detect'
 
 const CommunityByName = ({ account }: { account: string }) => {
   let { community = '' } = useParams()
@@ -165,7 +166,12 @@ const CommunityByName = ({ account }: { account: string }) => {
   }
 
   return (
-    <Flex flexDirection='column' background='white' height='100vh' flex='1'>
+    <Flex
+      flexDirection='column'
+      background='white'
+      height={isMobile ? '85vh' : '100vh'}
+      flex='1'
+    >
       <Flex alignItems='center' px={5} pt={4} pb={2}>
         <Flex alignItems='flex-start' p={2} borderRadius='md'>
           {communityData?.logo && (

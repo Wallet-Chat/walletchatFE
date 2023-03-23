@@ -13,7 +13,7 @@ const NewConversation = ({ web3 }: { web3: any }) => {
          minHeight={isSmallLayout ? 'unset' : '100vh'}
          justifyContent="center"
          alignItems="center"
-         width={isSmallLayout ? '100vh' : '360px'}
+         width={isSmallLayout ? '100vw' : '360px'}
       >
          <StartConversationWithAddress web3={web3} />
       </Flex>

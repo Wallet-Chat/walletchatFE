@@ -26,7 +26,7 @@ const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
       background='white'
       height={isSmallLayout ? 'unset' : '100vh'}
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
-      width={isSmallLayout ? '100vh' : '360px'}
+      width={isSmallLayout ? '100vw' : '360px'}
       maxW='100%'
       overflowY='scroll'
       className='custom-scrollbar'

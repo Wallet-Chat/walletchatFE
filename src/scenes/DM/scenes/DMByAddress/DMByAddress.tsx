@@ -21,6 +21,7 @@ import {
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
 import { walletChatEth } from '@/constants/wallets'
+import { isMobile } from 'react-device-detect'
 
 const PAGE_SIZE = 25
 
@@ -202,7 +203,7 @@ const DMByAddress = ({ account }: { account: string }) => {
   // TODO: 'back to bottom' button
   if (isFetching && !encryptedDmsStr && chatData.length === 0) {
     return (
-      <Flex background='white' height='100vh' flexDirection='column' flex='1'>
+      <Flex background='white' flexDirection='column' flex='1'>
         <DMHeader />
 
         <DottedBackground className='custom-scrollbar' overflow='hidden'>
@@ -222,7 +223,7 @@ const DMByAddress = ({ account }: { account: string }) => {
   // instead of error message
   if (encryptedDms && encryptedDms.length > 0) {
     return (
-      <Flex background='white' height='100vh' flexDirection='column' flex='1'>
+      <Flex background='white' flexDirection='column' flex='1'>
         <DMHeader />
 
         <DottedBackground className='custom-scrollbar' overflow='hidden'>
@@ -239,7 +240,12 @@ const DMByAddress = ({ account }: { account: string }) => {
   }
 
   return (
-    <Flex background='white' height='100vh' flexDirection='column' flex='1'>
+    <Flex
+      background='white'
+      height={isMobile ? '85vh' : '100vh'}
+      flexDirection='column'
+      flex='1'
+    >
       <DMHeader />
 
       <DottedBackground ref={bodyRef} className='custom-scrollbar'>
