@@ -77,8 +77,8 @@ const SidebarLink = styled(
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60px;
-  height: 60px;
+  width: ${isMobile ? '50px' : '60px'};
+  height: ${isMobile ? '50px' : '60px'};
   padding: var(--chakra-space-2);
   margin-bottom: 0.2rem;
   border-radius: 0.5rem;
@@ -141,7 +141,7 @@ const Divider = () => (
 )
 
 const AccountInfo = styled.button`
-  padding: 0.6rem 0.8rem;
+  padding: ${isMobile ? '0.2rem 0.3rem' : '0.6rem 0.8rem'};
   border-radius: var(--chakra-radii-md);
   /* border-bottom-left-radius: 0.5rem;
    border-bottom-right-radius: 0.5rem; */
@@ -422,21 +422,23 @@ export default function Sidebar() {
         )}
       </Flex>
       <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
-        <SidebarLink to='/dm/new'>
-          <Button
-            size='sm'
-            variant='outline'
-            borderRadius='full'
-            w='100%'
-            h='100%'
-            _hover={{
-              textDecoration: 'none',
-              backgroundColor: 'var(--chakra-colors-lightgray-300)',
-            }}
-          >
-            <AddIcon boxSize='4' />
-          </Button>
-        </SidebarLink>
+        {!isMobile && (
+          <SidebarLink to='/dm/new'>
+            <Button
+              size='sm'
+              variant='outline'
+              borderRadius='full'
+              w='100%'
+              h='100%'
+              _hover={{
+                textDecoration: 'none',
+                backgroundColor: 'var(--chakra-colors-lightgray-300)',
+              }}
+            >
+              <AddIcon boxSize='4' />
+            </Button>
+          </SidebarLink>
+        )}
 
         <Menu isLazy>
           <MenuButton as={AccountInfo}>
