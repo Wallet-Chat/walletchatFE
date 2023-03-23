@@ -240,12 +240,7 @@ const DMByAddress = ({ account }: { account: string }) => {
   }
 
   return (
-    <Flex
-      background='white'
-      height={isMobile ? '85vh' : '100vh'}
-      flexDirection='column'
-      flex='1'
-    >
+    <Flex background='white' flexDirection='column' flex='1'>
       <DMHeader />
 
       <DottedBackground ref={bodyRef} className='custom-scrollbar'>

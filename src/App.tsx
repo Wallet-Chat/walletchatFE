@@ -137,16 +137,20 @@ export const App = () => {
   if (isAuthenticated && !name) {
     return (
       <Box>
-        <Flex>
+        <Flex
+          flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
+          minHeight={isSmallLayout ? '100vh' : 'unset'}
+          width='100vw'
+        >
           <ExtensionCloseButton />
 
           <Sidebar />
 
           {name === undefined ? (
             <Flex
+              flexGrow={1}
               justifyContent='center'
               alignItems='center'
-              height='100vh'
               width='100%'
             >
               <Spinner />
@@ -170,13 +174,18 @@ export const App = () => {
 
         <Sidebar />
 
-        <Box flex='1' overflow='hidden' minWidth='1px'>
+        <Flex
+          flexGrow={1}
+          overflow='hidden'
+          minWidth='1px'
+          flexDirection='column'
+        >
           <Routes>
             <Route path={`/${PAGES.DM}`}>
               <Route
                 path='new'
                 element={
-                  <Flex>
+                  <Flex flexGrow={1}>
                     <NewConversation web3={web3} />
                     {!isSmallLayout && (
                       <Flex
@@ -197,7 +206,7 @@ export const App = () => {
               <Route
                 index
                 element={
-                  <Flex>
+                  <Flex flexGrow={1}>
                     <Inbox account={account} web3={web3} />
 
                     {!isSmallLayout && (
@@ -219,7 +228,7 @@ export const App = () => {
               <Route
                 path=':address'
                 element={
-                  <Flex>
+                  <Flex flexGrow={1}>
                     {!isSmallLayout && <Inbox account={account} web3={web3} />}
 
                     <DMByAddress account={account} delegate={delegate} />
@@ -251,7 +260,7 @@ export const App = () => {
             <Route
               path='/nft_error'
               element={
-                <Flex>
+                <Flex flexGrow={1}>
                   <NFT account={account} web3={web3} />
                   {!isSmallLayout && (
                     <Flex
@@ -274,7 +283,7 @@ export const App = () => {
               <Route
                 index
                 element={
-                  <Flex>
+                  <Flex flexGrow={1}>
                     <NFT account={account} web3={web3} />
 
                     {!isSmallLayout && (
@@ -293,7 +302,7 @@ export const App = () => {
 
               <Route
                 element={
-                  <Flex>
+                  <Flex flexGrow={1}>
                     {!isSmallLayout && <NFT account={account} web3={web3} />}
 
                     <Outlet />
@@ -324,7 +333,7 @@ export const App = () => {
               <Route
                 index
                 element={
-                  <Flex>
+                  <Flex flexGrow={1}>
                     <Community account={account} web3={web3} />
 
                     {!isSmallLayout && (
@@ -346,7 +355,7 @@ export const App = () => {
               <Route
                 path=':community'
                 element={
-                  <Flex>
+                  <Flex flexGrow={1}>
                     {!isSmallLayout && (
                       <Community account={account} web3={web3} />
                     )}
@@ -359,7 +368,7 @@ export const App = () => {
             <Route path='/' element={<Navigate to='/dm' replace />} />
             <Route path='/index.html' element={<Navigate to='/dm' replace />} />
           </Routes>
-        </Box>
+        </Flex>
       </Flex>
     </Box>
   )

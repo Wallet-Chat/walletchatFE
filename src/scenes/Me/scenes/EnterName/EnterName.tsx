@@ -206,7 +206,7 @@ const EnterName = ({ account }: { account: string }) => {
 
   const onSubmitPFP = (values: any) => {}
   return (
-    <Box p={6} pt={16} background='white' width='100%'>
+    <Box flexGrow={1} p={6} pt={16} background='white' width='100%'>
       <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
         Welcome to the WalletChat Community!
       </Text>

@@ -6,6 +6,7 @@ export const DottedBackground = styled.div.attrs(
   })
 )`
   flex-grow: 1;
+  flex: 10 100px;
   width: 100%;
   height: auto;
   background: linear-gradient(

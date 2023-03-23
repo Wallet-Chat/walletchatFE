@@ -170,7 +170,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   }
 
   return (
-    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+    <Flex flex='1' p='4' alignItems='center' justifyContent='center' gap='4'>
       <Textarea
         placeholder='Write a message...'
         ref={textAreaRef}

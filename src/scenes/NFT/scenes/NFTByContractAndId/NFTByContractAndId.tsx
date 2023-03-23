@@ -356,12 +356,7 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
   }, [account, ownerAddr])
 
   return (
-    <Flex
-      flexDirection='column'
-      background='white'
-      height={isMobile ? '85vh' : '100vh'}
-      flex='1'
-    >
+    <Flex flexDirection='column' background='white' flex='1'>
       <Flex alignItems='center' px={5} pt={4} pb={2}>
         <Flex alignItems='flex-start' p={2} borderRadius='md'>
           {nftData?.image && (

@@ -80,7 +80,8 @@ const SidebarLink = styled(
   width: ${isMobile ? '50px' : '60px'};
   height: ${isMobile ? '50px' : '60px'};
   padding: var(--chakra-space-2);
-  margin-bottom: 0.2rem;
+  margin-bottom: ${isMobile ? '0' : '0.2rem'};
+  margin-right: ${isMobile ? '0.2rem' : '0.2rem'};
   border-radius: 0.5rem;
   text-align: center;
   box-sizing: border-box;
