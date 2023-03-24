@@ -147,6 +147,7 @@ const WalletProvider = React.memo(
         )
 
         getSettings(address)
+        setAuthenticated(true)
 
         if (isWidget) {
           window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
@@ -371,7 +372,6 @@ const WalletProvider = React.memo(
           .then((response) => response.json())
           .then(async (signInData) => {
             storeJwtForAccount(accountAddress, signInData.access)
-            setAuthenticated(true)
             localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
 
             signIn(accountAddress, signInData.access)

@@ -49,6 +49,7 @@ const CustomConnectButton = () => {
   } = useWallet()
 
   // TODO: allow changing sign-in method after already selected wallet
+  // switch wallet button
   return (
     <ConnectButton.Custom>
       {() => {
