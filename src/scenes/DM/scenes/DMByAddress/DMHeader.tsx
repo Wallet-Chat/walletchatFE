@@ -45,7 +45,6 @@ const DMHeader = () => {
 
   return (
     <Box
-      flex='1'
       p={5}
       pb={3}
       borderBottom='1px solid var(--chakra-colors-lightgray-400)'
