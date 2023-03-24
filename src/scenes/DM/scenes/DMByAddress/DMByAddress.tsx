@@ -21,7 +21,6 @@ import {
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
 import { walletChatEth } from '@/constants/wallets'
-import { isMobile } from 'react-device-detect'
 
 const PAGE_SIZE = 25
 
@@ -50,9 +49,18 @@ const AlertBubble = ({
 const DMByAddress = ({ account }: { account: string }) => {
   const bodyRef = React.useRef<any>(null)
   const maxPages = React.useRef(1)
-  const pageRef = React.useRef<number>(1)
+
+  const selectorPageRef = React.useRef<number>(1)
+  const [selectorPage, setSelectorPage] = React.useState<number>(
+    selectorPageRef.current
+  )
+
+  const layoutPageRef = React.useRef<number>(selectorPage)
   const fullChatData = React.useRef<undefined | ChatMessageType[]>()
   const prevLastMsg = React.useRef<string | undefined>()
+  const topMostItem = React.useRef<number>()
+  const prevTopMostItem = React.useRef(topMostItem.current)
+  const shouldScrollBack = React.useRef<boolean>(false)
 
   const dispatch = useAppDispatch()
 
@@ -61,7 +69,6 @@ const DMByAddress = ({ account }: { account: string }) => {
   const encryptedDms = useAppSelector((state) =>
     selectEncryptedDmIds(state, account, toAddr)
   )
-  const [page, setPage] = React.useState<number>(pageRef.current)
 
   const selectChatDataForPage = React.useMemo(
     () =>
@@ -82,13 +89,18 @@ const DMByAddress = ({ account }: { account: string }) => {
           }
 
           const currentDataForPage = newChatData.slice(
-            -PAGE_SIZE * pageRef.current
+            -PAGE_SIZE * selectorPage
           )
+
+          if (layoutPageRef.current !== selectorPage) {
+            prevTopMostItem.current = topMostItem.current
+          }
+          layoutPageRef.current = selectorPage
 
           return JSON.stringify(currentDataForPage)
         }
       ),
-    []
+    [selectorPage]
   )
 
   // for effect deps, makes sure it won't re-calculate many times even with the same value
@@ -117,25 +129,25 @@ const DMByAddress = ({ account }: { account: string }) => {
   const chatData = fetchedData ? JSON.parse(fetchedData) : []
 
   const scrollToBottomCb = React.useCallback(
-    (msg: ChatMessageType, useSmooth?: boolean) => (node: HTMLElement) => {
+    (msg: ChatMessageType) => (node: HTMLElement) => {
       const previousScrolledMsg = prevLastMsg.current
       const previousAddr = previousScrolledMsg?.split(':')[0]
       const previousMsgId = previousScrolledMsg?.split(':')[1]
 
       if (node && previousMsgId !== String(msg.Id)) {
-        const isNewPage = previousAddr !== toAddr
+        const isNewPage = previousAddr !== msg.fromaddr
         const lastMsgMine = previousAddr === account
 
         if (isNewPage || lastMsgMine) {
           node.scrollIntoView({ behavior: !isNewPage ? 'smooth' : 'auto' })
         }
 
-        prevLastMsg.current = `${toAddr}:${String(msg.Id)}`
-        setPage(1)
-        pageRef.current = 1
+        prevLastMsg.current = `${msg.fromaddr}:${String(msg.Id)}`
+        selectorPageRef.current = 1
+        setSelectorPage(selectorPageRef.current)
       }
     },
-    [account, toAddr]
+    [account]
   )
 
   React.useEffect(() => {
@@ -143,14 +155,23 @@ const DMByAddress = ({ account }: { account: string }) => {
 
     if (bodyElem) {
       const autoScrollPagination = () => {
-        if (page < maxPages.current) {
-          const scrollThreshold = 200
-          const scrollTop = bodyElem.scrollTop || 0
+        const scrollThreshold = 200
+        const scrollTop = bodyElem.scrollTop || 0
 
-          if (scrollTop <= scrollThreshold) {
-            pageRef.current += 1
-            setPage((prev) => prev + 1)
+        if (scrollTop <= scrollThreshold) {
+          if (
+            layoutPageRef.current < maxPages.current &&
+            layoutPageRef.current === selectorPageRef.current
+          ) {
+            shouldScrollBack.current = true
+            selectorPageRef.current += 1
+            setSelectorPage(selectorPageRef.current)
           }
+        } else {
+          // On any other scroll movement that is not in the direction of
+          // pagination, we should reset behavior to scroll back to the last message
+          // to avoid overtaking the user's scroll position
+          shouldScrollBack.current = false
         }
       }
 
@@ -158,7 +179,7 @@ const DMByAddress = ({ account }: { account: string }) => {
 
       return () => bodyElem.removeEventListener('scroll', autoScrollPagination)
     }
-  }, [page])
+  }, [])
 
   useGetReadChatItemsQuery({ account, toAddr }, POLLING_QUERY_OPTS)
 
@@ -199,6 +220,11 @@ const DMByAddress = ({ account }: { account: string }) => {
       retryFailed()
     }
   }, [dispatch, encryptedDmsStr, account, toAddr])
+
+  const scrollIntoViewCb = React.useCallback(
+    (node) => shouldScrollBack.current && node?.scrollIntoView(),
+    []
+  )
 
   // TODO: 'back to bottom' button
   if (isFetching && !encryptedDmsStr && chatData.length === 0) {
@@ -252,12 +278,20 @@ const DMByAddress = ({ account }: { account: string }) => {
 
         {chatData.map((msg: ChatMessageType, i: number) => {
           const isLast = i === chatData.length - 1
+          const isFirst = i === 0
+          const msgId = msg.Id
+
+          let ref
+          if (isLast) {
+            ref = scrollToBottomCb(msg) as any
+          } else if (isFirst) {
+            topMostItem.current = msgId
+          } else if (msgId === prevTopMostItem.current) {
+            ref = scrollIntoViewCb
+          }
 
           return (
-            <Box
-              key={`${String(i)}_${msg.Id}`}
-              ref={isLast ? (scrollToBottomCb(msg) as any) : undefined}
-            >
+            <Box key={`${String(i)}_${msg.Id}`} ref={ref}>
               <ChatMessage context='dm' account={account} msg={msg} />
             </Box>
           )
