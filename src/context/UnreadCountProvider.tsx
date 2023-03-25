@@ -19,10 +19,10 @@ export function withUnreadCount(Component) {
 const UnreadCountProvider = React.memo(({ children }) => {
   const [unreadCount, setUnreadCount] = React.useState(0)
   const [totalUnreadCount, setTotalUnreadCount] = React.useState(0)
-  const { account, isAuthenticated } = useWallet()
+  const { account } = useWallet()
 
   const getUnreadCount = useCallback(() => {
-    if (account && isAuthenticated) {
+    if (account) {
       fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/unreadcount/${account}`,
         {
