@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { IconX } from '@tabler/icons'
+import { IconExternalLink, IconX } from '@tabler/icons'
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import {
    Button,
@@ -10,10 +10,16 @@ import {
    Spinner,
    Alert,
    Tag,
+   Text,
+   HStack,
+   Link,
+   MenuItem,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 
 import logoThumb from './images/logo-thumb.svg'
+import logoTwitter from './images/twitter-logo.svg'
+import logoDelegateCash from './images/delegateCash.svg'
 import './App.scss'
 import Inbox from './scenes/DM'
 import NewConversation from './scenes/NewConversation'
@@ -138,6 +144,40 @@ export const App = () => {
                   >
                      Sign in using wallet
                   </Button>
+                  <Heading size="2xl" mb={8}>
+                      
+                  </Heading>
+                  <HStack>         
+                     <Heading size="s">
+                        Delegate.cash supported
+
+                     </Heading>
+                     <Link
+                     href={`https://twitter.com/delegatecash`}
+                     target="_blank"
+                     _hover={{
+                        textDecoration: 'none',
+                        background: 'var(--chakra-colors-lightgray-400)',
+                     }}
+                  >
+                      <Image src={logoDelegateCash} width="25px" /> 
+                  </Link> 
+                  </HStack>
+                  <HStack>         
+                     <Heading size="s">
+                        Powered by WalletChat.fun 
+                     </Heading>
+                     <Link
+                     href={`https://twitter.com/wallet_chat`}
+                     target="_blank"
+                     _hover={{
+                        textDecoration: 'none',
+                        background: 'var(--chakra-colors-lightgray-400)',
+                     }}
+                  >
+                      <Image src={logoTwitter} width="25px" /> 
+                  </Link> 
+                  </HStack>
                   {btnClicks > 0 && !error && (
                      <Alert status="success" variant="solid" mt={4}>
                         Check the your wallet for signature prompt to continue
