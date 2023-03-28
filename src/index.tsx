@@ -1,16 +1,14 @@
 import React from 'react'
-import { ColorModeScript, ChakraProvider } from '@chakra-ui/react'
+import { ColorModeScript, ChakraProvider, Flex } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 
 import '@rainbow-me/rainbowkit/styles.css'
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
-import { configureChains, createClient, WagmiConfig } from 'wagmi'
-import { mainnet, polygon, optimism } from 'wagmi/chains'
-import { infuraProvider } from '@wagmi/core/providers/infura'
-import { publicProvider } from 'wagmi/providers/public'
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { createClient, WagmiConfig } from 'wagmi'
 
 import { Provider } from 'react-redux'
+import { chains, provider, connectors } from '@/context/WalletProvider'
 import { App } from './App'
 import reportWebVitals from './reportWebVitals'
 // import * as serviceWorker from './serviceWorker'
@@ -18,20 +16,9 @@ import WalletProvider from './context/WalletProvider'
 import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
-import * as ENV from '@/constants/env'
 import { getIsWidgetContext } from './utils/context'
 
 const isWidget = getIsWidgetContext()
-
-const { chains, provider } = configureChains(
-  [mainnet, polygon, optimism],
-  [infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }), publicProvider()]
-)
-
-const { connectors } = getDefaultWallets({
-  appName: 'WalletChat',
-  chains,
-})
 
 const wagmiClient = createClient({
   autoConnect: !isWidget,
@@ -49,7 +36,9 @@ ReactDOM.render(
             <WalletProvider>
               <UnreadCountProvider>
                 <ChakraProvider theme={theme}>
-                  <App />
+                  <Flex w='100vw' h='100vh'>
+                    <App />
+                  </Flex>
                 </ChakraProvider>
               </UnreadCountProvider>
             </WalletProvider>

@@ -1,5 +1,4 @@
 import { Route, Routes, Navigate, Outlet } from 'react-router-dom'
-import * as wagmi from '@wagmi/core'
 import {
   Box,
   Flex,
@@ -43,9 +42,10 @@ const CustomConnectButton = () => {
   const {
     siweFailed,
     siwePending,
-    parentProvider,
+    connectConfig,
     isAuthenticated,
     doRequestSiwe,
+    connect,
   } = useWallet()
 
   // TODO: allow changing sign-in method after already selected wallet
@@ -66,16 +66,14 @@ const CustomConnectButton = () => {
             )
           }
 
-          if (siweFailed || (isWidget && parentProvider)) {
+          if (siweFailed || (isWidget && connectConfig)) {
             return (
               <Flex direction='column' gap={2} alignItems='start'>
                 <Button
                   variant='black'
                   size='lg'
                   onClick={() =>
-                    siweFailed
-                      ? doRequestSiwe()
-                      : wagmi.connect({ connector: parentProvider.connector })
+                    siweFailed ? doRequestSiwe() : connect(connectConfig)
                   }
                 >
                   <Tag variant='solid' colorScheme='green' mr={2}>
@@ -107,15 +105,7 @@ export const App = () => {
 
   if (!isAuthenticated) {
     return (
-      <Flex
-        p={2}
-        flexFlow='column'
-        position='absolute'
-        top='15px'
-        bottom='15px'
-        left='10px'
-        right='10px'
-      >
+      <Flex flex={1} padding='15px'>
         <ExtensionCloseButton />
 
         <Box

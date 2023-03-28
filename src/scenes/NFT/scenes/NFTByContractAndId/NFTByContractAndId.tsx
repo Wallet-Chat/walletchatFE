@@ -19,6 +19,7 @@ import {
   IconExternalLink,
   IconShieldLock,
 } from '@tabler/icons'
+import { API } from 'react-wallet-chat/dist/src/types'
 import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
@@ -41,7 +42,6 @@ import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import { useHover } from '../../../../helpers/useHover'
 import { getJwtForAccount } from '@/helpers/jwt'
-import { isMobile } from 'react-device-detect'
 
 const tokenType = 'erc721'
 
@@ -69,13 +69,21 @@ const NFTByContractAndId = ({ account }: { account: string }) => {
 
   useEffect(() => {
     window.addEventListener('message', (e) => {
-      const data = e.data
+      const { target, data }: API = e.data
 
-      const { contractAddress, itemId, network, redirect, ownerAddress } = data
+      if (target === 'nft_info') {
+        const {
+          contractAddress,
+          itemId,
+          network,
+          redirect,
+          ownerAddress,
+        }: any = data
 
-      if (contractAddress && itemId && network && ownerAddress) {
-        if (redirect) {
-          setTabIndex(2)
+        if (contractAddress && itemId && network && ownerAddress) {
+          if (redirect) {
+            setTabIndex(2)
+          }
         }
       }
     })

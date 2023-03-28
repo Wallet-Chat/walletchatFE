@@ -1,5 +1,4 @@
 import * as wagmi from '@wagmi/core'
-import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect'
 
 import React, { useState } from 'react'
 import Web3 from 'web3'
@@ -7,6 +6,17 @@ import { SiweMessage } from 'siwe'
 
 import { AnalyticsBrowser } from '@segment/analytics-next'
 
+import { getDefaultWallets } from '@rainbow-me/rainbowkit'
+import { configureChains, useConnect } from 'wagmi'
+import { mainnet, polygon, optimism, celo } from 'wagmi/chains'
+import { infuraProvider } from '@wagmi/core/providers/infura'
+import { publicProvider } from 'wagmi/providers/public'
+
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+
+import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
@@ -21,6 +31,18 @@ import {
   storeJwtForAccount,
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
+
+export const { chains, provider } = configureChains(
+  [mainnet, polygon, optimism, celo],
+  [infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }), publicProvider()]
+)
+
+const APP_NAME = 'WalletChat'
+
+export const { connectors } = getDefaultWallets({
+  appName: APP_NAME,
+  chains,
+})
 
 // TODO: Context Type
 export const WalletContext = React.createContext<any>(null)
@@ -37,7 +59,7 @@ const WalletProvider = React.memo(
     const prevNonce = React.useRef<null | string>()
     const siwePendingRef = React.useRef<boolean>(false)
 
-    const provider = wagmi.getProvider()
+    const currentProvider = wagmi.getProvider()
 
     const [chainId, setChainId] = React.useState(wagmi.getNetwork()?.chain?.id)
 
@@ -56,12 +78,17 @@ const WalletProvider = React.memo(
     const [siwePending, setSiwePending] = React.useState<boolean>(false)
     const [siweFailed, setSiweFailed] = React.useState(false)
 
-    const [parentProvider, setParentProvider] = React.useState<null | any>()
+    const [connectConfig, setConnectConfig] = React.useState<null | {
+      chainId: number
+      connector: wagmi.Connector
+    }>()
     const [widgetOpen, setWidgetOpen] = React.useState(false)
 
     const { currentData: name } = endpoints.getName.useQueryState(
       accountAddress?.toLocaleLowerCase()
     )
+
+    const { connect } = useConnect()
 
     // help debug issues and watch for high traffic conditions
     const analytics = AnalyticsBrowser.load({
@@ -249,25 +276,9 @@ const WalletProvider = React.memo(
       if (!isWidget) return
 
       window.addEventListener('message', (e) => {
-        const data = e.data
+        const { data, origin } = e
 
-        const {
-          data: messageData,
-          target,
-        }: {
-          data:
-            | undefined
-            | null
-            | {
-                isInjected: boolean
-                connectorOptions: null | {
-                  projectId: string
-                  address: string
-                  chainId: number
-                }
-              }
-          target: undefined | string
-        } = data
+        const { data: messageData, target }: API = data
 
         if (target === 'widget_open') {
           setWidgetOpen(true)
@@ -275,17 +286,46 @@ const WalletProvider = React.memo(
 
         if (target === 'sign_in') {
           if (messageData) {
-            if (messageData.isInjected) {
-              setParentProvider({ connector: new wagmi.InjectedConnector() })
-            } else if (messageData.connectorOptions) {
-              setParentProvider({
-                connector: new WalletConnectConnector({
-                  options: {},
-                }),
+            const walletIs = (walletName: string) =>
+              messageData.walletName.toLowerCase().includes(walletName)
+
+            let connector
+
+            if (walletIs('metamask')) {
+              connector = new MetaMaskConnector({ chains })
+            }
+
+            if (walletIs('coinbase')) {
+              connector = new CoinbaseWalletConnector({
+                chains,
+                options: {
+                  appName: APP_NAME,
+                  jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM}`,
+                },
               })
             }
-          } else if (messageData === null) {
-            setParentProvider(null)
+
+            if (
+              walletIs('connect') ||
+              walletIs('gooddollar') ||
+              walletIs('zengo')
+            ) {
+              connector = new WalletConnectConnector({
+                chains,
+                options: {},
+              })
+            }
+
+            if (connector) {
+              setConnectConfig({
+                chainId: messageData.chainId,
+                connector,
+              })
+            }
+          }
+
+          if (messageData === null) {
+            setConnectConfig(null)
           }
         }
       })
@@ -300,7 +340,7 @@ const WalletProvider = React.memo(
           networkUnwatch()
         }
       }
-    }, [accountUnwatch, networkUnwatch])
+    }, [])
 
     const doRequestSiwe = React.useCallback(async () => {
       if (
@@ -311,7 +351,7 @@ const WalletProvider = React.memo(
         !siwePendingRef.current &&
         prevNonce.current !== nonce
       ) {
-        const domain = window.location.hostname
+        const domain = window.location.host
         const origin = window.location.protocol + domain
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
@@ -412,13 +452,14 @@ const WalletProvider = React.memo(
         account: accountAddress?.toLowerCase(),
         disconnectWallet,
         isAuthenticated,
-        web3: provider && new Web3(provider),
-        provider,
+        web3: currentProvider && new Web3(currentProvider),
+        provider: currentProvider,
         delegate,
-        parentProvider,
+        connectConfig,
         siweFailed,
         siwePending,
         doRequestSiwe,
+        connect,
       }),
       [
         accountAddress,
@@ -428,13 +469,14 @@ const WalletProvider = React.memo(
         name,
         notify24,
         notifyDM,
-        provider,
+        currentProvider,
         updateName,
-        parentProvider,
+        connectConfig,
         siweFailed,
         siwePending,
         doRequestSiwe,
         disconnectWallet,
+        connect,
       ]
     )
 
