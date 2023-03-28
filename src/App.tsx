@@ -52,7 +52,7 @@ const CustomConnectButton = () => {
   // switch wallet button
   return (
     <ConnectButton.Custom>
-      {() => {
+      {({ openConnectModal }) => {
         return (() => {
           if (siwePending || isAuthenticated === undefined) {
             return (
@@ -79,7 +79,11 @@ const CustomConnectButton = () => {
                   <Tag variant='solid' colorScheme='green' mr={2}>
                     Connected
                   </Tag>
-                  <Box>Log In</Box>
+                  <Box>Log in</Box>
+                </Button>
+
+                <Button variant='black' size='lg' onClick={openConnectModal}>
+                  Sign in with another wallet
                 </Button>
 
                 {siweFailed && (
