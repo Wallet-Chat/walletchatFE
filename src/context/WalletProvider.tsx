@@ -322,6 +322,8 @@ const WalletProvider = React.memo(
                 connector,
               })
             }
+
+            storage.set('current-widget-origin', origin)
           }
 
           if (messageData === null) {
@@ -330,6 +332,13 @@ const WalletProvider = React.memo(
         }
       })
     }, [])
+
+    React.useEffect(() => {
+      if (isAuthenticated) {
+        const origin = storage.get('current-widget-origin')
+        storage.push('widget-logins', origin)
+      }
+    }, [isAuthenticated])
 
     React.useEffect(() => {
       return () => {

@@ -16,12 +16,10 @@ import WalletProvider from './context/WalletProvider'
 import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
-import { getIsWidgetContext } from './utils/context'
-
-const isWidget = getIsWidgetContext()
+import { getAutoConnect } from './helpers/widget'
 
 const wagmiClient = createClient({
-  autoConnect: !isWidget,
+  autoConnect: getAutoConnect(),
   connectors,
   provider,
 })
