@@ -213,6 +213,13 @@ const WalletProvider = React.memo(
         setAccount(accountAddress)
 
         if (prevAccount.current !== accountAddress.toString()) {
+          if (prevAccount.current === null) {
+            // Fallback for when signed out and this effect re-ran
+            // revert prevAccount to default state so can log back in
+            prevAccount.current = undefined
+            return
+          }
+
           prevAccount.current = accountAddress.toString()
 
           // limit wallet connection recording to once per day
@@ -421,7 +428,7 @@ const WalletProvider = React.memo(
           .then((response) => response.json())
           .then(async (signInData) => {
             storeJwtForAccount(accountAddress, signInData.access)
-            localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
+            storage.set('lit-auth-signature', JSON.stringify(authSig))
 
             signIn(accountAddress, signInData.access)
           })
@@ -439,13 +446,15 @@ const WalletProvider = React.memo(
       networkUnwatch()
       wagmi.disconnect()
 
-      const rkRecent = localStorage.getItem('rk-recent')
-      localStorage.clear()
-      if (rkRecent) localStorage.setItem('rk-recent', rkRecent)
-
       prevAccount.current = null
       setNonce(null)
       setSiweFailed(false)
+      setAuthenticated(false)
+
+      if (isWidget) {
+        // Tell the widget the iframe has signed out
+        window.parent.postMessage({ data: null, target: 'sign_in' }, '*')
+      }
     }, [accountUnwatch, networkUnwatch])
 
     const contextValue = React.useMemo(
