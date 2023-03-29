@@ -294,6 +294,11 @@ const WalletProvider = React.memo(
       window.addEventListener('message', (e) => {
         const { data, origin } = e
 
+        const currentOrigin = storage.get('current-widget-origin')
+        if (currentOrigin !== origin) {
+          storage.set('current-widget-origin', origin)
+        }
+
         const { data: messageData, target }: API = data
 
         if (target === 'widget_open') {
