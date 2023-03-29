@@ -48,7 +48,7 @@ import IconNFT from '../../images/icon-nft.svg'
 import IconSupport from '../../images/icon-feedback.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
-import { supportWallet } from '@/constants/wallets'
+import { getSupportWallet } from '@/helpers/widget'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -186,7 +186,7 @@ const UnreadBadge = ({ children }: { children: string }) => (
 export default function Sidebar() {
   const navigate = useNavigate()
   const location = useLocation()
-  const isSupportPage = location.pathname.includes(supportWallet)
+  const isSupportPage = location.pathname.includes(getSupportWallet())
   const isNewDMPage = location.pathname.startsWith('/dm/new')
 
   const nftNotificationCount = 0
@@ -393,7 +393,7 @@ export default function Sidebar() {
           )}
         </SidebarLink>
 
-        <SidebarLink to={`/dm/${supportWallet}`}>
+        <SidebarLink to={`/dm/${getSupportWallet()}`}>
           <Image src={IconSupport} alt='' />
         </SidebarLink>
 

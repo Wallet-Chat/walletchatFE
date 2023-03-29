@@ -20,7 +20,7 @@ import {
   selectEncryptedDmIds,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
-import { supportWallet } from '@/constants/wallets'
+import { getSupportWallet } from '@/helpers/widget'
 import * as ENV from '@/constants/env'
 
 const PAGE_SIZE = 25
@@ -275,7 +275,7 @@ const DMByAddress = ({ account }: { account: string }) => {
       <DMHeader />
 
       <DottedBackground ref={bodyRef} className='custom-scrollbar'>
-        {toAddr.toLocaleLowerCase() === supportWallet && (
+        {toAddr.toLocaleLowerCase() === getSupportWallet() && (
           <AlertBubble color='green'>{supportHeader}</AlertBubble>
         )}
 

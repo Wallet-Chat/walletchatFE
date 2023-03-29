@@ -350,9 +350,9 @@ const WalletProvider = React.memo(
                 })
               }
             }
-
-            storage.set('current-widget-origin', origin)
           }
+
+          storage.set('current-widget-origin', origin)
 
           if (messageData === null) {
             setConnectConfig(null)

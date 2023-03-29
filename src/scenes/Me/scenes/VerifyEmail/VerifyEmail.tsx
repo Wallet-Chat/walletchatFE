@@ -21,6 +21,7 @@ import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { getCommunity } from '@/helpers/widget'
 
 const VerifyEmail = ({ account }: { account: string }) => {
   const location = useLocation()
@@ -97,8 +98,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
           console.log('✅[GET][Verify Email]:', response)
           setFetchError(false)
           setIsVerifySuccess(true)
-          let communityChat = ENV.REACT_APP_DEFAULT_COMMUNITY || 'walletchat'
-          navigate(`/community/${communityChat}`)
+          navigate(`/community/${getCommunity()}`)
         })
         .catch((error) => {
           console.error('🚨[GET][Verify Email]:', error)

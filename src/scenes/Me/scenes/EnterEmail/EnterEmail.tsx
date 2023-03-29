@@ -22,6 +22,7 @@ import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { getCommunity } from '@/helpers/widget'
 
 const EnterEmail = ({ account }: { account: string }) => {
   const {
@@ -114,8 +115,7 @@ const EnterEmail = ({ account }: { account: string }) => {
   }
 
   const handleCancel = () => {
-    let communityChat = ENV.REACT_APP_DEFAULT_COMMUNITY || 'walletchat'
-    navigate(`/community/${communityChat}`)
+    navigate(`/community/${getCommunity()}`)
   }
 
   const onSubmit = (values: any) => {
