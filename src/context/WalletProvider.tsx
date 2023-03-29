@@ -76,6 +76,7 @@ const WalletProvider = React.memo(
       (state) => state.dm.account || wagmiAddress
     )
 
+    const initialJwt = accountAddress && storage.get('jwt')
     const accountAuthenticated =
       accountAddress && chainId ? getHasJwtForAccount(accountAddress) : null
 
@@ -193,7 +194,13 @@ const WalletProvider = React.memo(
 
     React.useEffect(() => {
       setAuthenticated(accountAuthenticated)
-    }, [accountAuthenticated])
+
+      console.log(1000, initialJwt, typeof initialJwt)
+      if (typeof initialJwt === 'string') {
+        localStorage.clear()
+        window.location.reload()
+      }
+    }, [initialJwt, accountAuthenticated])
 
     React.useEffect(() => {
       if (analytics && accountAddress && name && email) {
