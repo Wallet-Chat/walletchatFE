@@ -478,6 +478,7 @@ const WalletProvider = React.memo(
       wagmi.disconnect()
 
       prevAccount.current = null
+      dispatch(setAccount(null))
       setNonce(null)
       setSiweFailed(false)
       setAuthenticated(false)
