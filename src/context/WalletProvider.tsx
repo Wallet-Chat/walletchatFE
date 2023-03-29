@@ -7,7 +7,13 @@ import { SiweMessage } from 'siwe'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 
 import { getDefaultWallets } from '@rainbow-me/rainbowkit'
-import { configureChains, useConnect } from 'wagmi'
+import {
+  configureChains,
+  useAccount,
+  useConnect,
+  useNetwork,
+  useProvider,
+} from 'wagmi'
 import { mainnet, polygon, optimism, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { publicProvider } from 'wagmi/providers/public'
@@ -58,12 +64,18 @@ const WalletProvider = React.memo(
     const prevAccount = React.useRef<null | string>()
     const prevNonce = React.useRef<null | string>()
     const siwePendingRef = React.useRef<boolean>(false)
+    const signatureRequested = React.useRef<boolean>(false)
 
-    const currentProvider = wagmi.getProvider()
+    const currentProvider = useProvider()
 
-    const [chainId, setChainId] = React.useState(wagmi.getNetwork()?.chain?.id)
+    const { chain } = useNetwork()
+    const [chainId, setChainId] = React.useState(chain?.id)
 
-    const accountAddress = useAppSelector((state) => state.dm.account)
+    const { address: wagmiAddress } = useAccount()
+    const accountAddress = useAppSelector(
+      (state) => state.dm.account || wagmiAddress
+    )
+
     const accountAuthenticated =
       accountAddress && chainId ? getHasJwtForAccount(accountAddress) : null
 
@@ -74,6 +86,9 @@ const WalletProvider = React.memo(
     const [notifyDM, setNotifyDM] = useState('true')
     const [notify24, setNotify24] = useState('true')
     const [delegate, setDelegate] = useState<null | string>(null)
+    const [signedMessage, setSignature] = useState<null | undefined | string>(
+      null
+    )
 
     const [siwePending, setSiwePending] = React.useState<boolean>(false)
     const [siweFailed, setSiweFailed] = React.useState(false)
@@ -202,7 +217,10 @@ const WalletProvider = React.memo(
     }
 
     React.useEffect(() => {
-      if (accountAddress && (!isWidget || widgetOpen)) {
+      if (
+        accountAddress &&
+        (!isWidget || widgetOpen || signatureRequested.current)
+      ) {
         setAccount(accountAddress)
 
         if (prevAccount.current !== accountAddress.toString()) {
@@ -284,43 +302,53 @@ const WalletProvider = React.memo(
           setWidgetOpen(true)
         }
 
+        if (target === 'signed_message') {
+          setSignature(messageData)
+        }
+
         if (target === 'sign_in') {
           if (messageData) {
             const walletIs = (walletName: string) =>
               messageData.walletName.toLowerCase().includes(walletName)
 
-            let connector
+            if (messageData.requestSignature) {
+              signatureRequested.current = true
+              dispatch(setAccount(messageData.account))
+              setChainId(messageData.chainId)
+            } else {
+              let connector
 
-            if (walletIs('metamask')) {
-              connector = new MetaMaskConnector({ chains })
-            }
+              if (walletIs('metamask')) {
+                connector = new MetaMaskConnector({ chains })
+              }
 
-            if (walletIs('coinbase')) {
-              connector = new CoinbaseWalletConnector({
-                chains,
-                options: {
-                  appName: APP_NAME,
-                  jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM}`,
-                },
-              })
-            }
+              if (walletIs('coinbase')) {
+                connector = new CoinbaseWalletConnector({
+                  chains,
+                  options: {
+                    appName: APP_NAME,
+                    jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM}`,
+                  },
+                })
+              }
 
-            if (
-              walletIs('connect') ||
-              walletIs('gooddollar') ||
-              walletIs('zengo')
-            ) {
-              connector = new WalletConnectConnector({
-                chains,
-                options: {},
-              })
-            }
+              if (
+                walletIs('connect') ||
+                walletIs('gooddollar') ||
+                walletIs('zengo')
+              ) {
+                connector = new WalletConnectConnector({
+                  chains,
+                  options: {},
+                })
+              }
 
-            if (connector) {
-              setConnectConfig({
-                chainId: messageData.chainId,
-                connector,
-              })
+              if (connector) {
+                setConnectConfig({
+                  chainId: messageData.chainId,
+                  connector,
+                })
+              }
             }
 
             storage.set('current-widget-origin', origin)
@@ -360,16 +388,16 @@ const WalletProvider = React.memo(
         nonce &&
         chainId &&
         !getHasJwtForAccount(accountAddress) &&
-        !siwePendingRef.current &&
-        prevNonce.current !== nonce
+        ((!siwePendingRef.current && prevNonce.current !== nonce) ||
+          signedMessage)
       ) {
+        setSiwePending(true)
+        siwePendingRef.current = true
+
         const domain = window.location.host
         const origin = window.location.protocol + domain
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
-
-        setSiwePending(true)
-        siwePendingRef.current = true
 
         const siweMessage = new SiweMessage({
           domain,
@@ -382,13 +410,22 @@ const WalletProvider = React.memo(
         })
 
         const messageToSign = siweMessage.prepareMessage()
-        const signer = await wagmi.fetchSigner()
+        let signature = signedMessage
 
-        let signature
-        try {
-          signature = await signer?.signMessage(messageToSign)
-        } catch (error) {
-          console.log('🚨[SIWE][Failed or Rejected]:', error)
+        if (!signature) {
+          if (signatureRequested.current) {
+            window.parent.postMessage({ data: nonce, target: 'nonce' }, '*')
+
+            return
+          }
+
+          const signer = await wagmi.fetchSigner()
+
+          try {
+            signature = await signer?.signMessage(messageToSign)
+          } catch (error) {
+            console.log('🚨[SIWE][Failed or Rejected]:', error)
+          }
         }
 
         setSiwePending(false)
@@ -431,7 +468,7 @@ const WalletProvider = React.memo(
 
         prevNonce.current = nonce
       }
-    }, [accountAddress, chainId, nonce, signIn])
+    }, [signedMessage, accountAddress, chainId, nonce, signIn])
 
     React.useEffect(() => {
       doRequestSiwe()
