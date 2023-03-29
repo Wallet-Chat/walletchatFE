@@ -24,7 +24,10 @@ function getWidgetEnvSuffix() {
   const currentWidgetOrigin = storage.get('current-widget-origin')
   if (!currentWidgetOrigin) return null
 
-  if (currentWidgetOrigin.toLowerCase().includes('gooddollar')) {
+  if (
+    currentWidgetOrigin.toLowerCase().includes('gooddollar') ||
+    currentWidgetOrigin.toLowerCase().includes('good-protocol')
+  ) {
     return '_GOODDOLLAR'
   }
 
