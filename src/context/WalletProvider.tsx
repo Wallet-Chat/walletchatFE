@@ -110,13 +110,6 @@ const WalletProvider = React.memo(
       [accountAddress, dispatch]
     )
 
-    const accountUnwatch = wagmi.watchAccount((wagmiAccount) =>
-      dispatch(setAccount(wagmiAccount?.address))
-    )
-    const networkUnwatch = wagmi.watchNetwork((wagmiNetwork) =>
-      setChainId(wagmiNetwork?.chain?.id)
-    )
-
     const getSettings = React.useCallback((address: string) => {
       fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${address}`,
@@ -338,7 +331,7 @@ const WalletProvider = React.memo(
           }
         }
       })
-    }, [])
+    }, [dispatch])
 
     React.useEffect(() => {
       if (isAuthenticated) {
@@ -348,15 +341,18 @@ const WalletProvider = React.memo(
     }, [isAuthenticated])
 
     React.useEffect(() => {
+      const accountUnwatch = wagmi.watchAccount((wagmiAccount) =>
+        dispatch(setAccount(wagmiAccount?.address))
+      )
+      const networkUnwatch = wagmi.watchNetwork((wagmiNetwork) =>
+        setChainId(wagmiNetwork?.chain?.id)
+      )
+
       return () => {
-        if (accountUnwatch) {
-          accountUnwatch()
-        }
-        if (networkUnwatch) {
-          networkUnwatch()
-        }
+        accountUnwatch()
+        networkUnwatch()
       }
-    }, [])
+    }, [dispatch])
 
     const doRequestSiwe = React.useCallback(async () => {
       if (
@@ -428,7 +424,7 @@ const WalletProvider = React.memo(
           .then((response) => response.json())
           .then(async (signInData) => {
             storeJwtForAccount(accountAddress, signInData.access)
-            storage.set('lit-auth-signature', JSON.stringify(authSig))
+            storage.set('lit-auth-signature', authSig)
 
             signIn(accountAddress, signInData.access)
           })
@@ -442,8 +438,6 @@ const WalletProvider = React.memo(
     }, [doRequestSiwe])
 
     const disconnectWallet = React.useCallback(async () => {
-      accountUnwatch()
-      networkUnwatch()
       wagmi.disconnect()
 
       prevAccount.current = null
@@ -455,7 +449,7 @@ const WalletProvider = React.memo(
         // Tell the widget the iframe has signed out
         window.parent.postMessage({ data: null, target: 'sign_in' }, '*')
       }
-    }, [accountUnwatch, networkUnwatch])
+    }, [])
 
     const contextValue = React.useMemo(
       () => ({
