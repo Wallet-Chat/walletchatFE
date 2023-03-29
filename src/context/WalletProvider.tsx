@@ -195,7 +195,6 @@ const WalletProvider = React.memo(
     React.useEffect(() => {
       setAuthenticated(accountAuthenticated)
 
-      console.log(1000, initialJwt, typeof initialJwt)
       if (typeof initialJwt === 'string') {
         localStorage.clear()
         window.location.reload()
@@ -228,15 +227,7 @@ const WalletProvider = React.memo(
         accountAddress &&
         (!isWidget || widgetOpen || signatureRequested.current)
       ) {
-        setAccount(accountAddress)
-
         if (prevAccount.current !== accountAddress.toString()) {
-          if (prevAccount.current === null) {
-            // Fallback for when signed out and this effect re-ran
-            // revert prevAccount to default state so can log back in
-            prevAccount.current = undefined
-            return
-          }
 
           prevAccount.current = accountAddress.toString()
 
@@ -376,9 +367,15 @@ const WalletProvider = React.memo(
     }, [isAuthenticated])
 
     React.useEffect(() => {
-      const accountUnwatch = wagmi.watchAccount((wagmiAccount) =>
+      const accountUnwatch = wagmi.watchAccount((wagmiAccount) => {
+        if (!wagmiAccount && prevAccount.current === null) {
+          // Fallback for when signed out and this effect re-ran
+          // revert prevAccount to default state so can log back in
+          prevAccount.current = undefined
+        }
+
         dispatch(setAccount(wagmiAccount?.address))
-      )
+      })
       const networkUnwatch = wagmi.watchNetwork((wagmiNetwork) =>
         setChainId(wagmiNetwork?.chain?.id)
       )
@@ -484,7 +481,6 @@ const WalletProvider = React.memo(
     const disconnectWallet = React.useCallback(async () => {
       wagmi.disconnect()
 
-      prevAccount.current = null
       dispatch(setAccount(null))
       setNonce(null)
       setSiweFailed(false)
