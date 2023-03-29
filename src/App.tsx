@@ -1,8 +1,19 @@
 import { Route, Routes, Navigate, Outlet } from 'react-router-dom'
-import { Box, Flex, Image, Heading, Spinner, Tag } from '@chakra-ui/react'
+import {
+  Link,
+  HStack,
+  Box,
+  Flex,
+  Image,
+  Heading,
+  Spinner,
+  Tag,
+} from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
 import logoThumb from './images/logo-thumb.svg'
+import logoTwitter from './images/twitter-logo.svg'
+import logoDelegateCash from './images/delegateCash.svg'
 import './App.scss'
 import Inbox from './scenes/DM'
 import NewConversation from './scenes/NewConversation'
@@ -48,6 +59,34 @@ export const App = () => {
           </Heading>
 
           <ConnectWalletButton />
+
+          <Heading size='2xl' mb={8} />
+          <HStack>
+            <Heading size='s'>Delegate.cash supported</Heading>
+            <Link
+              href='https://twitter.com/delegatecash'
+              target='_blank'
+              _hover={{
+                textDecoration: 'none',
+                background: 'var(--chakra-colors-lightgray-400)',
+              }}
+            >
+              <Image src={logoDelegateCash} width='25px' />
+            </Link>
+          </HStack>
+          <HStack>
+            <Heading size='s'>Powered by WalletChat.fun</Heading>
+            <Link
+              href='https://twitter.com/wallet_chat'
+              target='_blank'
+              _hover={{
+                textDecoration: 'none',
+                background: 'var(--chakra-colors-lightgray-400)',
+              }}
+            >
+              <Image src={logoTwitter} width='25px' />
+            </Link>
+          </HStack>
         </Box>
       </Flex>
     )
