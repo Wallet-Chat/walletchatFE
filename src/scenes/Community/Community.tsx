@@ -7,7 +7,8 @@ const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
   const isSmallLayout = useIsSmallLayout()
 
   return (
-    <Box
+    <Flex
+      direction='column'
       background='white'
       height={isSmallLayout ? 'unset' : '100vh'}
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
@@ -24,7 +25,7 @@ const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
       </Box>
 
       <InboxList context='community' web3={web3} account={account} />
-    </Box>
+    </Flex>
   )
 }
 

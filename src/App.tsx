@@ -133,7 +133,7 @@ export const App = () => {
         <Sidebar />
 
         <Flex
-          flexGrow={1}
+          flex='1 1 0px'
           overflow='hidden'
           minWidth='1px'
           flexDirection='column'
@@ -164,7 +164,7 @@ export const App = () => {
               <Route
                 index
                 element={
-                  <Flex flexGrow={1}>
+                  <Flex flexGrow={1} overflowY='scroll'>
                     <Inbox account={account} web3={web3} />
 
                     {!isSmallLayout && (
@@ -186,7 +186,7 @@ export const App = () => {
               <Route
                 path=':address'
                 element={
-                  <Flex flexGrow={1}>
+                  <Flex flexGrow={1} overflowY='scroll'>
                     {!isSmallLayout && <Inbox account={account} web3={web3} />}
 
                     <DMByAddress account={account} delegate={delegate} />
@@ -218,7 +218,7 @@ export const App = () => {
             <Route
               path='/nft_error'
               element={
-                <Flex flexGrow={1}>
+                <Flex flexGrow={1} overflowY='scroll'>
                   <NFT account={account} web3={web3} />
                   {!isSmallLayout && (
                     <Flex
@@ -241,7 +241,7 @@ export const App = () => {
               <Route
                 index
                 element={
-                  <Flex flexGrow={1}>
+                  <Flex flexGrow={1} overflowY='scroll'>
                     <NFT account={account} web3={web3} />
 
                     {!isSmallLayout && (
@@ -260,7 +260,7 @@ export const App = () => {
 
               <Route
                 element={
-                  <Flex flexGrow={1}>
+                  <Flex flexGrow={1} overflowY='scroll'>
                     {!isSmallLayout && <NFT account={account} web3={web3} />}
 
                     <Outlet />
@@ -291,7 +291,7 @@ export const App = () => {
               <Route
                 index
                 element={
-                  <Flex flexGrow={1}>
+                  <Flex flexGrow={1} overflowY='scroll'>
                     <Community account={account} web3={web3} />
 
                     {!isSmallLayout && (
@@ -313,7 +313,7 @@ export const App = () => {
               <Route
                 path=':community'
                 element={
-                  <Flex flexGrow={1}>
+                  <Flex flexGrow={1} overflowY='scroll'>
                     {!isSmallLayout && (
                       <Community account={account} web3={web3} />
                     )}

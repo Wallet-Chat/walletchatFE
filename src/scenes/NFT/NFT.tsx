@@ -25,10 +25,8 @@ import { POLLING_QUERY_OPTS } from '@/constants'
 import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
 
 const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
-  const { currentData: fetchedData, isFetching: isFetchingInboxData } = useGetInboxQuery(
-    account,
-    POLLING_QUERY_OPTS
-  )
+  const { currentData: fetchedData, isFetching: isFetchingInboxData } =
+    useGetInboxQuery(account, POLLING_QUERY_OPTS)
   const storedData = getInboxDmDataForAccount(account)
   const cachedData = fetchedData ? JSON.parse(fetchedData) : storedData
   const inboxData = Object.values(cachedData.nft)
@@ -48,7 +46,7 @@ const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
   //     // Show "My NFTs" if Inbox is blank
   //     setTabIndex(1)
   //   }
-  //   
+  //
   // }, [inboxData])
 
   // useEffect(() => {
@@ -87,7 +85,8 @@ const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
   }
 
   return (
-    <Box
+    <Flex
+      direction='column'
       background='white'
       height={isSmallLayout ? 'unset' : '100vh'}
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
@@ -111,39 +110,41 @@ const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
         <NFTInboxSearchInput />
       </Box>
 
-      <Tabs isLazy index={tabIndex} onChange={handleTabsChange}>
-        <TabList
-          overflowX='auto'
-          overflowY='visible'
-          className='custom-scrollbar'
-        >
-          <Tab marginBottom='0'>
-            Joined{' '}
-            {unreadCount?.nft !== 0 && (
-              <Badge ml={1} variant='midgray'>
-                {unreadCount.nft}
-              </Badge>
-            )}
-          </Tab>
-          <Tab marginBottom='0'>Your NFTs</Tab>
-        </TabList>
+      <Box flex='1 1 0px' overflow='scroll'>
+        <Tabs isLazy index={tabIndex} onChange={handleTabsChange}>
+          <TabList
+            overflowX='auto'
+            overflowY='visible'
+            className='custom-scrollbar'
+          >
+            <Tab marginBottom='0'>
+              Joined{' '}
+              {unreadCount?.nft !== 0 && (
+                <Badge ml={1} variant='midgray'>
+                  {unreadCount.nft}
+                </Badge>
+              )}
+            </Tab>
+            <Tab marginBottom='0'>Your NFTs</Tab>
+          </TabList>
 
-        <TabPanels>
-          <TabPanel p={0}>
-            <Box px={4} pt={2}>
-              <ChainFilters
-                chainFilters={chainFilters}
-                setChainFilters={setChainFilters}
-              />
-            </Box>
-            <InboxList context='nft' web3={web3} account={account} />
-          </TabPanel>
-          <TabPanel p={0}>
-            <MyNFTs account={account} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Box>
+          <TabPanels>
+            <TabPanel p={0}>
+              <Box px={4} pt={2}>
+                <ChainFilters
+                  chainFilters={chainFilters}
+                  setChainFilters={setChainFilters}
+                />
+              </Box>
+              <InboxList context='nft' web3={web3} account={account} />
+            </TabPanel>
+            <TabPanel p={0}>
+              <MyNFTs account={account} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Box>
+    </Flex>
   )
 }
 
