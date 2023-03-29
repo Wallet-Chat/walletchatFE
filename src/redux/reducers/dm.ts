@@ -160,13 +160,13 @@ export function getLocalDmDataForAccountToAddr(
   account: string,
   toAddr: string
 ) {
-  const localDmDataByAddr = getLocalData(account, STORAGE_KEYS.DM_DATA) || {}
-  const sessionDmDataByAddr =
-    getSessionData(account, STORAGE_KEYS.DM_DATA) || {}
+  const localDmDataByAddr = getLocalData(account, STORAGE_KEYS.DM_DATA)
+  if (!localDmDataByAddr) return null
 
-  const localDmData = localDmDataByAddr[toAddr.toLocaleLowerCase()] || []
-  const sessionDmData = sessionDmDataByAddr[toAddr.toLocaleLowerCase()] || []
-  return [...localDmData, ...sessionDmData]
+  const localDmData = localDmDataByAddr[toAddr.toLocaleLowerCase()]
+  if (!localDmData) return null
+
+  return localDmData
 }
 
 export function updateSessionDmDataForAccountToAddr(
@@ -222,7 +222,7 @@ export function addLocalDmDataForAccountToAddr(
   toAddr: string,
   chatData: ChatMessageType[]
 ) {
-  const localDmData = getLocalDmDataForAccountToAddr(account, toAddr)
+  const localDmData = getLocalDmDataForAccountToAddr(account, toAddr) || []
 
   updateLocalDmDataForAccountToAddr(account, toAddr, [
     ...localDmData,

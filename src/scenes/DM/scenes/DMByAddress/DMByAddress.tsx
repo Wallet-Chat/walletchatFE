@@ -20,7 +20,8 @@ import {
   selectEncryptedDmIds,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
-import { walletChatEth } from '@/constants/wallets'
+import { supportWallet } from '@/constants/wallets'
+import * as ENV from '@/constants/env'
 
 const PAGE_SIZE = 25
 
@@ -47,6 +48,10 @@ const AlertBubble = ({
 )
 
 const DMByAddress = ({ account }: { account: string }) => {
+  const supportHeader =
+    ENV.REACT_APP_SUPPORT_HEADER ||
+    'We welcome all feedback and bug reports. Thank you! 😊'
+
   const bodyRef = React.useRef<any>(null)
   const maxPages = React.useRef(1)
 
@@ -126,7 +131,7 @@ const DMByAddress = ({ account }: { account: string }) => {
     }
   )
 
-  const chatData = fetchedData ? JSON.parse(fetchedData) : []
+  const chatData = fetchedData && JSON.parse(fetchedData)
 
   const scrollToBottomCb = React.useCallback(
     (msg: ChatMessageType) => (node: HTMLElement) => {
@@ -226,25 +231,6 @@ const DMByAddress = ({ account }: { account: string }) => {
     []
   )
 
-  // TODO: 'back to bottom' button
-  if (isFetching && !encryptedDmsStr && chatData.length === 0) {
-    return (
-      <Flex background='white' flexDirection='column' flex='1'>
-        <DMHeader />
-
-        <DottedBackground className='custom-scrollbar' overflow='hidden'>
-          <AlertBubble color='green'>
-            Decrypting Your Messages, Please Wait and Do Not Refresh 😊
-          </AlertBubble>
-
-          <Flex justifyContent='center' alignItems='center' height='100%'>
-            <Spinner />
-          </Flex>
-        </DottedBackground>
-      </Flex>
-    )
-  }
-
   // TODO: when some DMs are still encrypted due to fail or pending, show skeleton
   // instead of error message
   if (encryptedDms && encryptedDms.length > 0) {
@@ -265,15 +251,32 @@ const DMByAddress = ({ account }: { account: string }) => {
     )
   }
 
+  // TODO: 'back to bottom' button
+  if (!chatData) {
+    return (
+      <Flex background='white' flexDirection='column' flex='1'>
+        <DMHeader />
+
+        <DottedBackground className='custom-scrollbar' overflow='hidden'>
+          <AlertBubble color='green'>
+            Decrypting Your Messages, Please Wait and Do Not Refresh 😊
+          </AlertBubble>
+
+          <Flex justifyContent='center' alignItems='center' height='100%'>
+            <Spinner />
+          </Flex>
+        </DottedBackground>
+      </Flex>
+    )
+  }
+
   return (
     <Flex background='white' flexDirection='column' flex='1'>
       <DMHeader />
 
       <DottedBackground ref={bodyRef} className='custom-scrollbar'>
-        {toAddr.toLocaleLowerCase() === walletChatEth && (
-          <AlertBubble color='green'>
-            We welcome all feedback and bug reports. Thank you! 😊
-          </AlertBubble>
+        {toAddr.toLocaleLowerCase() === supportWallet && (
+          <AlertBubble color='green'>{supportHeader}</AlertBubble>
         )}
 
         {chatData.map((msg: ChatMessageType, i: number) => {

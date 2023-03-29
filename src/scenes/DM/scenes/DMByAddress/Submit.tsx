@@ -1,7 +1,7 @@
 import React from 'react'
+import { AnalyticsBrowser } from '@segment/analytics-next'
 import { IconSend } from '@tabler/icons'
-import { Textarea } from '@chakra-ui/react'
-import { FormControl, Button, Flex } from '@chakra-ui/react'
+import { Textarea, Button, Flex } from '@chakra-ui/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import { useWallet } from '@/context/WalletProvider'
@@ -14,7 +14,6 @@ import {
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { getAccessControlConditions } from '@/helpers/lit'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { name } = useWallet()
@@ -23,9 +22,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const msgInput = React.useRef<string>('')
-  const supportHeader =
-    ENV.REACT_APP_SUPPORT_HEADER ||
-    'We welcome all feedback and bug reports. Thank you! 😊'
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
@@ -170,7 +166,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   }
 
   return (
-    <Flex flex='1' p='4' alignItems='center' justifyContent='center' gap='4'>
+    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
       <Textarea
         placeholder='Write a message...'
         ref={textAreaRef}
