@@ -49,6 +49,7 @@ import IconSupport from '../../images/icon-feedback.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
 import { getSupportWallet } from '@/helpers/widget'
+import { API } from 'react-wallet-chat/dist/src/types'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -267,32 +268,31 @@ export default function Sidebar() {
   // -- Widget iFrame API for receiving NFT data --
   useEffect(() => {
     window.addEventListener('message', (e) => {
-      const data = e.data
+      const { target, data }: API = e.data
 
-      const { contractAddress, itemId, network, redirect, ownerAddress } = data
+      if (target === 'nft_info' && data) {
+        const { contractAddress, itemId, network, redirect, ownerAddress } =
+          data
 
-      if (
-        contractAddress !== undefined &&
-        itemId !== undefined &&
-        network !== undefined
-      ) {
-        setNftContractAddr(contractAddress)
-        setNftId(itemId)
-        setChainName(network)
+        if (contractAddress && itemId && network) {
+          setNftContractAddr(contractAddress)
+          setNftId(itemId)
+          setChainName(network)
 
-        if (contractAddress?.startsWith('0x')) {
-          getNftMetadata(contractAddress, itemId, network)
+          if (contractAddress?.startsWith('0x')) {
+            getNftMetadata(contractAddress, itemId, network)
+          }
+
+          if (redirect) {
+            navigate(
+              `/nft/${network}/${contractAddress}/${itemId}${
+                ownerAddress ? '/dm' : ''
+              }`
+            )
+          }
+        } else if (ownerAddress) {
+          navigate(`/dm/${ownerAddress}`)
         }
-
-        if (redirect) {
-          navigate(
-            `/nft/${network}/${contractAddress}/${itemId}${
-              ownerAddress ? '/dm' : ''
-            }`
-          )
-        }
-      } else if (ownerAddress) {
-        navigate(`/dm/${ownerAddress}`)
       }
     })
   }, [navigate])

@@ -65,6 +65,7 @@ const WalletProvider = React.memo(
     const prevNonce = React.useRef<null | string>()
     const siwePendingRef = React.useRef<boolean>(false)
     const signatureRequested = React.useRef<boolean>(false)
+    const siweFailedRef = React.useRef<boolean>(false)
 
     const currentProvider = useProvider()
 
@@ -89,7 +90,7 @@ const WalletProvider = React.memo(
     const [delegate, setDelegate] = useState<null | string>(null)
     const [authSignature, setAuthSig] = useState<
       null | undefined | { signature: string; signedMsg: string }
-    >(null)
+    >()
 
     const [siwePending, setSiwePending] = React.useState<boolean>(false)
     const [siweFailed, setSiweFailed] = React.useState(false)
@@ -403,7 +404,8 @@ const WalletProvider = React.memo(
         chainId &&
         !getHasJwtForAccount(accountAddress) &&
         ((!siwePendingRef.current && prevNonce.current !== nonce) ||
-          authSignature)
+          authSignature ||
+          authSignature === null)
       ) {
         setSiwePending(true)
         siwePendingRef.current = true
@@ -411,7 +413,7 @@ const WalletProvider = React.memo(
         let signature = authSignature?.signature
         let messageToSign = authSignature?.signedMsg
 
-        if (!signature) {
+        if (!signature && (authSignature !== null || siweFailedRef.current)) {
           const widgetHost = storage.get('current-widget-host')
           const domain = widgetHost?.domain || window.location.host
           const origin = widgetHost?.origin || window.location.protocol + domain
@@ -453,10 +455,12 @@ const WalletProvider = React.memo(
 
         if (!signature) {
           setSiweFailed(true)
+          siweFailedRef.current = true
           return
         }
 
         setSiweFailed(false)
+        siweFailedRef.current = false
 
         const authSig = {
           sig: signature,
@@ -500,6 +504,7 @@ const WalletProvider = React.memo(
       dispatch(setAccount(null))
       setNonce(null)
       setSiweFailed(false)
+      siweFailedRef.current = false
       setAuthenticated(false)
 
       if (isWidget) {
