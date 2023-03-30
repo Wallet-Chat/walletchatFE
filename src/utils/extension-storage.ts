@@ -1,6 +1,12 @@
 import browser from 'webextension-polyfill'
 
-export type StoreKeys = 'widget-logins' | 'current-widget-origin' | 'jwt'
+export type StoreKeys =
+  | 'widget-logins'
+  | 'current-widget-origin'
+  | 'jwt'
+  | 'delegate'
+  | 'last-wallet-connection-timestamp'
+  | 'lit-auth-signature'
 
 const storage = {
   set: (key: StoreKeys, data: any) => {

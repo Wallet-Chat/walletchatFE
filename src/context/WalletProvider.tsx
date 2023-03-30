@@ -87,9 +87,9 @@ const WalletProvider = React.memo(
     const [notifyDM, setNotifyDM] = useState('true')
     const [notify24, setNotify24] = useState('true')
     const [delegate, setDelegate] = useState<null | string>(null)
-    const [signedMessage, setSignature] = useState<null | undefined | string>(
-      null
-    )
+    const [authSignature, setAuthSig] = useState<
+      null | undefined | { signature: string; signedMsg: string }
+    >(null)
 
     const [siwePending, setSiwePending] = React.useState<boolean>(false)
     const [siweFailed, setSiweFailed] = React.useState(false)
@@ -186,7 +186,7 @@ const WalletProvider = React.memo(
         setAuthenticated(true)
 
         if (isWidget) {
-          window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
+          window.parent.postMessage({ data: true, target: 'is_signed_in' }, '*')
         }
       },
       [accountAddress, dispatch, getSettings]
@@ -213,7 +213,7 @@ const WalletProvider = React.memo(
         headers: { 'Content-Type': 'application/json' },
       })
         .then((response) => response.json())
-        .then(async (usersData: any) => {
+        .then(async (usersData: { Nonce: string }) => {
           console.log('✅[GET][Nonce]:', usersData)
           setNonce(usersData.Nonce)
         })
@@ -228,7 +228,6 @@ const WalletProvider = React.memo(
         (!isWidget || widgetOpen || signatureRequested.current)
       ) {
         if (prevAccount.current !== accountAddress.toString()) {
-
           prevAccount.current = accountAddress.toString()
 
           // limit wallet connection recording to once per day
@@ -281,10 +280,10 @@ const WalletProvider = React.memo(
             })
         }
       } else if (isWidget && widgetOpen && !accountAddress) {
-        window.parent.postMessage({ data: false, target: 'sign_in' }, '*')
+        window.parent.postMessage({ data: false, target: 'is_signed_in' }, '*')
       } else if (isWidget && !widgetOpen && accountAddress) {
         // notify the widget that we are signed in
-        window.parent.postMessage({ data: true, target: 'sign_in' }, '*')
+        window.parent.postMessage({ data: true, target: 'is_signed_in' }, '*')
       }
     }, [OneDay, analytics, accountAddress, updateName, signIn, widgetOpen])
 
@@ -306,7 +305,7 @@ const WalletProvider = React.memo(
         }
 
         if (target === 'signed_message') {
-          setSignature(messageData)
+          setAuthSig(messageData)
         }
 
         if (target === 'sign_in') {
@@ -355,8 +354,6 @@ const WalletProvider = React.memo(
             }
           }
 
-          storage.set('current-widget-origin', origin)
-
           if (messageData === null) {
             setConnectConfig(null)
           }
@@ -398,32 +395,37 @@ const WalletProvider = React.memo(
         chainId &&
         !getHasJwtForAccount(accountAddress) &&
         ((!siwePendingRef.current && prevNonce.current !== nonce) ||
-          signedMessage)
+          authSignature)
       ) {
         setSiwePending(true)
         siwePendingRef.current = true
 
-        const domain = window.location.host
-        const origin = window.location.protocol + domain
-        const statement =
-          'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
-
-        const siweMessage = new SiweMessage({
-          domain,
-          address: accountAddress,
-          statement,
-          uri: origin,
-          version: '1',
-          chainId,
-          nonce,
-        })
-
-        const messageToSign = siweMessage.prepareMessage()
-        let signature = signedMessage
+        let signature = authSignature?.signature
+        let messageToSign = authSignature?.signedMsg
 
         if (!signature) {
+          const domain = window.location.host
+          const origin = window.location.protocol + domain
+          const statement =
+            'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
+
+          const siweMessage = new SiweMessage({
+            domain,
+            address: accountAddress,
+            statement,
+            uri: origin,
+            version: '1',
+            chainId,
+            nonce,
+          })
+
+          messageToSign = siweMessage.prepareMessage()
+
           if (signatureRequested.current) {
-            window.parent.postMessage({ data: nonce, target: 'nonce' }, '*')
+            window.parent.postMessage(
+              { data: messageToSign, target: 'message_to_sign' },
+              '*'
+            )
 
             return
           }
@@ -477,7 +479,7 @@ const WalletProvider = React.memo(
 
         prevNonce.current = nonce
       }
-    }, [signedMessage, accountAddress, chainId, nonce, signIn])
+    }, [authSignature, accountAddress, chainId, nonce, signIn])
 
     React.useEffect(() => {
       doRequestSiwe()
@@ -493,9 +495,9 @@ const WalletProvider = React.memo(
 
       if (isWidget) {
         // Tell the widget the iframe has signed out
-        window.parent.postMessage({ data: null, target: 'sign_in' }, '*')
+        window.parent.postMessage({ data: null, target: 'is_signed_in' }, '*')
       }
-    }, [])
+    }, [dispatch])
 
     const contextValue = React.useMemo(
       () => ({

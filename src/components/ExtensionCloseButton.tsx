@@ -26,7 +26,7 @@ function ExtensionCloseButton() {
         onClick={() =>
           isExtension
             ? window.close()
-            : window.parent.postMessage({ closeWidget: true }, '*')
+            : window.parent.postMessage({ target: 'close_widget' }, '*')
         }
       >
         <IconX size={14} color='var(--chakra-colors-darkgray-700)' />
