@@ -291,11 +291,19 @@ const WalletProvider = React.memo(
       if (!isWidget) return
 
       window.addEventListener('message', (e) => {
-        const { data, origin } = e
+        const { data, origin }: { data: API; origin: string } = e
 
         const currentOrigin = storage.get('current-widget-origin')
         if (currentOrigin !== origin) {
           storage.set('current-widget-origin', origin)
+        }
+
+        const currentHost = storage.get('current-widget-host')
+        if (data.target === 'origin' && !currentHost) {
+          storage.set('current-widget-host', {
+            domain: data.data.domain,
+            origin: data.data.origin,
+          })
         }
 
         const { data: messageData, target }: API = data
@@ -404,8 +412,9 @@ const WalletProvider = React.memo(
         let messageToSign = authSignature?.signedMsg
 
         if (!signature) {
-          const domain = window.location.host
-          const origin = window.location.protocol + domain
+          const widgetHost = storage.get('current-widget-host')
+          const domain = widgetHost?.domain || window.location.host
+          const origin = widgetHost?.origin || window.location.protocol + domain
           const statement =
             'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
 

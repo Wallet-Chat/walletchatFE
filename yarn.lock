@@ -9841,10 +9841,10 @@ react-textarea-autosize@^8.3.3:
     use-composed-ref "^1.3.0"
     use-latest "^1.2.1"
 
-react-wallet-chat@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/react-wallet-chat/-/react-wallet-chat-2.3.1.tgz#d8c7a4044c53b60f51a4dfc0b76b5e3572d7de02"
-  integrity sha512-nXp7oCE5gI5ockHMTxzzN4cN1DKOXgn8ZGJ/CkI2nLTLzM6IoPcUncmTZ6SytLlT2pXGShCCpj1jj+Ydpo+tRg==
+react-wallet-chat@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/react-wallet-chat/-/react-wallet-chat-2.3.3.tgz#edabec2fd39b35f67e18dbd57e38b4c49b600aac"
+  integrity sha512-i2PBxl1d9V2iGEgD3u0GY3gbCjfB8vpLYSbSAwQ/r3HM0j7Gf/OZIRjydttjclFWKqFqmAKMixbJJ6CrlFkwHg==
   dependencies:
     classnames "^2.3.2"
 
