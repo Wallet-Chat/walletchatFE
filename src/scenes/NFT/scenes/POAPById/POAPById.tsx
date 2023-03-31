@@ -264,6 +264,7 @@ const POAPById = ({ account }: { account: string }) => {
         display='flex'
         flexDirection='column'
         overflowY='auto'
+        className='custom-scrollbar'
         flexGrow={1}
         variant='enclosed'
         isLazy

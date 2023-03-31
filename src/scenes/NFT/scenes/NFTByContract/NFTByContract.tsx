@@ -523,7 +523,8 @@ const NFTByContract = ({ account }: { account: string }) => {
         display='flex'
         flexDirection='column'
         overflowY='auto'
-        flexGrow={1}
+        className='custom-scrollbar'
+        flex='10 100px'
         variant='enclosed'
         isLazy
       >
