@@ -66,6 +66,10 @@ const WalletProvider = React.memo(
     const siwePendingRef = React.useRef<boolean>(false)
     const signatureRequested = React.useRef<boolean>(false)
     const siweFailedRef = React.useRef<boolean>(false)
+    const currentWidgetHost = React.useRef<{
+      domain: string
+      origin: string
+    } | null>(null)
 
     const currentProvider = useProvider()
 
@@ -89,7 +93,7 @@ const WalletProvider = React.memo(
     const [notify24, setNotify24] = useState('true')
     const [delegate, setDelegate] = useState<null | string>(null)
     const [authSignature, setAuthSig] = useState<
-      null | undefined | { signature: string; signedMsg: string }
+      null | undefined | { signature: null | string; signedMsg: string }
     >()
 
     const [siwePending, setSiwePending] = React.useState<boolean>(false)
@@ -299,12 +303,8 @@ const WalletProvider = React.memo(
           storage.set('current-widget-origin', origin)
         }
 
-        const currentHost = storage.get('current-widget-host')
-        if (data.target === 'origin' && !currentHost) {
-          storage.set('current-widget-host', {
-            domain: data.data.domain,
-            origin: data.data.origin,
-          })
+        if (data.target === 'origin') {
+          currentWidgetHost.current = data.data
         }
 
         const { data: messageData, target }: API = data
@@ -414,7 +414,7 @@ const WalletProvider = React.memo(
         let messageToSign = authSignature?.signedMsg
 
         if (!signature && (authSignature !== null || siweFailedRef.current)) {
-          const widgetHost = storage.get('current-widget-host')
+          const widgetHost = currentWidgetHost.current
           const domain = widgetHost?.domain || window.location.host
           const origin = widgetHost?.origin || window.location.protocol + domain
           const statement =

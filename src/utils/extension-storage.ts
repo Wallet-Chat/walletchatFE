@@ -3,7 +3,6 @@ import browser from 'webextension-polyfill'
 export type StoreKeys =
   | 'widget-logins'
   | 'current-widget-origin'
-  | 'current-widget-host'
   | 'jwt'
   | 'delegate'
   | 'last-wallet-connection-timestamp'
