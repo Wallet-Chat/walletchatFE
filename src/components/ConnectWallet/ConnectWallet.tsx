@@ -7,13 +7,29 @@ const isWidget = getIsWidgetContext()
 
 const ConnectWalletButton = () => {
   const {
+    account,
     siweFailed,
     siwePending,
     connectConfig,
     isAuthenticated,
-    doRequestSiwe,
+    requestSIWEandFetchJWT,
     connect,
+    setWalletDataFromWidget,
+    widgetWalletData,
+    clearWidgetData,
   } = useWallet()
+
+  function handleLogin() {
+    if (!account && widgetWalletData) {
+      return setWalletDataFromWidget()
+    }
+
+    if (siweFailed || widgetWalletData) {
+      return requestSIWEandFetchJWT()
+    }
+
+    return connect(connectConfig)
+  }
 
   // TODO: allow changing sign-in method after already selected wallet
   // switch wallet button
@@ -33,23 +49,24 @@ const ConnectWalletButton = () => {
             )
           }
 
-          if (siweFailed || (isWidget && connectConfig)) {
+          if (siweFailed || (isWidget && (connectConfig || widgetWalletData))) {
             return (
               <Flex direction='column' gap={2} alignItems='start'>
-                <Button
-                  variant='black'
-                  size='lg'
-                  onClick={() =>
-                    siweFailed ? doRequestSiwe() : connect(connectConfig)
-                  }
-                >
+                <Button variant='black' size='lg' onClick={() => handleLogin()}>
                   <Tag variant='solid' colorScheme='green' mr={2}>
                     Connected
                   </Tag>
-                  <Box>Log in</Box>
+                  <Box>Use the App to Log in</Box>
                 </Button>
 
-                <Button variant='black' size='lg' onClick={openConnectModal}>
+                <Button
+                  variant='black'
+                  size='lg'
+                  onClick={() => {
+                    clearWidgetData()
+                    openConnectModal()
+                  }}
+                >
                   Sign in with another wallet
                 </Button>
 

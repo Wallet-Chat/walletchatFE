@@ -50,6 +50,12 @@ export const { connectors } = getDefaultWallets({
   chains,
 })
 
+// help debug issues and watch for high traffic conditions
+const analytics = AnalyticsBrowser.load({
+  writeKey: ENV.REACT_APP_SEGMENT_KEY,
+})
+const OneDay = 1 * 24 * 60 * 60 * 1000
+
 // TODO: Context Type
 export const WalletContext = React.createContext<any>(null)
 export const useWallet = () => React.useContext(WalletContext)
@@ -61,10 +67,18 @@ const WalletProvider = React.memo(
   ({ children }: { children: React.ReactElement }) => {
     const dispatch = useAppDispatch()
 
+    const didDisconnect = React.useRef<boolean>(false)
     const prevAccount = React.useRef<null | string>()
     const prevNonce = React.useRef<null | string>()
     const siwePendingRef = React.useRef<boolean>(false)
-    const signatureRequested = React.useRef<boolean>(false)
+    const widgetWalletDataRef = React.useRef<
+      | undefined
+      | { account: string; chainId: number; requestSignature?: boolean }
+    >()
+    const [widgetWalletData, setWidgetWalletData] = React.useState<
+      undefined | { account: string; chainId: number }
+    >()
+
     const siweFailedRef = React.useRef<boolean>(false)
     const currentWidgetHost = React.useRef<{
       domain: string
@@ -92,9 +106,10 @@ const WalletProvider = React.memo(
     const [notifyDM, setNotifyDM] = useState('true')
     const [notify24, setNotify24] = useState('true')
     const [delegate, setDelegate] = useState<null | string>(null)
-    const [authSignature, setAuthSig] = useState<
-      null | undefined | { signature: null | string; signedMsg: string }
+    const [widgetAuthSig, setWidgetAuthSig] = useState<
+      undefined | { signature: undefined | null | string; signedMsg: string }
     >()
+    const widgetSignature = widgetAuthSig?.signature
 
     const [siwePending, setSiwePending] = React.useState<boolean>(false)
     const [siweFailed, setSiweFailed] = React.useState(false)
@@ -103,19 +118,16 @@ const WalletProvider = React.memo(
       chainId: number
       connector: wagmi.Connector
     }>()
-    const [widgetOpen, setWidgetOpen] = React.useState(false)
 
     const { currentData: name } = endpoints.getName.useQueryState(
       accountAddress?.toLocaleLowerCase()
     )
 
-    const { connect } = useConnect()
-
-    // help debug issues and watch for high traffic conditions
-    const analytics = AnalyticsBrowser.load({
-      writeKey: ENV.REACT_APP_SEGMENT_KEY,
+    const { connect } = useConnect({
+      onSuccess: () => {
+        didDisconnect.current = false
+      },
     })
-    const OneDay = 1 * 24 * 60 * 60 * 1000
 
     const updateName = React.useCallback(
       (newName: null | string, address: undefined | string) =>
@@ -189,10 +201,6 @@ const WalletProvider = React.memo(
 
         getSettings(address)
         setAuthenticated(true)
-
-        if (isWidget) {
-          window.parent.postMessage({ data: true, target: 'is_signed_in' }, '*')
-        }
       },
       [accountAddress, dispatch, getSettings]
     )
@@ -210,7 +218,7 @@ const WalletProvider = React.memo(
       if (analytics && accountAddress && name && email) {
         analytics.identify(accountAddress, { name, email })
       }
-    }, [accountAddress, analytics, email, name])
+    }, [accountAddress, email, name])
 
     function getNonce(address: string) {
       fetch(` ${ENV.REACT_APP_REST_API}/users/${address}/nonce`, {
@@ -228,10 +236,19 @@ const WalletProvider = React.memo(
     }
 
     React.useEffect(() => {
-      if (
-        accountAddress &&
-        (!isWidget || widgetOpen || signatureRequested.current)
-      ) {
+      if (isWidget) {
+        if (!accountAddress) {
+          window.parent.postMessage(
+            { data: false, target: 'is_signed_in' },
+            '*'
+          )
+        } else {
+          // notify the widget that we are signed in
+          window.parent.postMessage({ data: true, target: 'is_signed_in' }, '*')
+        }
+      }
+
+      if (accountAddress) {
         if (prevAccount.current !== accountAddress.toString()) {
           prevAccount.current = accountAddress.toString()
 
@@ -284,18 +301,27 @@ const WalletProvider = React.memo(
               getNonce(accountAddress)
             })
         }
-      } else if (isWidget && widgetOpen && !accountAddress) {
-        window.parent.postMessage({ data: false, target: 'is_signed_in' }, '*')
-      } else if (isWidget && !widgetOpen && accountAddress) {
-        // notify the widget that we are signed in
-        window.parent.postMessage({ data: true, target: 'is_signed_in' }, '*')
       }
-    }, [OneDay, analytics, accountAddress, updateName, signIn, widgetOpen])
+    }, [accountAddress, updateName, signIn])
+
+    const setWalletDataFromWidget = React.useCallback(() => {
+      if (widgetWalletDataRef.current) {
+        dispatch(setAccount(widgetWalletDataRef.current.account))
+        setChainId(widgetWalletDataRef.current.chainId)
+        didDisconnect.current = false
+      }
+    }, [dispatch])
+
+    const clearWidgetData = React.useCallback(() => {
+      setWidgetAuthSig(undefined)
+      widgetWalletDataRef.current = undefined
+      setWidgetWalletData(undefined)
+    }, [])
 
     React.useEffect(() => {
       if (!isWidget) return
 
-      window.addEventListener('message', (e) => {
+      const eventListener = (e: MessageEvent) => {
         const { data, origin }: { data: API; origin: string } = e
 
         const currentOrigin = storage.get('current-widget-origin')
@@ -309,12 +335,8 @@ const WalletProvider = React.memo(
 
         const { data: messageData, target }: API = data
 
-        if (target === 'widget_open') {
-          setWidgetOpen(true)
-        }
-
         if (target === 'signed_message') {
-          setAuthSig(messageData)
+          setWidgetAuthSig(messageData)
         }
 
         if (target === 'sign_in') {
@@ -322,10 +344,24 @@ const WalletProvider = React.memo(
             const walletIs = (walletName: string) =>
               messageData.walletName.toLowerCase().includes(walletName)
 
-            if (messageData.requestSignature) {
-              signatureRequested.current = true
-              dispatch(setAccount(messageData.account))
-              setChainId(messageData.chainId)
+            if (messageData.hasSigner) {
+              widgetWalletDataRef.current = {
+                account: messageData.account,
+                chainId: messageData.chainId,
+              }
+
+              setWidgetWalletData(widgetWalletDataRef.current)
+
+              if (
+                accountAddress !== messageData.account &&
+                !didDisconnect.current
+              ) {
+                widgetWalletDataRef.current = {
+                  ...widgetWalletDataRef.current,
+                  requestSignature: true,
+                }
+                setWalletDataFromWidget()
+              }
             } else {
               let connector
 
@@ -367,8 +403,17 @@ const WalletProvider = React.memo(
             setConnectConfig(null)
           }
         }
-      })
-    }, [dispatch])
+      }
+
+      window.addEventListener('message', eventListener)
+      return () => window.removeEventListener('message', eventListener)
+    }, [
+      accountAddress,
+      dispatch,
+      clearWidgetData,
+      setWalletDataFromWidget,
+      isAuthenticated,
+    ])
 
     React.useEffect(() => {
       if (isAuthenticated) {
@@ -397,24 +442,48 @@ const WalletProvider = React.memo(
       }
     }, [dispatch])
 
-    const doRequestSiwe = React.useCallback(async () => {
-      if (
-        accountAddress &&
-        nonce &&
-        chainId &&
-        !getHasJwtForAccount(accountAddress) &&
-        ((!siwePendingRef.current && prevNonce.current !== nonce) ||
-          authSignature ||
-          authSignature === null)
-      ) {
+    const requestSIWEandFetchJWT = React.useCallback(async () => {
+      const walletIsConnected = accountAddress && chainId
+
+      const accountHasNoJwt =
+        accountAddress && !getHasJwtForAccount(accountAddress)
+
+      const hasNewNonce = prevNonce.current !== nonce
+      const requestAlreadyInitiated = siwePendingRef.current
+
+      const preventDuplicateRequests = !requestAlreadyInitiated && hasNewNonce
+      const hasPendingWidgetSignature = widgetAuthSig !== undefined
+
+      // in the pending widget signature case, the function has only requested SIWE, but not fetched JWT yet
+      // so it will need to be called again in order to fetch the JWT, so it will skip the SIWE request
+      const shouldRequestJwt =
+        preventDuplicateRequests || hasPendingWidgetSignature
+
+      const needsToRequestJwt =
+        walletIsConnected && nonce && accountHasNoJwt && shouldRequestJwt
+
+      if (needsToRequestJwt) {
         setSiwePending(true)
         siwePendingRef.current = true
 
-        let signature = authSignature?.signature
-        let messageToSign = authSignature?.signedMsg
+        let signature = widgetAuthSig?.signature
+        let messageToSign = widgetAuthSig?.signedMsg
 
-        if (!signature && (authSignature !== null || siweFailedRef.current)) {
-          const widgetHost = currentWidgetHost.current
+        const shouldRetrySignature = siweFailedRef.current
+        const widgetRequestedSIWE =
+          widgetWalletDataRef.current?.requestSignature &&
+          widgetSignature !== null
+
+        const shouldRequestSIWE =
+          !widgetWalletDataRef.current ||
+          widgetRequestedSIWE ||
+          shouldRetrySignature
+        const needsToRequestSIWE = !signature && shouldRequestSIWE
+
+        if (needsToRequestSIWE) {
+          const widgetHost = widgetWalletDataRef.current?.requestSignature
+            ? currentWidgetHost.current
+            : null
           const domain = widgetHost?.domain || window.location.host
           const origin = widgetHost?.origin || window.location.protocol + domain
           const statement =
@@ -432,7 +501,19 @@ const WalletProvider = React.memo(
 
           messageToSign = siweMessage.prepareMessage()
 
-          if (signatureRequested.current) {
+          if (widgetWalletDataRef.current?.requestSignature) {
+            // Here, in case the first signature was rejected or failed,
+            // it will clear the values and try to request again from the widget
+            if (shouldRetrySignature) {
+              siweFailedRef.current = false
+              setWidgetAuthSig({
+                signature: undefined,
+                signedMsg: messageToSign,
+              })
+
+              return
+            }
+
             window.parent.postMessage(
               { data: messageToSign, target: 'message_to_sign' },
               '*'
@@ -492,13 +573,15 @@ const WalletProvider = React.memo(
 
         prevNonce.current = nonce
       }
-    }, [authSignature, accountAddress, chainId, nonce, signIn])
+    }, [widgetAuthSig, accountAddress, chainId, nonce, signIn, widgetSignature])
 
     React.useEffect(() => {
-      doRequestSiwe()
-    }, [doRequestSiwe])
+      requestSIWEandFetchJWT()
+    }, [requestSIWEandFetchJWT])
 
     const disconnectWallet = React.useCallback(async () => {
+      didDisconnect.current = true
+
       wagmi.disconnect()
 
       dispatch(setAccount(null))
@@ -507,11 +590,8 @@ const WalletProvider = React.memo(
       siweFailedRef.current = false
       setAuthenticated(false)
 
-      if (isWidget) {
-        // Tell the widget the iframe has signed out
-        window.parent.postMessage({ data: null, target: 'is_signed_in' }, '*')
-      }
-    }, [dispatch])
+      if (isWidget) clearWidgetData()
+    }, [dispatch, clearWidgetData])
 
     const contextValue = React.useMemo(
       () => ({
@@ -532,8 +612,11 @@ const WalletProvider = React.memo(
         connectConfig,
         siweFailed,
         siwePending,
-        doRequestSiwe,
+        requestSIWEandFetchJWT,
         connect,
+        setWalletDataFromWidget,
+        widgetWalletData,
+        clearWidgetData,
       }),
       [
         accountAddress,
@@ -548,9 +631,12 @@ const WalletProvider = React.memo(
         connectConfig,
         siweFailed,
         siwePending,
-        doRequestSiwe,
+        requestSIWEandFetchJWT,
         disconnectWallet,
         connect,
+        setWalletDataFromWidget,
+        widgetWalletData,
+        clearWidgetData,
       ]
     )
 
