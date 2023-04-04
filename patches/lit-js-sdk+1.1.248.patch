@@ -1,0 +1,40 @@
+diff --git a/node_modules/lit-js-sdk/src/utils/frameComms.js b/node_modules/lit-js-sdk/src/utils/frameComms.js
+index a198bb4..0905fb5 100644
+--- a/node_modules/lit-js-sdk/src/utils/frameComms.js
++++ b/node_modules/lit-js-sdk/src/utils/frameComms.js
+@@ -1,7 +1,7 @@
+ import { unlockLitWithKey } from "./lit";
+ 
+ export const listenForChildFrameMessages = async () => {
+-  console.log("calling listenForChildFrameMessages from " + window.origin);
++  // console.log("calling listenForChildFrameMessages from " + window.origin);
+   // listen for requests from child frames
+   window.addEventListener(
+     "message",
+@@ -16,7 +16,7 @@ export const listenForChildFrameMessages = async () => {
+       }
+ 
+       if (childFrameThatSentMessageIndex !== false) {
+-        console.log("onMessage in parent: ", event);
++        // console.log("onMessage in parent: ", event);
+ 
+         const { command, params } = event.data;
+         if (command === "LIT_SYN") {
+@@ -66,7 +66,7 @@ export const listenForChildFrameMessages = async () => {
+ };
+ 
+ export const listenForFrameParentMessages = async () => {
+-  console.log("calling listenForFrameParentMessages from " + window.origin);
++  // console.log("calling listenForFrameParentMessages from " + window.origin);
+   // listen for requests from child frames
+   window.addEventListener(
+     "message",
+@@ -74,7 +74,7 @@ export const listenForFrameParentMessages = async () => {
+       const messageIsFromFrameParent = event.source === window.parent;
+ 
+       if (messageIsFromFrameParent) {
+-        console.log("onMessage in frame: ", event);
++        // console.log("onMessage in frame: ", event);
+       }
+ 
+       // console.log('messageIsFromFrameParent: ', messageIsFromFrameParent)
