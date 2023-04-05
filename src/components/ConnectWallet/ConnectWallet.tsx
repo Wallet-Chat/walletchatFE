@@ -41,6 +41,7 @@ const ConnectWalletButton = () => {
     pendingConnect.current = true
 
     resetWidgetDataWithSignature()
+    requestSIWEandFetchJWT()
   }
 
   // TODO: allow changing sign-in method after already selected wallet
