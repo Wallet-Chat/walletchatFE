@@ -12,10 +12,6 @@ import { mainnet, polygon, optimism, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { publicProvider } from 'wagmi/providers/public'
 
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
 import Lit from '../utils/lit'
@@ -74,6 +70,7 @@ const WalletProvider = React.memo(
           requestSignature?: boolean
         }
     >()
+    const previousWidgetData = React.useRef(widgetWalletDataRef.current)
     const [widgetWalletData, setWidgetWalletData] = React.useState<
       undefined | { account: string; chainId: number }
     >()
@@ -91,7 +88,7 @@ const WalletProvider = React.memo(
     const { chain } = useNetwork()
     const [chainId, setChainId] = React.useState(chain?.id)
 
-    const { address: wagmiAddress, isConnected } = useAccount()
+    const { address: wagmiAddress } = useAccount()
     const accountAddress = useAppSelector(
       (state) => state.dm.account || wagmiAddress
     )
@@ -116,11 +113,6 @@ const WalletProvider = React.memo(
     const [siweLastFailure, setSiweLastFailure] = React.useState<null | number>(
       null
     )
-
-    const [connectConfig, setConnectConfig] = React.useState<null | {
-      chainId: number
-      connector: wagmi.Connector
-    }>()
 
     const { currentData: name } = endpoints.getName.useQueryState(
       accountAddress?.toLocaleLowerCase()
@@ -302,6 +294,10 @@ const WalletProvider = React.memo(
 
     const resetWidgetData = React.useCallback(
       (withSignature?: boolean) => {
+        if (!widgetWalletDataRef.current) {
+          widgetWalletDataRef.current = previousWidgetData.current
+        }
+
         if (widgetWalletDataRef.current) {
           setWidgetAuthSig(undefined)
 
@@ -322,7 +318,6 @@ const WalletProvider = React.memo(
       setWidgetAuthSig(undefined)
       widgetWalletDataRef.current = undefined
       setWidgetWalletData(undefined)
-      setConnectConfig(undefined)
     }, [])
 
     React.useEffect(() => {
@@ -350,11 +345,7 @@ const WalletProvider = React.memo(
           setWidgetAuthSig(messageData)
         }
 
-        if (target === 'sign_in') {
-          if (messageData === null) {
-            return setConnectConfig(null)
-          }
-
+        if (target === 'sign_in' && messageData) {
           const shouldRequestSignature = messageData.requestSignature
           const widgetAccountChanged =
             widgetWalletDataRef?.current?.account !== messageData.account &&
@@ -363,49 +354,7 @@ const WalletProvider = React.memo(
           if (widgetAccountChanged) {
             widgetWalletDataRef.current = messageData
             setWidgetWalletData(widgetWalletDataRef.current)
-          }
-
-          // -- Single Sign-in -> auto request signature
-          if (widgetAccountChanged)
             resetWidgetData(pendingConnect.current || shouldRequestSignature)
-
-          // -- Auto-connect -> enable same app wallet connection
-          if (!shouldRequestSignature) {
-            let connector
-            const walletIs = (walletName: string) =>
-              messageData.walletName.toLowerCase().includes(walletName)
-
-            if (walletIs('metamask')) {
-              connector = new MetaMaskConnector({ chains })
-            }
-
-            if (walletIs('coinbase')) {
-              connector = new CoinbaseWalletConnector({
-                chains,
-                options: {
-                  appName: APP_NAME,
-                  jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM}`,
-                },
-              })
-            }
-
-            if (
-              walletIs('connect') ||
-              walletIs('gooddollar') ||
-              walletIs('zengo')
-            ) {
-              connector = new WalletConnectConnector({
-                chains,
-                options: {},
-              })
-            }
-
-            if (connector) {
-              setConnectConfig({
-                chainId: messageData.chainId,
-                connector,
-              })
-            }
           }
         }
       }
@@ -582,36 +531,29 @@ const WalletProvider = React.memo(
 
         prevNonce.current = nonce
       }
-    }, [
-      isConnected,
-      widgetAuthSig,
-      accountAddress,
-      chainId,
-      nonce,
-      signIn,
-      widgetSignature,
-    ])
+    }, [widgetAuthSig, accountAddress, chainId, nonce, signIn, widgetSignature])
 
     React.useEffect(() => {
       requestSIWEandFetchJWT()
     }, [requestSIWEandFetchJWT])
 
-    const disconnectWallet = React.useCallback(
-      async (keepWidgetData?: boolean) => {
-        didDisconnect.current = true
+    const disconnectWallet = React.useCallback(async () => {
+      didDisconnect.current = true
 
-        await wagmi.disconnect()
+      await wagmi.disconnect()
 
-        dispatch(setAccount(null))
-        setNonce(null)
-        setSiweLastFailure(null)
-        siweFailedRef.current = false
-        setAuthenticated(false)
+      dispatch(setAccount(null))
+      setNonce(null)
+      setSiweLastFailure(null)
+      siweFailedRef.current = false
+      setAuthenticated(false)
+    }, [dispatch])
 
-        if (isWidget && !keepWidgetData) clearWidgetData()
-      },
-      [dispatch, clearWidgetData]
-    )
+    React.useEffect(() => {
+      if (widgetWalletData) {
+        previousWidgetData.current = widgetWalletData
+      }
+    }, [widgetWalletData])
 
     const contextValue = React.useMemo(
       () => ({
@@ -629,17 +571,14 @@ const WalletProvider = React.memo(
         web3: currentProvider && new Web3(currentProvider),
         provider: currentProvider,
         delegate,
-        connectConfig,
         siweLastFailure,
-        setSiweLastFailure,
         siwePending,
         requestSIWEandFetchJWT,
         resetWidgetDataWithSignature: () => resetWidgetData(true),
         widgetWalletData,
-        isConnected,
-        widgetWalletDataRef,
-        didDisconnect,
         pendingConnect,
+        clearWidgetData,
+        previousWidgetData,
       }),
       [
         accountAddress,
@@ -651,18 +590,15 @@ const WalletProvider = React.memo(
         notifyDM,
         currentProvider,
         updateName,
-        connectConfig,
         siweLastFailure,
-        setSiweLastFailure,
         siwePending,
         requestSIWEandFetchJWT,
         disconnectWallet,
         resetWidgetData,
         widgetWalletData,
-        isConnected,
-        widgetWalletDataRef,
-        didDisconnect,
         pendingConnect,
+        clearWidgetData,
+        previousWidgetData,
       ]
     )
 

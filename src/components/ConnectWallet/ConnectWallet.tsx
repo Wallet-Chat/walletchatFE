@@ -8,25 +8,21 @@ const isWidget = getIsWidgetContext()
 
 const ConnectWalletButton = () => {
   const {
-    account,
     siweLastFailure,
     siwePending,
-    connectConfig,
     isAuthenticated,
     requestSIWEandFetchJWT,
     resetWidgetDataWithSignature,
-    widgetWalletData,
-    isConnected,
     pendingConnect,
+    clearWidgetData,
+    previousWidgetData,
   } = useWallet()
 
-  const canUseWidgetConnection = isWidget && (connectConfig || widgetWalletData)
+  const canUseWidgetConnection = isWidget && previousWidgetData.current
   const siweFailed = Boolean(siweLastFailure)
 
   const hasPendingAuth = siwePending || isAuthenticated === undefined
-  const [pending, setPending] = React.useState(
-    siwePending || isAuthenticated === undefined
-  )
+  const [pending, setPending] = React.useState(hasPendingAuth)
 
   React.useEffect(() => {
     if (hasPendingAuth) {
@@ -45,7 +41,6 @@ const ConnectWalletButton = () => {
     pendingConnect.current = true
 
     resetWidgetDataWithSignature()
-    requestSIWEandFetchJWT()
   }
 
   // TODO: allow changing sign-in method after already selected wallet
@@ -90,7 +85,14 @@ const ConnectWalletButton = () => {
               )}
 
               {(siweFailed || canUseWidgetConnection) && (
-                <Button variant='black' size='lg' onClick={openConnectModal}>
+                <Button
+                  variant='black'
+                  size='lg'
+                  onClick={() => {
+                    if (canUseWidgetConnection) clearWidgetData()
+                    openConnectModal()
+                  }}
+                >
                   Sign in with another wallet
                 </Button>
               )}
