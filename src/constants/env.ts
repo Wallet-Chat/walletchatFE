@@ -30,3 +30,5 @@ export const REACT_APP_DEFAULT_COMMUNITY_GOODDOLLAR = import.meta.env
 // GoodDollar Support Wallet
 export const REACT_APP_SUPPORT_WALLET_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_GOODDOLLAR
+export const REACT_APP_APP_URL_GOODDOLLAR = import.meta.env
+  .VITE_REACT_APP_APP_URL_GOODDOLLAR

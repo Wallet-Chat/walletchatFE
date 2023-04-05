@@ -43,6 +43,10 @@ export function getSupportWallet() {
   const suffix = getWidgetEnvSuffix()
   return suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
 }
+export function getWidgetUrl() {
+  const suffix = getWidgetEnvSuffix()
+  return suffix && ENV[`REACT_APP_APP_URL${suffix}`]
+}
 
 export function postMessage(message: AppAPI) {
   window.postMessage(message, '*')

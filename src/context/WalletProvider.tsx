@@ -37,7 +37,7 @@ import {
   storeJwtForAccount,
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
-import { postMessage } from '@/helpers/widget'
+import { getWidgetUrl, postMessage } from '@/helpers/widget'
 
 export const { chains, provider } = configureChains(
   [mainnet, polygon, optimism, celo],
@@ -344,11 +344,8 @@ const WalletProvider = React.memo(
       const eventListener = (e: MessageEvent) => {
         const { data, origin }: { data: API; origin: string } = e
 
-        if (import.meta.env.VITE_REACT_APP_APP_URL) {
-          postMessage({
-            data: import.meta.env.VITE_REACT_APP_APP_URL,
-            target: 'url_env',
-          })
+        if (getWidgetUrl()) {
+          postMessage({ data: getWidgetUrl(), target: 'url_env' })
         }
 
         const currentOrigin = storage.get('current-widget-origin')
