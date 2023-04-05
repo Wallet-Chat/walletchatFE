@@ -37,6 +37,7 @@ import {
   storeJwtForAccount,
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
+import { postMessage } from '@/helpers/widget'
 
 export const { chains, provider } = configureChains(
   [mainnet, polygon, optimism, celo],
@@ -249,13 +250,10 @@ const WalletProvider = React.memo(
     React.useEffect(() => {
       if (isWidget) {
         if (!accountAddress) {
-          window.parent.postMessage(
-            { data: false, target: 'is_signed_in' },
-            '*'
-          )
+          postMessage({ data: false, target: 'is_signed_in' })
         } else {
           // notify the widget that we are signed in
-          window.parent.postMessage({ data: true, target: 'is_signed_in' }, '*')
+          postMessage({ data: true, target: 'is_signed_in' })
         }
       }
 
@@ -345,6 +343,13 @@ const WalletProvider = React.memo(
 
       const eventListener = (e: MessageEvent) => {
         const { data, origin }: { data: API; origin: string } = e
+
+        if (import.meta.env.VITE_REACT_APP_APP_URL) {
+          postMessage({
+            data: import.meta.env.VITE_REACT_APP_APP_URL,
+            target: 'url_env',
+          })
+        }
 
         const currentOrigin = storage.get('current-widget-origin')
         if (currentOrigin !== origin) {
@@ -533,10 +538,7 @@ const WalletProvider = React.memo(
               return
             }
 
-            window.parent.postMessage(
-              { data: messageToSign, target: 'message_to_sign' },
-              '*'
-            )
+            postMessage({ data: messageToSign, target: 'message_to_sign' })
 
             return
           }

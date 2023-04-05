@@ -1,4 +1,5 @@
 import storage from 'utils/extension-storage'
+import { AppAPI } from 'react-wallet-chat/dist/src/types'
 import * as ENV from '@/constants/env'
 import { getIsWidgetContext } from '@/utils/context'
 
@@ -41,4 +42,8 @@ export function getCommunity() {
 export function getSupportWallet() {
   const suffix = getWidgetEnvSuffix()
   return suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
+}
+
+export function postMessage(message: AppAPI) {
+  window.postMessage(message, '*')
 }
