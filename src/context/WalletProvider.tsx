@@ -78,11 +78,10 @@ const WalletProvider = React.memo(
           account: string
           chainId: number
           requestSignature?: boolean
-          hasSigner?: boolean
         }
     >()
     const [widgetWalletData, setWidgetWalletData] = React.useState<
-      undefined | { account: string; chainId: number; hasSigner?: boolean }
+      undefined | { account: string; chainId: number }
     >()
     const pendingConnect = React.useRef<boolean>(false)
 
@@ -368,17 +367,13 @@ const WalletProvider = React.memo(
             return setConnectConfig(null)
           }
 
-          const shouldRequestSignature = messageData.hasSigner
+          const shouldRequestSignature = messageData.requestSignature
           const widgetAccountChanged =
             widgetWalletDataRef?.current?.account !== messageData.account &&
             !didDisconnect.current
 
           if (widgetAccountChanged) {
-            widgetWalletDataRef.current = {
-              account: messageData.account,
-              chainId: messageData.chainId,
-              hasSigner: messageData.hasSigner,
-            }
+            widgetWalletDataRef.current = messageData
             setWidgetWalletData(widgetWalletDataRef.current)
           }
 
@@ -502,7 +497,7 @@ const WalletProvider = React.memo(
         const needsToRequestSIWE = !signature && shouldRequestSIWE
 
         if (needsToRequestSIWE) {
-          const widgetHost = widgetWalletDataRef.current?.hasSigner
+          const widgetHost = widgetWalletDataRef.current?.requestSignature
             ? currentWidgetHost.current
             : null
           const domain = widgetHost?.domain || window.location.host
@@ -522,7 +517,7 @@ const WalletProvider = React.memo(
 
           messageToSign = siweMessage.prepareMessage()
 
-          if (widgetWalletDataRef.current?.hasSigner) {
+          if (widgetWalletDataRef.current?.requestSignature) {
             // Here, in case the first signature was rejected or failed,
             // it will clear the values and try to request again from the widget
             if (shouldRetrySignature) {

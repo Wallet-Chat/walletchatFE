@@ -49,5 +49,5 @@ export function getWidgetUrl() {
 }
 
 export function postMessage(message: AppAPI) {
-  window.postMessage(message, '*')
+  window.parent.postMessage(message, '*')
 }
