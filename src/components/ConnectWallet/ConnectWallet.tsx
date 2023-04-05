@@ -1,5 +1,4 @@
 import React from 'react'
-import * as wagmi from '@wagmi/core'
 import { Box, Flex, Spinner, Tag, Button, Alert } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getIsWidgetContext } from '@/utils/context'
@@ -11,17 +10,13 @@ const ConnectWalletButton = () => {
   const {
     account,
     siweLastFailure,
-    setSiweLastFailure,
     siwePending,
     connectConfig,
     isAuthenticated,
     requestSIWEandFetchJWT,
-    connect,
     resetWidgetDataWithSignature,
     widgetWalletData,
     isConnected,
-    widgetWalletDataRef,
-    didDisconnect,
     pendingConnect,
   } = useWallet()
 
@@ -32,7 +27,6 @@ const ConnectWalletButton = () => {
   const [pending, setPending] = React.useState(
     siwePending || isAuthenticated === undefined
   )
-  const pendingModal = React.useRef<boolean>(false)
 
   React.useEffect(() => {
     if (hasPendingAuth) {
@@ -48,23 +42,7 @@ const ConnectWalletButton = () => {
 
   const handleLogin = async () => {
     setPending(true)
-
-    if (!isConnected) {
-      pendingConnect.current = true
-      connect(connectConfig)
-      resetWidgetDataWithSignature()
-      requestSIWEandFetchJWT()
-      return
-    }
-
-    if (!account && widgetWalletData?.requestSignature) {
-      return resetWidgetDataWithSignature()
-    }
-
-    if (didDisconnect.current) {
-      await wagmi.disconnect()
-      connect(connectConfig)
-    }
+    pendingConnect.current = true
 
     resetWidgetDataWithSignature()
     requestSIWEandFetchJWT()
@@ -74,22 +52,9 @@ const ConnectWalletButton = () => {
   // switch wallet button
   return (
     <ConnectButton.Custom>
-      {({ openConnectModal, connectModalOpen }) => {
-        React.useEffect(() => {
-          if (pending && pendingModal.current && !isConnected) {
-            openConnectModal()
-          }
-        }, [isConnected, openConnectModal, pending])
-
-        React.useEffect(() => {
-          if (connectModalOpen && pending && pendingModal.current) {
-            pendingModal.current = false
-            setPending(false)
-          }
-        }, [connectModalOpen, pending])
-
+      {({ openConnectModal }) => {
         return (() => {
-          if (pending) {
+          if (hasPendingAuth) {
             return (
               <>
                 <Spinner />
@@ -125,24 +90,7 @@ const ConnectWalletButton = () => {
               )}
 
               {(siweFailed || canUseWidgetConnection) && (
-                <Button
-                  variant='black'
-                  size='lg'
-                  onClick={() => {
-                    if (isConnected) {
-                      setSiweLastFailure(null)
-                      setPending(true)
-                      pendingModal.current = true
-
-                      widgetWalletDataRef.current = undefined
-
-                      wagmi.disconnect()
-                      didDisconnect.current = true
-                    } else {
-                      openConnectModal()
-                    }
-                  }}
-                >
+                <Button variant='black' size='lg' onClick={openConnectModal}>
                   Sign in with another wallet
                 </Button>
               )}

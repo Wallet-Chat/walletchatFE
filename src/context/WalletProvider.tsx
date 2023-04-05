@@ -7,13 +7,7 @@ import { SiweMessage } from 'siwe'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 
 import { getDefaultWallets } from '@rainbow-me/rainbowkit'
-import {
-  configureChains,
-  useAccount,
-  useConnect,
-  useNetwork,
-  useProvider,
-} from 'wagmi'
+import { configureChains, useAccount, useNetwork, useProvider } from 'wagmi'
 import { mainnet, polygon, optimism, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { publicProvider } from 'wagmi/providers/public'
@@ -131,12 +125,6 @@ const WalletProvider = React.memo(
     const { currentData: name } = endpoints.getName.useQueryState(
       accountAddress?.toLocaleLowerCase()
     )
-
-    const { connect } = useConnect({
-      onSuccess: () => {
-        didDisconnect.current = false
-      },
-    })
 
     const updateName = React.useCallback(
       (newName: null | string, address: undefined | string) =>
@@ -460,7 +448,7 @@ const WalletProvider = React.memo(
     }, [dispatch])
 
     const requestSIWEandFetchJWT = React.useCallback(async () => {
-      const walletIsConnected = accountAddress && chainId && isConnected
+      const walletIsConnected = accountAddress && chainId
 
       const accountHasNoJwt =
         accountAddress && !getHasJwtForAccount(accountAddress)
@@ -646,7 +634,6 @@ const WalletProvider = React.memo(
         setSiweLastFailure,
         siwePending,
         requestSIWEandFetchJWT,
-        connect,
         resetWidgetDataWithSignature: () => resetWidgetData(true),
         widgetWalletData,
         isConnected,
@@ -670,7 +657,6 @@ const WalletProvider = React.memo(
         siwePending,
         requestSIWEandFetchJWT,
         disconnectWallet,
-        connect,
         resetWidgetData,
         widgetWalletData,
         isConnected,
