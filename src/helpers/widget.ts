@@ -18,12 +18,16 @@ export function getAutoConnect() {
   return Boolean(alreadyLoggedIn)
 }
 
-function getWidgetEnvSuffix() {
+function getWidgetEnvSuffix(addDev?: boolean) {
   const isWidget = getIsWidgetContext()
   if (!isWidget) return null
 
   const currentWidgetOrigin = storage.get('current-widget-origin')
   if (!currentWidgetOrigin) return null
+
+  if (addDev && currentWidgetOrigin.toLowerCase().includes('localhost')) {
+    return '_LOCALHOST'
+  }
 
   if (
     currentWidgetOrigin.toLowerCase().includes('gooddollar') ||
@@ -44,7 +48,7 @@ export function getSupportWallet() {
   return suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
 }
 export function getWidgetUrl() {
-  const suffix = getWidgetEnvSuffix()
+  const suffix = getWidgetEnvSuffix(true)
   return suffix && ENV[`REACT_APP_APP_URL${suffix}`]
 }
 
