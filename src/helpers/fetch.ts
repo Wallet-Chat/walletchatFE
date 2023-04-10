@@ -5,9 +5,12 @@ const credentialsBody = { credentials: 'include' }
 export const getFetchBody = { method: 'GET', ...credentialsBody }
 export const postFetchBody = { method: 'POST', ...credentialsBody }
 
-export function prepareHeaderCredentials(headers: Headers, account: string) {
+export function prepareHeaderCredentials(headers: Headers, account?: string) {
   headers.set('Content-Type', 'application/json')
-  headers.set('authorization', `Bearer ${getJwtForAccount(account)}`)
+
+  if (account)
+    headers.set('authorization', `Bearer ${getJwtForAccount(account)}`)
+
   return headers
 }
 

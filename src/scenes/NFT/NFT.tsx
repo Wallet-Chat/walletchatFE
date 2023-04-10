@@ -38,7 +38,6 @@ const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
   const isSmallLayout = useIsSmallLayout()
 
   // useEffect(() => {
-  //   console.log(1000, inboxData)
   //   const filtered = inboxData.filter(
   //     (d) => d.context_type === 'nft' && !(d.chain === 'none')
   //   )

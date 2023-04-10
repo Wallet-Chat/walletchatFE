@@ -100,7 +100,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     console.log('ℹ️[POST][Encrypting Message]', value, accessControlConditions)
 
-    const encrypted = await lit.encryptString(value, accessControlConditions)
+    const encrypted = await lit.encryptString(account, value, accessControlConditions)
     createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
     createMessageData.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
     createMessageData.lit_access_conditions = JSON.stringify(

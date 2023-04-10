@@ -7,6 +7,7 @@ export type StoreKeys =
   | 'delegate'
   | 'last-wallet-connection-timestamp'
   | 'lit-auth-signature'
+  | 'lit-auth-signature-by-account'
 
 const storage = {
   set: (key: StoreKeys, data: any) => {

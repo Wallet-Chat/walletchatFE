@@ -1,3 +1,5 @@
+import storage from '@/utils/extension-storage'
+
 export function getAccessControlConditions(fromaddr: string, toaddr: string) {
   const accessControlConditions = [
     {
@@ -102,4 +104,12 @@ export function getAccessControlConditions(fromaddr: string, toaddr: string) {
   ]
 
   return accessControlConditions
+}
+
+export function getAuthSig(account: string) {
+  const authSigByAccount = storage.get('lit-auth-signature-by-account')
+
+  if (authSigByAccount && authSigByAccount[account.toLocaleLowerCase()]) {
+    return authSigByAccount[account.toLocaleLowerCase()]
+  }
 }

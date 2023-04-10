@@ -112,7 +112,7 @@ const DMByAddress = ({ account }: { account: string }) => {
   // so it will only retry when the array changes like removing some
   const encryptedDmsStr = encryptedDms && JSON.stringify(encryptedDms)
 
-  const { currentData: fetchedData, isFetching } = useGetChatDataQuery(
+  const { currentData: fetchedData } = useGetChatDataQuery(
     { account, toAddr },
     {
       ...POLLING_QUERY_OPTS,

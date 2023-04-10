@@ -5,7 +5,7 @@ import { prepareHeaderCredentials } from '@/helpers/fetch'
 import * as ENV from '@/constants/env'
 import { RootState } from '@/redux/store'
 import storage from '@/utils/storage'
-import lit from '@/utils/lit'
+import Lit from '@/utils/lit'
 import { ChatMessageType, InboxMessageType } from '@/types/Message'
 
 export const STORAGE_KEYS = Object.freeze({
@@ -94,15 +94,17 @@ export async function decryptMessage(
       if (
         String(fetchedMessages[i].lit_access_conditions).includes('evmBasic')
       ) {
-        const rawmsg = lit.decryptString(
-          lit.b64toBlob(fetchedMessages[i].message),
+        const rawmsg = Lit.decryptString(
+          account,
+          Lit.b64toBlob(fetchedMessages[i].message),
           fetchedMessages[i].encrypted_sym_lit_key,
           accessControlConditions
         )
         pendingMsgs[i] = rawmsg
       } else {
-        const rawmsg = lit.decryptStringOrig(
-          lit.b64toBlob(fetchedMessages[i].message),
+        const rawmsg = Lit.decryptStringOrig(
+          account,
+          Lit.b64toBlob(fetchedMessages[i].message),
           fetchedMessages[i].encrypted_sym_lit_key,
           accessControlConditions
         )

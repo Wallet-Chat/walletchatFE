@@ -3,23 +3,17 @@ import equal from 'fast-deep-equal/es6'
 import { useWallet } from './WalletProvider'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { getIsWidgetContext } from '@/utils/context'
 
-export const UnreadCountContext = React.createContext()
+const isWidget = getIsWidgetContext()
+
+export const UnreadCountContext = React.createContext<any>(null)
 export const useUnreadCount = () => React.useContext<any>(UnreadCountContext)
 
-export function withUnreadCount(Component) {
-  const WalletComponent = (props) => (
-    <UnreadCountContext.Consumer>
-      {(contexts) => <Component {...props} {...contexts} />}
-    </UnreadCountContext.Consumer>
-  )
-  return WalletComponent
-}
-
-const UnreadCountProvider = React.memo(({ children }) => {
+const UnreadCountProvider = ({ children }: { children: any }) => {
   const [unreadCount, setUnreadCount] = React.useState(0)
   const [totalUnreadCount, setTotalUnreadCount] = React.useState(0)
-  const { account } = useWallet()
+  const { account, isAuthenticated } = useWallet()
 
   const getUnreadCount = useCallback(() => {
     if (account) {
@@ -37,55 +31,57 @@ const UnreadCountProvider = React.memo(({ children }) => {
         .then((response) => response.json())
         .then((data) => {
           if (!equal(data, unreadCount)) {
-            console.log('✅[GET][unread Count]:', data)
-            //let total_cnt = Object.values(data).reduce((a, b) => a + b);
-            //for now we only have DMs in widget so only sent DM unread count
-            let total_cnt = data.dm
+            console.log('✅[GET][Unread Count]:', data)
 
-            //send message to parent for notifications when using widget
-            let msg = {
-              data: total_cnt,
-              target: 'unread_cnt',
+            // send message to parent for notifications when using widget
+            if (isWidget) {
+              window.parent.postMessage(
+                {
+                  data: data.dm,
+                  target: 'unread_cnt',
+                },
+                '*' // targertOrigin should be a .env variable
+              )
             }
-            window.parent.postMessage(msg, '*') //targertOrigin should be a .env variable
 
             setUnreadCount(data)
-            if (typeof data === 'object') {
-              setTotalUnreadCount(data?.dm + data?.nft + data?.community)
+            if (
+              Number.isInteger(data?.dm) &&
+              Number.isInteger(data?.nft) &&
+              Number.isInteger(data?.community)
+            ) {
+              setTotalUnreadCount(data.dm + data.nft + data.community)
             }
           }
         })
-        .catch((error) => {
-          console.error('🚨[GET][Unread Count]:', error)
-        })
+        .catch((error) => console.error('🚨[GET][Unread Count]:', error))
     }
   }, [account, unreadCount])
 
   useEffect(() => {
-    getUnreadCount()
-  }, [getUnreadCount])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
+    if (isAuthenticated) {
       getUnreadCount()
-    }, 5000) // every 5s
 
-    return () => {
-      clearInterval(interval)
+      const interval = setInterval(getUnreadCount, 5000) // every 5s
+
+      return () => clearInterval(interval)
     }
-  }, [account, unreadCount, getUnreadCount])
+  }, [getUnreadCount, isAuthenticated])
+
+  const value = React.useMemo(
+    () => ({
+      unreadCount,
+      setUnreadCount,
+      totalUnreadCount,
+    }),
+    [unreadCount, totalUnreadCount]
+  )
 
   return (
-    <UnreadCountContext.Provider
-      value={{
-        unreadCount,
-        setUnreadCount,
-        totalUnreadCount,
-      }}
-    >
+    <UnreadCountContext.Provider value={value}>
       {children}
     </UnreadCountContext.Provider>
   )
-})
+}
 
 export default UnreadCountProvider
