@@ -11,6 +11,9 @@ export function storeJwtForAccount(account: string, jwt: string) {
 }
 
 export function getJwtForAccount(account: string) {
+  if (account === undefined) {
+    return null
+  }
   const currentJwtByAccount = storage.get('jwt') || {}
   const currentJwt = currentJwtByAccount[account.toLocaleLowerCase()]
 
