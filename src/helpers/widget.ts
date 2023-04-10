@@ -51,6 +51,10 @@ export function getWidgetUrl() {
   const suffix = getWidgetEnvSuffix(true)
   return suffix && ENV[`REACT_APP_APP_URL${suffix}`]
 }
+export function getWidgetOriginName() {
+  const suffix = getWidgetEnvSuffix(true)
+  return suffix && ENV[`REACT_APP_ORIGIN_NAME${suffix}`]
+}
 
 export function postMessage(message: AppAPI) {
   window.parent.postMessage(message, '*')

@@ -88,6 +88,8 @@ const WalletProviderContext = () => {
     origin: string
   } | null>(null)
 
+  const [connectConfig, setConnectConfig] = React.useState<any>()
+
   const currentProvider = useProvider()
 
   const { chain } = useNetwork()
@@ -310,9 +312,11 @@ const WalletProviderContext = () => {
         dispatch(setAccount(widgetWalletDataRef.current.account))
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
+
+        connect(connectConfig)
       }
     },
-    [dispatch]
+    [connect, connectConfig, dispatch]
   )
 
   const clearWidgetData = React.useCallback(() => {
@@ -384,12 +388,13 @@ const WalletProviderContext = () => {
           ) {
             connector = new WalletConnectConnector({
               chains,
-              options: {},
+              options: { projectId: '' },
             })
           }
 
           if (connector && !wagmiConnected) {
             connect({ chainId: messageData.chainId, connector })
+            setConnectConfig({ chainId: messageData.chainId, connector })
           }
         }
       }
@@ -441,16 +446,14 @@ const WalletProviderContext = () => {
           // revert prevAccount to default state so can log back in
           prevAccount.current = undefined
         }
+      } else if (
+        prevAccount.current &&
+        prevAccount.current !== address.toLocaleLowerCase()
+      ) {
+        Lit.disconnect()
+        disconnect()
       } else {
-        if (
-          prevAccount.current &&
-          prevAccount.current !== address.toLocaleLowerCase()
-        ) {
-          Lit.disconnect()
-          disconnect()
-        } else {
-          didDisconnect.current = false
-        }
+        didDisconnect.current = false
       }
 
       dispatch(setAccount(address))
@@ -463,7 +466,7 @@ const WalletProviderContext = () => {
       accountUnwatch()
       networkUnwatch()
     }
-  }, [dispatch])
+  }, [disconnect, dispatch])
 
   const requestSIWEandFetchJWT = React.useCallback(async () => {
     const walletIsConnected = accountAddress && chainId
@@ -519,24 +522,6 @@ const WalletProviderContext = () => {
         })
 
         messageToSign = siweMessage.prepareMessage()
-
-        if (!1) {
-          // Here, in case the first signature was rejected or failed,
-          // it will clear the values and try to request again from the widget
-          if (shouldRetrySignature) {
-            siweFailedRef.current = false
-            setWidgetAuthSig({
-              signature: undefined,
-              signedMsg: messageToSign,
-            })
-
-            return
-          }
-
-          postMessage({ data: messageToSign, target: 'message_to_sign' })
-
-          return
-        }
 
         const signer = await wagmi.fetchSigner()
 
@@ -604,6 +589,8 @@ const WalletProviderContext = () => {
 
       prevNonce.current = nonce
     }
+
+    return true
   }, [widgetAuthSig, accountAddress, chainId, nonce, signIn, widgetSignature])
 
   React.useEffect(() => {
@@ -613,14 +600,15 @@ const WalletProviderContext = () => {
   const disconnectWallet = React.useCallback(async () => {
     didDisconnect.current = true
 
-    await wagmi.disconnect()
+    Lit.disconnect()
+    disconnect()
 
     dispatch(setAccount(null))
     setNonce(null)
     setSiweLastFailure(null)
     siweFailedRef.current = false
     setAuthenticated(false)
-  }, [dispatch])
+  }, [disconnect, dispatch])
 
   React.useEffect(() => {
     if (widgetWalletData) {
@@ -641,6 +629,7 @@ const WalletProviderContext = () => {
     disconnectWallet,
     isAuthenticated,
     web3: currentProvider && new Web3(currentProvider),
+    signIn,
     provider: currentProvider,
     delegate,
     siweLastFailure,

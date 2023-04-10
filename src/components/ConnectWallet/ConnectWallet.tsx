@@ -3,15 +3,19 @@ import { Box, Flex, Spinner, Tag, Button, Alert } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getIsWidgetContext } from '@/utils/context'
 import { useWallet } from '@/context/WalletProvider'
+import { getWidgetOriginName } from '@/helpers/widget'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 const isWidget = getIsWidgetContext()
 
 const ConnectWalletButton = () => {
   const {
+    account,
     siweLastFailure,
     siwePending,
     isAuthenticated,
     requestSIWEandFetchJWT,
+    signIn,
     resetWidgetDataWithSignature,
     pendingConnect,
     clearWidgetData,
@@ -22,26 +26,28 @@ const ConnectWalletButton = () => {
   const siweFailed = Boolean(siweLastFailure)
 
   const hasPendingAuth = siwePending || isAuthenticated === undefined
-  const [pending, setPending] = React.useState(hasPendingAuth)
 
-  React.useEffect(() => {
-    if (hasPendingAuth) {
-      setPending(true)
-    }
-  }, [hasPendingAuth])
+  // React.useEffect(() => {
+  //   if (hasPendingAuth) {
+  //     setPending(true)
+  //   }
+  // }, [hasPendingAuth])
 
-  React.useEffect(() => {
-    if (siweLastFailure) {
-      setPending(false)
-    }
-  }, [siweLastFailure])
+  // React.useEffect(() => {
+  //   if (siweLastFailure) {
+  //     setPending(false)
+  //   }
+  // }, [siweLastFailure])
 
   const handleLogin = async () => {
-    setPending(true)
+    // setPending(true)
     pendingConnect.current = true
 
     resetWidgetDataWithSignature()
-    requestSIWEandFetchJWT()
+    const canSignIn = requestSIWEandFetchJWT()
+    if (canSignIn && account) {
+      signIn(account, getJwtForAccount(account) || '')
+    }
   }
 
   // TODO: allow changing sign-in method after already selected wallet
@@ -71,7 +77,7 @@ const ConnectWalletButton = () => {
                   <Tag variant='solid' colorScheme='green' mr={2}>
                     Connected
                   </Tag>
-                  <Box>Use the App to Log in</Box>
+                  <Box>Connect with {getWidgetOriginName() || 'App'}</Box>
                 </Button>
               ) : (
                 <Button

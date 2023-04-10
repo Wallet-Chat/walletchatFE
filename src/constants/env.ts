@@ -24,14 +24,22 @@ export const REACT_APP_SUPPORT_WALLET = import.meta.env
 export const REACT_APP_SUPPORT_HEADER = import.meta.env
   .VITE_REACT_APP_SUPPORT_HEADER
 
-// GoodDollar Community
+// --- GoodDollar ---
+
+// Community
 export const REACT_APP_DEFAULT_COMMUNITY_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY_GOODDOLLAR
-// GoodDollar Support Wallet
+// Support Wallet
 export const REACT_APP_SUPPORT_WALLET_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_GOODDOLLAR
+// App Url
 export const REACT_APP_APP_URL_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_APP_URL_GOODDOLLAR
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_GOODDOLLAR = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_GOODDOLLAR
+
+// ------------------
 
 export const REACT_APP_DEFAULT_COMMUNITY_LOCALHOST = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY_LOCALHOST
@@ -39,3 +47,5 @@ export const REACT_APP_SUPPORT_WALLET_LOCALHOST = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_LOCALHOST
 export const REACT_APP_APP_URL_LOCALHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_LOCALHOST
+export const REACT_APP_ORIGIN_NAME_LOCALHOST = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_LOCALHOST
