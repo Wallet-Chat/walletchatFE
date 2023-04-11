@@ -29,17 +29,17 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
       updateQueryData('getChatData', { account, toAddr }, (chatData) => {
-        const chatDataValue = JSON.parse(chatData)
+        const chatDataValue = JSON.parse(chatData)?.messages || []
         chatDataValue.push(newMessage)
         addLocalDmDataForAccountToAddr(account, toAddr, [newMessage])
-        return JSON.stringify(chatDataValue)
+        return JSON.stringify({ messages: chatDataValue })
       })
     )
 
   const updateSentMessage = (message: ChatMessageType, timestamp: string) =>
     dispatch(
       updateQueryData('getChatData', { account, toAddr }, (chatData) => {
-        const chatDataValue = JSON.parse(chatData)
+        const chatDataValue = JSON.parse(chatData)?.messages || []
 
         const index = chatDataValue.findIndex(
           (chat: ChatMessageType) => chat.timestamp === timestamp
@@ -50,7 +50,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         }
 
         updateLocalDmDataForAccountToAddr(account, toAddr, chatDataValue)
-        return JSON.stringify(chatDataValue)
+        return JSON.stringify({ messages: chatDataValue })
       })
     )
 
@@ -100,7 +100,11 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     console.log('ℹ️[POST][Encrypting Message]', value, accessControlConditions)
 
-    const encrypted = await lit.encryptString(account, value, accessControlConditions)
+    const encrypted = await lit.encryptString(
+      account,
+      value,
+      accessControlConditions
+    )
     createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
     createMessageData.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
     createMessageData.lit_access_conditions = JSON.stringify(

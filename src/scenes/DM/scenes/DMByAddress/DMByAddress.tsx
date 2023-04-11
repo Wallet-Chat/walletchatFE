@@ -23,7 +23,7 @@ import Submit from './Submit'
 import { getSupportWallet } from '@/helpers/widget'
 import * as ENV from '@/constants/env'
 
-const PAGE_SIZE = 25
+export const PAGE_SIZE = 25
 
 const AlertBubble = ({
   children,
@@ -78,15 +78,26 @@ const DMByAddress = ({ account }: { account: string }) => {
   const selectChatDataForPage = React.useMemo(
     () =>
       createSelector(
-        (chatData: ChatMessageType[]) => chatData,
+        (chatData: {
+          messages: ChatMessageType[]
+          pendingMsgs: ChatMessageType[]
+        }) => chatData,
         (chatData) => {
-          if (!chatData) return chatData
+          if (!chatData?.messages) return chatData?.messages
 
-          if (chatData.length <= PAGE_SIZE) {
-            return JSON.stringify(chatData)
+          const decryptedAndPendingChats = chatData.pendingMsgs
+            ? [...chatData.messages, ...chatData.pendingMsgs].sort(
+                (a, b) =>
+                  new Date(a.timestamp).getTime() -
+                  new Date(b.timestamp).getTime()
+              )
+            : chatData.messages
+
+          if (decryptedAndPendingChats.length <= PAGE_SIZE) {
+            return JSON.stringify(decryptedAndPendingChats)
           }
 
-          const newChatData = [...chatData]
+          const newChatData = [...decryptedAndPendingChats]
           maxPages.current = Math.ceil(newChatData.length / PAGE_SIZE)
 
           if (newChatData.length <= PAGE_SIZE) {
@@ -112,20 +123,22 @@ const DMByAddress = ({ account }: { account: string }) => {
   // so it will only retry when the array changes like removing some
   const encryptedDmsStr = encryptedDms && JSON.stringify(encryptedDms)
 
-  const { currentData: fetchedData } = useGetChatDataQuery(
+  const { currentData: fetchedData, pendingMsgs } = useGetChatDataQuery(
     { account, toAddr },
     {
       ...POLLING_QUERY_OPTS,
       selectFromResult: (options) => {
         const cachedData = getLocalDmDataForAccountToAddr(account, toAddr)
-        fullChatData.current =
+        const currentData =
           options.currentData && JSON.parse(options.currentData)
+        fullChatData.current = currentData
 
         return {
           ...options,
           currentData: selectChatDataForPage(
-            options.currentData ? JSON.parse(options.currentData) : cachedData
+            currentData || { messages: cachedData }
           ),
+          pendingMsgs: currentData?.pendingMsgs || [],
         }
       },
     }
@@ -171,6 +184,12 @@ const DMByAddress = ({ account }: { account: string }) => {
             shouldScrollBack.current = true
             selectorPageRef.current += 1
             setSelectorPage(selectorPageRef.current)
+            decryptMessage(
+              pendingMsgs.slice(selectorPageRef.current * PAGE_SIZE),
+              account,
+              dispatch,
+              'getChatData'
+            )
           }
         } else {
           // On any other scroll movement that is not in the direction of
@@ -184,7 +203,7 @@ const DMByAddress = ({ account }: { account: string }) => {
 
       return () => bodyElem.removeEventListener('scroll', autoScrollPagination)
     }
-  }, [])
+  }, [account, dispatch, pendingMsgs, selectorPageRef, toAddr])
 
   useGetReadChatItemsQuery({ account, toAddr }, POLLING_QUERY_OPTS)
 
@@ -214,7 +233,7 @@ const DMByAddress = ({ account }: { account: string }) => {
 
         dispatch(
           updateQueryData('getChatData', { account, toAddr }, () =>
-            JSON.stringify(newChatData)
+            JSON.stringify({ messages: newChatData })
           )
         )
         dispatch(
@@ -230,26 +249,6 @@ const DMByAddress = ({ account }: { account: string }) => {
     (node) => shouldScrollBack.current && node?.scrollIntoView(),
     []
   )
-
-  // TODO: when some DMs are still encrypted due to fail or pending, show skeleton
-  // instead of error message
-  if (encryptedDms && encryptedDms.length > 0) {
-    return (
-      <Flex background='white' flexDirection='column' flex='1'>
-        <DMHeader />
-
-        <DottedBackground className='custom-scrollbar' overflow='hidden'>
-          <AlertBubble color='red'>
-            Failed to decrypt messages, retrying...
-          </AlertBubble>
-
-          <Flex justifyContent='center' alignItems='center' height='100%'>
-            <Spinner />
-          </Flex>
-        </DottedBackground>
-      </Flex>
-    )
-  }
 
   // TODO: 'back to bottom' button
   if (!chatData) {
@@ -283,6 +282,10 @@ const DMByAddress = ({ account }: { account: string }) => {
           const isLast = i === chatData.length - 1
           const isFirst = i === 0
           const msgId = msg.Id
+          const key = `${String(i)}_${msg.Id}`
+          const decryptionPending = pendingMsgs?.some(
+            (pendingMsg: any) => pendingMsg.Id === msgId
+          )
 
           let ref
           if (isLast) {
@@ -294,8 +297,13 @@ const DMByAddress = ({ account }: { account: string }) => {
           }
 
           return (
-            <Box key={`${String(i)}_${msg.Id}`} ref={ref}>
-              <ChatMessage context='dm' account={account} msg={msg} />
+            <Box key={key} ref={ref}>
+              <ChatMessage
+                pending={decryptionPending}
+                context='dm'
+                account={account}
+                msg={msg}
+              />
             </Box>
           )
         })}

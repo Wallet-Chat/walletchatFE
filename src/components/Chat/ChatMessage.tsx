@@ -132,10 +132,12 @@ const ChatMessage = ({
   context,
   account,
   msg,
+  pending,
 }: {
   context: (typeof CHAT_CONTEXT_TYPES)[number]
   account: string | undefined
   msg: MessageUIType
+  pending?: boolean
 }) => {
   const sender = msg?.fromaddr || msg?.fromAddr
   const { data: senderName } = useGetNameQuery(sender, {
@@ -327,7 +329,7 @@ const ChatMessage = ({
               </Text>
             </UserProfileContextMenu>
           )}
-          <Box>{msg.message}</Box>
+          {pending ? <Spinner /> : <Box>{msg.message}</Box>}
           <Box
             d='inline-block'
             className='timestamp'
