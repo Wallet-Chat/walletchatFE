@@ -8,6 +8,7 @@ export type StoreKeys =
   | 'last-wallet-connection-timestamp'
   | 'lit-auth-signature'
   | 'lit-auth-signature-by-account'
+  | 'current-widget-provider'
 
 const storage = {
   set: (key: StoreKeys, data: any) => {

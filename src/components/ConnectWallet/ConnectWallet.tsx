@@ -22,7 +22,7 @@ const ConnectWalletButton = () => {
     previousWidgetData,
   } = useWallet()
 
-  const canUseWidgetConnection = isWidget && previousWidgetData.current
+  const canUseWidgetConnection = isWidget && previousWidgetData?.current
   const siweFailed = Boolean(siweLastFailure)
 
   const hasPendingAuth = siwePending || isAuthenticated === undefined

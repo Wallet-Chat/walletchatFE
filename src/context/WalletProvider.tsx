@@ -17,7 +17,7 @@ import {
 } from 'wagmi'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
-import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect'
+import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
 
 import { mainnet, polygon, optimism, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
@@ -195,7 +195,7 @@ const WalletProviderContext = () => {
         )
         storage.set('delegate', address)
         setDelegate(address) // not sure this is used anymore
-        setAccount(walletInJWT)
+        dispatch(setAccount(walletInJWT))
       }
 
       dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
@@ -369,6 +369,7 @@ const WalletProviderContext = () => {
 
           if (walletIs('metamask')) {
             connector = new MetaMaskConnector({ chains })
+            storage.set('current-widget-provider', 'metamask')
           }
 
           if (walletIs('coinbase')) {
@@ -379,6 +380,7 @@ const WalletProviderContext = () => {
                 jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM}`,
               },
             })
+            storage.set('current-widget-provider', 'coinbase')
           }
 
           if (
@@ -386,10 +388,13 @@ const WalletProviderContext = () => {
             walletIs('gooddollar') ||
             walletIs('zengo')
           ) {
-            connector = new WalletConnectConnector({
+            connector = new WalletConnectLegacyConnector({
               chains,
-              options: { projectId: '' },
+              options: {
+                qrcode: true,
+              },
             })
+            storage.set('current-widget-provider', 'wallet-connect')
           }
 
           if (connector && !wagmiConnected) {
@@ -616,35 +621,59 @@ const WalletProviderContext = () => {
     }
   }, [widgetWalletData])
 
-  return {
-    name,
-    email,
-    notifyDM,
-    notify24,
-    setName: updateName,
-    setEmail,
-    setNotifyDM,
-    setNotify24,
-    account: accountAddress?.toLowerCase(),
-    disconnectWallet,
-    isAuthenticated,
-    web3: currentProvider && new Web3(currentProvider),
-    signIn,
-    provider: currentProvider,
-    delegate,
-    siweLastFailure,
-    siwePending,
-    requestSIWEandFetchJWT,
-    resetWidgetDataWithSignature: () => updateAccountFromWidget(true),
-    widgetWalletData,
-    pendingConnect,
-    clearWidgetData,
-    previousWidgetData,
-  }
+  return React.useMemo(
+    () => ({
+      name,
+      email,
+      notifyDM,
+      notify24,
+      setName: updateName,
+      setEmail,
+      setNotifyDM,
+      setNotify24,
+      account: accountAddress?.toLowerCase(),
+      disconnectWallet,
+      isAuthenticated,
+      web3: currentProvider && new Web3(currentProvider),
+      signIn,
+      provider: currentProvider,
+      delegate,
+      siweLastFailure,
+      siwePending,
+      requestSIWEandFetchJWT,
+      resetWidgetDataWithSignature: () => updateAccountFromWidget(true),
+      widgetWalletData,
+      pendingConnect,
+      clearWidgetData,
+      previousWidgetData,
+    }),
+    [
+      accountAddress,
+      delegate,
+      email,
+      isAuthenticated,
+      name,
+      notify24,
+      notifyDM,
+      currentProvider,
+      updateName,
+      signIn,
+      siweLastFailure,
+      siwePending,
+      requestSIWEandFetchJWT,
+      disconnectWallet,
+      updateAccountFromWidget,
+      widgetWalletData,
+      pendingConnect,
+      clearWidgetData,
+      previousWidgetData,
+    ]
+  )
 }
 
-export const WalletContext =
-  React.createContext<ReturnType<typeof WalletProviderContext>>()
+export const WalletContext = React.createContext<
+  ReturnType<typeof WalletProviderContext>
+>({})
 
 export const useWallet = () => React.useContext(WalletContext)
 

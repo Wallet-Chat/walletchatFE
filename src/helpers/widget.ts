@@ -10,10 +10,14 @@ export function getAutoConnect() {
   const isWidget = getIsWidgetContext()
   if (!isWidget) return true
 
-  const widgetLogins = storage.get('widget-logins')
+  const widgetLogins: { [origin: string]: string } =
+    storage.get('widget-logins')
   const currentWidgetOrigin = storage.get('current-widget-origin')
+  const currentWidgetProvider = storage.get('current-widget-provider')
   const alreadyLoggedIn =
-    widgetLogins && widgetLogins.includes(currentWidgetOrigin)
+    widgetLogins &&
+    widgetLogins[currentWidgetOrigin] &&
+    widgetLogins[currentWidgetOrigin] === currentWidgetProvider
 
   return Boolean(alreadyLoggedIn)
 }
