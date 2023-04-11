@@ -44,7 +44,7 @@ const ConnectWalletButton = () => {
     pendingConnect.current = true
 
     resetWidgetDataWithSignature()
-    const canSignIn = requestSIWEandFetchJWT()
+    const canSignIn = await requestSIWEandFetchJWT()
     if (canSignIn && account) {
       signIn(account, getJwtForAccount(account) || '')
     }
@@ -74,10 +74,17 @@ const ConnectWalletButton = () => {
             <Flex direction='column' gap={2} alignItems='start'>
               {canUseWidgetConnection ? (
                 <Button variant='black' size='lg' onClick={handleLogin}>
-                  <Tag variant='solid' colorScheme='green' mr={2}>
+                  <Tag
+                    variant='solid'
+                    colorScheme='green'
+                    mr={2}
+                    minWidth='unset'
+                  >
                     Connected
                   </Tag>
-                  <Box>Connect with {getWidgetOriginName() || 'App'}</Box>
+                  <Box whiteSpace='break-spaces'>
+                    Connect with {getWidgetOriginName() || 'App'}
+                  </Box>
                 </Button>
               ) : (
                 <Button
