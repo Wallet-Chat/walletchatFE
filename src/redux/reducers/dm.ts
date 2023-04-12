@@ -582,16 +582,10 @@ export const dmApi = createApi({
             console.log('✅[GET][Inbox]:', data)
 
             if (newDms.length > 0) {
-              const { fetchedMessages } = await decryptMessage(
-                newInboxData,
-                account,
-                dispatch,
-                'getInbox'
-              )
-
-              updateLocalInboxDataForAccount(account, fetchedMessages)
+              await decryptMessage(newInboxData, account, dispatch, 'getInbox')
             }
 
+            updateLocalInboxDataForAccount(account, newInboxData)
             return {
               data: JSON.stringify(getInboxDmDataForAccount(account)),
             }
