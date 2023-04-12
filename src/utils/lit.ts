@@ -1,21 +1,17 @@
-import * as LitJsSdk from '@lit-protocol/lit-node-client'
-import * as Types from '@lit-protocol/types'
+import * as LitJsSdk from 'lit-js-sdk'
 import storage from './extension-storage'
 import { getAuthSig } from '@/helpers/lit'
 
 const chain = 'ethereum'
 
-export type AuthSig = Types.AuthSig
-
 class Lit {
   litNodeClient: LitJsSdk.LitNodeClient | null = null
 
-  authSig: AuthSig | undefined = undefined
+  authSig: any | undefined = undefined
 
   setAuthSig(account: string) {
     const authSig = getAuthSig(account)
     storage.set('lit-auth-signature', authSig)
-    storage.set('lit-web3-provider', 'metamask')
     this.authSig = authSig
   }
 
