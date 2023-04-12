@@ -677,12 +677,14 @@ export const WalletContext = React.createContext<
 
 export const useWallet = () => React.useContext(WalletContext)
 
-const WalletProvider = ({ children }: { children: React.ReactElement }) => {
-  const value = WalletProviderContext()
+const WalletProvider = React.memo(
+  ({ children }: { children: React.ReactElement }) => {
+    const value = WalletProviderContext()
 
-  return (
-    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
-  )
-}
+    return (
+      <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
+    )
+  }
+)
 
 export default WalletProvider
