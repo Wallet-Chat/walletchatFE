@@ -27,7 +27,7 @@ class Lit {
   }
 
   async disconnect() {
-    LitJsSdk.ethConnect.disconnectWeb3()
+    LitJsSdk.disconnectWeb3()
     this.litNodeClient = null
     this.authSig = undefined
   }
