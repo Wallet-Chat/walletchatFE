@@ -241,7 +241,7 @@ const ChatMessage = ({
               'getChatData',
               { account, toAddr: fromAddr },
               (chatData) => {
-                const chatDataValue = JSON.parse(chatData)
+                const chatDataValue = JSON.parse(chatData)?.messages || []
 
                 chatDataValue.forEach((dataMsg: MessageUIType, i: number) => {
                   if (dataMsg.Id === msg.Id) {
