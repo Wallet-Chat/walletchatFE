@@ -31,7 +31,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       updateQueryData('getChatData', { account, toAddr }, (chatData) => {
         const chatDataValue = JSON.parse(chatData)?.messages || []
         chatDataValue.push(newMessage)
-        addLocalDmDataForAccountToAddr(account, toAddr, [newMessage])
+        addLocalDmDataForAccountToAddr(account, toAddr, newMessage)
         return JSON.stringify({ messages: chatDataValue })
       })
     )

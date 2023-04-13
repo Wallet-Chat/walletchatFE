@@ -61,8 +61,16 @@ function litDecryptionForMessages(
   account: string,
   messages: ChatMessageType[] | InboxMessageType[],
   count: number,
-  cb: (i: number) => (litResponse?: { decryptedFile?: string }) => void
+  onDecryptionSuccess: (
+    i: number
+  ) => (litResponse?: { decryptedFile?: string }) => void,
+  onBeforeBegin?: (messages: ChatMessageType[] | InboxMessageType[]) => void
 ) {
+  // Reverse it so newer messages are decrypted first
+  messages.reverse()
+
+  if (onBeforeBegin) onBeforeBegin(messages)
+
   // Get data from LIT and replace the message with the decrypted text
   for (let i = 0; i < count; i += 1) {
     let shouldBreak
@@ -85,11 +93,9 @@ function litDecryptionForMessages(
           ? { accessControlConditions }
           : { unifiedAccessControlConditions: accessControlConditions }
       )
-        .then(cb(i))
+        .then(onDecryptionSuccess(i))
         .catch(() => {
-          console.log(1000, currentMessage)
           // const messagesLeft = messages.slice(i)
-
           // setTimeout(
           //   () =>
           //     litDecryptionForMessages(
@@ -100,7 +106,6 @@ function litDecryptionForMessages(
           //     ),
           //   1000 * 5
           // )
-
           // shouldBreak = true
         })
 
@@ -124,7 +129,7 @@ export async function decryptInboxMessages(
         decryptedMessages[i] = { ...messages[i], message }
         const newInboxValue = decryptedMessages[i]
 
-        console.log('✅[POST][Decrypted DM]: ', newInboxValue)
+        console.log('✅[POST][Decrypted Inbox Message]: ', newInboxValue)
 
         dispatch(
           updateQueryData('getInbox', account, () => {
@@ -136,10 +141,7 @@ export async function decryptInboxMessages(
               (msg) => !inboxDms.some((chat) => chat.Id === msg.Id)
             )
 
-            return JSON.stringify({
-              ...newInboxData,
-              pendingMsgs,
-            })
+            return JSON.stringify({ ...newInboxData, pendingMsgs })
           })
         )
       }
@@ -160,9 +162,6 @@ export async function decryptDMMessages(
   account: string,
   dispatch: any
 ) {
-  // Reverse it so newer messages are decrypted first
-  messages.reverse()
-
   const decryptedMessages: ChatMessageType[] = []
   const toAddr = getMessageToAddr(account, messages[0])
 
@@ -172,34 +171,37 @@ export async function decryptDMMessages(
 
       if (message) {
         decryptedMessages[i] = { ...messages[i], message }
-        console.log('✅[POST][Decrypted DM]: ', message)
+        const newMessage = decryptedMessages[i]
+
+        console.log('✅[POST][Decrypted DM Message]: ', message)
 
         dispatch(
-          updateQueryData('getChatData', { account, toAddr }, (chatData) => {
-            const chatDataValue = JSON.parse(chatData)?.messages || []
-
-            const index = chatDataValue.findIndex(
-              (msg: ChatMessageType) => msg.Id === decryptedMessages[i].Id
+          updateQueryData('getChatData', { account, toAddr }, () => {
+            const pendingMsgs =
+              getPendingDmDataForAccountToAddr(account, toAddr) || []
+            const newPendingMsgs = pendingMsgs.filter(
+              (msg: ChatMessageType) => msg.Id !== newMessage.Id
             )
 
-            if (index >= 0) {
-              chatDataValue[index] = decryptedMessages[i]
-            } else {
-              chatDataValue.push(decryptedMessages[i])
-            }
+            updatePendingDmDataForAccountToAddr(account, toAddr, newPendingMsgs)
+            addLocalDmDataForAccountToAddr(account, toAddr, newMessage)
 
-            const pendingMsgs = messages.filter(
-              (msg) => !chatDataValue.some((chat: any) => chat.Id === msg.Id)
-            )
-
-            updatePendingDmDataForAccountToAddr(account, toAddr, pendingMsgs)
-            updateLocalDmDataForAccountToAddr(account, toAddr, chatDataValue)
-
-            return JSON.stringify({ messages: chatDataValue, pendingMsgs })
+            return ''
           })
         )
       }
     }
+
+  const onBeforeBegin = (messages: ChatMessageType[]) => {
+    const currentChatData =
+      getLocalDmDataForAccountToAddr(account, toAddr) || []
+
+    const pendingMessages = messages.filter(
+      (msg: ChatMessageType) =>
+        !currentChatData.some((chat: ChatMessageType) => chat.Id === msg.Id)
+    )
+    updatePendingDmDataForAccountToAddr(account, toAddr, pendingMessages)
+  }
 
   const amountToDecrypt =
     messages.length > PAGE_SIZE ? PAGE_SIZE : messages.length
@@ -208,7 +210,8 @@ export async function decryptDMMessages(
     account,
     messages,
     amountToDecrypt,
-    getDecryptionResult
+    getDecryptionResult,
+    onBeforeBegin
   )
 }
 
@@ -216,7 +219,8 @@ export function getPendingDmDataForAccountToAddr(
   account: string,
   toAddr: string
 ) {
-  const localDmDataByAddr = getLocalData(account, STORAGE_KEYS.PENDING_DATA)
+  const localDmDataByAddr =
+    getLocalData(account, STORAGE_KEYS.PENDING_DATA) || {}
   if (!localDmDataByAddr) return null
 
   const localDmData = localDmDataByAddr[toAddr.toLocaleLowerCase()]
@@ -234,7 +238,7 @@ export function getLocalDmDataForAccountToAddr(
   const localDmData = localDmDataByAddr[toAddr.toLocaleLowerCase()]
   if (!localDmData) return null
 
-  return localDmData
+  return [...localDmData]
 }
 
 export function updatePendingDmDataForAccountToAddr(
@@ -259,14 +263,12 @@ export function updatePendingDmDataForAccountToAddr(
 export function addPendingDmDataForAccountToAddr(
   account: string,
   toAddr: string,
-  chatData: ChatMessageType[]
+  newPendingMessage: ChatMessageType
 ) {
-  const localDmData = getLocalDmDataForAccountToAddr(account, toAddr) || []
-  const newDmData = [...localDmData, ...chatData].sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-  )
+  const localDmData = getPendingDmDataForAccountToAddr(account, toAddr) || []
+  const newDmData = [...localDmData, newPendingMessage]
 
-  updateLocalDmDataForAccountToAddr(account, toAddr, newDmData)
+  updatePendingDmDataForAccountToAddr(account, toAddr, newDmData)
 }
 export function updateLocalDmDataForAccountToAddr(
   account: string,
@@ -290,12 +292,10 @@ export function updateLocalDmDataForAccountToAddr(
 export function addLocalDmDataForAccountToAddr(
   account: string,
   toAddr: string,
-  chatData: ChatMessageType[]
+  newMessage: ChatMessageType
 ) {
   const localDmData = getLocalDmDataForAccountToAddr(account, toAddr) || []
-  const newDmData = [...localDmData, ...chatData].sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-  )
+  const newDmData = [...localDmData, newMessage]
 
   updateLocalDmDataForAccountToAddr(account, toAddr, newDmData)
 }
@@ -356,13 +356,22 @@ export function addLocalInboxDataForAccount(
   const localInboxData = getInboxDmDataForAccount(account)
   const inboxDataForContext = localInboxData[newInboxMessage.context_type]
 
+  const values = Object.values(inboxDataForContext)
+  values.push(newInboxMessage) // add the new message to the array
+
+  values.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  )
+
+  const sortedNewInboxForContext: { [from: string]: InboxMessageType } = {}
+  values.forEach((item) => {
+    sortedNewInboxForContext[getInboxFrom(account, item)] = item
+  })
+
   storage.set(STORAGE_KEYS.INBOX_DATA, {
     [account.toLocaleLowerCase()]: {
       ...localInboxData,
-      [newInboxMessage.context_type]: {
-        ...inboxDataForContext,
-        [getInboxFrom(account, newInboxMessage)]: newInboxMessage,
-      },
+      [newInboxMessage.context_type]: sortedNewInboxForContext,
     },
   })
 }
@@ -373,9 +382,14 @@ export function updateLocalInboxDataForAccount(
 ) {
   const localInboxData = getInboxDmDataForAccount(account)
 
-  inboxData.forEach((item) => {
-    localInboxData[item.context_type][getInboxFrom(account, item)] = item
-  })
+  inboxData
+    .sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    )
+    .forEach((item) => {
+      localInboxData[item.context_type][getInboxFrom(account, item)] = item
+    })
 
   storage.set(STORAGE_KEYS.INBOX_DATA, {
     [account.toLocaleLowerCase()]: localInboxData,
@@ -383,34 +397,13 @@ export function updateLocalInboxDataForAccount(
 }
 
 const selectState = (state: RootState) => state.dm
-const selectEncryptedDmIdsByAddrByAcc = (state: RootState) =>
-  selectState(state).encryptedDmIdsByAddrByAcc
-const selectEncryptedDmIdsByAddr = (state: RootState, account: string) => {
-  const encryptedDmIdsByAddrByAcc = selectEncryptedDmIdsByAddrByAcc(state)
-  return encryptedDmIdsByAddrByAcc?.[account.toLocaleLowerCase()]
-}
-export const selectEncryptedDmIds = (
-  state: RootState,
-  account: string,
-  toAddr: string
-) => {
-  const dmDataEncByAddrForAccount = selectEncryptedDmIdsByAddr(state, account)
-  return (
-    dmDataEncByAddrForAccount?.[toAddr.toLocaleLowerCase()] ||
-    getLocalEncDmIdsByAddrByAcc(account, toAddr)
-  )
-}
 
 type DMState = {
   account: undefined | string
-  encryptedDmIdsByAddrByAcc: {
-    [account: string]: { [toAddr: string]: number[] }
-  }
 }
 
 const initialState: DMState = {
   account: undefined,
-  encryptedDmIdsByAddrByAcc: {},
 }
 
 export const dmSlice = createSlice({
@@ -420,31 +413,10 @@ export const dmSlice = createSlice({
     setAccount: (state, action) => {
       state.account = action.payload
     },
-
-    addEncryptedDmIds: (state, action) => {
-      const { account, toAddr, data } = action.payload
-      const accountData = state.encryptedDmIdsByAddrByAcc[account] || {}
-
-      if (!accountData) {
-        state.encryptedDmIdsByAddrByAcc = {
-          [account]: {
-            [toAddr]: data,
-          },
-        }
-      } else if (!accountData[toAddr]) {
-        state.encryptedDmIdsByAddrByAcc[account] = {
-          [toAddr]: data,
-        }
-      } else {
-        state.encryptedDmIdsByAddrByAcc[account][toAddr] = data
-      }
-
-      updateLocalEncDmIdsByAddrByAcc(account, toAddr, data)
-    },
   },
 })
 
-export const { setAccount, addEncryptedDmIds } = dmSlice.actions
+export const { setAccount } = dmSlice.actions
 
 async function fetchAndStoreChatData(
   queryArgs: any,
@@ -466,7 +438,6 @@ async function fetchAndStoreChatData(
     }
 
     const localData = getLocalDmDataForAccountToAddr(account, toAddr) || []
-    const pendingData = getPendingDmDataForAccountToAddr(account, toAddr) || []
     const hasLocalData = localData && localData.length > 0
 
     let lastTimeMsg
@@ -486,9 +457,7 @@ async function fetchAndStoreChatData(
       ).data as unknown as ChatMessageType[]) || []
 
     if (data.length === 0) {
-      return {
-        data: JSON.stringify({ messages: localData, pendingMsgs: pendingData }),
-      }
+      return { data: '' }
     }
 
     if (!hasLocalData) {
@@ -502,7 +471,7 @@ async function fetchAndStoreChatData(
     console.log('🚨[GET][Chat items]:', error)
   }
 
-  return { data: JSON.stringify({ messages: [], pendingMsgs: [] }) }
+  return { data: '' }
 }
 
 export const dmApi = createApi({
@@ -576,11 +545,15 @@ export const dmApi = createApi({
           }
         })
 
-        console.log('✅[GET][Updated Read Items]:')
+        const pendingMsgs = getPendingDmDataForAccountToAddr(account, toAddr)
 
-        updateLocalDmDataForAccountToAddr(account, toAddr, newLocalData)
+        if (!pendingMsgs || pendingMsgs.length === 0) {
+          console.log('✅[GET][Updated Read Items]:')
 
-        return { data: JSON.stringify(newLocalData) }
+          updateLocalDmDataForAccountToAddr(account, toAddr, newLocalData)
+        }
+
+        return { data: '' }
       },
     }),
 

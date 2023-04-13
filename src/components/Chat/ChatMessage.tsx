@@ -7,6 +7,7 @@ import equal from 'fast-deep-equal/es6'
 import {
   getInboxDmDataForAccount,
   getInboxFrom,
+  getLocalDmDataForAccountToAddr,
   updateLocalDmDataForAccountToAddr,
   updateLocalInboxDataForAccount,
   updateQueryData,
@@ -133,11 +134,13 @@ const ChatMessage = ({
   account,
   msg,
   pending,
+  hasPendingMsgs,
 }: {
   context: (typeof CHAT_CONTEXT_TYPES)[number]
   account: string | undefined
   msg: MessageUIType
   pending?: boolean
+  hasPendingMsgs?: boolean
 }) => {
   const sender = msg?.fromaddr || msg?.fromAddr
   const { data: senderName } = useGetNameQuery(sender, {
@@ -240,22 +243,23 @@ const ChatMessage = ({
             updateQueryData(
               'getChatData',
               { account, toAddr: fromAddr },
-              (chatData) => {
-                const chatDataValue = JSON.parse(chatData)?.messages || []
+              () => {
+                const currentChatData =
+                  getLocalDmDataForAccountToAddr(account, fromAddr) || []
 
-                chatDataValue.forEach((dataMsg: MessageUIType, i: number) => {
+                currentChatData.forEach((dataMsg: MessageUIType, i: number) => {
                   if (dataMsg.Id === msg.Id) {
-                    chatDataValue[i] = { ...chatDataValue[i], read: true }
+                    currentChatData[i] = { ...currentChatData[i], read: true }
                   }
                 })
 
                 updateLocalDmDataForAccountToAddr(
                   account,
                   fromAddr,
-                  chatDataValue
+                  currentChatData
                 )
 
-                return JSON.stringify(chatDataValue)
+                return JSON.stringify(currentChatData)
               }
             )
           )
@@ -287,18 +291,26 @@ const ChatMessage = ({
           console.error('🚨[PUT][Message]:', error)
         })
     }
-  }, [msg])
+  }, [msg, account, fromAddr, dispatch])
 
   useEffect(() => {
     if (
       context === 'dm' &&
       isInViewport &&
       msg?.read === false &&
-      !msgSentByMe
+      !msgSentByMe &&
+      !hasPendingMsgs
     ) {
       setMessageAsRead()
     }
-  }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
+  }, [
+    context,
+    hasPendingMsgs,
+    isInViewport,
+    msg,
+    msgSentByMe,
+    setMessageAsRead,
+  ])
 
   return (
     <Flex

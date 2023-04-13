@@ -2,7 +2,6 @@ import { Box, Flex, Spinner } from '@chakra-ui/react'
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { createSelector } from '@reduxjs/toolkit'
-import { useAppSelector } from '@/hooks/useSelector'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { POLLING_QUERY_OPTS } from '@/constants'
 import { ChatMessageType } from '@/types/Message'
@@ -14,7 +13,7 @@ import {
   getLocalDmDataForAccountToAddr,
   useGetReadChatItemsQuery,
   decryptDMMessages,
-  selectEncryptedDmIds,
+  getPendingDmDataForAccountToAddr,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
 import { getSupportWallet } from '@/helpers/widget'
@@ -49,7 +48,6 @@ const DMByAddress = ({ account }: { account: string }) => {
     ENV.REACT_APP_SUPPORT_HEADER ||
     'We welcome all feedback and bug reports. Thank you! 😊'
 
-  const bodyRef = React.useRef<any>(null)
   const maxPages = React.useRef(1)
 
   const selectorPageRef = React.useRef<number>(1)
@@ -58,7 +56,6 @@ const DMByAddress = ({ account }: { account: string }) => {
   )
 
   const layoutPageRef = React.useRef<number>(selectorPage)
-  const fullChatData = React.useRef<undefined | ChatMessageType[]>()
   const prevLastMsg = React.useRef<string | undefined>()
   const topMostItem = React.useRef<number>()
   const prevTopMostItem = React.useRef(topMostItem.current)
@@ -68,27 +65,25 @@ const DMByAddress = ({ account }: { account: string }) => {
 
   const { address: toAddr = '' } = useParams()
 
-  const encryptedDms = useAppSelector((state) =>
-    selectEncryptedDmIds(state, account, toAddr)
-  )
-
   const selectChatDataForPage = React.useMemo(
     () =>
       createSelector(
-        (chatData: {
-          messages: ChatMessageType[]
-          pendingMsgs: ChatMessageType[]
-        }) => chatData,
+        (chatData: { messages: ChatMessageType[] }) => chatData,
         (chatData) => {
-          if (!chatData?.messages) return chatData?.messages
+          if (!chatData?.messages) return null
 
-          const decryptedAndPendingChats = chatData.pendingMsgs
-            ? [...chatData.messages, ...chatData.pendingMsgs].sort(
-                (a, b) =>
-                  new Date(a.timestamp).getTime() -
-                  new Date(b.timestamp).getTime()
-              )
-            : chatData.messages
+          const decryptedAndPendingChats =
+            getPendingDmDataForAccountToAddr(account, toAddr) &&
+            getLocalDmDataForAccountToAddr(account, toAddr)
+              ? [
+                  ...getLocalDmDataForAccountToAddr(account, toAddr),
+                  ...getPendingDmDataForAccountToAddr(account, toAddr),
+                ].sort(
+                  (a, b) =>
+                    new Date(a.timestamp).getTime() -
+                    new Date(b.timestamp).getTime()
+                )
+              : chatData.messages
 
           if (decryptedAndPendingChats.length <= PAGE_SIZE) {
             return JSON.stringify(decryptedAndPendingChats)
@@ -113,14 +108,10 @@ const DMByAddress = ({ account }: { account: string }) => {
           return JSON.stringify(currentDataForPage)
         }
       ),
-    [selectorPage]
+    [account, toAddr, selectorPage]
   )
 
-  // for effect deps, makes sure it won't re-calculate many times even with the same value
-  // so it will only retry when the array changes like removing some
-  const encryptedDmsStr = encryptedDms && JSON.stringify(encryptedDms)
-
-  const { currentData: fetchedData, pendingMsgs } = useGetChatDataQuery(
+  const { currentData: fetchedData } = useGetChatDataQuery(
     { account, toAddr },
     {
       ...POLLING_QUERY_OPTS,
@@ -128,14 +119,12 @@ const DMByAddress = ({ account }: { account: string }) => {
         const cachedData = getLocalDmDataForAccountToAddr(account, toAddr)
         const currentData =
           options.currentData && JSON.parse(options.currentData)
-        fullChatData.current = currentData
 
         return {
           ...options,
           currentData: selectChatDataForPage(
             currentData || { messages: cachedData }
           ),
-          pendingMsgs: currentData?.pendingMsgs || [],
         }
       },
     }
@@ -165,41 +154,63 @@ const DMByAddress = ({ account }: { account: string }) => {
     [account]
   )
 
-  React.useEffect(() => {
-    const bodyElem = bodyRef.current
+  const infiniteScrollRef = React.useCallback(
+    (node) => {
+      if (node) {
+        const autoScrollPagination = () => {
+          const scrollThreshold = 200
+          const scrollTop = node.scrollTop || 0
 
-    if (bodyElem) {
-      const autoScrollPagination = () => {
-        const scrollThreshold = 200
-        const scrollTop = bodyElem.scrollTop || 0
+          if (scrollTop <= scrollThreshold) {
+            if (
+              layoutPageRef.current < maxPages.current &&
+              layoutPageRef.current === selectorPageRef.current
+            ) {
+              shouldScrollBack.current = true
+              selectorPageRef.current += 1
+              setSelectorPage(selectorPageRef.current)
 
-        if (scrollTop <= scrollThreshold) {
-          if (
-            layoutPageRef.current < maxPages.current &&
-            layoutPageRef.current === selectorPageRef.current
-          ) {
-            shouldScrollBack.current = true
-            selectorPageRef.current += 1
-            setSelectorPage(selectorPageRef.current)
-            decryptDMMessages(
-              pendingMsgs.slice(selectorPageRef.current * PAGE_SIZE),
-              account,
-              dispatch
-            )
+              const pendingMessages = getPendingDmDataForAccountToAddr(
+                account,
+                toAddr
+              )
+
+              if (pendingMessages.length > 0) {
+                decryptDMMessages(pendingMessages, account, dispatch)
+              }
+            }
+          } else {
+            // On any other scroll movement that is not in the direction of
+            // pagination, we should reset behavior to scroll back to the last message
+            // to avoid overtaking the user's scroll position
+            shouldScrollBack.current = false
           }
-        } else {
-          // On any other scroll movement that is not in the direction of
-          // pagination, we should reset behavior to scroll back to the last message
-          // to avoid overtaking the user's scroll position
-          shouldScrollBack.current = false
         }
+
+        node.addEventListener('scroll', autoScrollPagination)
+
+        return () => node.removeEventListener('scroll', autoScrollPagination)
       }
+    },
+    [account, dispatch, selectorPageRef, toAddr]
+  )
 
-      bodyElem.addEventListener('scroll', autoScrollPagination)
+  React.useEffect(() => {
+    if (account && toAddr) {
+      const pendingMessages = getPendingDmDataForAccountToAddr(account, toAddr)
 
-      return () => bodyElem.removeEventListener('scroll', autoScrollPagination)
+      if (pendingMessages?.length > 0)
+        decryptDMMessages(pendingMessages, account, dispatch)
     }
-  }, [account, dispatch, pendingMsgs, selectorPageRef, toAddr])
+  }, [account, toAddr, dispatch])
+
+  React.useEffect(() => {
+    selectorPageRef.current = 1
+
+    return () => {
+      selectorPageRef.current = 1
+    }
+  }, [account, toAddr])
 
   useGetReadChatItemsQuery({ account, toAddr }, POLLING_QUERY_OPTS)
 
@@ -231,7 +242,7 @@ const DMByAddress = ({ account }: { account: string }) => {
     <Flex background='white' flexDirection='column' flex='1'>
       <DMHeader />
 
-      <DottedBackground ref={bodyRef} className='custom-scrollbar'>
+      <DottedBackground ref={infiniteScrollRef} className='custom-scrollbar'>
         {toAddr.toLocaleLowerCase() === getSupportWallet() && (
           <AlertBubble color='green'>{supportHeader}</AlertBubble>
         )}
@@ -241,6 +252,7 @@ const DMByAddress = ({ account }: { account: string }) => {
           const isFirst = i === 0
           const msgId = msg.Id
           const key = `${String(i)}_${msg.Id}`
+          const pendingMsgs = getPendingDmDataForAccountToAddr(account, toAddr)
           const decryptionPending = pendingMsgs?.some(
             (pendingMsg: any) => pendingMsg.Id === msgId
           )
@@ -258,6 +270,7 @@ const DMByAddress = ({ account }: { account: string }) => {
             <Box key={key} ref={ref}>
               <ChatMessage
                 pending={decryptionPending}
+                hasPendingMsgs={pendingMsgs?.length > 1}
                 context='dm'
                 account={account}
                 msg={msg}
