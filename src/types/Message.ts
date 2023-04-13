@@ -24,10 +24,12 @@ export interface ChatMessageType {
   lit_access_conditions: string
 }
 
+export type InboxContextTypes = 'dm' | 'community' | 'nft'
+
 export interface InboxMessageType extends ChatMessageType {
   unread: number
   type: string
-  context_type: string
+  context_type: InboxContextTypes
   name: string
   logo: string
   chain: string

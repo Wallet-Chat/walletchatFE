@@ -57,121 +57,159 @@ export function updateLocalEncDmIdsByAddrByAcc(
   })
 }
 
-export async function decryptMessage(
-  messages: ChatMessageType[] | InboxMessageType[],
+function litDecryptionForMessages(
   account: string,
-  dispatch: any,
-  methodName: 'getChatData' | 'getInbox'
+  messages: ChatMessageType[] | InboxMessageType[],
+  count: number,
+  cb: (i: number) => (litResponse?: { decryptedFile?: string }) => void
+) {
+  // Get data from LIT and replace the message with the decrypted text
+  for (let i = 0; i < count; i += 1) {
+    let shouldBreak
+
+    const currentMessage = messages[i]
+
+    if (currentMessage.encrypted_sym_lit_key) {
+      // only needed for mixed DB with plain and encrypted data
+      const accessControlConditions = JSON.parse(
+        currentMessage.lit_access_conditions
+      )
+
+      Lit.decryptString(
+        account,
+        Lit.b64toBlob(currentMessage.message),
+        currentMessage.encrypted_sym_lit_key,
+        // after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
+        // this is done to support legacy messages (new databases wouldn't need this)
+        !String(currentMessage.lit_access_conditions).includes('evmBasic')
+          ? { accessControlConditions }
+          : { unifiedAccessControlConditions: accessControlConditions }
+      )
+        .then(cb(i))
+        .catch(() => {
+          console.log(1000, currentMessage)
+          // const messagesLeft = messages.slice(i)
+
+          // setTimeout(
+          //   () =>
+          //     litDecryptionForMessages(
+          //       account,
+          //       messagesLeft,
+          //       messagesLeft.length,
+          //       cb
+          //     ),
+          //   1000 * 5
+          // )
+
+          // shouldBreak = true
+        })
+
+      if (shouldBreak) break
+    }
+  }
+}
+
+export async function decryptInboxMessages(
+  messages: InboxMessageType[],
+  account: string,
+  dispatch: any
+) {
+  const decryptedMessages: InboxMessageType[] = []
+
+  const getDecryptionResult =
+    (i: number) => (litResponse?: { decryptedFile?: string }) => {
+      const message = litResponse?.decryptedFile?.toString()
+
+      if (message) {
+        decryptedMessages[i] = { ...messages[i], message }
+        const newInboxValue = decryptedMessages[i]
+
+        console.log('✅[POST][Decrypted DM]: ', newInboxValue)
+
+        dispatch(
+          updateQueryData('getInbox', account, () => {
+            addLocalInboxDataForAccount(account, newInboxValue)
+            const newInboxData = getInboxDmDataForAccount(account)
+            const inboxDms = getAllInboxDmMessagesForAccount(account)
+
+            const pendingMsgs = messages.filter(
+              (msg) => !inboxDms.some((chat) => chat.Id === msg.Id)
+            )
+
+            return JSON.stringify({
+              ...newInboxData,
+              pendingMsgs,
+            })
+          })
+        )
+      }
+    }
+
+  console.log('ℹ️[POST][Decrypt DMs Begin]')
+
+  litDecryptionForMessages(
+    account,
+    messages,
+    messages.length,
+    getDecryptionResult
+  )
+}
+
+export async function decryptDMMessages(
+  messages: ChatMessageType[],
+  account: string,
+  dispatch: any
 ) {
   // Reverse it so newer messages are decrypted first
   messages.reverse()
+
   const decryptedMessages: ChatMessageType[] = []
-  const failedDecryptMsgIds: number[] = []
   const toAddr = getMessageToAddr(account, messages[0])
 
-  const addFailedDecryptMsg = () => (i: number) =>
-    failedDecryptMsgIds.push(messages[i].Id)
-
   const getDecryptionResult =
-    (i: number) =>
-    ({ decryptedFile }: { decryptedFile?: string }) => {
-      const message = decryptedFile?.toString()
+    (i: number) => (litResponse?: { decryptedFile?: string }) => {
+      const message = litResponse?.decryptedFile?.toString()
 
       if (message) {
         decryptedMessages[i] = { ...messages[i], message }
         console.log('✅[POST][Decrypted DM]: ', message)
 
-        if (methodName === 'getChatData') {
-          dispatch(
-            updateQueryData(methodName, { account, toAddr }, (chatData) => {
-              const chatDataValue = JSON.parse(chatData)?.messages || []
+        dispatch(
+          updateQueryData('getChatData', { account, toAddr }, (chatData) => {
+            const chatDataValue = JSON.parse(chatData)?.messages || []
 
-              const index = chatDataValue.findIndex(
-                (msg: ChatMessageType) => msg.Id === decryptedMessages[i].Id
-              )
+            const index = chatDataValue.findIndex(
+              (msg: ChatMessageType) => msg.Id === decryptedMessages[i].Id
+            )
 
-              if (index >= 0) {
-                chatDataValue[index] = decryptedMessages[i]
-              } else {
-                chatDataValue.push(decryptedMessages[i])
-              }
+            if (index >= 0) {
+              chatDataValue[index] = decryptedMessages[i]
+            } else {
+              chatDataValue.push(decryptedMessages[i])
+            }
 
-              const pendingMsgs = messages.filter(
-                (msg) => !chatDataValue.some((chat: any) => chat.Id === msg.Id)
-              )
+            const pendingMsgs = messages.filter(
+              (msg) => !chatDataValue.some((chat: any) => chat.Id === msg.Id)
+            )
 
-              updatePendingDmDataForAccountToAddr(account, toAddr, pendingMsgs)
-              updateLocalDmDataForAccountToAddr(account, toAddr, chatDataValue)
-              return JSON.stringify({ messages: chatDataValue, pendingMsgs })
-            })
-          )
-        } else if (methodName === 'getInbox') {
-          dispatch(
-            updateQueryData(methodName, account, () => {
-              updateLocalInboxDataForAccount(account, [
-                decryptedMessages[i] as InboxMessageType,
-              ])
+            updatePendingDmDataForAccountToAddr(account, toAddr, pendingMsgs)
+            updateLocalDmDataForAccountToAddr(account, toAddr, chatDataValue)
 
-              const newInboxData = getInboxDmDataForAccount(account)
-              // const pendingMsgs = messages.filter(
-              //   (msg) => !newInboxData.some((chat: any) => chat.Id === msg.Id)
-              // )
-
-              return JSON.stringify({
-                ...newInboxData,
-                // pendingMsgs,
-              })
-            })
-          )
-        }
-      } else {
-        addFailedDecryptMsg()(i)
+            return JSON.stringify({ messages: chatDataValue, pendingMsgs })
+          })
+        )
       }
     }
 
   const amountToDecrypt =
     messages.length > PAGE_SIZE ? PAGE_SIZE : messages.length
 
-  // Get data from LIT and replace the message with the decrypted text
-  for (let i = 0; i < amountToDecrypt; i += 1) {
-    if (i === 0) console.log('ℹ️[POST][Decrypt DMs Begin]')
-
-    if (messages[i].encrypted_sym_lit_key) {
-      // only needed for mixed DB with plain and encrypted data
-      const accessControlConditions = JSON.parse(
-        messages[i].lit_access_conditions
-      )
-
-      // after change to include SC conditions, we had to change LIT accessControlConditions to UnifiedAccessControlConditions
-      // this is done to support legacy messages (new databases wouldn't need this)
-      if (String(messages[i].lit_access_conditions).includes('evmBasic')) {
-        Lit.decryptString(
-          account,
-          Lit.b64toBlob(messages[i].message),
-          messages[i].encrypted_sym_lit_key,
-          accessControlConditions
-        )
-          .then(getDecryptionResult(i))
-          .catch(addFailedDecryptMsg)
-      } else {
-        Lit.decryptStringOrig(
-          account,
-          Lit.b64toBlob(messages[i].message),
-          messages[i].encrypted_sym_lit_key,
-          accessControlConditions
-        )
-          .then(getDecryptionResult(i))
-          .catch(addFailedDecryptMsg)
-      }
-    }
-  }
-
-  updateLocalEncDmIdsByAddrByAcc(account, toAddr, failedDecryptMsgIds)
-
-  return {
-    fetchedMessages: decryptedMessages,
-    failedDecryptMsgs: failedDecryptMsgIds,
-  }
+  litDecryptionForMessages(
+    account,
+    messages,
+    amountToDecrypt,
+    getDecryptionResult
+  )
 }
 
 export function getPendingDmDataForAccountToAddr(
@@ -266,15 +304,24 @@ function getMessageToAddr(
   account: string,
   msg: ChatMessageType | InboxMessageType
 ) {
-  return msg.fromaddr.toLocaleLowerCase() === account.toLocaleLowerCase()
-    ? msg.toaddr
-    : msg.fromaddr
+  return (
+    msg &&
+    (msg.fromaddr.toLocaleLowerCase() === account.toLocaleLowerCase()
+      ? msg.toaddr
+      : msg.fromaddr)
+  )
 }
 
 interface InboxStore {
   [context: string]: {
     [from: string]: InboxMessageType
   }
+}
+
+export function getAllInboxDmMessagesForAccount(account: string) {
+  const localInboxData = getInboxDmDataForAccount(account)
+  const dms = localInboxData.dm
+  return Object.values(dms)
 }
 
 export function getInboxDmDataForAccount(account: string) {
@@ -300,6 +347,24 @@ export function getInboxFrom(account: string, item: InboxMessageType) {
     ? item.nftaddr
     : getMessageToAddr(account, item)
   return fromValue
+}
+
+export function addLocalInboxDataForAccount(
+  account: string,
+  newInboxMessage: InboxMessageType
+) {
+  const localInboxData = getInboxDmDataForAccount(account)
+  const inboxDataForContext = localInboxData[newInboxMessage.context_type]
+
+  storage.set(STORAGE_KEYS.INBOX_DATA, {
+    [account.toLocaleLowerCase()]: {
+      ...localInboxData,
+      [newInboxMessage.context_type]: {
+        ...inboxDataForContext,
+        [getInboxFrom(account, newInboxMessage)]: newInboxMessage,
+      },
+    },
+  })
 }
 
 export function updateLocalInboxDataForAccount(
@@ -432,25 +497,12 @@ async function fetchAndStoreChatData(
       console.log('✅[GET][New Chat items]')
     }
 
-    const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
-      data,
-      account,
-      dispatch,
-      'getChatData'
-    )
-
-    dispatch(addEncryptedDmIds({ account, toAddr, data: failedDecryptMsgs }))
-
-    const allChats = localData.concat(fetchedMessages)
-
-    // store so when user switches views, data is ready
-    addLocalDmDataForAccountToAddr(account, toAddr, fetchedMessages)
-
-    return { data: JSON.stringify({ messages: allChats }) }
+    await decryptDMMessages(data, account, dispatch)
   } catch (error) {
     console.log('🚨[GET][Chat items]:', error)
-    return { data: '' }
   }
+
+  return { data: JSON.stringify({ messages: [], pendingMsgs: [] }) }
 }
 
 export const dmApi = createApi({
@@ -496,7 +548,7 @@ export const dmApi = createApi({
 
     // TODO -- only call if all messages not yet read.
     getReadChatItems: builder.query({
-      queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
+      queryFn: async (queryArgs, api, extraOptions, fetchWithBQ) => {
         const { account, toAddr } = queryArgs
 
         const newLocalData = [
@@ -561,41 +613,52 @@ export const dmApi = createApi({
           const storedInboxData = getInboxDmDataForAccount(account)
           const newDms: InboxMessageType[] = []
 
-          const newInboxData = data.filter((inboxItem) => {
-            if (!storedInboxData[inboxItem.context_type]) return true
+          const newDecryptedMessages = data.filter((inboxItem) => {
+            if (inboxItem.toaddr.endsWith('.eth')) return true
 
             const currentInbox =
               storedInboxData[inboxItem.context_type][
                 getInboxFrom(account, inboxItem)
               ]
 
-            if (!currentInbox || inboxItem.timestamp > currentInbox.timestamp) {
+            if (
+              !currentInbox ||
+              new Date(inboxItem.timestamp).getTime() >
+                new Date(currentInbox.timestamp).getTime()
+            ) {
               if (inboxItem.context_type === 'dm') {
                 newDms.push(inboxItem)
+                return false
               }
 
               return true
             }
+
+            return false
           })
 
-          if (newInboxData.length > 0) {
-            console.log('✅[GET][Inbox]:', data)
+          // DM inbox messages -> go to the decryption queue
+          if (newDms.length > 0) {
+            console.log('✅[GET][New Inbox Encrypted DMs]:', newDms)
 
-            if (newDms.length > 0) {
-              await decryptMessage(newInboxData, account, dispatch, 'getInbox')
-            }
-
-            updateLocalInboxDataForAccount(account, newInboxData)
-            return {
-              data: JSON.stringify(getInboxDmDataForAccount(account)),
-            }
+            await decryptInboxMessages(newDms, account, dispatch)
           }
 
-          return { data: '' }
+          // Other inbox messages -> update local inbox data
+          if (newDecryptedMessages.length > 0) {
+            console.log(
+              '✅[GET][New Plain Text Inbox Messages]:',
+              newDecryptedMessages
+            )
+
+            updateLocalInboxDataForAccount(account, newDecryptedMessages)
+            return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
+          }
         } catch (error) {
           console.log('🚨[GET][Inbox]:', error)
-          return { data: '' }
         }
+
+        return { data: '' }
       },
     }),
   }),

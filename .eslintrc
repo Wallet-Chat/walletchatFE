@@ -1,13 +1,11 @@
 {
+  "root": true,
   "env": {
     "node": true,
     "browser": true,
     "es2021": true
   },
   "extends": [
-    "airbnb",
-    "airbnb-typescript",
-    "airbnb/hooks",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
@@ -21,10 +19,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": [
-    "react",
-    "@typescript-eslint"
-  ],
+  "plugins": ["import", "react", "react-hooks", "@typescript-eslint"],
   "rules": {
     "react/react-in-jsx-scope": 0,
     "react/function-component-definition": 0,
@@ -48,9 +43,7 @@
       "error",
       {
         "props": true,
-        "ignorePropertyModificationsFor": [
-          "state"
-        ]
+        "ignorePropertyModificationsFor": ["state"]
       }
     ],
     "consistent-return": 0,

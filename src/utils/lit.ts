@@ -1,13 +1,16 @@
-import * as LitJsSdk from 'lit-js-sdk'
+import * as LitJsSdk from '@lit-protocol/lit-node-client'
+import * as Types from '@lit-protocol/types'
 import storage from './extension-storage'
 import { getAuthSig } from '@/helpers/lit'
 
 const chain = 'ethereum'
 
+export type AuthSig = Types.AuthSig
+
 class Lit {
   litNodeClient: LitJsSdk.LitNodeClient | null = null
 
-  authSig: any | undefined = undefined
+  authSig: AuthSig | undefined = undefined
 
   setAuthSig(account: string) {
     const authSig = getAuthSig(account)
@@ -27,7 +30,7 @@ class Lit {
   }
 
   async disconnect() {
-    LitJsSdk.disconnectWeb3()
+    LitJsSdk.ethConnect.disconnectWeb3()
     this.litNodeClient = null
     this.authSig = undefined
   }
@@ -65,9 +68,13 @@ class Lit {
 
   async decryptString(
     account: string,
-    encryptedStr: any,
-    encryptedSymmetricKey: any,
-    unifiedAccessControlConditions: any
+    encryptedStr: Blob,
+    encryptedSymmetricKey: string,
+    // when delegate.cash was added, the contract call condition changed the access control condition type
+    // this is here to support legacy messages
+    accessControlConditions:
+      | { accessControlConditions: any }
+      | { unifiedAccessControlConditions: any }
   ) {
     if (!this.litNodeClient) {
       await this.connectManual()
@@ -77,48 +84,21 @@ class Lit {
       this.setAuthSig(account)
     }
 
-    const symmetricKey: any = await this.litNodeClient?.getEncryptionKey({
-      unifiedAccessControlConditions,
+    const symmetricKey = await this.litNodeClient?.getEncryptionKey({
+      ...accessControlConditions,
       toDecrypt: encryptedSymmetricKey,
       chain,
       authSig: this.authSig,
     })
-    const decryptedFile = await LitJsSdk.decryptString(
-      encryptedStr,
-      symmetricKey
-    )
 
-    return { decryptedFile }
-  }
+    if (symmetricKey) {
+      const decryptedFile = await LitJsSdk.decryptString(
+        encryptedStr,
+        symmetricKey
+      )
 
-  // when delegate.cash was added, the contract call condition changed the access control condition type
-  // this is here to support legacy messages
-  async decryptStringOrig(
-    account: string,
-    encryptedStr: any,
-    encryptedSymmetricKey: any,
-    _accessControlConditions: any
-  ) {
-    if (!this.litNodeClient) {
-      await this.connectManual()
+      return { decryptedFile }
     }
-
-    if (!this.authSig) {
-      this.setAuthSig(account)
-    }
-
-    const symmetricKey: any = await this.litNodeClient?.getEncryptionKey({
-      accessControlConditions: _accessControlConditions,
-      toDecrypt: encryptedSymmetricKey,
-      chain,
-      authSig: this.authSig,
-    })
-    const decryptedFile = await LitJsSdk.decryptString(
-      encryptedStr,
-      symmetricKey
-    )
-
-    return { decryptedFile }
   }
 
   /**

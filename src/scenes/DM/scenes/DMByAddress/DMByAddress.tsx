@@ -13,10 +13,7 @@ import {
   useGetChatDataQuery,
   getLocalDmDataForAccountToAddr,
   useGetReadChatItemsQuery,
-  decryptMessage,
-  addEncryptedDmIds,
-  updateLocalDmDataForAccountToAddr,
-  updateQueryData,
+  decryptDMMessages,
   selectEncryptedDmIds,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
@@ -184,11 +181,10 @@ const DMByAddress = ({ account }: { account: string }) => {
             shouldScrollBack.current = true
             selectorPageRef.current += 1
             setSelectorPage(selectorPageRef.current)
-            decryptMessage(
+            decryptDMMessages(
               pendingMsgs.slice(selectorPageRef.current * PAGE_SIZE),
               account,
-              dispatch,
-              'getChatData'
+              dispatch
             )
           }
         } else {
@@ -206,44 +202,6 @@ const DMByAddress = ({ account }: { account: string }) => {
   }, [account, dispatch, pendingMsgs, selectorPageRef, toAddr])
 
   useGetReadChatItemsQuery({ account, toAddr }, POLLING_QUERY_OPTS)
-
-  React.useEffect(() => {
-    const newEncryptedDms = encryptedDmsStr && JSON.parse(encryptedDmsStr)
-    const allDms = fullChatData.current
-
-    if (allDms && newEncryptedDms && newEncryptedDms.length > 0) {
-      const retryFailed = async () => {
-        const newChatData = allDms || []
-        const failedDms = newChatData.filter((msg: ChatMessageType) =>
-          newEncryptedDms.includes(msg.Id)
-        )
-
-        const { fetchedMessages, failedDecryptMsgs } = await decryptMessage(
-          failedDms,
-          account
-        )
-
-        fetchedMessages.forEach((msg: ChatMessageType) => {
-          newChatData[
-            newChatData.findIndex((dm: ChatMessageType) => dm.Id === msg.Id)
-          ] = msg
-        })
-
-        updateLocalDmDataForAccountToAddr(account, toAddr, newChatData)
-
-        dispatch(
-          updateQueryData('getChatData', { account, toAddr }, () =>
-            JSON.stringify({ messages: newChatData })
-          )
-        )
-        dispatch(
-          addEncryptedDmIds({ account, toAddr, data: failedDecryptMsgs })
-        )
-      }
-
-      retryFailed()
-    }
-  }, [dispatch, encryptedDmsStr, account, toAddr])
 
   const scrollIntoViewCb = React.useCallback(
     (node) => shouldScrollBack.current && node?.scrollIntoView(),
