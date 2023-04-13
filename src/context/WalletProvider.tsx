@@ -209,10 +209,11 @@ const WalletProviderContext = () => {
   )
 
   React.useEffect(() => {
-    setAuthenticated(accountAuthenticated)
+    if (accountAuthenticated) setAuthenticated(accountAuthenticated)
 
-    if (typeof initialJwt === 'string') {
+    if (storage.get('app-version') !== '3.0.1') {
       localStorage.clear()
+      storage.set('app-version', '3.0.1')
       window.location.reload()
     }
   }, [initialJwt, accountAuthenticated])

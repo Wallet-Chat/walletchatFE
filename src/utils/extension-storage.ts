@@ -9,6 +9,7 @@ export type StoreKeys =
   | 'lit-auth-signature'
   | 'lit-auth-signature-by-account'
   | 'current-widget-provider'
+  | 'app-version'
 
 const storage = {
   set: (key: StoreKeys, data: any) => {
