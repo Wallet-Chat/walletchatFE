@@ -10,6 +10,7 @@ import {
   updateQueryData,
   updateLocalDmDataForAccountToAddr,
   addLocalDmDataForAccountToAddr,
+  getLocalDmDataForAccountToAddr,
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
@@ -28,29 +29,31 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
-      updateQueryData('getChatData', { account, toAddr }, (chatData) => {
-        const chatDataValue = JSON.parse(chatData)?.messages || []
-        chatDataValue.push(newMessage)
+      updateQueryData('getChatData', { account, toAddr }, () => {
+        const currentChatData =
+          getLocalDmDataForAccountToAddr(account, toAddr) || []
+        currentChatData.push(newMessage)
         addLocalDmDataForAccountToAddr(account, toAddr, newMessage)
-        return JSON.stringify({ messages: chatDataValue })
+        return JSON.stringify({ messages: currentChatData })
       })
     )
 
   const updateSentMessage = (message: ChatMessageType, timestamp: string) =>
     dispatch(
-      updateQueryData('getChatData', { account, toAddr }, (chatData) => {
-        const chatDataValue = JSON.parse(chatData)?.messages || []
+      updateQueryData('getChatData', { account, toAddr }, () => {
+        const currentChatData =
+          getLocalDmDataForAccountToAddr(account, toAddr) || []
 
-        const index = chatDataValue.findIndex(
+        const index = currentChatData.findIndex(
           (chat: ChatMessageType) => chat.timestamp === timestamp
         )
-        chatDataValue[index] = {
+        currentChatData[index] = {
           ...message,
-          message: chatDataValue[index].message,
+          message: currentChatData[index].message,
         }
 
-        updateLocalDmDataForAccountToAddr(account, toAddr, chatDataValue)
-        return JSON.stringify({ messages: chatDataValue })
+        updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData)
+        return JSON.stringify({ messages: currentChatData })
       })
     )
 
