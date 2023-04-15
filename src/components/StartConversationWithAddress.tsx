@@ -40,6 +40,26 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
          const _addr = await provider.resolveName(address)
          setResolvedAddr(_addr)
          setIsResolvingENS(false)
+      } else if (address.includes(".bnb")) {
+         setIsResolvingENS(true)
+
+         fetch(
+            `https://api.prd.space.id/v1/getAddress?tld=bnb&domain=${address}`,
+            {
+               method: 'GET',
+            }
+         )
+            .then((response) => response.json())
+            .then((result) => {
+               console.log(`✅[GET][.BNB Name Owned by ${address}]]:`, result)
+               if (result?.address?.length > 0) {
+                  setResolvedAddr(result.address)
+               }
+            })
+            .catch((error) =>
+               console.log(`🚨[GET][BNB Owned by ${address}`, error)
+            )
+         setIsResolvingENS(false)
       }
    }
 
