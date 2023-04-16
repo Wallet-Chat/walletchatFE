@@ -174,18 +174,18 @@ const EnterName = ({ account }: { account: string }) => {
          fetch(
             ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/name`,
             {
-            method: 'POST',
+               method: 'POST',
                credentials: 'include',
-            headers: {
-               'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-            },
-            body: JSON.stringify({
-               name: values.name,
-               address: account,
-               signupsite: document.referrer,
-               domain: document.domain
-            }),
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               },
+               body: JSON.stringify({
+                  name: values.name,
+                  address: account,
+                  signupsite: document.referrer,
+                  domain: document.domain
+               }),
             }
          )
             .then((response) => response.json())

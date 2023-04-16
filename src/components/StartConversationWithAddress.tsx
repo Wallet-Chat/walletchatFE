@@ -35,31 +35,30 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    }
 
    const checkENS = async (address: string) => {
-      if (address.includes(".eth")) {
-         setIsResolvingENS(true)
-         const _addr = await provider.resolveName(address)
-         setResolvedAddr(_addr)
-         setIsResolvingENS(false)
-      } else if (address.includes(".bnb")) {
+       if (address.includes(".eth") || address.includes(".bnb")) {
          setIsResolvingENS(true)
 
-         fetch(
-            `https://api.prd.space.id/v1/getAddress?tld=bnb&domain=${address}`,
-            {
-               method: 'GET',
-            }
-         )
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/resolve_name/${address}`, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
             .then((response) => response.json())
             .then((result) => {
-               console.log(`✅[GET][.BNB Name Owned by ${address}]]:`, result)
+               console.log(`✅[GET][Name Owned by ${address}]]:`, result)
                if (result?.address?.length > 0) {
                   setResolvedAddr(result.address)
                }
             })
             .catch((error) =>
-               console.log(`🚨[GET][BNB Owned by ${address}`, error)
+               console.log(`🚨[GET][Owned by ${address}`, error)
             )
-         setIsResolvingENS(false)
+            .finally(() => {
+               setIsResolvingENS(false)
+            })
       }
    }
 
@@ -105,7 +104,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                </Link>
             )}
             {isResolvingENS && <Spinner size="sm" mt={2} />}
-            {toAddr.includes(".eth") && resolvedAddr && !isResolvingENS && (
+            {(toAddr.includes(".eth") || toAddr.includes(".bnb")) && resolvedAddr && !isResolvingENS && (
                <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"

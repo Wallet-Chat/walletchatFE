@@ -48,7 +48,10 @@ const VerifyEmail = ({ account }: { account: string }) => {
    const [isVerifySuccess, setIsVerifySuccess] = useState(false)
    const callVerifyEmail = () => {
       fetch(` ${process.env.REACT_APP_REST_API}/verify_email/${verificationemail}/${verificationcode}`, {
-         method: 'GET'
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         },
       })
          .then((response) => response.json())
          .then((response) => {
