@@ -38,11 +38,30 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    }
 
    const checkENS = async (address: string) => {
-      if (address.includes(".eth")) {
+       if (address.includes(".eth") || address.includes(".bnb")) {
          setIsResolvingENS(true)
-         const _addr = await provider.resolveName(address)
-         setResolvedAddr(_addr)
-         setIsResolvingENS(false)
+
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/resolve_name/${address}`, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+            .then((response) => response.json())
+            .then((result) => {
+               console.log(`✅[GET][Name Owned by ${address}]]:`, result)
+               if (result?.address?.length > 0) {
+                  setResolvedAddr(result.address)
+               }
+            })
+            .catch((error) =>
+               console.log(`🚨[GET][Owned by ${address}`, error)
+            )
+            .finally(() => {
+               setIsResolvingENS(false)
+            })
       }
    }
 
@@ -108,7 +127,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                </Link>
             )}
             {isResolvingENS && <Spinner size="sm" mt={2} />}
-            {toAddr.includes(".eth") && resolvedAddr && !isResolvingENS && (
+            {(toAddr.includes(".eth") || toAddr.includes(".bnb")) && resolvedAddr && !isResolvingENS && (
                <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
