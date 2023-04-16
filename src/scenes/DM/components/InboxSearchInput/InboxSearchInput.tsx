@@ -24,14 +24,31 @@ export default function InboxSearchInput() {
    const ref = useRef(null)
 
    const checkENS = async (address: string) => {
-      if (address.endsWith('.eth')) {
+      if (address.includes(".eth") || address.includes(".bnb")) {
          setIsResolvingENS(true)
-         const _addr = await provider.resolveName(address)
-         if (_addr) {
-            setResolvedAddr(_addr)
-            setIsSuggestionListOpen(true)
-         }
-         setIsResolvingENS(false)
+
+         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/resolve_name/${address}`, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+         })
+            .then((response) => response.json())
+            .then((result) => {
+               console.log(`✅[GET][Name Owned by ${address}]]:`, result)
+               if (result?.address?.length > 0) {
+                  setResolvedAddr(result.address)
+                  setIsSuggestionListOpen(true)
+               }
+            })
+            .catch((error) =>
+               console.log(`🚨[GET][Owned by ${address}`, error)
+            )
+            .finally(() => {
+               setIsResolvingENS(false)
+            })
       }
    }
 
@@ -52,7 +69,7 @@ export default function InboxSearchInput() {
    let suggestedAddress: string = toAddr
    if (web3.utils.isAddress(toAddr)) {
       suggestedAddress = toAddr
-   } else if (toAddr.endsWith('.eth') && resolvedAddr && !isResolvingENS) {
+   } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')) && resolvedAddr && !isResolvingENS) {
       suggestedAddress = resolvedAddr
    }
 
@@ -62,7 +79,7 @@ export default function InboxSearchInput() {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter ENS or address (0x.. or .eth) to chat"
+               placeholder="Enter ENS/BNB or address (0x.. or .eth) to chat"
                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setToAddr(e.target.value)
                }
@@ -124,10 +141,10 @@ export default function InboxSearchInput() {
                            scale={3}
                         />
                         <Text fontWeight="bold" fontSize="md" ml={2}>
-                           {toAddr.endsWith('.eth')
+                           {toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')
                               ? toAddr
                               : truncateAddress(toAddr)}{' '}
-                           {toAddr.endsWith('.eth') &&
+                           {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')) &&
                               `(${truncateAddress(suggestedAddress)})`}
                         </Text>
                      </Flex>
