@@ -42,6 +42,23 @@ export const REACT_APP_ORIGIN_NAME_GOODDOLLAR = import.meta.env
 
 // ------------------
 
+// --- NFT Demo ---
+
+// Community
+export const REACT_APP_DEFAULT_COMMUNITY_NFT_DEMO = import.meta.env
+  .VITE_REACT_APP_DEFAULT_COMMUNITY_NFT_DEMO
+// Support Wallet
+export const REACT_APP_SUPPORT_WALLET_NFT_DEMO = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_NFT_DEMO
+// App Url
+export const REACT_APP_APP_URL_NFT_DEMO = import.meta.env
+  .VITE_REACT_APP_APP_URL_NFT_DEMO
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_NFT_DEMO = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_NFT_DEMO
+
+// ------------------
+
 export const REACT_APP_DEFAULT_COMMUNITY_LOCALHOST = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY_LOCALHOST
 export const REACT_APP_SUPPORT_WALLET_LOCALHOST = import.meta.env

@@ -40,6 +40,10 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_GOODDOLLAR'
   }
 
+  if (currentWidgetOrigin.toLowerCase().includes('nft.walletchat.fun')) {
+    return '_NFT_DEMO'
+  }
+
   return null
 }
 
