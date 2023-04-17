@@ -52,6 +52,7 @@ export const { chains, provider } = configureChains(
 )
 
 const APP_NAME = 'WalletChat'
+const APP_VERSION = '3.0.2'
 
 export const { connectors } = getDefaultWallets({
   appName: APP_NAME,
@@ -217,9 +218,9 @@ const WalletProviderContext = () => {
   React.useEffect(() => {
     dispatch(setIsAuthenticated(accountAuthenticated))
 
-    if (storage.get('app-version') !== '3.0.1') {
+    if (storage.get('app-version') !== APP_VERSION) {
       localStorage.clear()
-      storage.set('app-version', '3.0.1')
+      storage.set('app-version', APP_VERSION)
       window.location.reload()
     }
   }, [dispatch, initialJwt, accountAuthenticated])
