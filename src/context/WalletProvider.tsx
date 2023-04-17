@@ -21,6 +21,7 @@ import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLega
 
 import { mainnet, polygon, optimism, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
+import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
 
 import { API } from 'react-wallet-chat/dist/src/types'
@@ -46,9 +47,13 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 
-export const { chains, provider } = configureChains(
-  [mainnet, polygon, optimism, celo],
-  [infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }), publicProvider()]
+export const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet, polygon, optimism],
+  [
+    infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
+    alchemyProvider({ apiKey: ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM }),
+    publicProvider(),
+  ]
 )
 
 const APP_NAME = 'WalletChat'

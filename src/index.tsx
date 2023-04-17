@@ -8,7 +8,12 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig } from 'wagmi'
 
 import { Provider } from 'react-redux'
-import { chains, provider, connectors } from '@/context/WalletProvider'
+import {
+  chains,
+  provider,
+  webSocketProvider,
+  connectors,
+} from '@/context/WalletProvider'
 import { App } from './App'
 import reportWebVitals from './reportWebVitals'
 // import * as serviceWorker from './serviceWorker'
@@ -16,12 +21,13 @@ import WalletProvider from './context/WalletProvider'
 import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
-import { getAutoConnect } from './helpers/widget'
+// import { getAutoConnect } from './helpers/widget'
 
 const wagmiClient = createClient({
   autoConnect: false,
   connectors,
   provider,
+  webSocketProvider,
 })
 
 ReactDOM.render(
