@@ -25,9 +25,13 @@ import POAPEvent from '../../../../types/POAP/POAPEvent'
 import { useHover } from '../../../../helpers/useHover'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
 
-const POAPById = ({ account }: { account: string }) => {
-  let { poapId = '' } = useParams()
+const POAPById = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
+  const { poapId = '' } = useParams()
 
   const [poapEvent, setPoapEvent] = useState<POAPEvent>()
   const [isFetchingPoapEvent, setIsFetchingPoapEvent] = useState(false)

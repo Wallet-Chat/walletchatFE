@@ -1,13 +1,12 @@
 import { Box, Heading, Flex, Button } from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
-import Web3 from 'web3'
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import InboxSearchInput from './components/InboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
 // import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 
 // TODO -- on submit new message, also update here
-const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
+const Inbox = () => {
   const isSmallLayout = useIsSmallLayout()
 
   // const communities = React.useMemo(() => inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')), [inboxData])
@@ -57,7 +56,7 @@ const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
         <InboxSearchInput />
       </Box>
 
-      <InboxList context='dm' web3={web3} account={account} />
+      <InboxList context='dm' />
     </Flex>
   )
 }

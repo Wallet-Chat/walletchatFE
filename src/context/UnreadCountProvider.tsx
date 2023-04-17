@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect } from 'react'
 import equal from 'fast-deep-equal/es6'
-import { useWallet } from './WalletProvider'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { getIsWidgetContext } from '@/utils/context'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
 
 const isWidget = getIsWidgetContext()
 
@@ -13,7 +14,11 @@ export const useUnreadCount = () => React.useContext<any>(UnreadCountContext)
 const UnreadCountProvider = ({ children }: { children: any }) => {
   const [unreadCount, setUnreadCount] = React.useState(0)
   const [totalUnreadCount, setTotalUnreadCount] = React.useState(0)
-  const { account, isAuthenticated } = useWallet()
+
+  const account = useAppSelector((state) => selectAccount(state))
+  const isAuthenticated = useAppSelector((state) =>
+    selectIsAuthenticated(state)
+  )
 
   const getUnreadCount = useCallback(() => {
     if (account) {

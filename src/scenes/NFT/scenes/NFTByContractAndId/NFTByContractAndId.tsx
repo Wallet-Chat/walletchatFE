@@ -42,10 +42,14 @@ import IconEthereum from '../../../../images/icon-chains/icon-ethereum.svg'
 import { capitalizeFirstLetter } from '../../../../helpers/text'
 import { useHover } from '../../../../helpers/useHover'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
 
 const tokenType = 'erc721'
 
-const NFTByContractAndId = ({ account }: { account: string }) => {
+const NFTByContractAndId = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
   const params = useParams()
   const { nftContractAddr = '', nftId = '', chain = '' } = params
   const [searchParams] = useSearchParams()

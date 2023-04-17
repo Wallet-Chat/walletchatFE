@@ -1,19 +1,19 @@
-import React from 'react'
+// import React from 'react'
 import { Box, Flex, Spinner, Tag, Button, Alert } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getIsWidgetContext } from '@/utils/context'
 import { useWallet } from '@/context/WalletProvider'
 import { getWidgetOriginName } from '@/helpers/widget'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
 
 const isWidget = getIsWidgetContext()
 
 const ConnectWalletButton = () => {
   const {
-    account,
     siweLastFailure,
     siwePending,
-    isAuthenticated,
     requestSIWEandFetchJWT,
     signIn,
     resetWidgetDataWithSignature,
@@ -21,6 +21,11 @@ const ConnectWalletButton = () => {
     clearWidgetData,
     previousWidgetData,
   } = useWallet()
+
+  const account = useAppSelector((state) => selectAccount(state))
+  const isAuthenticated = useAppSelector((state) =>
+    selectIsAuthenticated(state)
+  )
 
   const canUseWidgetConnection = isWidget && previousWidgetData?.current
   const siweFailed = Boolean(siweLastFailure)

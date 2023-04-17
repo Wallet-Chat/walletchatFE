@@ -18,6 +18,8 @@ import {
 import Submit from './Submit'
 import { getSupportWallet } from '@/helpers/widget'
 import * as ENV from '@/constants/env'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
 
 export const PAGE_SIZE = 25
 
@@ -43,7 +45,9 @@ const AlertBubble = ({
   </Flex>
 )
 
-const DMByAddress = ({ account }: { account: string }) => {
+const DMByAddress = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
   const supportHeader =
     ENV.REACT_APP_SUPPORT_HEADER ||
     'We welcome all feedback and bug reports. Thank you! 😊'

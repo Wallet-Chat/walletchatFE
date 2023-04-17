@@ -1,9 +1,8 @@
 import { Box, Heading, Flex } from '@chakra-ui/react'
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
-import Web3 from 'web3'
 import InboxList from '../../components/Inbox/InboxList'
 
-const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
+const Inbox = () => {
   const isSmallLayout = useIsSmallLayout()
 
   return (
@@ -22,7 +21,7 @@ const Inbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
         {/* <InboxSearchInput /> */}
       </Box>
 
-      <InboxList context='community' web3={web3} account={account} />
+      <InboxList context='community' />
     </Flex>
   )
 }

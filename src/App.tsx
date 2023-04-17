@@ -20,7 +20,6 @@ import NewConversation from './scenes/NewConversation'
 import DMByAddress from './scenes/DM/scenes/DMByAddress'
 import NFT from './scenes/NFT'
 import Sidebar from './components/Sidebar/Sidebar'
-import { useWallet } from './context/WalletProvider'
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import EnterName from './scenes/Me/scenes/EnterName'
 import ChangeName from './scenes/Me/scenes/ChangeName'
@@ -36,9 +35,18 @@ import POAPById from './scenes/NFT/scenes/POAPById'
 import CommunityByName from './scenes/Community/scenes/CommunityByName'
 import ExtensionCloseButton from './components/ExtensionCloseButton'
 import ConnectWalletButton from '@/components/ConnectWallet'
+import { useAppSelector } from './hooks/useSelector'
+import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
+import { endpoints } from './redux/reducers/dm'
 
 export const App = () => {
-  const { isAuthenticated, name, account, web3, delegate }: any = useWallet()
+  const account = useAppSelector((state) => selectAccount(state))
+  const isAuthenticated = useAppSelector((state) =>
+    selectIsAuthenticated(state)
+  )
+  const { currentData: name } = endpoints.getName.useQueryState(
+    account?.toLocaleLowerCase()
+  )
 
   const isSmallLayout = useIsSmallLayout()
 
@@ -114,7 +122,7 @@ export const App = () => {
               <Spinner />
             </Flex>
           ) : (
-            <EnterName account={account} />
+            <EnterName />
           )}
         </Flex>
       </Box>
@@ -144,7 +152,7 @@ export const App = () => {
                 path='new'
                 element={
                   <Flex flexGrow={1}>
-                    <NewConversation web3={web3} />
+                    <NewConversation />
                     {!isSmallLayout && (
                       <Flex
                         background='lightgray.200'
@@ -165,7 +173,7 @@ export const App = () => {
                 index
                 element={
                   <Flex flexGrow={1}>
-                    <Inbox account={account} web3={web3} />
+                    <Inbox />
 
                     {!isSmallLayout && (
                       <Flex
@@ -187,39 +195,27 @@ export const App = () => {
                 path=':address'
                 element={
                   <Flex flexGrow={1}>
-                    {!isSmallLayout && <Inbox account={account} web3={web3} />}
+                    {!isSmallLayout && <Inbox />}
 
-                    <DMByAddress account={account} delegate={delegate} />
+                    <DMByAddress />
                   </Flex>
                 }
               />
             </Route>
 
             <Route path={`/${PAGES.ME}`}>
-              <Route
-                path='enter-email'
-                element={<EnterEmail account={account} />}
-              />
+              <Route path='enter-email' element={<EnterEmail />} />
               <Route path='change-name' element={<ChangeName />} />
-              <Route
-                path='change-email'
-                element={<ChangeEmail account={account} />}
-              />
-              <Route
-                path='verify-email'
-                element={<VerifyEmail account={account} />}
-              />
-              <Route
-                path='verify-success'
-                element={<VerifySuccess account={account} />}
-              />
+              <Route path='change-email' element={<ChangeEmail />} />
+              <Route path='verify-email' element={<VerifyEmail />} />
+              <Route path='verify-success' element={<VerifySuccess />} />
             </Route>
 
             <Route
               path='/nft_error'
               element={
                 <Flex flexGrow={1}>
-                  <NFT account={account} web3={web3} />
+                  <NFT />
                   {!isSmallLayout && (
                     <Flex
                       background='lightgray.200'
@@ -242,7 +238,7 @@ export const App = () => {
                 index
                 element={
                   <Flex flexGrow={1}>
-                    <NFT account={account} web3={web3} />
+                    <NFT />
 
                     {!isSmallLayout && (
                       <Flex
@@ -261,27 +257,18 @@ export const App = () => {
               <Route
                 element={
                   <Flex flexGrow={1}>
-                    {!isSmallLayout && <NFT account={account} web3={web3} />}
+                    {!isSmallLayout && <NFT />}
 
                     <Outlet />
                   </Flex>
                 }
               >
-                <Route
-                  path='poap/:poapId'
-                  element={<POAPById account={account} />}
-                />
+                <Route path='poap/:poapId' element={<POAPById />} />
 
                 <Route path=':chain'>
                   <Route path=':nftContractAddr'>
-                    <Route
-                      index
-                      element={<NFTByContract account={account} />}
-                    />
-                    <Route
-                      path=':nftId*'
-                      element={<NFTByContractAndId account={account} />}
-                    />
+                    <Route index element={<NFTByContract />} />
+                    <Route path=':nftId*' element={<NFTByContractAndId />} />
                   </Route>
                 </Route>
               </Route>
@@ -292,7 +279,7 @@ export const App = () => {
                 index
                 element={
                   <Flex flexGrow={1}>
-                    <Community account={account} web3={web3} />
+                    <Community />
 
                     {!isSmallLayout && (
                       <Flex
@@ -314,10 +301,8 @@ export const App = () => {
                 path=':community'
                 element={
                   <Flex flexGrow={1}>
-                    {!isSmallLayout && (
-                      <Community account={account} web3={web3} />
-                    )}
-                    <CommunityByName account={account} />
+                    {!isSmallLayout && <Community />}
+                    <CommunityByName />
                   </Flex>
                 }
               />

@@ -9,12 +9,8 @@ import {
   TabPanel,
   Badge,
 } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
-import Web3 from 'web3'
-import equal from 'fast-deep-equal/es6'
+import { useState } from 'react'
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
-import { InboxItemType } from '../../types/InboxItem'
-import { chains } from '../../constants'
 import { useUnreadCount } from '../../context/UnreadCountProvider'
 import ChainFilters from '../../components/ChainFilters'
 import MyNFTs from './components/MyNFTs'
@@ -23,8 +19,14 @@ import InboxList from '../../components/Inbox/InboxList'
 import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 import { POLLING_QUERY_OPTS } from '@/constants'
 import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
+import { useWallet } from '@/context/WalletProvider'
 
-const NFTInbox = ({ account, web3 }: { account: string; web3: Web3 }) => {
+const NFTInbox = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+  const { web3 } = useWallet()
+
   const { currentData: fetchedData, isFetching: isFetchingInboxData } =
     useGetInboxQuery(account, POLLING_QUERY_OPTS)
   const storedData = getInboxDmDataForAccount(account)

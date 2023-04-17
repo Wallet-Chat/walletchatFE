@@ -1,5 +1,4 @@
 import { Box, Text } from '@chakra-ui/react'
-import Web3 from 'web3'
 import { memo } from 'react'
 import NFTInboxItem from './NFT/NFTInboxListItem'
 import { InboxItemType } from '../../types/InboxItem'
@@ -8,16 +7,15 @@ import StartConversationWithAddress from '../StartConversationWithAddress'
 import DMInboxItem from './DM/DMInboxListItem'
 import { POLLING_QUERY_OPTS, CHAT_CONTEXT_TYPES } from '@/constants'
 import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
 
 const InboxList = ({
   context,
-  account,
-  web3,
 }: {
   context: (typeof CHAT_CONTEXT_TYPES)[number]
-  account: string
-  web3: Web3
 }) => {
+  const account = useAppSelector((state) => selectAccount(state))
   const storedData = getInboxDmDataForAccount(account)
   const { currentData: fetchedData } = useGetInboxQuery(
     account,
@@ -68,7 +66,7 @@ const InboxList = ({
           <Text mb={4} fontSize='md'>
             You have no messages.
           </Text>
-          <StartConversationWithAddress web3={web3} />
+          <StartConversationWithAddress />
         </Box>
       )}
       {inboxList?.length === 0 && !(context === 'dm') && (

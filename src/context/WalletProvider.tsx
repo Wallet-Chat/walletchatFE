@@ -28,7 +28,13 @@ import storage from '../utils/extension-storage'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
-import { endpoints, setAccount, upsertQueryData } from '@/redux/reducers/dm'
+import { endpoints, upsertQueryData } from '@/redux/reducers/dm'
+import {
+  selectAccount,
+  selectIsAuthenticated,
+  setAccount,
+  setIsAuthenticated,
+} from '@/redux/reducers/account'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { getIsWidgetContext } from '@/utils/context'
 import {
@@ -101,7 +107,10 @@ const WalletProviderContext = () => {
   const { disconnect } = useDisconnect()
 
   const accountAddress = useAppSelector(
-    (state) => state.dm.account || wagmiAddress
+    (state) => selectAccount(state) || wagmiAddress
+  )
+  const isAuthenticated = useAppSelector((state) =>
+    selectIsAuthenticated(state)
   )
 
   const initialJwt = accountAddress && storage.get('jwt')
@@ -109,9 +118,6 @@ const WalletProviderContext = () => {
     accountAddress && chainId && wagmiConnected
       ? getHasJwtForAccount(accountAddress)
       : null
-
-  const [isAuthenticated, setAuthenticated] =
-    React.useState(accountAuthenticated)
 
   const [nonce, setNonce] = React.useState<string | null>()
   const [email, setEmail] = React.useState(null)
@@ -201,7 +207,7 @@ const WalletProviderContext = () => {
       dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
 
       getSettings(address)
-      setAuthenticated(true)
+      dispatch(setIsAuthenticated(true))
 
       pendingConnect.current = false
     },
@@ -209,14 +215,14 @@ const WalletProviderContext = () => {
   )
 
   React.useEffect(() => {
-    setAuthenticated(accountAuthenticated)
+    dispatch(setIsAuthenticated(accountAuthenticated))
 
     if (storage.get('app-version') !== '3.0.1') {
       localStorage.clear()
       storage.set('app-version', '3.0.1')
       window.location.reload()
     }
-  }, [initialJwt, accountAuthenticated])
+  }, [dispatch, initialJwt, accountAuthenticated])
 
   React.useEffect(() => {
     if (analytics && accountAddress && name && email) {
@@ -445,34 +451,22 @@ const WalletProviderContext = () => {
   }, [accountAddress, isAuthenticated, wagmiConnected])
 
   React.useEffect(() => {
-    const accountUnwatch = wagmi.watchAccount(({ address }) => {
-      if (!address) {
-        if (prevAccount.current === null) {
-          // Fallback for when signed out and this effect re-ran
-          // revert prevAccount to default state so can log back in
-          prevAccount.current = undefined
-        }
-      } else if (
-        prevAccount.current &&
-        prevAccount.current !== address.toLocaleLowerCase()
-      ) {
-        Lit.disconnect()
-        disconnect()
-      } else {
-        didDisconnect.current = false
+    if (!wagmiAddress) {
+      if (prevAccount.current === null) {
+        // Fallback for when signed out and this effect re-ran
+        // revert prevAccount to default state so can log back in
+        prevAccount.current = undefined
       }
-
-      dispatch(setAccount(address))
-    })
-    const networkUnwatch = wagmi.watchNetwork((wagmiNetwork) =>
-      setChainId(wagmiNetwork?.chain?.id)
-    )
-
-    return () => {
-      accountUnwatch()
-      networkUnwatch()
+    } else {
+      didDisconnect.current = false
     }
-  }, [disconnect, dispatch])
+
+    dispatch(setAccount(wagmiAddress))
+  }, [wagmiAddress, dispatch])
+
+  React.useEffect(() => {
+    setChainId(chain?.id)
+  }, [chain?.id])
 
   const requestSIWEandFetchJWT = React.useCallback(async () => {
     const walletIsConnected = accountAddress && chainId
@@ -613,7 +607,7 @@ const WalletProviderContext = () => {
     setNonce(null)
     setSiweLastFailure(null)
     siweFailedRef.current = false
-    setAuthenticated(false)
+    dispatch(setIsAuthenticated(false))
   }, [disconnect, dispatch])
 
   React.useEffect(() => {
@@ -624,7 +618,6 @@ const WalletProviderContext = () => {
 
   return React.useMemo(
     () => ({
-      name,
       email,
       notifyDM,
       notify24,
@@ -632,9 +625,7 @@ const WalletProviderContext = () => {
       setEmail,
       setNotifyDM,
       setNotify24,
-      account: accountAddress?.toLowerCase(),
       disconnectWallet,
-      isAuthenticated,
       web3: currentProvider && new Web3(currentProvider),
       signIn,
       provider: currentProvider,
@@ -649,11 +640,8 @@ const WalletProviderContext = () => {
       previousWidgetData,
     }),
     [
-      accountAddress,
       delegate,
       email,
-      isAuthenticated,
-      name,
       notify24,
       notifyDM,
       currentProvider,

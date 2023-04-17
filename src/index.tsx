@@ -19,7 +19,7 @@ import { store } from './redux/store'
 import { getAutoConnect } from './helpers/widget'
 
 const wagmiClient = createClient({
-  autoConnect: getAutoConnect(),
+  autoConnect: false,
   connectors,
   provider,
 })

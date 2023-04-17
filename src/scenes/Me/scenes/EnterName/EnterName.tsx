@@ -23,8 +23,10 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
 import * as ENV from '@/constants/env'
 import Resizer from 'react-image-file-resizer'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
 
-const EnterName = ({ account }: { account: string }) => {
+const EnterName = () => {
   const {
     handleSubmit,
     register,
@@ -32,10 +34,11 @@ const EnterName = ({ account }: { account: string }) => {
     setValue,
   } = useForm()
 
+  const account = useAppSelector((state) => selectAccount(state))
   const toast = useToast()
 
   const { setName: globalSetName } = useWallet()
-  let navigate = useNavigate()
+  const navigate = useNavigate()
 
   const [name, setName] = useState('')
   const [isFetching, setIsFetching] = useState(false)

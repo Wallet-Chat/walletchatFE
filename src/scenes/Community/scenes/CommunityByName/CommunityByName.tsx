@@ -26,10 +26,13 @@ import { useHover } from '../../../../helpers/useHover'
 import IconDiscord from '../../../../images/icon-products/icon-discord.svg'
 import CommunityType from '../../../../types/Community'
 import { getJwtForAccount } from '@/helpers/jwt'
-import { isMobile } from 'react-device-detect'
+import { selectAccount } from '@/redux/reducers/account'
+import { useAppSelector } from '@/hooks/useSelector'
 
-const CommunityByName = ({ account }: { account: string }) => {
-  let { community = '' } = useParams()
+const CommunityByName = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
+  const { community = '' } = useParams()
 
   const [communityData, setCommunityData] = useState<CommunityType>()
   const [

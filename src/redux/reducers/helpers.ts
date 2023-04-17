@@ -7,7 +7,7 @@ export function createErrorResponse(call: string) {
 			error: string
 		}
 
-		console.error(`🚨[GET][${call}]:`, errorResponse.error)
+		console.log(`🚨[GET][${call}]:`, errorResponse.error)
 
 		return errorResponse.status
 	}

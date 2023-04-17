@@ -50,6 +50,9 @@ import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
 import { getSupportWallet } from '@/helpers/widget'
 import { API } from 'react-wallet-chat/dist/src/types'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
+import { endpoints } from '@/redux/reducers/dm'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -201,7 +204,11 @@ export default function Sidebar() {
 
   const { metadata } = nftData?.nft || {}
 
-  const { disconnectWallet, name, account } = useWallet()
+  const { disconnectWallet } = useWallet()
+  const account = useAppSelector((state) => selectAccount(state))
+  const { currentData: name } = endpoints.getName.useQueryState(
+    account?.toLocaleLowerCase()
+  )
 
   const getNftMetadata = (
     nftContractAddr: string,

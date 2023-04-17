@@ -22,8 +22,12 @@ import { useWallet } from '../../../../context/WalletProvider'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { getCommunity } from '@/helpers/widget'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
 
-const VerifyEmail = ({ account }: { account: string }) => {
+const VerifyEmail = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
   const location = useLocation()
   let verificationcode: string | null = null
   let verificationemail: string | null = null
@@ -43,7 +47,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
     formState: { errors },
   } = useForm()
 
-  let navigate = useNavigate()
+  const navigate = useNavigate()
   const toast = useToast()
   const { email: _email, setEmail: globalSetEmail } = useWallet()
   const [isFetching, setIsFetching] = useState(false)

@@ -23,22 +23,26 @@ import { useWallet } from '../../../../context/WalletProvider'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { getCommunity } from '@/helpers/widget'
+import { selectAccount } from '@/redux/reducers/account'
+import { useAppSelector } from '@/hooks/useSelector'
 
-const EnterEmail = ({ account }: { account: string }) => {
+const EnterEmail = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm()
 
-  let navigate = useNavigate()
+  const navigate = useNavigate()
   const toast = useToast()
 
   const { setEmail: globalSetEmail } = useWallet()
   const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
   const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
-  var dmBool = _notifyDM === 'true'
-  var dailyBool = _notify24 === 'true'
+  const dmBool = _notifyDM === 'true'
+  const dailyBool = _notify24 === 'true'
   const [email, setEmail] = useState('')
   const [isFetching, setIsFetching] = useState(false)
 

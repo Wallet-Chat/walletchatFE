@@ -1,9 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { createErrorResponse } from '@/redux/reducers/helpers'
 import { prepareHeaderCredentials } from '@/helpers/fetch'
 import * as ENV from '@/constants/env'
-import { RootState } from '@/redux/store'
+import { selectAccount } from '@/redux/reducers/account'
 import storage from '@/utils/storage'
 import Lit from '@/utils/lit'
 import { ChatMessageType, InboxMessageType } from '@/types/Message'
@@ -13,7 +12,6 @@ export const STORAGE_KEYS = Object.freeze({
   DM_DATA: 'dmData',
   PENDING_DATA: 'pendingData',
   INBOX_DATA: 'inboxData',
-  ENC_DM_IDS: 'encDmIds',
 })
 
 export function getLocalDataByAccount(key: string) {
@@ -27,34 +25,6 @@ export function getLocalData(account: string, key: string) {
 
   const localData = localDataByAccount[account.toLocaleLowerCase()]
   return localData || null
-}
-
-export function getLocalEncDmIdsByAddrByAcc(account: string, toAddr: string) {
-  const localEncDmIdsByAddr = getLocalData(account, STORAGE_KEYS.ENC_DM_IDS)
-  if (!localEncDmIdsByAddr) return null
-
-  const localEncDmIds = localEncDmIdsByAddr[toAddr.toLocaleLowerCase()]
-  return localEncDmIds || null
-}
-
-// Stores encrypted DM IDs in localStorage in the case of failures
-// to decrypt, and the page is refreshed/closed and memory state is lost
-// this is going to be used to retrieve what local DM messages still need
-// to be decrypted
-export function updateLocalEncDmIdsByAddrByAcc(
-  account: string,
-  toAddr: string,
-  encDms: number[]
-) {
-  const encDmDataObj = storage.get(STORAGE_KEYS.ENC_DM_IDS)
-  const encDmDataForAccount = encDmDataObj?.[account.toLocaleLowerCase()] || {}
-
-  storage.set(STORAGE_KEYS.ENC_DM_IDS, {
-    [account.toLocaleLowerCase()]: {
-      ...encDmDataForAccount,
-      [toAddr.toLocaleLowerCase()]: encDms,
-    },
-  })
 }
 
 function litDecryptionForMessages(
@@ -396,28 +366,6 @@ export function updateLocalInboxDataForAccount(
   })
 }
 
-const selectState = (state: RootState) => state.dm
-
-type DMState = {
-  account: undefined | string
-}
-
-const initialState: DMState = {
-  account: undefined,
-}
-
-export const dmSlice = createSlice({
-  name: 'dm',
-  initialState,
-  reducers: {
-    setAccount: (state, action) => {
-      state.account = action.payload
-    },
-  },
-})
-
-export const { setAccount } = dmSlice.actions
-
 async function fetchAndStoreChatData(
   queryArgs: any,
   { dispatch }: any,
@@ -479,9 +427,7 @@ export const dmApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/`,
     prepareHeaders: (headers: Headers, { getState }) => {
-      const state = selectState(getState() as any) as DMState
-      const account = state.account
-
+      const account = selectAccount(getState())
       return prepareHeaderCredentials(headers, account)
     },
   }),
@@ -646,5 +592,3 @@ export const {
   useGetReadChatItemsQuery,
   useGetInboxQuery,
 } = dmApi
-
-export default dmSlice.reducer

@@ -48,10 +48,13 @@ import NFTPortNFTCollection, {
 import NFTCollection from '../../../../types/NFTCollection'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
-import { isMobile } from 'react-device-detect'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
 
-const NFTByContract = ({ account }: { account: string }) => {
-  let { nftContractAddr = '', chain = '' } = useParams()
+const NFTByContract = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
+  const { nftContractAddr = '', chain = '' } = useParams()
 
   const [nftData, setNftData] = useState<NFTCollection>()
   const [nftStatistics, setNftStatistics] = useState<NFTStatisticsType>()

@@ -20,6 +20,9 @@ import OpenSeaNFT from '../../../../types/OpenSea/NFT'
 import Resizer from 'react-image-file-resizer'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount } from '@/redux/reducers/account'
+import { endpoints } from '@/redux/reducers/dm'
 
 const ChangeName = () => {
   const {
@@ -29,7 +32,13 @@ const ChangeName = () => {
     setValue,
   } = useForm()
 
-  const { name: _name, setName: globalSetName, account } = useWallet()
+  const { setName: globalSetName } = useWallet()
+
+  const account = useAppSelector((state) => selectAccount(state))
+  const { currentData: _name } = endpoints.getName.useQueryState(
+    account?.toLocaleLowerCase()
+  )
+
   const toast = useToast()
 
   const [name, setName] = useState('')

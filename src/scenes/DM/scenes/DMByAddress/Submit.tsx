@@ -4,20 +4,22 @@ import { IconSend } from '@tabler/icons'
 import { Textarea, Button, Flex } from '@chakra-ui/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
-import { useWallet } from '@/context/WalletProvider'
 import * as ENV from '@/constants/env'
 import {
   updateQueryData,
   updateLocalDmDataForAccountToAddr,
   addLocalDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
+  endpoints,
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { getAccessControlConditions } from '@/helpers/lit'
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
-  const { name } = useWallet()
+  const { currentData: name } = endpoints.getName.useQueryState(
+    account?.toLocaleLowerCase()
+  )
 
   const dispatch = useAppDispatch()
 
