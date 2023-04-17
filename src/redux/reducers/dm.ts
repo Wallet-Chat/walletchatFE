@@ -363,14 +363,22 @@ export function updateLocalInboxDataForAccount(
 ) {
   const localInboxData = getInboxDmDataForAccount(account)
 
-  inboxData
-    .sort(
+  inboxData.forEach((item) => {
+    const currentInbox = localInboxData[item.context_type]
+    const currentMessages = Object.values(currentInbox)
+    const newMessages = [...currentMessages, item].sort(
       (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     )
-    .forEach((item) => {
-      localInboxData[item.context_type][getInboxFrom(account, item)] = item
-    })
+
+    localInboxData[item.context_type] = newMessages.reduce(
+      (acc, msg) => ({
+        ...acc,
+        [getInboxFrom(account, msg)]: msg,
+      }),
+      {}
+    )
+  })
 
   storage.set(STORAGE_KEYS.INBOX_DATA, {
     [account.toLocaleLowerCase()]: localInboxData,
