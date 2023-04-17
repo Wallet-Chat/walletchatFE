@@ -248,10 +248,21 @@ export function updateLocalDmDataForAccountToAddr(
   const dmDataObj = storage.get(STORAGE_KEYS.DM_DATA)
   const dmDataForAccount = dmDataObj?.[account.toLocaleLowerCase()] || {}
 
+  const chatDataWithoutDuplicates: ChatMessageType[] = []
+  chatData.forEach((msg) => {
+    if (
+      !chatDataWithoutDuplicates.some(
+        (chat) => chat.Id === msg.Id && chat.message === msg.message
+      )
+    ) {
+      chatDataWithoutDuplicates.push(msg)
+    }
+  })
+
   storage.set(STORAGE_KEYS.DM_DATA, {
     [account.toLocaleLowerCase()]: {
       ...dmDataForAccount,
-      [toAddr.toLocaleLowerCase()]: chatData.sort(
+      [toAddr.toLocaleLowerCase()]: chatDataWithoutDuplicates.sort(
         (a, b) =>
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       ),
