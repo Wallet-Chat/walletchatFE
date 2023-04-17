@@ -80,6 +80,8 @@ function litDecryptionForMessages(
         })
 
       if (shouldBreak) break
+    } else {
+      onDecryptionSuccess(i)({ decryptedFile: currentMessage.message })
     }
   }
 }
@@ -168,6 +170,7 @@ export async function decryptDMMessages(
 
     const pendingMessages = messages.filter(
       (msg: ChatMessageType) =>
+        msg.encrypted_sym_lit_key &&
         !currentChatData.some((chat: ChatMessageType) => chat.Id === msg.Id)
     )
     updatePendingDmDataForAccountToAddr(account, toAddr, pendingMessages)
@@ -564,7 +567,10 @@ export const dmApi = createApi({
               new Date(inboxItem.timestamp).getTime() >
                 new Date(currentInbox.timestamp).getTime()
             ) {
-              if (inboxItem.context_type === 'dm') {
+              if (
+                inboxItem.context_type === 'dm' &&
+                inboxItem.encrypted_sym_lit_key !== ''
+              ) {
                 newDms.push(inboxItem)
                 return false
               }
