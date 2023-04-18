@@ -50,7 +50,7 @@ export default function InboxSearchInput() {
    useOnClickOutside(ref, handleClickOutside)
 
    let suggestedAddress: string = toAddr
-   if (web3.utils.isAddress(toAddr)) {
+   if (web3?.utils.isAddress(toAddr)) {
       suggestedAddress = toAddr
    } else if (toAddr.endsWith('.eth') && resolvedAddr && !isResolvingENS) {
       suggestedAddress = resolvedAddr
