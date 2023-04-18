@@ -24,7 +24,7 @@ export default function InboxSearchInput() {
    const ref = useRef(null)
 
    const checkENS = async (address: string) => {
-      if (address.includes(".eth") || address.includes(".bnb")) {
+      if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb")) {
          setIsResolvingENS(true)
 
          fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/resolve_name/${address}`, {
@@ -69,7 +69,7 @@ export default function InboxSearchInput() {
    let suggestedAddress: string = toAddr
    if (web3.utils.isAddress(toAddr)) {
       suggestedAddress = toAddr
-   } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')) && resolvedAddr && !isResolvingENS) {
+   } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.includes(".arb")) && resolvedAddr && !isResolvingENS) {
       suggestedAddress = resolvedAddr
    }
 
@@ -141,10 +141,10 @@ export default function InboxSearchInput() {
                            scale={3}
                         />
                         <Text fontWeight="bold" fontSize="md" ml={2}>
-                           {toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')
+                           {toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.includes(".arb")
                               ? toAddr
                               : truncateAddress(toAddr)}{' '}
-                           {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')) &&
+                           {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.includes(".arb")) &&
                               `(${truncateAddress(suggestedAddress)})`}
                         </Text>
                      </Flex>
