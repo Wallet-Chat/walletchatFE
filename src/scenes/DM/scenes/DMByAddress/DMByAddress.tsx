@@ -116,7 +116,10 @@ const DMByAddress = () => {
   )
 
   const { currentData: fetchedData } = useGetChatDataQuery(
-    { account, toAddr },
+    {
+      account: account?.toLocaleLowerCase(),
+      toAddr: toAddr.toLocaleLowerCase(),
+    },
     {
       ...POLLING_QUERY_OPTS,
       selectFromResult: (options) => {

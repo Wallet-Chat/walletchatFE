@@ -129,6 +129,20 @@ export async function decryptInboxMessages(
   )
 }
 
+export function updateQueryChatData(
+  { account, toAddr }: { account: string; toAddr: string },
+  fn: (chatData: string) => string
+) {
+  return updateQueryData(
+    'getChatData',
+    {
+      account: account.toLocaleLowerCase(),
+      toAddr: toAddr.toLocaleLowerCase(),
+    },
+    fn
+  )
+}
+
 export async function decryptDMMessages(
   messages: ChatMessageType[],
   account: string,
@@ -148,7 +162,7 @@ export async function decryptDMMessages(
         console.log('✅[POST][Decrypted DM Message]: ', message)
 
         dispatch(
-          updateQueryData('getChatData', { account, toAddr }, () => {
+          updateQueryChatData({ account, toAddr }, () => {
             const pendingMsgs =
               getPendingDmDataForAccountToAddr(account, toAddr) || []
             const newPendingMsgs = pendingMsgs.filter(
@@ -427,7 +441,7 @@ async function fetchAndStoreChatData(
       ).data as unknown as ChatMessageType[]) || []
 
     if (data.length === 0) {
-      return { data: '' }
+      return { data: JSON.stringify({ messages: [] }) }
     }
 
     if (!hasLocalData) {
@@ -441,7 +455,7 @@ async function fetchAndStoreChatData(
     console.log('🚨[GET][Chat items]:', error)
   }
 
-  return { data: '' }
+  return { data: JSON.stringify({ messages: [] }) }
 }
 
 export const dmApi = createApi({
@@ -521,7 +535,7 @@ export const dmApi = createApi({
           updateLocalDmDataForAccountToAddr(account, toAddr, newLocalData)
         }
 
-        return { data: '' }
+        return { data: JSON.stringify(newLocalData) }
       },
     }),
 
@@ -555,8 +569,6 @@ export const dmApi = createApi({
           const newDms: InboxMessageType[] = []
 
           const newDecryptedMessages = data.filter((inboxItem) => {
-            if (inboxItem.toaddr.endsWith('.eth')) return true
-
             const currentInbox =
               storedInboxData[inboxItem.context_type][
                 getInboxFrom(account, inboxItem)

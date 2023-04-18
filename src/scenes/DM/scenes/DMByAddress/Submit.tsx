@@ -6,17 +6,20 @@ import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
 import {
-  updateQueryData,
   updateLocalDmDataForAccountToAddr,
   addLocalDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
+  updateQueryChatData,
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { getAccessControlConditions } from '@/helpers/lit'
+import { useWallet } from '@/context/WalletProvider'
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
+  const { provider } = useWallet()
+
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -31,7 +34,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
-      updateQueryData('getChatData', { account, toAddr }, () => {
+      updateQueryChatData({ account, toAddr }, () => {
         const currentChatData =
           getLocalDmDataForAccountToAddr(account, toAddr) || []
         currentChatData.push(newMessage)
@@ -42,7 +45,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const updateSentMessage = (message: ChatMessageType, timestamp: string) =>
     dispatch(
-      updateQueryData('getChatData', { account, toAddr }, () => {
+      updateQueryChatData({ account, toAddr }, () => {
         const currentChatData =
           getLocalDmDataForAccountToAddr(account, toAddr) || []
 
@@ -100,7 +103,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     const accessControlConditions = getAccessControlConditions(
       createMessageData.fromaddr,
-      createMessageData.toaddr
+      (createMessageData.toaddr.includes('.eth') &&
+        (await provider.resolveName(toAddr))) ||
+        createMessageData.toaddr
     )
 
     console.log('ℹ️[POST][Encrypting Message]', value, accessControlConditions)
