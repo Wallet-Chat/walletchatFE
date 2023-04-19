@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import '@rainbow-me/rainbowkit/styles.css'
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig } from 'wagmi'
+import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 
 import { Provider } from 'react-redux'
 import {
@@ -23,9 +24,17 @@ import { theme } from './theme'
 import { store } from './redux/store'
 // import { getAutoConnect } from './helpers/widget'
 
+export const customMetamaskConnector = new MetaMaskConnector({
+  chains,
+  options: {
+    shimDisconnect: true,
+    UNSTABLE_shimOnConnectSelectAccount: true,
+  },
+})
+
 const wagmiClient = createClient({
   autoConnect: false,
-  connectors,
+  connectors: [...connectors(), customMetamaskConnector],
   provider,
   webSocketProvider,
 })

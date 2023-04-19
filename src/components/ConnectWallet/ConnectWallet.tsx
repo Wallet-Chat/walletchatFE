@@ -1,4 +1,4 @@
-// import React from 'react'
+import React from 'react'
 import { Box, Flex, Spinner, Tag, Button, Alert } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getIsWidgetContext } from '@/utils/context'
@@ -6,7 +6,12 @@ import { useWallet } from '@/context/WalletProvider'
 import { getWidgetOriginName } from '@/helpers/widget'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
-import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
+import {
+  selectAccount,
+  selectIsAuthenticated,
+  setAccount,
+} from '@/redux/reducers/account'
+import { useAppDispatch } from '@/hooks/useDispatch'
 
 const isWidget = getIsWidgetContext()
 
@@ -21,6 +26,7 @@ const ConnectWalletButton = () => {
     clearWidgetData,
     previousWidgetData,
   } = useWallet()
+  const dispatch = useAppDispatch()
 
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
@@ -59,7 +65,14 @@ const ConnectWalletButton = () => {
   // switch wallet button
   return (
     <ConnectButton.Custom>
-      {({ openConnectModal }) => {
+      {({ account: connectedAccount, openConnectModal }) => {
+        React.useEffect(() => {
+          if (connectedAccount) {
+            // setNonce(null)
+            dispatch(setAccount(connectedAccount.address))
+          }
+        }, [connectedAccount])
+
         return (() => {
           if (hasPendingAuth) {
             return (

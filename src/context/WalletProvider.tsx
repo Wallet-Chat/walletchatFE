@@ -15,7 +15,6 @@ import {
   useNetwork,
   useProvider,
 } from 'wagmi'
-import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
 import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
 
@@ -46,6 +45,7 @@ import {
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
+import { customMetamaskConnector } from '..'
 
 export const { chains, provider, webSocketProvider } = configureChains(
   [mainnet, polygon, optimism],
@@ -80,6 +80,7 @@ const WalletProviderContext = () => {
   const prevNonce = React.useRef<null | string>()
   const siwePendingRef = React.useRef<boolean>(false)
   const widgetWalletDataRef = React.useRef<
+    | null
     | undefined
     | {
         account: string
@@ -100,7 +101,9 @@ const WalletProviderContext = () => {
     origin: string
   } | null>(null)
 
-  const [connectConfig, setConnectConfig] = React.useState<any>()
+  const [connectConfig, setConnectConfig] = React.useState<
+    undefined | { chainId: number; connector: any }
+  >()
 
   const currentProvider = useProvider()
 
@@ -109,8 +112,8 @@ const WalletProviderContext = () => {
 
   const { address: wagmiAddress, isConnected: wagmiConnected } = useAccount()
 
-  const { connect } = useConnect()
-  const { disconnect } = useDisconnect()
+  const { connect, connectAsync } = useConnect()
+  const { disconnect, disconnectAsync } = useDisconnect()
 
   const accountAddress = useAppSelector(
     (state) => selectAccount(state) || wagmiAddress
@@ -309,8 +312,8 @@ const WalletProviderContext = () => {
   // Currently only needs account address & chainId
   const updateAccountFromWidget = React.useCallback(
     // withSignature forces a SIWE signature request
-    (withSignature?: boolean) => {
-      if (!widgetWalletDataRef.current) {
+    (withSignature?: boolean, config?: any) => {
+      if (widgetWalletDataRef.current === undefined) {
         widgetWalletDataRef.current = previousWidgetData.current
       }
 
@@ -326,7 +329,9 @@ const WalletProviderContext = () => {
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
 
-        connect(connectConfig)
+        if (connectConfig || config) {
+          connect(connectConfig || config)
+        }
       }
     },
     [connect, connectConfig, dispatch]
@@ -334,7 +339,7 @@ const WalletProviderContext = () => {
 
   const clearWidgetData = React.useCallback(() => {
     setWidgetAuthSig(undefined)
-    widgetWalletDataRef.current = undefined
+    widgetWalletDataRef.current = null
     setWidgetWalletData(undefined)
   }, [])
 
@@ -369,19 +374,16 @@ const WalletProviderContext = () => {
           widgetWalletDataRef?.current?.account !== messageData.account &&
           !didDisconnect.current
 
-        if (widgetAccountChanged) {
+        if (widgetAccountChanged && widgetWalletDataRef.current !== null) {
           widgetWalletDataRef.current = messageData
           setWidgetWalletData(widgetWalletDataRef.current)
-          updateAccountFromWidget(
-            pendingConnect.current || shouldRequestSignature
-          )
 
           let connector
           const walletIs = (walletName: string) =>
             messageData.walletName.toLowerCase().includes(walletName)
 
           if (walletIs('metamask')) {
-            connector = new MetaMaskConnector({ chains })
+            connector = customMetamaskConnector
             storage.set('current-widget-provider', 'metamask')
           }
 
@@ -410,9 +412,17 @@ const WalletProviderContext = () => {
             storage.set('current-widget-provider', 'wallet-connect')
           }
 
-          if (connector && !wagmiConnected) {
-            connect({ chainId: messageData.chainId, connector })
+          if (connector) {
+            if (!wagmiConnected) {
+              await connectAsync({ chainId: messageData.chainId, connector })
+            }
+            await disconnectAsync()
+
             setConnectConfig({ chainId: messageData.chainId, connector })
+            updateAccountFromWidget(
+              pendingConnect.current || shouldRequestSignature,
+              { chainId: messageData.chainId, connector }
+            )
           }
         }
       }
@@ -421,13 +431,11 @@ const WalletProviderContext = () => {
     window.addEventListener('message', eventListener)
     return () => window.removeEventListener('message', eventListener)
   }, [
-    disconnect,
+    connectAsync,
+    disconnectAsync,
     wagmiConnected,
-    connect,
-    accountAddress,
-    dispatch,
     updateAccountFromWidget,
-    isAuthenticated,
+    wagmiAddress,
   ])
 
   React.useEffect(() => {
@@ -609,6 +617,7 @@ const WalletProviderContext = () => {
     Lit.disconnect()
     disconnect()
 
+    widgetWalletDataRef.current = undefined
     dispatch(setAccount(null))
     setNonce(null)
     setSiweLastFailure(null)
