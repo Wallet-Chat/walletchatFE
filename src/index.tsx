@@ -4,17 +4,15 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 
 import '@rainbow-me/rainbowkit/styles.css'
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
-import { createClient, WagmiConfig } from 'wagmi'
+import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { createClient, WagmiConfig, configureChains } from 'wagmi'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
+import { mainnet, polygon, optimism } from 'wagmi/chains'
+import { infuraProvider } from '@wagmi/core/providers/infura'
+import { alchemyProvider } from 'wagmi/providers/alchemy'
+import { publicProvider } from 'wagmi/providers/public'
 
 import { Provider } from 'react-redux'
-import {
-  chains,
-  provider,
-  webSocketProvider,
-  connectors,
-} from '@/context/WalletProvider'
 import { App } from './App'
 import reportWebVitals from './reportWebVitals'
 // import * as serviceWorker from './serviceWorker'
@@ -23,18 +21,32 @@ import UnreadCountProvider from './context/UnreadCountProvider'
 import { theme } from './theme'
 import { store } from './redux/store'
 // import { getAutoConnect } from './helpers/widget'
+import * as ENV from '@/constants/env'
+import * as APP from './constants/app'
 
-export const customMetamaskConnector = new MetaMaskConnector({
-  chains,
-  options: {
-    shimDisconnect: true,
-    UNSTABLE_shimOnConnectSelectAccount: true,
-  },
-})
+export const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet, polygon, optimism],
+  [
+    infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
+    alchemyProvider({ apiKey: ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM }),
+    publicProvider(),
+  ]
+)
+
+export const { connectors } = getDefaultWallets({ appName: APP.NAME, chains })
 
 const wagmiClient = createClient({
   autoConnect: false,
-  connectors: [...connectors(), customMetamaskConnector],
+  connectors: [
+    ...connectors(),
+    new MetaMaskConnector({
+      chains,
+      options: {
+        shimDisconnect: true,
+        UNSTABLE_shimOnConnectSelectAccount: true,
+      },
+    }),
+  ],
   provider,
   webSocketProvider,
 })
@@ -46,7 +58,7 @@ ReactDOM.render(
       <BrowserRouter>
         <WagmiConfig client={wagmiClient}>
           <RainbowKitProvider chains={chains}>
-            <WalletProvider>
+            <WalletProvider chains={chains}>
               <UnreadCountProvider>
                 <ChakraProvider theme={theme}>
                   <Flex w='100vw' h='100vh'>

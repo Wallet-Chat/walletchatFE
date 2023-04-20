@@ -6,9 +6,7 @@ import { SiweMessage } from 'siwe'
 
 import { AnalyticsBrowser } from '@segment/analytics-next'
 
-import { getDefaultWallets } from '@rainbow-me/rainbowkit'
 import {
-  configureChains,
   useAccount,
   useConnect,
   useDisconnect,
@@ -17,11 +15,7 @@ import {
 } from 'wagmi'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
 import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
-
-import { mainnet, polygon, optimism, celo } from 'wagmi/chains'
-import { infuraProvider } from '@wagmi/core/providers/infura'
-import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { publicProvider } from 'wagmi/providers/public'
+import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
@@ -45,24 +39,7 @@ import {
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
-import { customMetamaskConnector } from '..'
-
-export const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, polygon, optimism],
-  [
-    infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
-    alchemyProvider({ apiKey: ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM }),
-    publicProvider(),
-  ]
-)
-
-const APP_NAME = 'WalletChat'
-const APP_VERSION = '3.0.2'
-
-export const { connectors } = getDefaultWallets({
-  appName: APP_NAME,
-  chains,
-})
+import * as APP from '@/constants/app'
 
 // help debug issues and watch for high traffic conditions
 const analytics = AnalyticsBrowser.load({
@@ -72,7 +49,7 @@ const analytics = AnalyticsBrowser.load({
 const isWidget = getIsWidgetContext()
 
 /* eslint-disable react/display-name */
-const WalletProviderContext = () => {
+const WalletProviderContext = (chains: any) => {
   const dispatch = useAppDispatch()
 
   const didDisconnect = React.useRef<boolean>(false)
@@ -226,9 +203,9 @@ const WalletProviderContext = () => {
   React.useEffect(() => {
     dispatch(setIsAuthenticated(accountAuthenticated))
 
-    if (storage.get('app-version') !== APP_VERSION) {
+    if (storage.get('app-version') !== APP.VERSION) {
       localStorage.clear()
-      storage.set('app-version', APP_VERSION)
+      storage.set('app-version', APP.VERSION)
       window.location.reload()
     }
   }, [dispatch, initialJwt, accountAuthenticated])
@@ -383,7 +360,14 @@ const WalletProviderContext = () => {
             messageData.walletName.toLowerCase().includes(walletName)
 
           if (walletIs('metamask')) {
-            connector = customMetamaskConnector
+            connector = new MetaMaskConnector({
+              chains,
+              options: {
+                shimDisconnect: true,
+                UNSTABLE_shimOnConnectSelectAccount: true,
+              },
+            })
+
             storage.set('current-widget-provider', 'metamask')
           }
 
@@ -391,7 +375,7 @@ const WalletProviderContext = () => {
             connector = new CoinbaseWalletConnector({
               chains,
               options: {
-                appName: APP_NAME,
+                appName: APP.NAME,
                 jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM}`,
               },
             })
@@ -682,8 +666,8 @@ export const WalletContext = React.createContext<
 export const useWallet = () => React.useContext(WalletContext)
 
 const WalletProvider = React.memo(
-  ({ children }: { children: React.ReactElement }) => {
-    const value = WalletProviderContext()
+  ({ children, chains }: { children: React.ReactElement; chains: any }) => {
+    const value = WalletProviderContext(chains)
 
     return (
       <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
