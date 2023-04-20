@@ -440,14 +440,10 @@ async function fetchAndStoreChatData(
         )
       ).data as unknown as ChatMessageType[]) || []
 
-    if (data.length === 0) {
-      return { data: JSON.stringify({ messages: [] }) }
-    }
+    console.log('✅[GET][Chat items]: ', data)
 
-    if (!hasLocalData) {
-      console.log('✅[GET][Chat items]')
-    } else {
-      console.log('✅[GET][New Chat items]')
+    if (data.length === 0) {
+      return { data: JSON.stringify({ messages: localData }) }
     }
 
     await decryptDMMessages(data, account, dispatch)
