@@ -105,9 +105,13 @@ const WalletProvider = React.memo(({ children }) => {
    useEffect(() => {
       window.addEventListener("message", (e) => {
         var data = e.data;
-        console.log("WalletChat RECEIVED message from PARENT to CHILD ");
-        console.log(data);
-        if(data["target"] == 'sign_in'){
+      //   console.log("WalletChat RECEIVED postMessage from PARENT to CHILD ");
+      //   console.log(data);
+        if(data["target"] == 'connect_wallet'){
+         // console.log("WalletChat RECEIVED connect_wallet from PARENT to CHILD ");
+         //connectWallet()
+         walletRequestPermissions()
+        } else if(data["target"] == 'sign_in'){
          data = data.data
          try {
             fetch(`${process.env.REACT_APP_REST_API}/signin`, {
