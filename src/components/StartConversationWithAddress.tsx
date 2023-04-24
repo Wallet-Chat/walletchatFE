@@ -68,7 +68,7 @@ const StartConversationWithAddress = () => {
             setToAddr(e.target.value)
           }
         />
-        {web3.utils.isAddress(toAddr) && (
+        {web3?.utils.isAddress(toAddr) && (
           <Link to={`/dm/${toAddr}`} style={{ textDecoration: 'none' }}>
             <Flex
               alignItems='center'
