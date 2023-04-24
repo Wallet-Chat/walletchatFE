@@ -1,7 +1,20 @@
-import { Box, Button, Flex, Image, Spinner, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  Image,
+  Spinner,
+  Text,
+  Tooltip,
+} from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
-import { IconCheck, IconChecks, IconExternalLink } from '@tabler/icons'
+import {
+  IconCheck,
+  IconChecks,
+  IconExternalLink,
+  IconAlertCircle,
+} from '@tabler/icons'
 import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
 import {
@@ -101,6 +114,11 @@ const MessageBox = styled.div`
     bottom: var(--chakra-space-2);
     svg {
       stroke: var(--chakra-colors-lightgray-800);
+    }
+  }
+  .read-status.alert {
+    svg {
+      stroke: var(--chakra-colors-red-500);
     }
   }
   &.read:not(.left) {
@@ -359,6 +377,12 @@ const ChatMessage = ({
               <span className='read-status'>
                 {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
               </span>
+            ) : msg.failed ? (
+              <Tooltip label='Message Failed'>
+                <span className='read-status alert'>
+                  <IconAlertCircle size={15} color='red' />
+                </span>
+              </Tooltip>
             ) : (
               <Spinner size='xs' className='read-status' />
             ))}

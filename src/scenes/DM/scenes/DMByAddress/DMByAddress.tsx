@@ -20,6 +20,7 @@ import { getSupportWallet } from '@/helpers/widget'
 import * as ENV from '@/constants/env'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
+import { useWallet } from '@/context/WalletProvider'
 
 export const PAGE_SIZE = 25
 
@@ -46,6 +47,7 @@ const AlertBubble = ({
 )
 
 const DMByAddress = () => {
+  const { provider } = useWallet()
   const account = useAppSelector((state) => selectAccount(state))
 
   const supportHeader =
@@ -67,7 +69,22 @@ const DMByAddress = () => {
 
   const dispatch = useAppDispatch()
 
-  const { address: toAddr = '' } = useParams()
+  const { address: dmAddr = '' } = useParams()
+  const [toAddr, setToAddr] = React.useState<string>('')
+
+  React.useEffect(() => {
+    async function setNewDmAddr() {
+      const newDmAddr = dmAddr.includes('.eth')
+        ? await provider.resolveName(dmAddr)
+        : dmAddr
+
+      if (newDmAddr) {
+        setToAddr(newDmAddr)
+      }
+    }
+
+    setNewDmAddr()
+  }, [dmAddr, provider])
 
   const selectChatDataForPage = React.useMemo(
     () =>
@@ -76,18 +93,34 @@ const DMByAddress = () => {
         (chatData) => {
           if (!chatData?.messages) return null
 
-          const decryptedAndPendingChats =
+          let decryptedAndPendingChats =
             getPendingDmDataForAccountToAddr(account, toAddr) &&
             getLocalDmDataForAccountToAddr(account, toAddr)
               ? [
                   ...getLocalDmDataForAccountToAddr(account, toAddr),
                   ...getPendingDmDataForAccountToAddr(account, toAddr),
-                ].sort(
-                  (a, b) =>
-                    new Date(a.timestamp).getTime() -
-                    new Date(b.timestamp).getTime()
-                )
+                ]
               : chatData.messages
+
+          const chatDataWithoutDuplicates: ChatMessageType[] = []
+          const submittingMsgs: ChatMessageType[] = []
+
+          decryptedAndPendingChats.forEach((msg) => {
+            if (msg.Id === -1) {
+              submittingMsgs.push(msg)
+            } else if (
+              !chatDataWithoutDuplicates.some(
+                (chat) => chat.Id === msg.Id && chat.message === msg.message
+              )
+            ) {
+              chatDataWithoutDuplicates.push(msg)
+            }
+          })
+
+          decryptedAndPendingChats = [
+            ...chatDataWithoutDuplicates.sort((a, b) => a.Id - b.Id),
+            ...submittingMsgs,
+          ]
 
           if (decryptedAndPendingChats.length <= PAGE_SIZE) {
             return JSON.stringify(decryptedAndPendingChats)
@@ -177,10 +210,8 @@ const DMByAddress = () => {
               selectorPageRef.current += 1
               setSelectorPage(selectorPageRef.current)
 
-              const pendingMessages = getPendingDmDataForAccountToAddr(
-                account,
-                toAddr
-              )
+              const pendingMessages =
+                getPendingDmDataForAccountToAddr(account, toAddr) || []
 
               if (pendingMessages.length > 0) {
                 decryptDMMessages(pendingMessages, account, dispatch)

@@ -31,6 +31,13 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
+  const pendingMsgs = React.useRef<
+    {
+      createMessageData: CreateChatMessageType
+      newMessage: ChatMessageType
+      timestamp: string
+    }[]
+  >([])
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
@@ -38,8 +45,11 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         const currentChatData =
           getLocalDmDataForAccountToAddr(account, toAddr) || []
         currentChatData.push(newMessage)
-        addLocalDmDataForAccountToAddr(account, toAddr, newMessage)
-        return JSON.stringify({ messages: currentChatData })
+        updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData)
+
+        const newChatData = getLocalDmDataForAccountToAddr(account, toAddr)
+
+        return JSON.stringify({ messages: newChatData })
       })
     )
 
@@ -49,18 +59,102 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         const currentChatData =
           getLocalDmDataForAccountToAddr(account, toAddr) || []
 
-        const index = currentChatData.findIndex(
-          (chat: ChatMessageType) => chat.timestamp === timestamp
-        )
-        currentChatData[index] = {
-          ...message,
-          message: currentChatData[index].message,
-        }
+        const newChatData = currentChatData.map((chat: ChatMessageType) => {
+          if (chat.timestamp === timestamp) {
+            return { ...message, message: chat.message }
+          }
 
-        updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData)
-        return JSON.stringify({ messages: currentChatData })
+          return chat
+        })
+
+        updateLocalDmDataForAccountToAddr(account, toAddr, newChatData)
+
+        const finalChatData = getLocalDmDataForAccountToAddr(account, toAddr)
+
+        return JSON.stringify({ messages: finalChatData })
       })
     )
+
+  const postMessage = React.useCallback(
+    async (
+      createMessageData: CreateChatMessageType,
+      newMessage: ChatMessageType,
+      timestamp: string
+    ) => {
+      const isNextMsg =
+        !pendingMsgs.current[0] ||
+        pendingMsgs.current[0].timestamp === timestamp
+
+      const index = pendingMsgs.current.findIndex(
+        (obj) => obj.timestamp === timestamp
+      )
+
+      if (!pendingMsgs.current || index === -1) {
+        pendingMsgs.current = [
+          ...(pendingMsgs.current || []),
+          { createMessageData, newMessage, timestamp },
+        ]
+      }
+
+      if (isNextMsg) {
+        const accessControlConditions = getAccessControlConditions(
+          createMessageData.fromaddr,
+          (createMessageData.toaddr.includes('.eth') &&
+            (await provider.resolveName(toAddr))) ||
+            createMessageData.toaddr
+        )
+
+        console.log(
+          'ℹ️[POST][Encrypting Message]',
+          createMessageData.message,
+          accessControlConditions
+        )
+
+        const encrypted = await lit.encryptString(
+          account,
+          createMessageData.message,
+          accessControlConditions
+        )
+        createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
+        newMessage.encryptedMessage = createMessageData.message
+        updateSentMessage(newMessage, timestamp)
+        createMessageData.encrypted_sym_lit_key =
+          encrypted.encryptedSymmetricKey
+        createMessageData.lit_access_conditions = JSON.stringify(
+          accessControlConditions
+        )
+
+        console.log('✅[POST][Encrypted Message]:', createMessageData)
+        fetch(
+          ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
+          postFetchOptions(createMessageData, account)
+        )
+          .then((response) => response.json())
+          .then((responseData) => {
+            console.log('✅[POST][Send Message]:', responseData)
+            updateSentMessage(responseData, timestamp)
+
+            if (pendingMsgs.current[0]?.timestamp === timestamp) {
+              pendingMsgs.current.shift()
+
+              if (pendingMsgs.current[0]) {
+                postMessage(
+                  pendingMsgs.current[0].createMessageData,
+                  pendingMsgs.current[0].newMessage,
+                  pendingMsgs.current[0].timestamp
+                )
+              }
+            }
+          })
+          .catch((error) => {
+            console.error('🚨[POST][Send message]:', error, createMessageData)
+            newMessage.failed = true
+            updateSentMessage(newMessage, timestamp)
+          })
+      }
+    },
+    [account]
+  )
 
   const sendMessage = async () => {
     const value = msgInput.current
@@ -84,7 +178,18 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       encrypted_sym_lit_key: '',
     }
 
-    const timestamp = new Date().toString()
+    const now = new Date()
+
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0') // January is 0
+    const day = String(now.getDate()).padStart(2, '0')
+
+    const hours = String(now.getUTCHours()).padStart(2, '0')
+    const minutes = String(now.getUTCMinutes()).padStart(2, '0')
+    const seconds = String(now.getUTCSeconds()).padStart(2, '0')
+    const milliseconds = String(now.getUTCMilliseconds()).padStart(3, '0')
+
+    const timestamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`
 
     const newMessage: ChatMessageType = {
       ...createMessageData,
@@ -101,40 +206,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     // it was sent after a successful response
     addPendingMessageToUI(newMessage)
 
-    const accessControlConditions = getAccessControlConditions(
-      createMessageData.fromaddr,
-      (createMessageData.toaddr.includes('.eth') &&
-        (await provider.resolveName(toAddr))) ||
-        createMessageData.toaddr
-    )
-
-    console.log('ℹ️[POST][Encrypting Message]', value, accessControlConditions)
-
-    const encrypted = await lit.encryptString(
-      account,
-      value,
-      accessControlConditions
-    )
-    createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
-    createMessageData.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-    createMessageData.lit_access_conditions = JSON.stringify(
-      accessControlConditions
-    )
-
-    console.log('✅[POST][Encrypted Message]:', createMessageData)
-
-    fetch(
-      ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
-      postFetchOptions(createMessageData, account)
-    )
-      .then((response) => response.json())
-      .then((responseData) => {
-        console.log('✅[POST][Send Message]:', responseData)
-        updateSentMessage(responseData, timestamp)
-      })
-      .catch((error) => {
-        console.error('🚨[POST][Send message]:', error, createMessageData)
-      })
+    postMessage(createMessageData, newMessage, timestamp)
 
     if (
       toAddr.toLocaleLowerCase() ===

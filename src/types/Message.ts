@@ -16,6 +16,7 @@ export interface ChatMessageType {
   timestamp: string
   timestamp_dtm: string
   read: boolean
+  encryptedMessage?: string
   message: string
   nftaddr: string
   nftid: string

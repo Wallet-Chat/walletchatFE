@@ -218,7 +218,7 @@ export function getPendingDmDataForAccountToAddr(
 export function getLocalDmDataForAccountToAddr(
   account: string,
   toAddr: string
-) {
+): ChatMessageType[] | null {
   const localDmDataByAddr = getLocalData(account, STORAGE_KEYS.DM_DATA)
   if (!localDmDataByAddr) return null
 
@@ -266,8 +266,12 @@ export function updateLocalDmDataForAccountToAddr(
   const dmDataForAccount = dmDataObj?.[account.toLocaleLowerCase()] || {}
 
   const chatDataWithoutDuplicates: ChatMessageType[] = []
+  const submittingMsgs: ChatMessageType[] = []
+
   chatData.forEach((msg) => {
-    if (
+    if (msg.Id === -1) {
+      submittingMsgs.push(msg)
+    } else if (
       !chatDataWithoutDuplicates.some(
         (chat) => chat.Id === msg.Id && chat.message === msg.message
       )
@@ -279,10 +283,10 @@ export function updateLocalDmDataForAccountToAddr(
   storage.set(STORAGE_KEYS.DM_DATA, {
     [account.toLocaleLowerCase()]: {
       ...dmDataForAccount,
-      [toAddr.toLocaleLowerCase()]: chatDataWithoutDuplicates.sort(
-        (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      ),
+      [toAddr.toLocaleLowerCase()]: [
+        ...chatDataWithoutDuplicates.sort((a, b) => a.Id - b.Id),
+        ...submittingMsgs,
+      ],
     },
   })
 }
@@ -426,7 +430,12 @@ async function fetchAndStoreChatData(
 
     let lastTimeMsg
     if (hasLocalData) {
-      lastTimeMsg = localData[localData.length - 1].timestamp
+      for (let i = localData.length - 1; i >= 0; i--) {
+        if (localData[i].timestamp && localData[i].Id !== -1) {
+          lastTimeMsg = localData[i].timestamp
+          break
+        }
+      }
     }
 
     const data =
@@ -446,9 +455,39 @@ async function fetchAndStoreChatData(
       return { data: JSON.stringify({ messages: localData }) }
     }
 
-    await decryptDMMessages(data, account, dispatch)
+    let dataToDecrypt: ChatMessageType[] = data
+
+    let hasDecryptedMsgs
+    const newLocalData = localData.map((msg) => {
+      if (msg.encryptedMessage) {
+        hasDecryptedMsgs = true
+        let newDataMsg = msg
+
+        data.forEach((dataMsg) => {
+          if (dataMsg.message === msg.encryptedMessage) {
+            newDataMsg = { ...newDataMsg, ...dataMsg }
+            newDataMsg.message = msg.message
+            delete newDataMsg.encryptedMessage
+
+            dataToDecrypt = dataToDecrypt.filter(
+              (item) => item.message !== dataMsg.message
+            )
+          }
+        })
+
+        return newDataMsg
+      }
+
+      return msg
+    })
+
+    if (hasDecryptedMsgs) {
+      updateLocalDmDataForAccountToAddr(account, toAddr, newLocalData)
+    }
+
+    await decryptDMMessages(dataToDecrypt, account, dispatch)
   } catch (error) {
-    console.log('🚨[GET][Chat items]:', error)
+    console.log('🚨[GET][Chat items]:', error, queryArgs)
   }
 
   return { data: JSON.stringify({ messages: [] }) }
