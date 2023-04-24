@@ -177,6 +177,8 @@ const WalletProviderContext = (chains: any) => {
 
       console.log('✅[INFO][JWT]:', jwt)
 
+      Lit.setAuthSig(address)
+
       // if we log in with a full delegate, act as the vault
       const walletInJWT = parseJwt(jwt).sub
       if (walletInJWT.toLocaleLowerCase() !== address.toLocaleLowerCase()) {
@@ -580,7 +582,6 @@ const WalletProviderContext = (chains: any) => {
             ...currentSigs,
             [accountAddress.toLocaleLowerCase()]: authSig,
           })
-          Lit.setAuthSig(accountAddress)
 
           signIn(accountAddress, signInData.access)
         })
