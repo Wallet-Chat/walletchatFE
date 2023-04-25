@@ -163,7 +163,7 @@ export async function decryptDMMessages(
         decryptedMessages[i] = { ...messages[i], message }
         const newMessage = decryptedMessages[i]
 
-        console.log('✅[POST][Decrypted DM Message]: ', message)
+        console.log('✅[POST][Decrypted DM Message]: ', newMessage)
 
         dispatch(
           updateQueryChatData({ account, toAddr }, () => {

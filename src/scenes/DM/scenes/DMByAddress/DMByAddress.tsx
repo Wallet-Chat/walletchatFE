@@ -70,7 +70,7 @@ const DMByAddress = () => {
   const dispatch = useAppDispatch()
 
   const { address: dmAddr = '' } = useParams()
-  const [toAddr, setToAddr] = React.useState<string>('')
+  const [toAddr, setToAddr] = React.useState<string>(dmAddr)
 
   React.useEffect(() => {
     async function setNewDmAddr() {

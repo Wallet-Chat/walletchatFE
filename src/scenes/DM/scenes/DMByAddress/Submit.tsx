@@ -124,7 +124,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
           accessControlConditions
         )
 
-        console.log('✅[POST][Encrypted Message]:', createMessageData)
+        console.log('✅[POST][Encrypted Message]:', newMessage)
         fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
           postFetchOptions(createMessageData, account)
