@@ -358,8 +358,15 @@ export function addLocalInboxDataForAccount(
   const localInboxData = getInboxDmDataForAccount(account)
   const inboxDataForContext = localInboxData[newInboxMessage.context_type]
 
-  const values = Object.values(inboxDataForContext)
-  values.push(newInboxMessage) // add the new message to the array
+  const values = Object.values(inboxDataForContext).map((item) => {
+    if (
+      getInboxFrom(account, item) === getInboxFrom(account, newInboxMessage)
+    ) {
+      return newInboxMessage
+    }
+
+    return item
+  })
 
   values.sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
