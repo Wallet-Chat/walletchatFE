@@ -3,6 +3,7 @@ import {
   Button,
   Flex,
   Image,
+  SkeletonText,
   Spinner,
   Text,
   Tooltip,
@@ -353,13 +354,37 @@ const ChatMessage = ({
       >
         <Box className='msg-bubble'>
           {senderName && fromAddr && (
-            <UserProfileContextMenu address={fromAddr}>
-              <Text fontSize='md' className='name'>
-                {senderName}
-              </Text>
-            </UserProfileContextMenu>
+            <Flex>
+              <UserProfileContextMenu address={fromAddr}>
+                <Text fontSize='md' className='name'>
+                  {senderName}
+                </Text>
+              </UserProfileContextMenu>
+
+              {pending && (
+                <Text
+                  marginLeft='2'
+                  fontSize='md'
+                  className='name'
+                  as='i'
+                  color='grey !important'
+                >
+                  Message being decrypted...
+                </Text>
+              )}
+            </Flex>
           )}
-          {pending ? <Spinner /> : <Box>{msg.message}</Box>}
+
+          {pending ? (
+            <SkeletonText
+              width='200px'
+              skeletonHeight='10px'
+              noOfLines={1}
+              marginBottom='2'
+            />
+          ) : (
+            <Box>{msg.message}</Box>
+          )}
           <Box
             d='inline-block'
             className='timestamp'
