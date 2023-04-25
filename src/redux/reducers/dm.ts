@@ -47,7 +47,11 @@ function litDecryptionForMessages(
 
     const currentMessage = messages[i]
 
-    if (currentMessage.encrypted_sym_lit_key) {
+    if (
+      currentMessage.encrypted_sym_lit_key &&
+      !currentMessage.toaddr.includes('.eth') &&
+      !currentMessage.fromaddr.includes('.eth')
+    ) {
       // only needed for mixed DB with plain and encrypted data
       const accessControlConditions = JSON.parse(
         currentMessage.lit_access_conditions
@@ -119,7 +123,7 @@ export async function decryptInboxMessages(
       }
     }
 
-  console.log('ℹ️[POST][Decrypt DMs Begin]')
+  console.log('ℹ️[POST][Decrypt Inbox Messages Begin]: ', messages)
 
   litDecryptionForMessages(
     account,
@@ -177,6 +181,8 @@ export async function decryptDMMessages(
         )
       }
     }
+
+  console.log('ℹ️[POST][Decrypt DMs Begin]: ', messages)
 
   const onBeforeBegin = (messages: ChatMessageType[]) => {
     const currentChatData =
@@ -358,15 +364,23 @@ export function addLocalInboxDataForAccount(
   const localInboxData = getInboxDmDataForAccount(account)
   const inboxDataForContext = localInboxData[newInboxMessage.context_type]
 
-  const values = Object.values(inboxDataForContext).map((item) => {
+  const inboxMessages = Object.values(inboxDataForContext)
+
+  let didUpdate = false
+  const values = inboxMessages.map((item) => {
     if (
       getInboxFrom(account, item) === getInboxFrom(account, newInboxMessage)
     ) {
+      didUpdate = true
       return newInboxMessage
     }
 
     return item
   })
+
+  if (!didUpdate) {
+    values.push(newInboxMessage)
+  }
 
   values.sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()

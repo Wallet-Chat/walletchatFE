@@ -37,7 +37,7 @@ const StartConversationWithAddress = () => {
   const checkENS = async (address: string) => {
     if (address.includes('.eth')) {
       setIsResolvingENS(true)
-      const _addr = await provider.resolveName(address)
+      const _addr = await provider?.resolveName(address)
       setResolvedAddr(_addr)
       setIsResolvingENS(false)
     }
