@@ -24,6 +24,7 @@ import {
   getLocalDmDataForAccountToAddr,
   updateLocalDmDataForAccountToAddr,
   updateLocalInboxDataForAccount,
+  updateQueryChatData,
   updateQueryData,
   useGetNameQuery,
 } from '@/redux/reducers/dm'
@@ -259,28 +260,28 @@ const ChatMessage = ({
           console.log('✅[PUT][Message]:', data)
 
           dispatch(
-            updateQueryData(
-              'getChatData',
-              { account, toAddr: fromAddr },
-              () => {
-                const currentChatData =
-                  getLocalDmDataForAccountToAddr(account, fromAddr) || []
+            updateQueryChatData({ account, toAddr: fromAddr }, () => {
+              const currentChatData: any = (
+                getLocalDmDataForAccountToAddr(account, fromAddr) || []
+              ).map((dataMsg: MessageUIType, i: number) => {
+                if (dataMsg.Id === msg.Id) {
+                  return { ...currentChatData[i], read: true }
+                }
+              })
 
-                currentChatData.forEach((dataMsg: MessageUIType, i: number) => {
-                  if (dataMsg.Id === msg.Id) {
-                    currentChatData[i] = { ...currentChatData[i], read: true }
-                  }
-                })
+              updateLocalDmDataForAccountToAddr(
+                account,
+                fromAddr,
+                currentChatData
+              )
 
-                updateLocalDmDataForAccountToAddr(
-                  account,
-                  fromAddr,
-                  currentChatData
-                )
+              const newChatData = getLocalDmDataForAccountToAddr(
+                account,
+                fromAddr
+              )
 
-                return JSON.stringify(currentChatData)
-              }
-            )
+              return JSON.stringify({ messages: newChatData })
+            })
           )
 
           if (account !== fromAddr) {
@@ -317,19 +318,11 @@ const ChatMessage = ({
       context === 'dm' &&
       isInViewport &&
       msg?.read === false &&
-      !msgSentByMe &&
-      !hasPendingMsgs
+      !msgSentByMe
     ) {
       setMessageAsRead()
     }
-  }, [
-    context,
-    hasPendingMsgs,
-    isInViewport,
-    msg,
-    msgSentByMe,
-    setMessageAsRead,
-  ])
+  }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
 
   return (
     <Flex
