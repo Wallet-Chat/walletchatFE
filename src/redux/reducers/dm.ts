@@ -176,7 +176,9 @@ export async function decryptDMMessages(
             updatePendingDmDataForAccountToAddr(account, toAddr, newPendingMsgs)
             addLocalDmDataForAccountToAddr(account, toAddr, newMessage)
 
-            return ''
+            const newChatData = getLocalDmDataForAccountToAddr(account, toAddr)
+
+            return JSON.stringify({ messages: newChatData })
           })
         )
       }
@@ -511,7 +513,7 @@ async function fetchAndStoreChatData(
     console.log('🚨[GET][Chat items]:', error, queryArgs)
   }
 
-  return { data: JSON.stringify({ messages: [] }) }
+  return { data: null }
 }
 
 export const dmApi = createApi({
