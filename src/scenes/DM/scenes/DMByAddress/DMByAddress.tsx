@@ -14,6 +14,7 @@ import {
   useGetReadChatItemsQuery,
   decryptDMMessages,
   getPendingDmDataForAccountToAddr,
+  getMessageToAddr,
 } from '@/redux/reducers/dm'
 import Submit from './Submit'
 import { getSupportWallet } from '@/helpers/widget'
@@ -71,6 +72,7 @@ const DMByAddress = () => {
 
   const { address: dmAddr = '' } = useParams()
   const [toAddr, setToAddr] = React.useState<string>(dmAddr)
+  const toAddrRef = React.useRef<string>(dmAddr)
 
   React.useEffect(() => {
     async function setNewDmAddr() {
@@ -80,6 +82,7 @@ const DMByAddress = () => {
 
       if (newDmAddr) {
         setToAddr(newDmAddr)
+        toAddrRef.current = newDmAddr
       }
     }
 
@@ -179,14 +182,16 @@ const DMByAddress = () => {
       const previousMsgId = previousScrolledMsg?.split(':')[1]
 
       if (node && previousMsgId !== String(msg.Id)) {
-        const isNewPage = previousAddr !== msg.fromaddr
+        const isNewPage = previousAddr !== getMessageToAddr(account, msg)
         const lastMsgMine = previousAddr === account
 
         if (isNewPage || lastMsgMine) {
           node.scrollIntoView({ behavior: !isNewPage ? 'smooth' : 'auto' })
         }
 
-        prevLastMsg.current = `${msg.fromaddr}:${String(msg.Id)}`
+        prevLastMsg.current = `${getMessageToAddr(account, msg)}:${String(
+          msg.Id
+        )}`
         selectorPageRef.current = 1
         setSelectorPage(selectorPageRef.current)
       }
@@ -211,7 +216,8 @@ const DMByAddress = () => {
               setSelectorPage(selectorPageRef.current)
 
               const pendingMessages =
-                getPendingDmDataForAccountToAddr(account, toAddr) || []
+                getPendingDmDataForAccountToAddr(account, toAddrRef.current) ||
+                []
 
               if (pendingMessages.length > 0) {
                 decryptDMMessages(pendingMessages, account, dispatch)
@@ -230,7 +236,7 @@ const DMByAddress = () => {
         return () => node.removeEventListener('scroll', autoScrollPagination)
       }
     },
-    [account, dispatch, selectorPageRef, toAddr]
+    [account, dispatch, selectorPageRef]
   )
 
   React.useEffect(() => {

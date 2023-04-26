@@ -310,7 +310,7 @@ export function addLocalDmDataForAccountToAddr(
   updateLocalDmDataForAccountToAddr(account, toAddr, newDmData)
 }
 
-function getMessageToAddr(
+export function getMessageToAddr(
   account: string,
   msg: ChatMessageType | InboxMessageType
 ) {
