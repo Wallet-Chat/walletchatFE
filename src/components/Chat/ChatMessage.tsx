@@ -263,7 +263,9 @@ const ChatMessage = ({
             updateQueryChatData({ account, toAddr: fromAddr }, () => {
               const currentChatData: any = (
                 getLocalDmDataForAccountToAddr(account, fromAddr) || []
-              ).map((dataMsg: MessageUIType, i: number) => {
+              )
+              
+              currentChatData.map((dataMsg: MessageUIType, i: number) => {
                 if (dataMsg.Id === msg.Id) {
                   return { ...currentChatData[i], read: true }
                 }
