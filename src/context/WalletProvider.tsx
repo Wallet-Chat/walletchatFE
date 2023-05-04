@@ -92,8 +92,9 @@ const WalletProviderContext = (chains: any) => {
   const { connect, connectAsync } = useConnect()
   const { disconnect, disconnectAsync } = useDisconnect()
 
+  const [delegate, setDelegate] = React.useState<null | string>(null)
   const accountAddress = useAppSelector(
-    (state) => selectAccount(state) || wagmiAddress
+    (state) => delegate || selectAccount(state)
   )
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
@@ -109,7 +110,6 @@ const WalletProviderContext = (chains: any) => {
   const [email, setEmail] = React.useState(null)
   const [notifyDM, setNotifyDM] = React.useState('true')
   const [notify24, setNotify24] = React.useState('true')
-  const [delegate, setDelegate] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
     undefined | { signature: undefined | null | string; signedMsg: string }
   >()
@@ -178,23 +178,9 @@ const WalletProviderContext = (chains: any) => {
       console.log('✅[INFO][JWT]:', jwt)
 
       Lit.setAuthSig(address)
-
-      // if we log in with a full delegate, act as the vault
-      const walletInJWT = parseJwt(jwt).sub
-      if (walletInJWT.toLocaleLowerCase() !== address.toLocaleLowerCase()) {
-        console.log(
-          '✅[Using Full Delegate Wallet]:',
-          walletInJWT,
-          accountAddress
-        )
-        storage.set('delegate', address)
-        setDelegate(address) // not sure this is used anymore
-        dispatch(setAccount(walletInJWT))
-      }
-
-      dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
-
       getSettings(address)
+      dispatch(endpoints.getName.initiate(address?.toLocaleLowerCase()))
+
       dispatch(setIsAuthenticated(true))
 
       pendingConnect.current = false
@@ -260,7 +246,7 @@ const WalletProviderContext = (chains: any) => {
 
             if (
               !welcomeData.msg.includes(accountAddress.toLocaleLowerCase()) &&
-              !accountAddress.includes(storage.get('delegate'))
+              !accountAddress.includes(delegate || "")
             ) {
               getNonce(accountAddress)
             } else {
@@ -304,6 +290,7 @@ const WalletProviderContext = (chains: any) => {
           requestSignature: Boolean(withSignature),
         }
 
+        console.log("set account widgetWalletRef")
         dispatch(setAccount(widgetWalletDataRef.current.account))
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
@@ -461,6 +448,7 @@ const WalletProviderContext = (chains: any) => {
       didDisconnect.current = false
     }
 
+    console.log("SET ACCOUNT to wagmiAddress", wagmiAddress)
     dispatch(setAccount(wagmiAddress))
   }, [wagmiAddress, dispatch])
 
@@ -575,15 +563,44 @@ const WalletProviderContext = (chains: any) => {
       })
         .then((response) => response.json())
         .then(async (signInData) => {
-          storeJwtForAccount(accountAddress, signInData.access)
 
-          const currentSigs = storage.get('lit-auth-signature-by-account')
-          storage.set('lit-auth-signature-by-account', {
-            ...currentSigs,
-            [accountAddress.toLocaleLowerCase()]: authSig,
-          })
+          // if we log in with a full delegate, act as the vault
+          const walletInJWT = parseJwt(signInData.access).sub
+          if (walletInJWT.toLocaleLowerCase() !== accountAddress.toLocaleLowerCase()) {
+            setDelegate(walletInJWT)
+            storeJwtForAccount(walletInJWT, signInData.access)
+            dispatch(setAccount(walletInJWT)) 
+            console.log(
+              '✅[Using Full Delegate Wallet]:',
+              walletInJWT,
+              accountAddress
+            )
+            
+            const currentSigs = storage.get('lit-auth-signature-by-account')
+            const delegateAuthSig = {
+              sig: signature,
+              derivedVia: 'web3.eth.personal.sign',
+              signedMessage: messageToSign,
+              address: walletInJWT,
+            }
+            storage.set('lit-auth-signature-by-account', {
+              ...currentSigs,
+              [walletInJWT.toLocaleLowerCase()]: delegateAuthSig,
+            })
 
-          signIn(accountAddress, signInData.access)
+            signIn(walletInJWT, signInData.access)
+          } else {
+
+            storeJwtForAccount(accountAddress, signInData.access)
+
+            const currentSigs = storage.get('lit-auth-signature-by-account')
+            storage.set('lit-auth-signature-by-account', {
+              ...currentSigs,
+              [accountAddress.toLocaleLowerCase()]: authSig,
+            })
+
+            signIn(accountAddress, signInData.access)
+          }
         })
 
       prevNonce.current = nonce
