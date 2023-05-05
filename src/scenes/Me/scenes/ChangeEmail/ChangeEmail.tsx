@@ -42,6 +42,43 @@ const ChangeEmail = ({ account }: { account: string }) => {
    const [telegramhandle, setTgHandle] = useState('')
    const [isFetching, setIsFetching] = useState(false)
 
+   const getSettings = () => {
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_settings/${account}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+         },
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Settings In Change Email]:', data)
+            // if (data[0]?.email) {
+            //    console.log('-[Email]:', data[0].email)
+            //    setEmail(data[0].email)
+            // }
+            if (data[0]?.telegramcode) {
+               console.log('-[telegramcode]:', data[0].telegramcode)
+               setTelegramCode(data[0].telegramcode)
+            }
+            else {
+               setTelegramCode("")
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Setting]:', error)
+         })
+   }
+
    const handleChangeOne = (checked: boolean) => {
       //setCheckedItems([checked, checkedItems[1]])
       globalSetNotifyDM(checked.toString())
@@ -156,6 +193,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
       }
    }
 
+   getSettings()
    return (
       <Box p={6} pt={16} background="white" width="100%">
          <form onSubmit={handleSubmit(onSubmit)}>
