@@ -70,8 +70,6 @@ const WalletProvider = React.memo(({ children }) => {
    const [name, setName] = useState(null)
    const [btnClicks, setBtnClicks] = useState(0)
    const [email, setEmail] = useState(null)
-   const [telegramCode, setTelegramCode] = useState(null)
-   const [telegramHandle, setTelegramHandle] = useState(null) 
    const [notifyDM, setNotifyDM] = useState('true')
    const [notify24, setNotify24] = useState('true')
    const [isFetchingName, setIsFetchingName] = useState(true)
@@ -110,21 +108,9 @@ const WalletProvider = React.memo(({ children }) => {
       //   console.log("WalletChat RECEIVED postMessage from PARENT to CHILD ");
       //   console.log(data);
         if(data["target"] == 'connect_wallet'){
-         let currAccount = localStorage.getItem('lit-auth-signature')
-         if (currAccount != null) {
-            currAccount = JSON.parse(currAccount).address
-         }
-         localStorage.setItem('connect_wallet', data.data.account)
-
-         console.log("WalletChat RECEIVED connect_wallet from PARENT to CHILD ", data.data.account);
-         console.log("connect_wallet is prev account: ", currAccount) 
-
-         //we get some early events here so skip the one for already selected account
-         //also we don't want the web3modal selction to auto pop up before the user
-         //ever sees the walletchat login button the very first time
-         if(currAccount && currAccount != data.data.account) {    
-            walletRequestPermissions()
-         }
+         // console.log("WalletChat RECEIVED connect_wallet from PARENT to CHILD ");
+         //connectWallet()
+         walletRequestPermissions()
         } else if(data["target"] == 'sign_in'){
          data = data.data
          try {
@@ -137,7 +123,7 @@ const WalletProvider = React.memo(({ children }) => {
                   })
                   .then((response) => response.json())
                   .then(async (returnData) => {
-                  localStorage.setItem('jwt_' + data.address, returnData.access);
+                  localStorage.setItem('jwt', returnData.access);
                   //Used for LIT encryption authSign parameter
                   const authSig = {
                      sig: data.signature,
@@ -179,8 +165,6 @@ const WalletProvider = React.memo(({ children }) => {
             setName(null)
             setBtnClicks(null)
             setEmail(null)
-            setTelegramCode(null)
-            setTelegramHandle(null)
             setNotifyDM(null)
             setNotify24(null)
             getName(accounts[0])
@@ -258,7 +242,7 @@ const WalletProvider = React.memo(({ children }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
       })
       .then((response) => response.json())
@@ -291,7 +275,7 @@ const WalletProvider = React.memo(({ children }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
       })
          .then((response) => response.json())
@@ -308,14 +292,6 @@ const WalletProvider = React.memo(({ children }) => {
             if (data[0]?.notify24) {
                console.log('-[notify24]:', data[0].notify24)
                setNotify24(data[0].notify24)
-            }
-            if (data[0]?.telegramcode) {
-               console.log('-[telegramcode]:', data[0].telegramcode)
-               setTelegramCode(data[0].telegramcode)
-            }
-            if (data[0]?.telegramhandle) {
-               console.log('-[telegramcode]:', data[0].telegramhandle)
-               setTelegramHandle(data[0].telegramhandle)
             }
          })
          .catch((error) => {
@@ -388,27 +364,10 @@ const WalletProvider = React.memo(({ children }) => {
             _account = getNormalizeAddress(_accounts)
          } else {
             const instance = await web3Modal.connect()
-            console.log("connect_wallet - instance", instance)
             setWeb3ModalProvider(instance)
             _provider = new ethers.providers.Web3Provider(instance)
-
-            console.log("connect_wallet - provider", _provider)
-
-            let currAccount = localStorage.getItem('connect_wallet')
-            if (currAccount != await _provider.getSigner().getAddress()) {
-                  console.log("connect_wallet - use stored account", currAccount)
-                  await _provider.provider.request({
-                     method: 'wallet_requestPermissions',
-                     params: [
-                        {
-                           eth_accounts: {},
-                        },
-                     ],
-                  })
-            }
+            _account = await _provider.getSigner().getAddress()
             _signer = await _provider.getSigner()
-            _account = await _signer.getAddress()
-            console.log("connect_wallet - account,signer",_account, _signer)
             const network = await _provider.getNetwork()
             setChainId(network.chainId)
             const _w3 = new Web3(_provider)
@@ -430,7 +389,7 @@ const WalletProvider = React.memo(({ children }) => {
                method: 'GET',
                headers: {
                   'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt_' + _account)}`,
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
                },
             })
             .then((response) => response.json())
@@ -493,7 +452,7 @@ const WalletProvider = React.memo(({ children }) => {
                      })
                      .then((response) => response.json())
                      .then(async (data) => {
-                        localStorage.setItem('jwt_' + _account, data.access);
+                        localStorage.setItem('jwt', data.access)
                         //Used for LIT encryption authSign parameter
                         localStorage.setItem('lit-auth-signature', JSON.stringify(authSig))
                         localStorage.setItem('lit-web3-provider', _provider.connection.url)
@@ -534,7 +493,7 @@ const WalletProvider = React.memo(({ children }) => {
                 //"Welcome:" + addrnameDB.Name + ":Addr:" + Authuser.Address (backend response)
                 setName(data.msg.toString().split(':')[1])
                 console.log('✅[Name: ]:', name)
-                const walletInJWT = parseJwt(localStorage.getItem('jwt_' + _account)).sub
+                const walletInJWT = parseJwt(localStorage.getItem('jwt')).sub
                if (walletInJWT.toLocaleLowerCase() !== _account.toLocaleLowerCase() &&
                    _account.toLocaleLowerCase() === localStorage.getItem('delegate').toLocaleLowerCase()) {
                   console.log('✅[Using Full Delegate Wallet]:', walletInJWT, _account)
@@ -610,7 +569,7 @@ const WalletProvider = React.memo(({ children }) => {
                   })
                   .then((response) => response.json())
                   .then(async (data) => {
-                      localStorage.setItem('jwt_' + _account, data.access);
+                     localStorage.setItem('jwt', data.access);
                      //Used for LIT encryption authSign parameter
                      localStorage.setItem('lit-auth-signature', JSON.stringify(authSig));
                      localStorage.setItem('lit-web3-provider', _provider.connection.url);
@@ -703,7 +662,7 @@ const WalletProvider = React.memo(({ children }) => {
                }
             }
             console.log('Deleting Login LocalStorage Items')
-            localStorage.removeItem('jwt_' + account)
+            localStorage.removeItem('jwt')
             localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
             localStorage.removeItem('metamask-connected')
             localStorage.removeItem('lit-auth-signature')
@@ -732,12 +691,8 @@ const WalletProvider = React.memo(({ children }) => {
             email,
             notifyDM,
             notify24,
-            telegramCode,
-            telegramHandle,
             setName,
             setEmail,
-            setTelegramCode,
-            setTelegramHandle,
             setNotifyDM,
             setNotify24,
             isFetchingName,

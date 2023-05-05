@@ -131,7 +131,7 @@ export const App = () => {
                   <Heading size="2xl" mb={8}>
                      Login to start chatting
                   </Heading>
-                  {/* {localStorage.getItem('jwt_' + account) && (
+                  {/* {localStorage.getItem('jwt') && (
                     connectWallet()
                   )} */}
                   <Button

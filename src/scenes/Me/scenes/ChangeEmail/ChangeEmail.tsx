@@ -34,12 +34,9 @@ const ChangeEmail = ({ account }: { account: string }) => {
    const { email: _email, setEmail: globalSetEmail } = useWallet()
    const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
    const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
-   const { telegramHandle, setTelegramHandle } = useWallet()
-   const { telegramCode, setTelegramCode } = useWallet()
    var dmBool = (_notifyDM === 'true')
    var dailyBool = (_notify24 === 'true')
    const [email, setEmail] = useState('')
-   const [telegramhandle, setTgHandle] = useState('')
    const [isFetching, setIsFetching] = useState(false)
 
    const handleChangeOne = (checked: boolean) => {
@@ -51,7 +48,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify({
             notifydm: checked.toString(), 
@@ -84,7 +81,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify({
             notify24: checked.toString(), 
@@ -109,7 +106,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
    };
 
    const onSubmit = (values: any) => {
-      if (values?.email || values?.telegramhandle) {
+      if (values?.email) {
 
          setIsFetching(true)
 
@@ -118,11 +115,10 @@ const ChangeEmail = ({ account }: { account: string }) => {
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
                email: values.email, 
-               telegramhandle: values.telegramhandle,
                walletaddr: account,
                signupsite: document.referrer,
                domain: document.domain
@@ -139,14 +135,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
                   duration: 2000,
                   isClosable: true,
                 })
-
-                if (values?.email) {
-                  globalSetEmail(values.email)
-                }
-                if (values?.telegramhandle) {
-                  setTelegramHandle(values.telegramhandle)
-                }
-
+               globalSetEmail(values.email)
                navigate('/me/verify-email')
             })
             .catch((error) => {
@@ -188,7 +177,7 @@ const ChangeEmail = ({ account }: { account: string }) => {
                verticalAlign="middle"
           />
             <FormControl>
-               <FormLabel fontSize="2xl">Enter account info to receive notifications:</FormLabel>
+               <FormLabel fontSize="2xl">Enter email to receive notifications for new messages</FormLabel>
                <Text color="darkgray.300" fontSize="md" mb={1}>Current email: <b>{_email}</b></Text>
                <Flex>
                   <Input
@@ -198,50 +187,22 @@ const ChangeEmail = ({ account }: { account: string }) => {
                      placeholder="somone@somewhere.com"
                      borderColor="black"
                      {...register('email', {
-                        required: false,
+                        required: true,
                      })}
                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setEmail(e.target.value)
                      }
                   />
-               </Flex>
-               <Text color="darkgray.300" fontSize="md" mb={1}>Current TG Handle: <b>{telegramHandle}</b></Text>
-               <Flex>
-                  <Input
-                     type="text"
-                     size="lg"
-                     value={telegramhandle}
-                     placeholder="myFunTelegramHandle"
-                     borderColor="black"
-                     {...register('telegramhandle', {
-                        required: false,
-                     })}
-                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setTgHandle(e.target.value)
-                     }
-                  />
-               </Flex>
-               <Flex>
-                  <Button variant="black" height="10" type="submit" isLoading={isFetching}>
+                  <Button variant="black" height="auto" type="submit" isLoading={isFetching}>
                      <IconSend size="20" />
                   </Button>
                </Flex>
+               <FormHelperText>
+                  You can change it anytime in your settings
+               </FormHelperText>
                <Alert status="info" variant="solid" mt={4}>
-                  Changed accounts must re-verify
+                  You must verify your email again if changed here
                </Alert>
-               
-               {telegramCode && (
-                  <div>
-                     <br />
-                     <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-                           Verify Telegram
-                           <br />
-                        </Text>
-                        <Text fontSize="xl" mb={1}>Message <a href="https://t.me/Wallet_Chat_Bot" target="_blank">@Wallet_Chat_Bot</a> the code to verify: <b>{telegramCode}</b>
-                     </Text>
-                  </div>
-               )}
-
                {errors.email && errors.email.type === 'required' && (
                   <FormErrorMessage>No blank email please</FormErrorMessage>
                )}

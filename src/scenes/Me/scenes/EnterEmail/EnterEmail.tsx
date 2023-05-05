@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { IconDoorExit, IconSend, IconX, IconZoomCancel } from '@tabler/icons'
+import { IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 
 const EnterEmail = ({ account }: { account: string }) => {
@@ -34,11 +34,9 @@ const EnterEmail = ({ account }: { account: string }) => {
    const {setEmail: globalSetEmail} = useWallet()
    const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
    const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
-   const { setTelegramHandle } = useWallet()
    var dmBool = (_notifyDM === 'true')
    var dailyBool = (_notify24 === 'true')
    const [email, setEmail] = useState('')
-   const [tgHandle, setTgHandle] = useState('')
    const [isFetching, setIsFetching] = useState(false)
 
    const handleChangeOne = (checked: boolean) => {
@@ -50,7 +48,7 @@ const EnterEmail = ({ account }: { account: string }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify({
             notifydm: checked.toString(), 
@@ -83,7 +81,7 @@ const EnterEmail = ({ account }: { account: string }) => {
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify({
             notify24: checked.toString(), 
@@ -113,7 +111,7 @@ const EnterEmail = ({ account }: { account: string }) => {
   };
 
    const onSubmit = (values: any) => {
-      if (values?.email || values?.telegramhandle) {
+      if (values?.email) {
 
          setIsFetching(true)
 
@@ -122,11 +120,10 @@ const EnterEmail = ({ account }: { account: string }) => {
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
             },
             body: JSON.stringify({
                email: values.email,
-               telegramhandle: values.telegramhandle,
                walletaddr: account,
                notify24: _notify24,
                notifyDM: _notifyDM,
@@ -145,12 +142,7 @@ const EnterEmail = ({ account }: { account: string }) => {
                   duration: 2000,
                   isClosable: true,
                 })
-                if (values?.email) {
-                  globalSetEmail(values.email)
-                }
-                if (values?.telegramhandle) {
-                  setTelegramHandle(values.telegramhandle)
-                }
+               globalSetEmail(email)
                navigate('/me/verify-email')
             })
             .catch((error) => {
@@ -192,7 +184,7 @@ const EnterEmail = ({ account }: { account: string }) => {
                d="inline-block"
                verticalAlign="middle"
           />
-               <FormLabel fontSize="2xl">Enter email/TG to receive notifications (optional)</FormLabel>
+               <FormLabel fontSize="2xl">Enter email to receive notifications (optional)</FormLabel>
                <Flex>
                   <Input
                      type="text"
@@ -201,34 +193,17 @@ const EnterEmail = ({ account }: { account: string }) => {
                      placeholder="somone@somewhere.com"
                      borderColor="black"
                      {...register('email', {
-                        required: false,
+                        required: true,
                      })}
                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setEmail(e.target.value)
                      }
                   />
-               </Flex>
-               <Flex>
-                  <Input
-                     type="text"
-                     size="lg"
-                     value={tgHandle}
-                     placeholder="myFunTelegramHandle"
-                     borderColor="black"
-                     {...register('telegramhandle', {
-                        required: false,
-                     })}
-                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setTgHandle(e.target.value)
-                     }
-                  />
-               </Flex>
-               <Flex>
-                  <Button variant="black" height="10" type="submit" isLoading={isFetching}>
+                  <Button variant="black" height="auto" type="submit" isLoading={isFetching}>
                      <IconSend size="20" />
                   </Button>
-                  <Button variant="black" height="10" type="submit" onClick={handleCancel}>
-                     <IconX size="20" color="red"/>
+                  <Button variant="black" height="auto" type="submit" onClick={handleCancel}>
+                     ❌
                   </Button>
                </Flex>
                <FormHelperText>

@@ -139,7 +139,7 @@ const CommunityGroupChat = ({
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
          },
          body: JSON.stringify(data),
       })
