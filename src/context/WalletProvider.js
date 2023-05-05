@@ -70,6 +70,8 @@ const WalletProvider = React.memo(({ children }) => {
    const [name, setName] = useState(null)
    const [btnClicks, setBtnClicks] = useState(0)
    const [email, setEmail] = useState(null)
+   const [telegramCode, setTelegramCode] = useState(null)
+   const [telegramHandle, setTelegramHandle] = useState(null) 
    const [notifyDM, setNotifyDM] = useState('true')
    const [notify24, setNotify24] = useState('true')
    const [isFetchingName, setIsFetchingName] = useState(true)
@@ -165,6 +167,8 @@ const WalletProvider = React.memo(({ children }) => {
             setName(null)
             setBtnClicks(null)
             setEmail(null)
+            setTelegramCode(null)
+            setTelegramHandle(null)
             setNotifyDM(null)
             setNotify24(null)
             getName(accounts[0])
@@ -292,6 +296,14 @@ const WalletProvider = React.memo(({ children }) => {
             if (data[0]?.notify24) {
                console.log('-[notify24]:', data[0].notify24)
                setNotify24(data[0].notify24)
+            }
+            if (data[0]?.telegramcode) {
+               console.log('-[telegramcode]:', data[0].telegramcode)
+               setTelegramCode(data[0].telegramcode)
+            }
+            if (data[0]?.telegramhandle) {
+               console.log('-[telegramcode]:', data[0].telegramhandle)
+               setTelegramHandle(data[0].telegramhandle)
             }
          })
          .catch((error) => {
@@ -691,8 +703,12 @@ const WalletProvider = React.memo(({ children }) => {
             email,
             notifyDM,
             notify24,
+            telegramCode,
+            telegramHandle,
             setName,
             setEmail,
+            setTelegramCode,
+            setTelegramHandle,
             setNotifyDM,
             setNotify24,
             isFetchingName,
