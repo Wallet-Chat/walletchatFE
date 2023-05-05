@@ -205,7 +205,7 @@ const ChatMessage = ({
                credentials: "include",
                headers: {
                   'Content-Type': 'application/json',
-                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                  Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
                },
                body: JSON.stringify({
                   ...msg,

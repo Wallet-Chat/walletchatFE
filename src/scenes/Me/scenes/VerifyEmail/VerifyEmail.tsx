@@ -43,6 +43,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
    let navigate = useNavigate()
    const toast = useToast()
    const { email: _email, setEmail: globalSetEmail } = useWallet()
+   const { telegramCode: _telegramcode, setTelegramCode } = useWallet()
    const [isFetching, setIsFetching] = useState(false)
    const [fetchError, setFetchError] = useState(false)
    const [isVerifySuccess, setIsVerifySuccess] = useState(false)
@@ -85,7 +86,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
             },
          })
             .then((response) => response.json())
@@ -116,6 +117,40 @@ const VerifyEmail = ({ account }: { account: string }) => {
       }
    }
 
+   const getSettings = () => {
+      if (!process.env.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+      fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_settings/${account}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
+         },
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Settings]:', data)
+            // if (data[0]?.email) {
+            //    console.log('-[Email]:', data[0].email)
+            //    setEmail(data[0].email)
+            // }
+            if (data[0]?.telegramcode) {
+               console.log('-[telegramcode]:', data[0].telegramcode)
+               setTelegramCode(data[0].telegramcode)
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Setting]:', error)
+         })
+   }
+
    const urlParams = new URLSearchParams(location.search);
    verificationcode = urlParams.get('code')
    verificationemail = urlParams.get('email')
@@ -137,6 +172,7 @@ const VerifyEmail = ({ account }: { account: string }) => {
          </Box>  
       )
    } else if (verificationcode === null) {
+      getSettings()
       return (
          <Box p={6} pt={16} background="white" width="100%">
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -164,6 +200,18 @@ const VerifyEmail = ({ account }: { account: string }) => {
                   {errors.email && errors.email.type === 'required' && (
                      <FormErrorMessage>No blank code please</FormErrorMessage>
                   )}
+                  <br />
+                  {_telegramcode && (
+                     <div>
+                     <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                           Verify Telegram
+                           <br />
+                        </Text>
+                        <Text fontSize="xl" mb={1}>Message <a href="https://t.me/Wallet_Chat_Bot" target="_blank">@Wallet_Chat_Bot</a> the code to verify: <b>{_telegramcode}</b>
+                     </Text>
+                     </div>
+                  )}
+                     
                </FormControl>
             </form>
             {fetchError && (

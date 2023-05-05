@@ -27,12 +27,11 @@ export default function InboxSearchInput() {
       if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb")) {
          setIsResolvingENS(true)
 
-         fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/resolve_name/${address}`, {
+         fetch(` ${process.env.REACT_APP_REST_API}/resolve_name/${address}`, {
             method: 'GET',
             credentials: "include",
             headers: {
-               'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               'Content-Type': 'application/json'
             },
          })
             .then((response) => response.json())

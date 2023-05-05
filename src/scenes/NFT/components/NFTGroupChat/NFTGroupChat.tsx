@@ -59,7 +59,7 @@ const NFTGroupChat = ({
             credentials: "include",
             headers: {
                'Content-Type': 'application/json',
-               Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+               Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
             },
          }
       )
@@ -119,7 +119,7 @@ const NFTGroupChat = ({
          credentials: "include",
          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            Authorization: `Bearer ${localStorage.getItem('jwt_' + account)}`,
          },
          body: JSON.stringify(data),
       })
