@@ -277,9 +277,17 @@ export default function Sidebar() {
     window.addEventListener('message', (e) => {
       const { target, data }: API = e.data
 
-      if (target === 'nft_info' && data) {
-        const { contractAddress, itemId, network, redirect, ownerAddress } =
-          data
+      if (data) {
+        const { contractAddress, itemId, network, redirect, ownerAddress } = data
+
+        if (ownerAddress) {
+          navigate(`/dm/${ownerAddress}`)
+        }
+      }
+
+      // if (target === 'nft_info' && data) {
+      //   const { contractAddress, itemId, network, redirect, ownerAddress } =
+      //     data
 
         // if (contractAddress && itemId && network) {
         //   setNftContractAddr(contractAddress)
@@ -298,9 +306,9 @@ export default function Sidebar() {
         //     )
         //   }
         // } else if (ownerAddress) {
-          navigate(`/dm/${ownerAddress}`)
+        //  navigate(`/dm/${ownerAddress}`)
         //}
-      }
+      // }
     })
   }, [navigate])
 
