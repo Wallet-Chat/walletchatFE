@@ -35,7 +35,7 @@ const NFTChat = ({
   nftContractAddr,
   nftId,
 }: {
-  recipientAddr: string | undefined | null
+  recipientAddr: string
   account: string
   nftContractAddr: string
   nftId: string
@@ -135,7 +135,7 @@ const NFTChat = ({
     let data = {
       message: msgInputCopy,
       fromAddr: account.toLocaleLowerCase(),
-      toAddr: recipientAddr ? recipientAddr.toLocaleLowerCase() : '',
+      toAddr: recipientAddr.toLocaleLowerCase(),
       timestamp,
       nftaddr: nftContractAddr,
       nftid: nftId,
@@ -145,7 +145,7 @@ const NFTChat = ({
     addMessageToUI(
       msgInputCopy,
       account,
-      recipientAddr ? recipientAddr.toLocaleLowerCase() : '',
+      recipientAddr,
       timestamp.toString(),
       false,
       'right',

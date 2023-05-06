@@ -507,26 +507,6 @@ const NFTByContractAndId = () => {
       >
         <TabList padding='0 var(--chakra-space-5)'>
           <Tab>
-            Chat{' '}
-            {unreadCount && unreadCount !== 0 ? (
-              <Badge variant='black' background='information.400' ml={1}>
-                {unreadCount}
-              </Badge>
-            ) : (
-              <></>
-            )}
-          </Tab>
-          {tweetCount && tweetCount !== 0 ? (
-            <Tab>
-              Tweets{' '}
-              {/* <Badge variant="black" background="information.400" ml={1}>
-                        {tweetCount}
-                     </Badge> */}
-            </Tab>
-          ) : (
-            <></>
-          )}
-          <Tab>
             <Box textAlign='left'>
               <Text>DM Owner</Text>{' '}
               {unreadCount && unreadCount !== 0 ? (
@@ -546,28 +526,13 @@ const NFTByContractAndId = () => {
 
         <TabPanels overflowY='auto' className='custom-scrollbar' height='100%'>
           <TabPanel px='0' height='100%' padding='0'>
-            <NFTGroupChat account={account} nftContractAddr={nftContractAddr} />
-          </TabPanel>
-          {tweetCount && tweetCount !== 0 && (
-            <TabPanel p={5}>
-              <NFTTweets account={account} nftContractAddr={nftContractAddr} />
-            </TabPanel>
-          )}
-          <TabPanel px='0' height='100%' padding='0'>
             <NFTChat
-              recipientAddr={recipientAddr}
+              recipientAddr={ownerAddr}
               account={account}
               nftContractAddr={nftContractAddr}
               nftId={nftId}
             />
           </TabPanel>
-          {/* <TabPanel p={5}>
-                  <NFTComments
-                     account={account}
-                     nftContractAddr={nftContractAddr}
-                     nftId={nftId}
-                  />
-               </TabPanel> */}
         </TabPanels>
       </Tabs>
     </Flex>
