@@ -281,25 +281,25 @@ export default function Sidebar() {
         const { contractAddress, itemId, network, redirect, ownerAddress } =
           data
 
-        if (contractAddress && itemId && network) {
-          setNftContractAddr(contractAddress)
-          setNftId(itemId)
-          setChainName(network)
+        // if (contractAddress && itemId && network) {
+        //   setNftContractAddr(contractAddress)
+        //   setNftId(itemId)
+        //   setChainName(network)
 
-          if (contractAddress?.startsWith('0x')) {
-            getNftMetadata(contractAddress, itemId, network)
-          }
+        //   if (contractAddress?.startsWith('0x')) {
+        //     getNftMetadata(contractAddress, itemId, network)
+        //   }
 
-          if (redirect) {
-            navigate(
-              `/nft/${network}/${contractAddress}/${itemId}${
-                ownerAddress ? '/dm' : ''
-              }`
-            )
-          }
-        } else if (ownerAddress) {
+        //   if (redirect) {
+        //     navigate(
+        //       `/nft/${network}/${contractAddress}/${itemId}${
+        //         ownerAddress ? '/dm' : ''
+        //       }`
+        //     )
+        //   }
+        // } else if (ownerAddress) {
           navigate(`/dm/${ownerAddress}`)
-        }
+        //}
       }
     })
   }, [navigate])
