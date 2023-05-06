@@ -5,6 +5,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { getIsWidgetContext } from '@/utils/context'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
+import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 
 const isWidget = getIsWidgetContext()
 

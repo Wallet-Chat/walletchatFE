@@ -16,6 +16,7 @@ import {
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
 import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
+import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
@@ -40,6 +41,7 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
+import { ethers } from 'ethers'
 
 // help debug issues and watch for high traffic conditions
 const analytics = AnalyticsBrowser.load({
@@ -47,6 +49,18 @@ const analytics = AnalyticsBrowser.load({
 })
 
 const isWidget = getIsWidgetContext()
+
+// const isLedgerLive = () => {
+//   //if we are within an iframe use the parent provider (Requirement for Ledger Live)
+//   if (window !== window.parent) {
+//     console.log('USING LEDGER IFRAME PROVIDER')
+//     //_instance = new IFrameEthereumProvider()
+//     return true
+//   } else {
+//     console.log('***useing wagmi provider***')
+//     return false;
+//   }
+// }
 
 /* eslint-disable react/display-name */
 const WalletProviderContext = (chains: any) => {
@@ -469,6 +483,15 @@ const WalletProviderContext = (chains: any) => {
   }, [chain?.id])
 
   const requestSIWEandFetchJWT = React.useCallback(async () => {
+      console.log('FORCING LEDGER IFRAME PROVIDER')
+      const _instance = new IFrameEthereumProvider()
+      const _provider = new ethers.providers.Web3Provider(_instance);
+      const _account = await _provider.getSigner().getAddress()
+      const network = await _provider.getNetwork()
+      await setChainId(network.chainId)
+      const _signer = await _provider.getSigner()
+      await dispatch(setAccount(_account))
+
     const walletIsConnected = accountAddress && chainId
 
     const accountHasNoJwt =
@@ -523,7 +546,7 @@ const WalletProviderContext = (chains: any) => {
 
         messageToSign = siweMessage.prepareMessage()
 
-        const signer = await wagmi.fetchSigner()
+        let signer = _signer  //await wagmi.fetchSigner()
 
         try {
           signature = await signer?.signMessage(messageToSign)

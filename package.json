@@ -9,6 +9,7 @@
     "@emotion/styled": "^11.8.1",
     "@ensdomains/eth-ens-namehash": "^2.0.15",
     "@fontsource/roboto": "^4.5.3",
+    "@ledgerhq/iframe-provider": "^0.4.3",
     "@lit-protocol/lit-node-client": "^2.1.114",
     "@rainbow-me/rainbowkit": "^0.12.8",
     "@reduxjs/toolkit": "^1.9.2",

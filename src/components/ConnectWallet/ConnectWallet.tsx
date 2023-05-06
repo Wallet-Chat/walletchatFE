@@ -12,6 +12,7 @@ import {
   setAccount,
 } from '@/redux/reducers/account'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 
 const isWidget = getIsWidgetContext()
 
@@ -122,7 +123,7 @@ const ConnectWalletButton = () => {
                   size='lg'
                   onClick={() => {
                     if (canUseWidgetConnection) clearWidgetData()
-                    openConnectModal()
+                      openConnectModal()                
                   }}
                 >
                   Sign in with another wallet
