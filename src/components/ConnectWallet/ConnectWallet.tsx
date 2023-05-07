@@ -12,7 +12,6 @@ import {
   setAccount,
 } from '@/redux/reducers/account'
 import { useAppDispatch } from '@/hooks/useDispatch'
-import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 
 const isWidget = getIsWidgetContext()
 
@@ -22,6 +21,7 @@ const ConnectWalletButton = () => {
     siwePending,
     requestSIWEandFetchJWT,
     signIn,
+    forceRefresh,
     resetWidgetDataWithSignature,
     pendingConnect,
     clearWidgetData,
@@ -110,7 +110,7 @@ const ConnectWalletButton = () => {
                   variant='black'
                   size='lg'
                   onClick={
-                    siweFailed ? requestSIWEandFetchJWT : openConnectModal
+                    siweFailed ? requestSIWEandFetchJWT : forceRefresh
                   }
                 >
                   {siweFailed ? 'Retry signature' : 'Sign in using wallet'}

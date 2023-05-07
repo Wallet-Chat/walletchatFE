@@ -115,7 +115,7 @@ const WalletProviderContext = (chains: any) => {
 
   const initialJwt = accountAddress && storage.get('jwt')
   const accountAuthenticated =
-    accountAddress && chainId && wagmiConnected
+    accountAddress && chainId
       ? getHasJwtForAccount(accountAddress)
       : null
 
@@ -633,6 +633,10 @@ const WalletProviderContext = (chains: any) => {
     dispatch(setIsAuthenticated(false))
   }, [disconnect, dispatch])
 
+  const forceRefresh = React.useCallback(async () => {
+    dispatch(setIsAuthenticated(true))
+  }, [dispatch])
+
   React.useEffect(() => {
     if (widgetWalletData) {
       previousWidgetData.current = widgetWalletData
@@ -649,6 +653,7 @@ const WalletProviderContext = (chains: any) => {
       setNotifyDM,
       setNotify24,
       disconnectWallet,
+      forceRefresh,
       web3: currentProvider && new Web3(currentProvider),
       signIn,
       provider: currentProvider,
@@ -674,6 +679,7 @@ const WalletProviderContext = (chains: any) => {
       siwePending,
       requestSIWEandFetchJWT,
       disconnectWallet,
+      forceRefresh,
       updateAccountFromWidget,
       widgetWalletData,
       pendingConnect,
