@@ -483,7 +483,7 @@ const WalletProviderContext = (chains: any) => {
   }, [chain?.id])
 
   const requestSIWEandFetchJWT = React.useCallback(async () => {
-      console.log('FORCING LEDGER IFRAME PROVIDER')
+      console.log('FORCING LEDGER IFRAME PROVIDER FOR LEDGER LIVE')
       const _instance = new IFrameEthereumProvider()
       const _provider = new ethers.providers.Web3Provider(_instance);
       const _account = await _provider.getSigner().getAddress()
