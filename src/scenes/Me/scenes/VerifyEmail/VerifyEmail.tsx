@@ -147,7 +147,7 @@ const VerifyEmail = () => {
          .then((data) => {
             console.log('✅[GET][Settings In Verify Email]:', data)
             if (data[0]?.verified) {
-               console.log('-[Email]:', data[0].verified)
+               console.log('-[Verified]:', data[0].verified)
                setEmailVerified(data[0].verified)
             }
             if (data[0]?.telegramcode) {
@@ -186,7 +186,7 @@ const VerifyEmail = () => {
       <Box p={6} pt={16} background='white' width='100%'>
         <form onSubmit={handleSubmit(onSubmit)}>    
             <FormControl>
-            {emailVerified != "true" && (              
+            {emailVerified != "true" && emailVerified != "" && (              
               <>
             <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
               Verify Email
@@ -225,6 +225,9 @@ const VerifyEmail = () => {
                       <br />
                   </Text>
                   <Text fontSize="xl" mb={1}>Message <a href="https://t.me/Wallet_Chat_Bot" target="_blank">@Wallet_Chat_Bot</a> the code to verify: <b>{_telegramcode}</b>
+                  </Text>
+                  <br />
+                  <Text fontSize="lg" mb={1}>You should receive a confirmation TG message in less than 1 minute after messaging the verification code.               
                 </Text>
                 </div>
             )}
