@@ -107,6 +107,8 @@ const WalletProviderContext = (chains: any) => {
 
   const [nonce, setNonce] = React.useState<string | null>()
   const [email, setEmail] = React.useState(null)
+  const [telegramCode, setTelegramCode] = React.useState(null)
+  const [telegramHandle, setTelegramHandle] = React.useState(null)
   const [notifyDM, setNotifyDM] = React.useState('true')
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
@@ -164,6 +166,14 @@ const WalletProviderContext = (chains: any) => {
         if (data[0]?.notify24) {
           console.log('-[notify24]:', data[0].notify24)
           setNotify24(data[0].notify24)
+        }
+        if (data[0]?.telegramcode) {
+          console.log('-[telegramcode]:', data[0].telegramcode)
+          setTelegramCode(data[0].telegramcode)
+        }
+        if (data[0]?.telegramhandle) {
+          console.log('-[telegramcode]:', data[0].telegramhandle)
+          setTelegramHandle(data[0].telegramhandle)
         }
       })
       .catch((error: any) => {
@@ -622,7 +632,11 @@ const WalletProviderContext = (chains: any) => {
       notifyDM,
       notify24,
       setName: updateName,
+      telegramCode,
+      telegramHandle,
       setEmail,
+      setTelegramCode,
+      setTelegramHandle,
       setNotifyDM,
       setNotify24,
       disconnectWallet,
@@ -644,6 +658,8 @@ const WalletProviderContext = (chains: any) => {
       email,
       notify24,
       notifyDM,
+      telegramCode,
+      telegramHandle,
       currentProvider,
       updateName,
       signIn,

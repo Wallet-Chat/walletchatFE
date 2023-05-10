@@ -49,7 +49,9 @@ function getWidgetEnvSuffix(addDev?: boolean) {
 
 export function getCommunity() {
   const suffix = getWidgetEnvSuffix()
-  return suffix ? ENV[`REACT_APP_DEFAULT_COMMUNITY${suffix}`] : 'walletchat'
+  const defaultCommunity = suffix ? ENV[`REACT_APP_DEFAULT_COMMUNITY${suffix}`] : 'walletchat'
+  console.log("Default community: ", defaultCommunity)
+  return defaultCommunity
 }
 export function getSupportWallet() {
   const suffix = getWidgetEnvSuffix()

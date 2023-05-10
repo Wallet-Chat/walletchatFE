@@ -47,11 +47,13 @@ const VerifyEmail = () => {
     formState: { errors },
   } = useForm()
 
-  const navigate = useNavigate()
+   let navigate = useNavigate()
   const toast = useToast()
   const { email: _email, setEmail: globalSetEmail } = useWallet()
+   const { telegramCode: _telegramcode, setTelegramCode } = useWallet()
   const [isFetching, setIsFetching] = useState(false)
   const [fetchError, setFetchError] = useState(false)
+  const [emailVerified, setEmailVerified] = useState("")
   const [isVerifySuccess, setIsVerifySuccess] = useState(false)
   const callVerifyEmail = () => {
     fetch(
@@ -124,7 +126,40 @@ const VerifyEmail = () => {
     }
   }
 
-  const urlParams = new URLSearchParams(location.search)
+   const getSettings = () => {
+      if (!ENV.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${account}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+         },
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Settings In Verify Email]:', data)
+            if (data[0]?.verified) {
+               console.log('-[Email]:', data[0].verified)
+               setEmailVerified(data[0].verified)
+            }
+            if (data[0]?.telegramcode) {
+               console.log('-[telegramcode]:', data[0].telegramcode)
+               setTelegramCode(data[0].telegramcode)
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Setting]:', error)
+         })
+   }
+   const urlParams = new URLSearchParams(location.search);
   verificationcode = urlParams.get('code')
   verificationemail = urlParams.get('email')
   if (isVerifySuccess) {
@@ -146,39 +181,52 @@ const VerifyEmail = () => {
       </Box>
     )
   } else if (verificationcode === null) {
+    getSettings()
     return (
       <Box p={6} pt={16} background='white' width='100%'>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
-            Verify Email
-            <br />
-          </Text>
-          <FormControl>
-            <Text color='darkgray.300' fontSize='md' mb={1}>
-              Current email: <b>{_email}</b>
+        <form onSubmit={handleSubmit(onSubmit)}>    
+            <FormControl>
+            {emailVerified != "true" && (              
+              <>
+            <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
+              Verify Email
+              <br />
             </Text>
-            <FormLabel fontSize='2xl'>Enter code to verify email</FormLabel>
-            <Flex>
-              <Input
-                type='text'
-                size='lg'
-                placeholder='<10-character code from email>'
-                borderColor='black'
-                {...register('code', {
-                  required: true,
-                })}
-              />
-              <Button
-                variant='black'
-                height='auto'
-                type='submit'
-                isLoading={isFetching}
-              >
-                <IconSend size='20' />
-              </Button>
-            </Flex>
-            {errors.email && errors.email.type === 'required' && (
-              <FormErrorMessage>No blank code please</FormErrorMessage>
+            <Text color='darkgray.300' fontSize='md' mb={1}>
+                Current email: <b>{_email}</b>
+              </Text><FormLabel fontSize='2xl'>Enter code to verify email</FormLabel><Flex>
+                  <Input
+                    type='text'
+                    size='lg'
+                    placeholder='<10-character code from email>'
+                    borderColor='black'
+                    {...register('code', {
+                      required: true,
+                    })} />
+                  <Button
+                    variant='black'
+                    height='auto'
+                    type='submit'
+                    isLoading={isFetching}
+                  >
+                    <IconSend size='20' />
+                  </Button>
+                </Flex>
+              {errors.email && errors.email.type === 'required' && (
+                <FormErrorMessage>No blank code please</FormErrorMessage>
+              )}
+              </>
+            )}
+            <br />
+            {_telegramcode && (
+                <div>
+                <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                      Verify Telegram
+                      <br />
+                  </Text>
+                  <Text fontSize="xl" mb={1}>Message <a href="https://t.me/Wallet_Chat_Bot" target="_blank">@Wallet_Chat_Bot</a> the code to verify: <b>{_telegramcode}</b>
+                </Text>
+                </div>
             )}
           </FormControl>
         </form>

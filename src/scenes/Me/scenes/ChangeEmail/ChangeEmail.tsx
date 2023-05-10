@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { IconSend } from '@tabler/icons'
+import { IconX, IconSend } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
@@ -40,11 +40,50 @@ const ChangeEmail = () => {
   const { email: _email, setEmail: globalSetEmail } = useWallet()
   const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
   const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
+   const { telegramHandle, setTelegramHandle } = useWallet()
+   const { telegramCode, setTelegramCode } = useWallet()
   const dmBool = _notifyDM === 'true'
   const dailyBool = _notify24 === 'true'
   const [email, setEmail] = useState('')
+   const [telegramhandle, setTgHandle] = useState('')
   const [isFetching, setIsFetching] = useState(false)
 
+   const getSettings = () => {
+    if (!ENV.REACT_APP_REST_API) {
+         console.log('REST API url not in .env', process.env)
+         return
+      }
+      if (!account) {
+         console.log('No account connected')
+         return
+      }
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${account}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+         },
+      })
+         .then((response) => response.json())
+         .then((data) => {
+            console.log('✅[GET][Settings In Change Email]:', data)
+            // if (data[0]?.email) {
+            //    console.log('-[Email]:', data[0].email)
+            //    setEmail(data[0].email)
+            // }
+            if (data[0]?.telegramcode) {
+               console.log('-[telegramcode]:', data[0].telegramcode)
+               setTelegramCode(data[0].telegramcode)
+            }
+            else {
+               setTelegramCode("")
+            }
+         })
+         .catch((error) => {
+            console.error('🚨[GET][Setting]:', error)
+         })
+   }
   const handleChangeOne = (checked: boolean) => {
     //setCheckedItems([checked, checkedItems[1]])
     globalSetNotifyDM(checked.toString())
@@ -118,7 +157,7 @@ const ChangeEmail = () => {
   }
 
   const onSubmit = (values: any) => {
-    if (values?.email) {
+      if (values?.email || values?.telegramhandle) {
       setIsFetching(true)
 
       fetch(
@@ -132,6 +171,7 @@ const ChangeEmail = () => {
           },
           body: JSON.stringify({
             email: values.email,
+            telegramhandle: values.telegramhandle,
             walletaddr: account,
             signupsite: document.referrer,
             domain: document.domain,
@@ -143,13 +183,18 @@ const ChangeEmail = () => {
           console.log('✅[POST][Email]:', response)
           toast({
             title: 'Success',
-            description: `Email updated to ${email}`,
+            description: `Notifications updated!`,
             status: 'success',
             position: 'top',
             duration: 2000,
             isClosable: true,
           })
-          globalSetEmail(values.email)
+          if (values?.email) {
+            globalSetEmail(values.email)
+          }
+          if (values?.telegramhandle) {
+            setTelegramHandle(values.telegramhandle)
+          }
           navigate('/me/verify-email')
         })
         .catch((error) => {
@@ -161,6 +206,7 @@ const ChangeEmail = () => {
     }
   }
 
+  getSettings()
   return (
     <Box p={6} pt={16} background='white' width='100%'>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -206,27 +252,53 @@ const ChangeEmail = () => {
               placeholder='somone@somewhere.com'
               borderColor='black'
               {...register('email', {
-                required: true,
+                required: false,
               })}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
             />
-            <Button
-              variant='black'
-              height='auto'
-              type='submit'
-              isLoading={isFetching}
-            >
-              <IconSend size='20' />
-            </Button>
-          </Flex>
-          <FormHelperText>
-            You can change it anytime in your settings
-          </FormHelperText>
-          <Alert status='info' variant='solid' mt={4}>
-            You must verify your email again if changed here
-          </Alert>
+            </Flex>
+            <Text color="darkgray.300" fontSize="md" mb={1}>Current TG Handle: <b>{telegramHandle}</b></Text>
+            <Flex>
+              <Input
+                  type="text"
+                  size="lg"
+                  value={telegramhandle}
+                  placeholder="myFunTelegramHandle"
+                  borderColor="black"
+                  {...register('telegramhandle', {
+                    required: false,
+                  })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTgHandle(e.target.value)
+                  }
+              />
+            </Flex>
+            <Flex>
+              <Button
+                variant='black'
+                height='10'
+                type='submit'
+                isLoading={isFetching}
+              >
+                <IconSend size='20' />
+              </Button>
+            </Flex>
+               <Alert status="info" variant="solid" mt={4}>
+                  Changed accounts must re-verify
+               </Alert>
+               {telegramCode && (
+                  <div>
+                     <br />
+                     <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                           Verify Telegram
+                           <br />
+                        </Text>
+                        <Text fontSize="xl" mb={1}>Message <a href="https://t.me/Wallet_Chat_Bot" target="_blank">@Wallet_Chat_Bot</a> the code to verify: <b>{telegramCode}</b>
+                     </Text>
+                  </div>
+               )}
           {errors.email && errors.email.type === 'required' && (
             <FormErrorMessage>No blank email please</FormErrorMessage>
           )}
