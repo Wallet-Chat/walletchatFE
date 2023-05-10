@@ -85,6 +85,17 @@ const VerifyEmail = () => {
       })
   }
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getSettings()
+      // getTweetCount()
+    }, 5000) // every 5s
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [account])
+
   const onSubmit = (values: any) => {
     if (values?.code) {
       setIsFetching(true)
@@ -154,6 +165,10 @@ const VerifyEmail = () => {
                console.log('-[telegramcode]:', data[0].telegramcode)
                setTelegramCode(data[0].telegramcode)
             }
+
+            if ((data[0]?.verified == "true" || data[0]?.verified == '') && data[0]?.telegramcode == '') {
+              navigate(`/community/${getCommunity()}`)
+            }
          })
          .catch((error) => {
             console.error('🚨[GET][Setting]:', error)
@@ -182,6 +197,7 @@ const VerifyEmail = () => {
     )
   } else if (verificationcode === null) {
     getSettings()
+
     return (
       <Box p={6} pt={16} background='white' width='100%'>
         <form onSubmit={handleSubmit(onSubmit)}>    
