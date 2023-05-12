@@ -181,14 +181,7 @@ const ChangeEmail = () => {
         .then((response) => response.json())
         .then((response) => {
           console.log('✅[POST][Email]:', response)
-          toast({
-            title: 'Success',
-            description: `Notifications updated!`,
-            status: 'success',
-            position: 'top',
-            duration: 2000,
-            isClosable: true,
-          })
+
           if (values?.email) {
             globalSetEmail(values.email)
           }

@@ -115,6 +115,14 @@ const VerifyEmail = () => {
           console.log('✅[GET][Verify Email]:', response)
           setFetchError(false)
           setIsVerifySuccess(true)
+          toast({
+            title: 'Success',
+            description: `Notifications updated!`,
+            status: 'success',
+            position: 'top',
+            duration: 2000,
+            isClosable: true,
+          })
           navigate(`/community/${getCommunity()}`)
         })
         .catch((error) => {
