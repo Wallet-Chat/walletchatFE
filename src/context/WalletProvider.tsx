@@ -318,6 +318,7 @@ const WalletProviderContext = (chains: any) => {
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
 
+        //TODO: do we need to connect yet again here? seems like we get 2 requests sometimes
         if (connectConfig || config) {
           connect(connectConfig || config)
         }
@@ -338,9 +339,12 @@ const WalletProviderContext = (chains: any) => {
     const eventListener = async (e: MessageEvent) => {
       const { data, origin }: { data: API; origin: string } = e
 
-      if (getWidgetUrl()) {
-        postMessage({ data: getWidgetUrl(), target: 'url_env' })
-      }
+      // TODO - KL removed 5/14/2023, seems the ENV vars still update correctly 
+      //        can remove this in a bit if no other issues seen.  
+      //        This seemed to cause very high CPU usage (maybe infinite loop?)
+      // if (getWidgetUrl()) {
+      //   postMessage({ data: getWidgetUrl(), target: 'url_env' })
+      // }
 
       const currentOrigin = storage.get('current-widget-origin')
       if (currentOrigin !== origin) {

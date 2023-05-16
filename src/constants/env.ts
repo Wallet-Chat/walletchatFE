@@ -41,6 +41,11 @@ export const REACT_APP_APP_URL_GOODDOLLAR = import.meta.env
 // Origin Name
 export const REACT_APP_ORIGIN_NAME_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_GOODDOLLAR
+export const REACT_APP_DEFAULT_COMMUNITY_MYSTICSWAP = import.meta.env
+  .VITE_REACT_APP_DEFAULT_COMMUNITY_MYSTICSWAP
+// Support Wallet
+export const REACT_APP_SUPPORT_WALLET_MYSTICSWAP = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_MYSTICSWAP
 
 // ------------------
 

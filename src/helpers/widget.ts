@@ -44,6 +44,10 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_NFT_DEMO'
   }
 
+  if (currentWidgetOrigin.toLowerCase().includes('mysticswap.io')) {
+    return '_MYSTICSWAP'
+  }
+
   return null
 }
 
@@ -59,7 +63,7 @@ export function getSupportWallet() {
 }
 export function getWidgetUrl() {
   const suffix = getWidgetEnvSuffix(true)
-  return suffix && ENV[`REACT_APP_APP_URL${suffix}`]
+  return suffix && ENV[`REACT_APP_APP_URL${suffix}`]  //TODO can we have local .env overrride the vercel setting for debug/localhost
 }
 export function getWidgetOriginName() {
   const suffix = getWidgetEnvSuffix(true)
