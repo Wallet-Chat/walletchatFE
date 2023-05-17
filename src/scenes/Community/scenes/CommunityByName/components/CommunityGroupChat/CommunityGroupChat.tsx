@@ -26,6 +26,7 @@ import generateItems from '../../../../helpers/generateGroupedByDays'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
+import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
 
 const CommunityGroupChat = ({
@@ -56,6 +57,7 @@ const analyticsGA4 = Analytics({
     }),
   ],
 })
+ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -126,6 +128,11 @@ const analyticsGA4 = Analytics({
       site: document.referrer,
       community,
       account
+    });
+    ReactGA.event({
+      category: "SendCommunityMessageCategory",
+      action: "SendCommunityMessage",
+      label: "SendCommunityLabel", // optional
     });
 
     // Make a copy and clear input field

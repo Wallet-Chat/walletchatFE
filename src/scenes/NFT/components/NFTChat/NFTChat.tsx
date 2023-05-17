@@ -29,6 +29,7 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
+import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
 
 const NFTChat = ({
@@ -63,6 +64,7 @@ const analyticsGA4 = Analytics({
     }),
   ],
 })
+ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
 
@@ -136,6 +138,11 @@ const analyticsGA4 = Analytics({
       site: document.referrer,
       account: account,
     })
+    ReactGA.event({
+      category: "SendNftMessageCategory",
+      action: "SendNftMessage",
+      label: "SendNftMessageLabel", // optional
+    });
     if (msgInput.length <= 0) return
 
     // Make a copy and clear input field

@@ -241,13 +241,9 @@ const WalletProviderContext = (chains: any) => {
       analytics.identify(accountAddress, { name, email })
       analyticsGA4.identify(accountAddress, { name, email })
       // Send pageview with a custom path
-      ReactGA.send({ hitType: "pageview", page: "/kevinwashere", title: "connect wallet" });
+      ReactGA.send({ hitType: "pageview", page: "/kevinwashere", title: "AccoutConnet" });
       // Send a custom event
-      ReactGA.event({
-        category: "TestEvent123",
-        action: "TestAction123",
-        label: "TestLabel123", // optional
-      });
+      
     }
   }, [accountAddress, email, name])
 
@@ -485,6 +481,11 @@ const WalletProviderContext = (chains: any) => {
             item: 'test only',
             price: 20
           })
+          ReactGA.event({
+            category: "ConnectWallet",
+            action: "ConnectWallet",
+            label: "TestLabel123", // optional
+          });
           
           storage.set('last-wallet-connection-timestamp', currentTime)
         }

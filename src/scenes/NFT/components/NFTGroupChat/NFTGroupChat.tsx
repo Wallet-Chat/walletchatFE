@@ -17,6 +17,7 @@ import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
+import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
 
 const NFTGroupChat = ({
@@ -48,6 +49,7 @@ const analyticsGA4 = Analytics({
     }),
   ],
 })
+ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   useEffect(() => {
     getChatData()
@@ -106,6 +108,12 @@ const analyticsGA4 = Analytics({
       site: document.referrer,
       account: account,
     })
+    ReactGA.event({
+      category: "SendNftGroupMessageCategory",
+      action: "SendNftGroupMessage",
+      label: "SendNftGroupMessageLabel", // optional
+    });
+    
     if (msgInput.length <= 0) return
     if (!account) {
       console.log('No account connected')
