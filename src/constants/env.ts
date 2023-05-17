@@ -20,6 +20,7 @@ export const REACT_APP_ALCHEMY_API_KEY_ETHEREUM = import.meta.env
 export const REACT_APP_SLEEKPLAN_API_KEY = import.meta.env
   .VITE_REACT_APP_SLEEKPLAN_API_KEY
 export const REACT_APP_SEGMENT_KEY = import.meta.env.VITE_REACT_APP_SEGMENT_KEY
+export const REACT_APP_GOOGLE_GA4_KEY = import.meta.env.VITE_REACT_APP_GOOGLE_GA4_KEY
 export const REACT_APP_DEFAULT_COMMUNITY = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY
 export const REACT_APP_SUPPORT_WALLET = import.meta.env
@@ -41,13 +42,25 @@ export const REACT_APP_APP_URL_GOODDOLLAR = import.meta.env
 // Origin Name
 export const REACT_APP_ORIGIN_NAME_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_GOODDOLLAR
+// ------------------
+
+
+// --- GoodDollar ---
+
+// Community
 export const REACT_APP_DEFAULT_COMMUNITY_MYSTICSWAP = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY_MYSTICSWAP
 // Support Wallet
 export const REACT_APP_SUPPORT_WALLET_MYSTICSWAP = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_MYSTICSWAP
-
+// App Url
+export const REACT_APP_APP_URL_MYSTICSWAP = import.meta.env
+  .VITE_REACT_APP_APP_URL_MYSTICSWAP
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_MYSTICSWAP = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_MYSTICSWAP
 // ------------------
+
 
 // --- NFT Demo ---
 

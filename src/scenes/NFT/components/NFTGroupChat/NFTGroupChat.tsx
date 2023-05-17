@@ -15,6 +15,8 @@ import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
 import { AnalyticsBrowser } from '@segment/analytics-next'
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 
 const NFTGroupChat = ({
@@ -36,6 +38,16 @@ const NFTGroupChat = ({
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
+  /* Initialize analytics instance */
+const analyticsGA4 = Analytics({
+  app: 'WalletChatApp',
+  plugins: [
+    /* Load Google Analytics v4 */
+    googleAnalyticsPlugin({
+      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+    }),
+  ],
+})
 
   useEffect(() => {
     getChatData()
@@ -87,6 +99,10 @@ const NFTGroupChat = ({
 
   const sendMessage = async (msgInput: string) => {
     analytics.track('SendNftGroupMessage', {
+      site: document.referrer,
+      account: account,
+    })
+    analyticsGA4.track('SendNftGroupMessage', {
       site: document.referrer,
       account: account,
     })

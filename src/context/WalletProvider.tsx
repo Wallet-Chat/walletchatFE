@@ -5,6 +5,9 @@ import Web3 from 'web3'
 import { SiweMessage } from 'siwe'
 
 import { AnalyticsBrowser } from '@segment/analytics-next'
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
+import ReactGA from "react-ga4";
 
 import {
   useAccount,
@@ -45,6 +48,17 @@ import * as APP from '@/constants/app'
 const analytics = AnalyticsBrowser.load({
   writeKey: ENV.REACT_APP_SEGMENT_KEY,
 })
+/* Initialize analytics instance */
+const analyticsGA4 = Analytics({
+  app: 'WalletChatApp',
+  plugins: [
+    /* Load Google Analytics v4 */
+    googleAnalyticsPlugin({
+      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+    }),
+  ],
+})
+ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
 const isWidget = getIsWidgetContext()
 
@@ -225,6 +239,15 @@ const WalletProviderContext = (chains: any) => {
   React.useEffect(() => {
     if (analytics && accountAddress && name && email) {
       analytics.identify(accountAddress, { name, email })
+      analyticsGA4.identify(accountAddress, { name, email })
+      // Send pageview with a custom path
+      ReactGA.send({ hitType: "pageview", page: "/kevinwashere", title: "connect wallet" });
+      // Send a custom event
+      ReactGA.event({
+        category: "TestEvent123",
+        action: "TestAction123",
+        label: "TestLabel123", // optional
+      });
     }
   }, [accountAddress, email, name])
 
@@ -453,6 +476,16 @@ const WalletProviderContext = (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
+          analyticsGA4.track('ConnectWallet', {
+            site: document.referrer,
+            account: accountAddress,
+          })
+          /* Track a custom event */
+          analyticsGA4.track('cartCheckout', {
+            item: 'test only',
+            price: 20
+          })
+          
           storage.set('last-wallet-connection-timestamp', currentTime)
         }
       }

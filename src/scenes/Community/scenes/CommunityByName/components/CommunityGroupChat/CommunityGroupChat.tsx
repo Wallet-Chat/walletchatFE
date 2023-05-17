@@ -24,6 +24,8 @@ import {
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
 import { AnalyticsBrowser } from '@segment/analytics-next'
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 
 const CommunityGroupChat = ({
@@ -44,6 +46,16 @@ const CommunityGroupChat = ({
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
+  /* Initialize analytics instance */
+const analyticsGA4 = Analytics({
+  app: 'WalletChatApp',
+  plugins: [
+    /* Load Google Analytics v4 */
+    googleAnalyticsPlugin({
+      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+    }),
+  ],
+})
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -110,6 +122,11 @@ const CommunityGroupChat = ({
        community,
        account
      });
+     analyticsGA4.track('SendCommunityMessage', {
+      site: document.referrer,
+      community,
+      account
+    });
 
     // Make a copy and clear input field
     const msgInputCopy = (' ' + msgInput).slice(1)
