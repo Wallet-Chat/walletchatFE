@@ -134,7 +134,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       site: document.referrer,
       account: account,
     })
-    analyticsGA4.track('SendNftMessage', {
+    analyticsGA4.track('SendNftMessage_TRACK', {
       site: document.referrer,
       account: account,
     })

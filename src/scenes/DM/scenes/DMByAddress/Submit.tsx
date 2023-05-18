@@ -180,7 +180,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       site: document.referrer,
       account,
     })
-    analyticsGA4.track('SendMessage', {
+    analyticsGA4.track('SendMessage_TRACK', {
       site: document.referrer,
       account,
     })

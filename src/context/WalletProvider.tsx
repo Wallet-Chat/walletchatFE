@@ -240,9 +240,6 @@ const WalletProviderContext = (chains: any) => {
     if (analytics && accountAddress && name && email) {
       analytics.identify(accountAddress, { name, email })
       analyticsGA4.identify(accountAddress, { name, email })
-      // Send pageview with a custom path
-      ReactGA.send({ hitType: "pageview", page: "/kevinwashere", title: "AccoutConnet" });
-      // Send a custom event
       
     }
   }, [accountAddress, email, name])
@@ -472,14 +469,9 @@ const WalletProviderContext = (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
-          analyticsGA4.track('ConnectWallet', {
+          analyticsGA4.track('ConnectWallet_TRACK', {
             site: document.referrer,
             account: accountAddress,
-          })
-          /* Track a custom event */
-          analyticsGA4.track('cartCheckout', {
-            item: 'test only',
-            price: 20
           })
           ReactGA.event({
             category: "ConnectWallet",

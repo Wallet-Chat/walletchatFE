@@ -124,7 +124,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
        community,
        account
      });
-     analyticsGA4.track('SendCommunityMessage', {
+     analyticsGA4.track('SendCommunityMessage_TRACK', {
       site: document.referrer,
       community,
       account
