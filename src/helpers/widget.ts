@@ -48,6 +48,10 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_MYSTICSWAP'
   }
 
+  if (currentWidgetOrigin.toLowerCase().includes('sso.walletchat.fun')) {
+    return '_SSO'
+  }
+
   return null
 }
 
