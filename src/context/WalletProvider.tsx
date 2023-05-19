@@ -2,6 +2,7 @@ import * as wagmi from '@wagmi/core'
 
 import React from 'react'
 import Web3 from 'web3'
+import { ethers }  from 'ethers'
 import { SiweMessage } from 'siwe'
 
 import { AnalyticsBrowser } from '@segment/analytics-next'
@@ -43,6 +44,7 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
+import { ethersProvider } from '@/services/ethers'
 
 // help debug issues and watch for high traffic conditions
 const analytics = AnalyticsBrowser.load({
@@ -114,10 +116,7 @@ const WalletProviderContext = (chains: any) => {
   )
 
   const initialJwt = accountAddress && storage.get('jwt')
-  const accountAuthenticated =
-    accountAddress && chainId && wagmiConnected
-      ? getHasJwtForAccount(accountAddress)
-      : null
+  const accountAuthenticated = getHasJwtForAccount(accountAddress || "")
 
   const [nonce, setNonce] = React.useState<string | null>()
   const [email, setEmail] = React.useState(null)
@@ -323,7 +322,8 @@ const WalletProviderContext = (chains: any) => {
       }
 
       if (widgetWalletDataRef.current) {
-        setWidgetAuthSig(undefined)
+        // console.log("Remove 1 - setWidgetAuthSig UNDEFINED")
+        // setWidgetAuthSig(undefined)
 
         widgetWalletDataRef.current = {
           ...widgetWalletDataRef.current,
@@ -335,9 +335,9 @@ const WalletProviderContext = (chains: any) => {
         didDisconnect.current = false
 
         //TODO: do we need to connect yet again here? seems like we get 2 requests sometimes
-        if (connectConfig || config) {
-          connect(connectConfig || config)
-        }
+        // if ((connectConfig || config)) {
+        //   connect(connectConfig || config)
+        // }
       }
     },
     [connect, connectConfig, dispatch]
@@ -384,7 +384,8 @@ const WalletProviderContext = (chains: any) => {
           widgetWalletDataRef?.current?.account !== messageData.account &&
           !didDisconnect.current
 
-        if (widgetAccountChanged && widgetWalletDataRef.current !== null) {
+        //if (widgetAccountChanged && widgetWalletDataRef.current !== null) {
+        if (widgetWalletDataRef.current !== null) {
           widgetWalletDataRef.current = messageData
           setWidgetWalletData(widgetWalletDataRef.current)
 
@@ -430,10 +431,10 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
-            if (!wagmiConnected) {
-              await connectAsync({ chainId: messageData.chainId, connector })
-            }
-            await disconnectAsync()
+            // if (!wagmiConnected) {
+            //   await connectAsync({ chainId: messageData.chainId, connector })
+            // }
+            // await disconnectAsync()
 
             setConnectConfig({ chainId: messageData.chainId, connector })
             updateAccountFromWidget(
@@ -564,7 +565,12 @@ const WalletProviderContext = (chains: any) => {
 
         messageToSign = siweMessage.prepareMessage()
 
-        const signer = await wagmi.fetchSigner()
+        let signer = await wagmi.fetchSigner()
+        //this covers the missing signer if no SSO, but LIT fails to work right without the wallet connection 
+        // if (signer == null) {
+        //   const _provider = new ethers.providers.Web3Provider(window.ethereum);
+        //   signer = _provider.getSigner();
+        // }
 
         try {
           signature = await signer?.signMessage(messageToSign)
