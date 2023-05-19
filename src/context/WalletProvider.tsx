@@ -44,7 +44,6 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
-import { ethersProvider } from '@/services/ethers'
 
 // help debug issues and watch for high traffic conditions
 const analytics = AnalyticsBrowser.load({
