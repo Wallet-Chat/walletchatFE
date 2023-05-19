@@ -565,7 +565,7 @@ const WalletProviderContext = (chains: any) => {
         messageToSign = siweMessage.prepareMessage()
 
         let signer = await wagmi.fetchSigner()
-        //this covers the missing signer if no SSO, but LIT fails to work right without the wallet connection 
+        //this covers the missing signer if no SSO, but LIT fails to work right without the wallet connection on the site directly 
         // if (signer == null) {
         //   const _provider = new ethers.providers.Web3Provider(window.ethereum);
         //   signer = _provider.getSigner();
