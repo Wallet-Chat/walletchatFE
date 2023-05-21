@@ -353,7 +353,7 @@ const WalletProviderContext = (chains: any) => {
     if (!isWidget) return
 
     const eventListener = async (e: MessageEvent) => {
-      const { data, origin }: { data: API; origin: string } = e
+      const { data }: { data: API } = e
 
       // TODO - KL removed 5/14/2023, seems the ENV vars still update correctly 
       //        can remove this in a bit if no other issues seen.  
@@ -362,14 +362,14 @@ const WalletProviderContext = (chains: any) => {
         postMessage({ data: getWidgetUrl(), target: 'url_env' })
       }
 
-      const currentOrigin = storage.get('current-widget-origin')
-      if (currentOrigin !== origin) {
-        storage.set('current-widget-origin', origin)
-      }
+      // const currentOrigin = storage.get('current-widget-origin')
+      // if (currentOrigin !== origin) {
+      //   storage.set('current-widget-origin', origin)
+      // }
 
-      if (data.target === 'origin') {
-        currentWidgetHost.current = data.data
-      }
+      // if (data.target === 'origin') {
+      //   currentWidgetHost.current = data.data
+      // }
 
       const { data: messageData, target }: API = data
 
@@ -486,7 +486,7 @@ const WalletProviderContext = (chains: any) => {
 
       analyticsRecord()
 
-      const origin = storage.get('current-widget-origin')
+      const origin = window.parent.origin //storage.get('current-widget-origin')
       storage.push('widget-logins', origin)
     }
   }, [accountAddress, isAuthenticated, wagmiConnected])
