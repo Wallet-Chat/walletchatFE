@@ -124,6 +124,8 @@ const WalletProviderContext = (chains: any) => {
   const [notifyDM, setNotifyDM] = React.useState('true')
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
+  const [currentWidgetOrigin, setCurrentWidgetOrigin] = React.useState<null | string>(null)
+  const [envURL, setEnvURL] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
     undefined | { signature: undefined | null | string; signedMsg: string }
   >()
@@ -352,7 +354,9 @@ const WalletProviderContext = (chains: any) => {
     if (!isWidget) return
 
     const eventListener = async (e: MessageEvent) => {
-      const { data, origin }: { data: API; origin: string } = e
+      const { data }: { data: API } = e
+
+      console.log("*** eventListenr ***", data)
 
       // TODO - KL removed 5/14/2023, seems the ENV vars still update correctly 
       //        can remove this in a bit if no other issues seen.  
@@ -361,19 +365,21 @@ const WalletProviderContext = (chains: any) => {
         postMessage({ data: getWidgetUrl(), target: 'url_env' })
       }
 
-      const currentOrigin = storage.get('current-widget-origin')
-      if (currentOrigin !== origin) {
-        storage.set('current-widget-origin', origin)
-      }
+      // if (currentWidgetOrigin !== origin) {
+      //   console.log("*** setting Origin ***", data, origin)
+      //   setCurrentWidgetOrigin(origin)
+      //   storage.set('current-widget-origin', origin)  //if only used for analytics likely can move to state var
+      // }
 
-      if (data.target === 'origin') {
-        currentWidgetHost.current = data.data
-      }
+      // if (data.target === 'origin' && currentWidgetHost.current != data.data) {
+      //   console.log("*** setting Origin host ***", data, origin)
+      //   currentWidgetHost.current = data.data
+      // }
 
       const { data: messageData, target }: API = data
 
-      if (target === 'signed_message') {
-        //console.log("*** Setting Widget Auth Sig ***", messageData)
+      if (target === 'signed_message' && widgetAuthSig != messageData) {
+        console.log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
       }
 
@@ -486,7 +492,7 @@ const WalletProviderContext = (chains: any) => {
 
       analyticsRecord()
 
-      const origin = storage.get('current-widget-origin')
+      const origin = window.parent //storage.get('current-widget-origin')
       storage.push('widget-logins', origin)
     }
   }, [accountAddress, isAuthenticated, wagmiConnected])
@@ -547,16 +553,16 @@ const WalletProviderContext = (chains: any) => {
       const needsToRequestSIWE = !signature && shouldRequestSIWE
 
       if (needsToRequestSIWE) {
-        const domain = window.location.host
-        const origin = window.location.protocol + domain
+        const _domain = window.location.host
+        const _origin = window.location.protocol + "//" + _domain
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
 
         const siweMessage = new SiweMessage({
-          domain,
+          domain: _domain,
           address: accountAddress,
           statement,
-          uri: origin,
+          uri: _origin,
           version: '1',
           chainId,
           nonce,
