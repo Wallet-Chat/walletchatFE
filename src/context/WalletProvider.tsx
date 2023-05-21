@@ -359,9 +359,9 @@ const WalletProviderContext = (chains: any) => {
       // TODO - KL removed 5/14/2023, seems the ENV vars still update correctly 
       //        can remove this in a bit if no other issues seen.  
       //        This seemed to cause very high CPU usage (maybe infinite loop?)
-      if (getWidgetUrl()) {
-        postMessage({ data: getWidgetUrl(), target: 'url_env' })
-      }
+      // if (getWidgetUrl()) {
+      //   postMessage({ data: getWidgetUrl(), target: 'url_env' })
+      // }
 
       // if (currentWidgetOrigin !== origin) {
       //   console.log("*** setting Origin ***", data, origin)
