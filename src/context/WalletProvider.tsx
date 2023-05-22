@@ -371,7 +371,7 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
-        console.log("*** Setting Widget Auth Sig ***", messageData)
+        //console.log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
       }
 
