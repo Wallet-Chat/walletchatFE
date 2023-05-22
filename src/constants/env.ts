@@ -45,7 +45,7 @@ export const REACT_APP_ORIGIN_NAME_GOODDOLLAR = import.meta.env
 // ------------------
 
 
-// --- GoodDollar ---
+// --- MysticSwap ---
 
 // Community
 export const REACT_APP_DEFAULT_COMMUNITY_MYSTICSWAP = import.meta.env
@@ -61,6 +61,21 @@ export const REACT_APP_ORIGIN_NAME_MYSTICSWAP = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_MYSTICSWAP
 // ------------------
 
+// --- OpenPeer ---
+
+// Community
+export const REACT_APP_DEFAULT_COMMUNITY_OPENPEER = import.meta.env
+  .VITE_REACT_APP_DEFAULT_COMMUNITY_OPENPEER
+// Support Wallet
+export const REACT_APP_SUPPORT_WALLET_OPENPEER = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_OPENPEER
+// App Url
+export const REACT_APP_APP_URL_OPENPEER = import.meta.env
+  .VITE_REACT_APP_APP_URL_OPENPEER
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_OPENPEER = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_OPENPEER
+// ------------------
 
 // --- NFT Demo ---
 

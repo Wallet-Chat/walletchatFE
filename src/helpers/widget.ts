@@ -48,6 +48,10 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_MYSTICSWAP'
   }
 
+  if (currentWidgetOrigin.toLowerCase().includes('openpeer.xyz')) {
+    return '_OPENPEER'
+  }
+
   return null
 }
 
