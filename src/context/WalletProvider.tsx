@@ -354,25 +354,22 @@ const WalletProviderContext = (chains: any) => {
     if (!isWidget) return
 
     const eventListener = async (e: MessageEvent) => {
-      const { data }: { data: API } = e
+      const { data, origin }: { data: API; origin: string } = e
 
-      // TODO - KL removed 5/14/2023, seems the ENV vars still update correctly 
-      //        can remove this in a bit if no other issues seen.  
-      //        This seemed to cause very high CPU usage (maybe infinite loop?)
       if (getWidgetUrl()) {
         postMessage({ data: getWidgetUrl(), target: 'url_env' })
       }
 
-      // if (currentWidgetOrigin !== origin) {
-      //   console.log("*** setting Origin ***", data, origin)
-      //   setCurrentWidgetOrigin(origin)
-      //   storage.set('current-widget-origin', origin)  //if only used for analytics likely can move to state var
-      // }
+      if (currentWidgetOrigin !== origin) {
+        console.log("*** setting Origin ***", data, origin)
+        setCurrentWidgetOrigin(origin)
+        storage.set('current-widget-origin', origin)  //if only used for analytics likely can move to state var
+      }
 
-      // if (data.target === 'origin' && currentWidgetHost.current != data.data) {
-      //   console.log("*** setting Origin host ***", data, origin)
-      //   currentWidgetHost.current = data.data
-      // }
+      if (data.target === 'origin' && currentWidgetHost.current != data.data) {
+        console.log("*** setting Origin host ***", data, origin)
+        currentWidgetHost.current = data.data
+      }
 
       const { data: messageData, target }: API = data
 
