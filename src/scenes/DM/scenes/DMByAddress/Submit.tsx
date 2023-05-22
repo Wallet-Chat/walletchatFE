@@ -1,7 +1,5 @@
 import React from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { IconSend } from '@tabler/icons'
 import { Textarea, Button, Flex } from '@chakra-ui/react'
@@ -34,17 +32,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
-/* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
-})
-ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const pendingMsgs = React.useRef<
     {
@@ -177,10 +165,6 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     if (value.length <= 0) return
 
     analytics.track('SendMessage', {
-      site: document.referrer,
-      account,
-    })
-    analyticsGA4.track('SendMessage_TRACK', {
       site: document.referrer,
       account,
     })

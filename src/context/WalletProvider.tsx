@@ -467,10 +467,6 @@ const WalletProviderContext = (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
-          analyticsGA4.track('ConnectWallet_TRACK', {
-            site: document.referrer,
-            account: accountAddress,
-          })
           ReactGA.event({
             category: "ConnectWallet",
             action: "ConnectWallet",

@@ -27,8 +27,6 @@ import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
 
@@ -54,17 +52,7 @@ const NFTChat = ({
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
-  /* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
-})
-ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   // const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false)
 
@@ -131,10 +119,6 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const sendMessage = async () => {
     analytics.track('SendNftMessage', {
-      site: document.referrer,
-      account: account,
-    })
-    analyticsGA4.track('SendNftMessage_TRACK', {
       site: document.referrer,
       account: account,
     })

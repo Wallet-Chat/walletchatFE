@@ -24,8 +24,6 @@ import {
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
 
@@ -47,17 +45,7 @@ const CommunityGroupChat = ({
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
-  /* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
-})
-ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -124,11 +112,6 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
        community,
        account
      });
-     analyticsGA4.track('SendCommunityMessage_TRACK', {
-      site: document.referrer,
-      community,
-      account
-    });
     ReactGA.event({
       category: "SendCommunityMessageCategory",
       action: "SendCommunityMessage",
