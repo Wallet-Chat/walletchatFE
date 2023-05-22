@@ -360,20 +360,18 @@ const WalletProviderContext = (chains: any) => {
         postMessage({ data: getWidgetUrl(), target: 'url_env' })
       }
 
-      if (currentWidgetOrigin !== origin) {
-        console.log("*** setting Origin ***", data, origin)
-        setCurrentWidgetOrigin(origin)
-        storage.set('current-widget-origin', origin)  //if only used for analytics likely can move to state var
+      const currentOrigin = storage.get('current-widget-origin')
+      if (currentOrigin !== origin) {
+        storage.set('current-widget-origin', origin)
       }
 
-      if (data.target === 'origin' && currentWidgetHost.current != data.data) {
-        console.log("*** setting Origin host ***", data, origin)
+      if (data.target === 'origin') {
         currentWidgetHost.current = data.data
       }
 
       const { data: messageData, target }: API = data
 
-      if (target === 'signed_message' && widgetAuthSig != messageData) {
+      if (target === 'signed_message') {
         console.log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
       }
