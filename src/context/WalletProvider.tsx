@@ -127,7 +127,7 @@ const WalletProviderContext = (chains: any) => {
   const [currentWidgetOrigin, setCurrentWidgetOrigin] = React.useState<null | string>(null)
   const [envURL, setEnvURL] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-    undefined | { signature: undefined | null | string; signedMsg: string }
+    undefined | { signature: undefined | null | string; msgToSign: string }
   >()
   const widgetSignature = widgetAuthSig?.signature
 
@@ -535,7 +535,7 @@ const WalletProviderContext = (chains: any) => {
       siwePendingRef.current = true
 
       let signature = widgetAuthSig?.signature
-      let messageToSign = widgetAuthSig?.signedMsg
+      let messageToSign = widgetAuthSig?.msgToSign
 
       const shouldRetrySignature = siweFailedRef.current
       const widgetRequestedSIWE =
