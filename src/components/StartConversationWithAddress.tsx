@@ -16,6 +16,8 @@ import { truncateAddress } from '../helpers/truncateString'
 import { IconArrowRight } from '@tabler/icons'
 import { useWallet } from '../context/WalletProvider'
 import { addressIsValid } from '../helpers/address'
+import * as ENV from '@/constants/env'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 const StartConversationWithAddress = () => {
   const [toAddr, setToAddr] = useState<string>('')
@@ -35,12 +37,30 @@ const StartConversationWithAddress = () => {
   }
 
   const checkENS = async (address: string) => {
-    if (address.includes('.eth')) {
+    if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb")) {
       setIsResolvingENS(true)
-      const _addr = await provider?.resolveName(address)
-      setResolvedAddr(_addr)
-      setIsResolvingENS(false)
-    }
+
+      fetch(`${ENV.REACT_APP_REST_API}/resolve_name/${address}`, {
+         method: 'GET',
+         credentials: "include",
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      })
+         .then((response) => response.json())
+         .then((result) => {
+            console.log(`✅[GET][Name Owned by ${address}]]:`, result)
+            if (result?.address?.length > 0) {
+               setResolvedAddr(result.address)
+            }
+         })
+         .catch((error) =>
+            console.log(`🚨[GET][Owned by ${address}`, error)
+         )
+         .finally(() => {
+            setIsResolvingENS(false)
+         })
+   }
   }
 
   useEffect(() => {
