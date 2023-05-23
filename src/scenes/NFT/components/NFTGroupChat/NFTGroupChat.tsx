@@ -93,7 +93,6 @@ const NFTGroupChat = ({
       site: document.referrer,
       account: account,
     })
-    analyticsGA4.track('SendNftGroupMessage_TRACK', {
     ReactGA.event({
       category: "SendNftGroupMessageCategory",
       action: "SendNftGroupMessage",
