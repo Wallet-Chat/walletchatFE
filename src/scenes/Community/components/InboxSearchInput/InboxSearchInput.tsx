@@ -42,7 +42,7 @@ export default function InboxSearchInput() {
             .then((result) => {
                console.log(`✅[GET][Name Owned by ${address}]]:`, result)
                if (result?.address?.length > 0) {
-                  await setResolvedAddr(result.address)
+                  setResolvedAddr(result.address)
                   setIsSuggestionListOpen(true)
                }
             })
