@@ -106,7 +106,7 @@ const StartConversationWithAddress = () => {
           </Link>
         )}
         {isResolvingENS && <Spinner size='sm' mt={2} />}
-        {(toAddr.includes('.eth') || address.includes(".bnb") || address.includes(".arb") || address.includes(".btc")) && resolvedAddr && !isResolvingENS && (
+        {(toAddr.includes('.eth') || toAddr.includes(".bnb") || toAddr.includes(".arb") || toAddr.includes(".btc")) && resolvedAddr && !isResolvingENS && (
           <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
             <Flex
               alignItems='center'
