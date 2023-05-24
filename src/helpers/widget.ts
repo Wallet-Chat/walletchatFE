@@ -33,6 +33,10 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_LOCALHOST'
   }
 
+  if (addDev && currentWidgetOrigin.toLowerCase().includes('testhost')) {
+    return '_TESTHOST'
+  }
+
   if (
     currentWidgetOrigin.toLowerCase().includes('gooddollar') ||
     currentWidgetOrigin.toLowerCase().includes('good-protocol')
