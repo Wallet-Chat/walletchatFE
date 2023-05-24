@@ -117,7 +117,7 @@ export default function InboxSearchInput() {
       console.log("checking address")
       if (web3.utils.isAddress(toAddr)) {
          suggestedAddress = toAddr
-   } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')) && resolvedAddr && !isResolvingENS) {
+   } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc')) && resolvedAddr && !isResolvingENS) {
          suggestedAddress = resolvedAddr
       }
    }
@@ -195,10 +195,10 @@ export default function InboxSearchInput() {
                            scale={3}
                         />
                         <Text fontWeight="bold" fontSize="md" ml={2}>
-                           {toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')
+                           {toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc')
                               ? toAddr
                               : truncateAddress(toAddr)}{' '}
-                           {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')) &&
+                           {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc')) &&
                               `(${truncateAddress(suggestedAddress)})`}
                            {toAddr.endsWith('.tez') &&
                               `(${truncateAddress(suggestedAddress)})`}
