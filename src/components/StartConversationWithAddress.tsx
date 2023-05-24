@@ -38,7 +38,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    }
 
    const checkENS = async (address: string) => {
-       if (address.includes(".eth") || address.includes(".bnb") || address.includes(".btc")) {
+       if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb") || address.includes(".btc")) {
          setIsResolvingENS(true)
 
          fetch(` ${process.env.REACT_APP_REST_API}/resolve_name/${address}`, {
@@ -126,7 +126,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                </Link>
             )}
             {isResolvingENS && <Spinner size="sm" mt={2} />}
-            {(toAddr.includes(".eth") || toAddr.includes(".bnb")) && resolvedAddr && !isResolvingENS && (
+            {(toAddr.includes(".eth") || toAddr.includes(".bnb") || address.includes(".arb") || address.includes(".btc")) && resolvedAddr && !isResolvingENS && (
                <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
