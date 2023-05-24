@@ -28,7 +28,7 @@ export default function InboxSearchInput() {
    const ref = useRef(null)
 
    const checkENS = async (address: string) => {
-      if (address.includes(".eth") || address.includes(".bnb")) {
+      if (address.includes(".eth") || address.includes(".bnb")) || address.includes(".btc") {
          setIsResolvingENS(true)
 
          fetch(` ${process.env.REACT_APP_REST_API}/resolve_name/${address}`, {
@@ -42,7 +42,7 @@ export default function InboxSearchInput() {
             .then((result) => {
                console.log(`✅[GET][Name Owned by ${address}]]:`, result)
                if (result?.address?.length > 0) {
-                  setResolvedAddr(result.address)
+                  await setResolvedAddr(result.address)
                   setIsSuggestionListOpen(true)
                }
             })
@@ -91,7 +91,7 @@ export default function InboxSearchInput() {
 
    let suggestedAddress: string = toAddr
    if (web3 != null){
-      console.log("checking address")
+      console.log("checking address 1")
       if (web3.utils.isAddress(toAddr)) {
          suggestedAddress = toAddr
       } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb')) && resolvedAddr && !isResolvingENS) {

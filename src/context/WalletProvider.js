@@ -144,7 +144,7 @@ const WalletProvider = React.memo(({ children }) => {
    useEffect(() => {
       window.addEventListener("message", (e) => {
         var data = e.data;
-        console.log("WalletChat RECEIVED message from PARENT to CHILD ");
+        //console.log("WalletChat RECEIVED message from PARENT to CHILD ");
         console.log(data);
         if(data["target"] == 'sign_in'){
          data = data.data
