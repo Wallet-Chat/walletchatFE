@@ -79,7 +79,7 @@ const StartConversationWithAddress = () => {
         <Input
           type='text'
           value={toAddr}
-          placeholder='Enter ENS or address (0x...) here'
+          placeholder='Enter ENS/BNB/BTC/ARB or (0x...) to chat'
           {...register('toAddr', {
             validate: (val) => addressIsValid(web3, val),
           })}

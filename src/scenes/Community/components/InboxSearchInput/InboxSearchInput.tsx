@@ -78,7 +78,7 @@ export default function InboxSearchInput() {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter ENS or address (0x.. or .eth) to chat"
+               placeholder="Enter ENS/BNB/BTC/ARB or (0x...) to chat"
                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setToAddr(e.target.value)
                }
