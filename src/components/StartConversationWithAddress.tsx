@@ -53,6 +53,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                console.log(`✅[GET][Name Owned by ${address}]]:`, result)
                if (result?.address?.length > 0) {
                   setResolvedAddr(result.address)
+                  setIsSuggestionListOpen(true)
                }
             })
             .catch((error) =>
