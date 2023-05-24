@@ -133,7 +133,7 @@ export default function InboxSearchInput() {
             <Input
                type="text"
                value={toAddr}
-               placeholder="Enter ENS/BNB/TEZ/NEAR or (0x...,) here"
+               placeholder="Enter ENS/BNB/BTC/ARB or (0x...,) here"
                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setToAddr(e.target.value)
                }
