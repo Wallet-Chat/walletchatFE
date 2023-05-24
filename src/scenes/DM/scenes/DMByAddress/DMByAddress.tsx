@@ -511,7 +511,9 @@ const DMByAddress = ({
          null
       )
 
-	if (account.includes(".eth") || account.startsWith("0x")) {  //only encrypt ethereum for now
+   //Currently only LIT works for EVM addresses (both to and from have to be EVM addrs)
+	if ((account.includes(".eth") || account.startsWith("0x")) &&
+       (data.toAddr.includes(".eth") || data.toAddr.startsWith("0x"))) {  //only encrypt ethereum for now
       
       const _accessControlConditions = [
          {
