@@ -36,7 +36,7 @@ const StartConversationWithAddress = () => {
   }
 
   const checkENS = async (address: string) => {
-    if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb")) {
+    if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb") || address.includes(".btc")) {
       setIsResolvingENS(true)
 
       fetch(`${ENV.REACT_APP_REST_API}/resolve_name/${address}`, {
