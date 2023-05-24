@@ -374,6 +374,10 @@ const WalletProviderContext = (chains: any) => {
         //console.log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
       }
+      
+      if (target === 'parent_provider') {
+        console.log("*** Parent Provider ***", data)
+      }
 
       if (target === 'sign_in' && messageData) {
         const shouldRequestSignature = messageData.requestSignature
@@ -427,6 +431,15 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
+            try {
+              if (parent.ethereum) {
+                console.log("parent etheruem var: ", parent.ethereum)
+              }
+            }
+            catch (error) {
+              console.log('🚨[Failed Parent.Ethereum]:', error)
+            }
+
             if (!wagmiConnected) {
               await connectAsync({ chainId: messageData.chainId, connector })
             }
