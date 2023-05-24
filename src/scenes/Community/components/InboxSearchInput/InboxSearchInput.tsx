@@ -28,7 +28,7 @@ export default function InboxSearchInput() {
    const ref = useRef(null)
 
    const checkENS = async (address: string) => {
-      if (address.includes(".eth") || address.includes(".bnb")) || address.includes(".btc") {
+      if (address.includes(".eth") || address.includes(".bnb") || address.includes(".btc")) {
          setIsResolvingENS(true)
 
          fetch(` ${process.env.REACT_APP_REST_API}/resolve_name/${address}`, {
