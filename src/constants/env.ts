@@ -123,3 +123,5 @@ export const REACT_APP_ORIGIN_NAME_LOCALHOST = import.meta.env
 
   export const REACT_APP_APP_URL_TESTHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_TESTHOST
+  export const REACT_APP_ORIGIN_NAME_TESTHOST = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_TESTHOST
