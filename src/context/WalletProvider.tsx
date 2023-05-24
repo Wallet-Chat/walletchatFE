@@ -431,15 +431,6 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
-            try {
-              if (parent.ethereum) {
-                console.log("parent etheruem var: ", parent.ethereum)
-              }
-            }
-            catch (error) {
-              console.log('🚨[Failed Parent.Ethereum]:', error)
-            }
-
             if (!wagmiConnected) {
               await connectAsync({ chainId: messageData.chainId, connector })
             }
