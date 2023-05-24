@@ -51,6 +51,7 @@ const StartConversationWithAddress = () => {
             console.log(`✅[GET][Name Owned by ${address}]]:`, result)
             if (result?.address?.length > 0) {
                setResolvedAddr(result.address)
+               setIsSuggestionListOpen(true)
             }
          })
          .catch((error) =>
