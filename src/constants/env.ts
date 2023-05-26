@@ -77,6 +77,20 @@ export const REACT_APP_ORIGIN_NAME_OPENPEER = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_OPENPEER
 // ------------------
 
+// --- SSO Demo ---
+// Community
+export const REACT_APP_DEFAULT_COMMUNITY_SSO = import.meta.env
+  .VITE_REACT_APP_DEFAULT_COMMUNITY_SSO
+// Support Wallet
+export const REACT_APP_SUPPORT_WALLET_SSO = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_SSO
+// App Url
+export const REACT_APP_APP_URL_SSO = import.meta.env
+  .VITE_REACT_APP_APP_URL_SSO
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_SSO = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_SSO
+// ------------------
 // --- NFT Demo ---
 
 // Community
@@ -102,3 +116,7 @@ export const REACT_APP_APP_URL_LOCALHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_LOCALHOST
 export const REACT_APP_ORIGIN_NAME_LOCALHOST = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_LOCALHOST
+  export const REACT_APP_APP_URL_TESTHOST = import.meta.env
+  .VITE_REACT_APP_APP_URL_TESTHOST
+  export const REACT_APP_ORIGIN_NAME_TESTHOST = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_TESTHOST

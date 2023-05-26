@@ -17,7 +17,7 @@ import { IconArrowRight } from '@tabler/icons'
 import { useWallet } from '../context/WalletProvider'
 import { addressIsValid } from '../helpers/address'
 import * as ENV from '@/constants/env'
-import { getJwtForAccount } from '@/helpers/jwt'
+import { log } from '@/helpers/log'
 
 const StartConversationWithAddress = () => {
   const [toAddr, setToAddr] = useState<string>('')
@@ -37,7 +37,7 @@ const StartConversationWithAddress = () => {
   }
 
   const checkENS = async (address: string) => {
-    if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb")) {
+    if (address.includes(".eth") || address.includes(".bnb") || address.includes(".arb") || address.includes(".btc")) {
       setIsResolvingENS(true)
 
       fetch(`${ENV.REACT_APP_REST_API}/resolve_name/${address}`, {
@@ -49,13 +49,14 @@ const StartConversationWithAddress = () => {
       })
          .then((response) => response.json())
          .then((result) => {
-            console.log(`✅[GET][Name Owned by ${address}]]:`, result)
+            log(`✅[GET][Name Owned by ${address}]]:`, result)
             if (result?.address?.length > 0) {
                setResolvedAddr(result.address)
+               setIsSuggestionListOpen(true)
             }
          })
          .catch((error) =>
-            console.log(`🚨[GET][Owned by ${address}`, error)
+            log(`🚨[GET][Owned by ${address}`, error)
          )
          .finally(() => {
             setIsResolvingENS(false)
@@ -80,7 +81,7 @@ const StartConversationWithAddress = () => {
         <Input
           type='text'
           value={toAddr}
-          placeholder='Enter ENS or address (0x...) here'
+          placeholder='Enter ENS/BNB/BTC/ARB or (0x...) to chat'
           {...register('toAddr', {
             validate: (val) => addressIsValid(web3, val),
           })}
@@ -107,7 +108,7 @@ const StartConversationWithAddress = () => {
           </Link>
         )}
         {isResolvingENS && <Spinner size='sm' mt={2} />}
-        {toAddr.includes('.eth') && resolvedAddr && !isResolvingENS && (
+        {(toAddr.includes('.eth') || toAddr.includes(".bnb") || toAddr.includes(".arb") || toAddr.includes(".btc")) && resolvedAddr && !isResolvingENS && (
           <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
             <Flex
               alignItems='center'

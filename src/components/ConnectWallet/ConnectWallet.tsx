@@ -4,6 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getIsWidgetContext } from '@/utils/context'
 import { useWallet } from '@/context/WalletProvider'
 import { getWidgetOriginName } from '@/helpers/widget'
+import { log } from '@/helpers/log'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import {

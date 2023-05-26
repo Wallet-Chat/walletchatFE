@@ -22,6 +22,7 @@ import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { useWallet } from '@/context/WalletProvider'
+import { log } from '@/helpers/log'
 
 const NFTInbox = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -51,7 +52,7 @@ const NFTInbox = () => {
   // }, [inboxData])
 
   // useEffect(() => {
-  //   // console.log('chainFilters', chainFilters)
+  //   // log('chainFilters', chainFilters)
   //   if (chainFilters.length === 0) {
   //     setNfts([])
   //   } else if (

@@ -50,6 +50,7 @@ import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
+import { log } from '@/helpers/log'
 
 const NFTByContract = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -100,7 +101,7 @@ const NFTByContract = () => {
     )
       .then((response) => response.json())
       .then((isBookmarked: boolean) => {
-        console.log('✅ [GET][NFT][Bookmarked?]', isBookmarked)
+        log('✅ [GET][NFT][Bookmarked?]', isBookmarked)
         setJoined(isBookmarked)
       })
       .catch((error) => {
@@ -128,7 +129,7 @@ const NFTByContract = () => {
       )
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[POST][NFT][Join Group]', response)
+          log('✅[POST][NFT][Join Group]', response)
           setJoined(true)
         })
         .catch((error) => {
@@ -160,7 +161,7 @@ const NFTByContract = () => {
       )
         .then((response) => response.json())
         .then((count: number) => {
-          console.log('✅[POST][NFT][Leave Group]')
+          log('✅[POST][NFT][Leave Group]')
           setJoined(false)
         })
         .catch((error) => {
@@ -188,7 +189,7 @@ const NFTByContract = () => {
         .then((response) => response.json())
         .then((count: number) => {
           if (count !== tweetCount) {
-            console.log('✅[GET][NFT][No. of tweets]:', count)
+            log('✅[GET][NFT][No. of tweets]:', count)
             setTweetCount(count)
           }
         })
@@ -200,12 +201,12 @@ const NFTByContract = () => {
 
   const getNftMetadata = () => {
     if (!nftContractAddr) {
-      console.log('Missing contract address')
+      log('Missing contract address')
       return
     }
     if (chain === 'ethereum') {
       if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-        console.log('Missing OpenSea API Key')
+        log('Missing OpenSea API Key')
         return
       }
       fetch(`https://api.opensea.io/api/v1/asset_contract/${nftContractAddr}`, {
@@ -217,14 +218,14 @@ const NFTByContract = () => {
         .then((response) => response.json())
         .then((result: OpenSeaNFTCollection) => {
           if (result?.collection?.name) {
-            console.log(`✅[GET][NFT]:`, result)
+            log(`✅[GET][NFT]:`, result)
             setNftData(openseaToGeneralNFTCollectionType(result))
           }
         })
-        .catch((error) => console.log(`🚨[GET][NFT]:`, error))
+        .catch((error) => log(`🚨[GET][NFT]:`, error))
     } else if (chain === 'polygon') {
       if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
-        console.log('Missing NFT Port API Key')
+        log('Missing NFT Port API Key')
         return
       }
       fetch(
@@ -238,7 +239,7 @@ const NFTByContract = () => {
       )
         .then((response) => response.json())
         .then((result: NFTPortNFTCollection) => {
-          console.log('✅[GET][NFT]:', result)
+          log('✅[GET][NFT]:', result)
           const _transformed = nftPortToGeneralNFTCollectionType(result)
           setNftData({
             ..._transformed,
@@ -247,17 +248,17 @@ const NFTByContract = () => {
               : _transformed?.image_url,
           })
         })
-        .catch((error) => console.log(`🚨[GET][NFT]:`, error))
+        .catch((error) => log(`🚨[GET][NFT]:`, error))
     }
   }
 
   const getNftStatistics = () => {
     if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
-      console.log('Missing NFT Port API Key')
+      log('Missing NFT Port API Key')
       return
     }
     if (!nftContractAddr) {
-      console.log('Missing contract address')
+      log('Missing contract address')
       return
     }
     fetch(
@@ -271,13 +272,13 @@ const NFTByContract = () => {
     )
       .then((response) => response.json())
       .then((result) => {
-        console.log('✅[GET][NFT Statistics]:', result)
-        // console.log(JSON.stringify(result, null, 2))
+        log('✅[GET][NFT Statistics]:', result)
+        // log(JSON.stringify(result, null, 2))
         if (result && result.statistics) {
           setNftStatistics(result.statistics)
         }
       })
-      .catch((error) => console.log('error', error))
+      .catch((error) => log('error', error))
   }
 
   return (

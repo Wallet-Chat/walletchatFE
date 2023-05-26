@@ -1,3 +1,4 @@
+import { log } from '@/helpers/log'
 export enum Sender {
 	React,
 	Content,
@@ -22,13 +23,13 @@ const messagesFromReactAppListener = (
 ) => {
 	const isValidated = validateSender(message, sender)
 	if (isValidated) {
-		console.log('sender.tab: ', sender.tab && sender.tab.url)
-		console.log('request message: ', message)
+		log('sender.tab: ', sender.tab && sender.tab.url)
+		log('request message: ', message)
 		response(document.title)
 	}
 }
 const main = () => {
-	console.log('[content.ts] Main')
+	log('[content.ts] Main')
 	/**
 	 * Fired when a message is sent from either an extension process or a content script.
 	 */

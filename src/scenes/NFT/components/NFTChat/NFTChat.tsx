@@ -14,6 +14,7 @@ import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 import {
   MessageType,
@@ -27,8 +28,6 @@ import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
 
@@ -53,16 +52,6 @@ const NFTChat = ({
 
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
-  })
-  /* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
 })
 ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
@@ -88,11 +77,11 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
   const getChatData = () => {
     // GET request to get off-chain data for RX user
     if (!ENV.REACT_APP_REST_API) {
-      console.log('REST API url not in .env', ENV)
+      log('REST API url not in .env', ENV)
       return
     }
     if (!account || !recipientAddr) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
     // setIsFetchingMessages(true)
@@ -110,7 +99,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       .then((response) => response.json())
       .then(async (data: MessageType[]) => {
         if (equal(data, chatData) === false) {
-          console.log('✅[GET][NFT][Messages]:', data)
+          log('✅[GET][NFT][Messages]:', data)
           setChatData(data)
         }
       })
@@ -134,10 +123,6 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       site: document.referrer,
       account: account,
     })
-    analyticsGA4.track('SendNftMessage_TRACK', {
-      site: document.referrer,
-      account: account,
-    })
     ReactGA.event({
       category: "SendNftMessageCategory",
       action: "SendNftMessage",
@@ -153,7 +138,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
     const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
-    console.log('nft id from sendMessage: ', nftId)
+    log('nft id from sendMessage: ', nftId)
 
     let data = {
       message: msgInputCopy,
@@ -181,7 +166,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
     // let toAddrPublicKey = await getPublicKeyFromSettings() //TODO: should only need to do this once per convo (@manapixels help move it)
 
-    // console.log('encrypt with public key: ', toAddrPublicKey)
+    // log('encrypt with public key: ', toAddrPublicKey)
     // const encryptedTo = await EthCrypto.encryptWithPublicKey(
     //    toAddrPublicKey,
     //    msgInputCopy
@@ -216,7 +201,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[POST][NFT][Send message]:', data, latestLoadedMsgs)
+        log('✅[POST][NFT][Send message]:', data, latestLoadedMsgs)
         getChatData()
       })
       .catch((error) => {
@@ -242,7 +227,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     nftAddr: string | null,
     nftId: string | null
   ) => {
-    console.log(`Add message to UI: ${message}`)
+    log(`Add message to UI: ${message}`)
 
     const newMsg: MessageUIType = {
       message,
@@ -280,7 +265,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const copyToClipboard = () => {
     if (recipientAddr) {
-      console.log('Copy to clipboard', recipientAddr)
+      log('Copy to clipboard', recipientAddr)
       let textField = document.createElement('textarea')
       textField.innerText = recipientAddr
       document.body.appendChild(textField)

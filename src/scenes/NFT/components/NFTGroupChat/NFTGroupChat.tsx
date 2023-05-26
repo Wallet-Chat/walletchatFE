@@ -16,9 +16,9 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
+import { log } from '@/helpers/log'
 
 const NFTGroupChat = ({
   account,
@@ -38,16 +38,6 @@ const NFTGroupChat = ({
 
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
-  })
-  /* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
 })
 ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
@@ -68,7 +58,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const getChatData = async () => {
     if (!account) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
 
@@ -88,7 +78,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       .then((response) => response.json())
       .then((data: GroupMessageType[]) => {
         if (equal(data, chatData) === false) {
-          console.log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
+          log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
           setChatData(data)
         }
       })
@@ -104,10 +94,6 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       site: document.referrer,
       account: account,
     })
-    analyticsGA4.track('SendNftGroupMessage_TRACK', {
-      site: document.referrer,
-      account: account,
-    })
     ReactGA.event({
       category: "SendNftGroupMessageCategory",
       action: "SendNftGroupMessage",
@@ -116,7 +102,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     
     if (msgInput.length <= 0) return
     if (!account) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
 
@@ -160,7 +146,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[POST][Message]:', data, latestLoadedMsgs)
+        log('✅[POST][Message]:', data, latestLoadedMsgs)
         getChatData()
       })
       .catch((error) => {
@@ -226,7 +212,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       isFetching: boolean,
       nftaddr: string | null
     ) => {
-      console.log(`Add message to UI: ${message}`)
+      log(`Add message to UI: ${message}`)
 
       const newMsg: MessageUIType = {
         message,

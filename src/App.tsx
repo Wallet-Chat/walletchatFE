@@ -38,6 +38,9 @@ import ConnectWalletButton from '@/components/ConnectWallet'
 import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
+import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
+window.debugON = enableDebugPrints
+window.debugOFF = disableDebugPrints
 
 export const App = () => {
   const account = useAppSelector((state) => selectAccount(state))

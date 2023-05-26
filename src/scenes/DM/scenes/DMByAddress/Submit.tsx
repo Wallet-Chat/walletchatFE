@@ -1,7 +1,5 @@
 import React from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { IconSend } from '@tabler/icons'
 import { Textarea, Button, Flex } from '@chakra-ui/react'
@@ -19,6 +17,7 @@ import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { getAccessControlConditions } from '@/helpers/lit'
 import { useWallet } from '@/context/WalletProvider'
+import { log } from '@/helpers/log'
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
@@ -33,16 +32,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const msgInput = React.useRef<string>('')
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
-  })
-/* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
 })
 ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
@@ -112,6 +101,9 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       }
 
       if (isNextMsg) {
+        //Currently only LIT works for EVM addresses (both to and from have to be EVM addrs)
+        if ((createMessageData.fromaddr.includes(".eth") || createMessageData.fromaddr.startsWith("0x")) &&
+            (createMessageData.toaddr.includes(".eth") || createMessageData.toaddr.startsWith("0x"))) {  //only encrypt ethereum for now
         const accessControlConditions = getAccessControlConditions(
           createMessageData.fromaddr,
           (createMessageData.toaddr.includes('.eth') &&
@@ -119,7 +111,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
             createMessageData.toaddr
         )
 
-        console.log(
+        log(
           'ℹ️[POST][Encrypting Message]',
           createMessageData.message,
           accessControlConditions
@@ -139,20 +131,22 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
           accessControlConditions
         )
 
-        console.log('✅[POST][Encrypted Message]:', newMessage)
+        log('✅[POST][Encrypted Message]:', newMessage)
+        }
         fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
           postFetchOptions(createMessageData, account)
         )
           .then((response) => response.json())
           .then((responseData) => {
-            console.log('✅[POST][Send Message]:', responseData)
+            log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
             if (pendingMsgs.current[0]?.timestamp === timestamp) {
               pendingMsgs.current.shift()
 
               if (pendingMsgs.current[0]) {
+                log('✅[POST][Retry Message - TODO debug]:', responseData)
                 postMessage(
                   pendingMsgs.current[0].createMessageData,
                   pendingMsgs.current[0].newMessage,
@@ -177,10 +171,6 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     if (value.length <= 0) return
 
     analytics.track('SendMessage', {
-      site: document.referrer,
-      account,
-    })
-    analyticsGA4.track('SendMessage_TRACK', {
       site: document.referrer,
       account,
     })
@@ -238,7 +228,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
     ) {
       if (!ENV.REACT_APP_SLEEKPLAN_API_KEY) {
-        console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
+        log('Missing REACT_APP_SLEEKPLAN_API_KEY')
       } else {
         fetch(`https://api.sleekplan.com/v1/post`, {
           method: 'POST',
@@ -256,7 +246,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
         })
           .then((response) => response.json())
           .then((responseData) => {
-            console.log('✅[POST][Feedback]:', responseData)
+            log('✅[POST][Feedback]:', responseData)
           })
           .catch((error) => {
             console.error(

@@ -17,6 +17,7 @@ import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 import {
   GroupMessageType,
@@ -24,8 +25,6 @@ import {
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
 
@@ -47,16 +46,6 @@ const CommunityGroupChat = ({
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
-  /* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
-})
 ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   useEffect(() => {
@@ -115,16 +104,11 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
   const sendMessage = async () => {
     if (msgInput.length <= 0) return
     if (!account) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
 
     analytics.track('SendCommunityMessage', {
-       site: document.referrer,
-       community,
-       account
-     });
-     analyticsGA4.track('SendCommunityMessage_TRACK', {
       site: document.referrer,
       community,
       account
@@ -175,7 +159,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
+        log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
       })
       .catch((error) => {
         console.error(
@@ -197,7 +181,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     position: string,
     isFetching: boolean
   ) => {
-    console.log(`Add message to UI: ${message}`)
+    log(`Add message to UI: ${message}`)
 
     const newMsg: MessageUIType = {
       type,

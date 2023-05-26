@@ -23,6 +23,7 @@ import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
+import { log } from '../helpers/log'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
@@ -168,25 +169,25 @@ const WalletProviderContext = (chains: any) => {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[GET][Settings]:', data)
+        log('✅[GET][Settings]:', data)
         if (data[0]?.email) {
-          console.log('-[Email]:', data[0].email)
+          log('-[Email]:', data[0].email)
           setEmail(data[0].email)
         }
         if (data[0]?.notifydm) {
-          console.log('-[notifydm]:', data[0].notifydm)
+          log('-[notifydm]:', data[0].notifydm)
           setNotifyDM(data[0].notifydm)
         }
         if (data[0]?.notify24) {
-          console.log('-[notify24]:', data[0].notify24)
+          log('-[notify24]:', data[0].notify24)
           setNotify24(data[0].notify24)
         }
         if (data[0]?.telegramcode) {
-          console.log('-[telegramcode]:', data[0].telegramcode)
+          log('-[telegramcode]:', data[0].telegramcode)
           setTelegramCode(data[0].telegramcode)
         }
         if (data[0]?.telegramhandle) {
-          console.log('-[telegramcode]:', data[0].telegramhandle)
+          log('-[telegramcode]:', data[0].telegramhandle)
           setTelegramHandle(data[0].telegramhandle)
         }
       })
@@ -199,14 +200,14 @@ const WalletProviderContext = (chains: any) => {
     (address: string, jwt: string) => {
       Lit.connectManual()
 
-      console.log('✅[INFO][JWT]:', jwt)
+      log('✅[INFO][JWT]:', jwt)
 
       Lit.setAuthSig(address)
 
       // if we log in with a full delegate, act as the vault
       const walletInJWT = parseJwt(jwt).sub
       if (walletInJWT.toLocaleLowerCase() !== address.toLocaleLowerCase()) {
-        console.log(
+        log(
           '✅[Using Full Delegate Wallet]:',
           walletInJWT,
           accountAddress
@@ -251,11 +252,11 @@ const WalletProviderContext = (chains: any) => {
     })
       .then((response) => response.json())
       .then(async (usersData: { Nonce: string }) => {
-        console.log('✅[GET][Nonce]:', usersData)
+        log('✅[GET][Nonce]:', usersData)
         setNonce(usersData.Nonce)
       })
       .catch((error) => {
-        console.log('🚨[GET][Nonce]:', error)
+        log('🚨[GET][Nonce]:', error)
       })
   }
 
@@ -282,7 +283,7 @@ const WalletProviderContext = (chains: any) => {
         )
           .then((response) => response.json())
           .then(async (welcomeData) => {
-            console.log('✅[GET][Welcome]:', welcomeData.msg)
+            log('✅[GET][Welcome]:', welcomeData.msg)
 
             if (
               !welcomeData.msg.includes(accountAddress.toLocaleLowerCase()) &&
@@ -294,7 +295,7 @@ const WalletProviderContext = (chains: any) => {
 
               if (currentName) {
                 updateName(currentName, accountAddress)
-                console.log('✅[Name]:', currentName)
+                log('✅[Name]:', currentName)
               } else {
                 updateName(null, accountAddress)
               }
@@ -306,7 +307,7 @@ const WalletProviderContext = (chains: any) => {
             }
           })
           .catch((welcomeError) => {
-            console.log('🚨[GET][Welcome]:', welcomeError)
+            log('🚨[GET][Welcome]:', welcomeError)
             getNonce(accountAddress)
           })
       }
@@ -323,7 +324,7 @@ const WalletProviderContext = (chains: any) => {
       }
 
       if (widgetWalletDataRef.current) {
-        // console.log("Remove 1 - setWidgetAuthSig UNDEFINED")
+        // log("Remove 1 - setWidgetAuthSig UNDEFINED")
         // setWidgetAuthSig(undefined)
 
         widgetWalletDataRef.current = {
@@ -372,7 +373,7 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
-        console.log("*** Setting Widget Auth Sig ***", messageData)
+        log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
       }
 
@@ -573,7 +574,7 @@ const WalletProviderContext = (chains: any) => {
         try {
           signature = await signer?.signMessage(messageToSign)
         } catch (error) {
-          console.log('🚨[SIWE][Failed or Rejected]:', error)
+          log('🚨[SIWE][Failed or Rejected]:', error)
         }
 
         siweAttempted.current = true
@@ -605,7 +606,7 @@ const WalletProviderContext = (chains: any) => {
         address: accountAddress.toLocaleLowerCase(),
       }
 
-      console.log('✅[INFO][AuthSig]:', authSig)
+      log('✅[INFO][AuthSig]:', authSig)
 
       fetch(`${ENV.REACT_APP_REST_API}/signin`, {
         body: JSON.stringify({

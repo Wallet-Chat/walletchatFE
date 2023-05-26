@@ -1,5 +1,6 @@
 import { create } from 'ipfs-http-client'
 import { v4 as uuidv4 } from 'uuid'
+import { log } from '@/helpers/log'
 
 const ipfsClient = create({
    url: 'https://ipfs.infura.io:5001/api/v0',
@@ -21,8 +22,8 @@ export const postIpfsData = async (text: string) => {
    let cidReturn = 'failed'
    let cid = await ipfsClient.add(text)
    // const url = `https://ipfs.infura.io/ipfs/${cid.path}`
-   // console.log('IPFS link: ', url)
-   console.log("text/cid:", text, cid)
+   // log('IPFS link: ', url)
+   log("text/cid:", text, cid)
    cidReturn = `${cid.path}`
    return await cidReturn
 }
@@ -50,6 +51,6 @@ export const uploadIpfs = async () => {
       })
    )
 
-   console.log('upload result ipfs', result)
+   log('upload result ipfs', result)
    return result
 }

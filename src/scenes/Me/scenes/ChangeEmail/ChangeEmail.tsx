@@ -24,6 +24,7 @@ import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
+import { log } from '@/helpers/log'
 
 const ChangeEmail = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -50,11 +51,11 @@ const ChangeEmail = () => {
 
    const getSettings = () => {
     if (!ENV.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
+         log('REST API url not in .env', process.env)
          return
       }
       if (!account) {
-         console.log('No account connected')
+         log('No account connected')
          return
       }
       fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${account}`, {
@@ -67,13 +68,13 @@ const ChangeEmail = () => {
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅[GET][Settings In Change Email]:', data)
+            log('✅[GET][Settings In Change Email]:', data)
             // if (data[0]?.email) {
-            //    console.log('-[Email]:', data[0].email)
+            //    log('-[Email]:', data[0].email)
             //    setEmail(data[0].email)
             // }
             if (data[0]?.telegramcode) {
-               console.log('-[telegramcode]:', data[0].telegramcode)
+               log('-[telegramcode]:', data[0].telegramcode)
                setTelegramCode(data[0].telegramcode)
             }
             else {
@@ -105,7 +106,7 @@ const ChangeEmail = () => {
     )
       .then((response) => response.json())
       .then((response) => {
-        console.log('✅[POST][NotifyDM]:', response)
+        log('✅[POST][NotifyDM]:', response)
         toast({
           title: 'Success',
           description: `Notifications updated!`,
@@ -141,7 +142,7 @@ const ChangeEmail = () => {
     )
       .then((response) => response.json())
       .then((response) => {
-        console.log('✅[POST][Notify24]:', response)
+        log('✅[POST][Notify24]:', response)
         toast({
           title: 'Success',
           description: `Notifications updated!`,
@@ -180,7 +181,7 @@ const ChangeEmail = () => {
       )
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[POST][Email]:', response)
+          log('✅[POST][Email]:', response)
 
           if (values?.email) {
             globalSetEmail(values.email)

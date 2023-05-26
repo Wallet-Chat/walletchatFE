@@ -23,6 +23,7 @@ import NFTPortNFTCollection, {
 import NFTCollection from '../../../../types/NFTCollection'
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 export default function NFTInboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -40,7 +41,7 @@ export default function NFTInboxSearchInput() {
          return
       }
       // if (!web3.utils.isAddress(address)) {
-      //    console.log('Invalid contract address')
+      //    log('Invalid contract address')
       //    return
       // }
 
@@ -49,7 +50,7 @@ export default function NFTInboxSearchInput() {
 
    const fetchEthereumContract = async (address: string) => {
       if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-         console.log('Missing OpenSea API Key')
+         log('Missing OpenSea API Key')
          return
       }
       setIsFetchingEthereum(true)
@@ -62,7 +63,7 @@ export default function NFTInboxSearchInput() {
          .then((response) => response.json())
          .then((result: OpenSeaNFTCollection) => {
             if (result?.collection?.name) {
-               // console.log(`✅[GET][NFT Contract]:`, result)
+               // log(`✅[GET][NFT Contract]:`, result)
                setNft(openseaToGeneralNFTCollectionType(result))
                setIsSuggestionListOpen(true)
             }
@@ -71,7 +72,7 @@ export default function NFTInboxSearchInput() {
             setIsFetchingEthereum(false)
          })
          .catch((error) => {
-            console.log(`🚨[GET][NFT Contract]:`, error)
+            log(`🚨[GET][NFT Contract]:`, error)
             fetchPolygonContract(address)
             setChain('polygon')
          })
@@ -79,7 +80,7 @@ export default function NFTInboxSearchInput() {
 
    const fetchPolygonContract = (address: string) => {
       if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
-         console.log('Missing NFT Port API Key')
+         log('Missing NFT Port API Key')
          return
       }
       setIsFetchingPolygon(true)
@@ -94,7 +95,7 @@ export default function NFTInboxSearchInput() {
       )
          .then((response) => response.json())
          .then((data: NFTPortNFTCollection) => {
-            // console.log('✅[GET][NFT Metadata]:', data)
+            // log('✅[GET][NFT Metadata]:', data)
 
             let _transformed: NFTCollection =
                nftPortToGeneralNFTCollectionType(data)
@@ -110,7 +111,7 @@ export default function NFTInboxSearchInput() {
             setIsFetchingPolygon(false)
          })
          .catch((error) => {
-            console.log('🚨[GET][NFT Metadata]:', error)
+            log('🚨[GET][NFT Metadata]:', error)
             setChain('ethereum')
          })
    }

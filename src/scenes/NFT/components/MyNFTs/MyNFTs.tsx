@@ -34,15 +34,15 @@ export default function MyNFTs({ account }: { account: string }) {
    useEffect(() => {
       const fetchAllNfts = async () => {
          if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
-            console.log('Missing NFTPort API Key')
+            log('Missing NFTPort API Key')
             return
          }
          if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-            console.log('Missing OpenSea API Key')
+            log('Missing OpenSea API Key')
             return
          }
          if (!account) {
-            console.log('No account connected')
+            log('No account connected')
             return
          }
 
@@ -66,7 +66,7 @@ export default function MyNFTs({ account }: { account: string }) {
             }).then((res) => res.json()),
          ])
             .then(([polygonData, ethereumData]) => {
-               console.log(
+               log(
                   `✅[GET][NFTs] ${account}:`,
                   polygonData,
                   ethereumData
@@ -104,16 +104,16 @@ export default function MyNFTs({ account }: { account: string }) {
             .finally(() => {
                setIsFetchingNFTs(false)
             })
-            .catch((error) => console.log(`🚨[GET][NFTs] ${account}`, error))
+            .catch((error) => log(`🚨[GET][NFTs] ${account}`, error))
             
       }
       const fetchPoaps = async () => {
          if (ENV.REACT_APP_POAP_API_KEY === undefined) {
-            console.log('Missing POAP API Key')
+            log('Missing POAP API Key')
             return
          }
          if (!account) {
-            console.log('No account connected')
+            log('No account connected')
             return
          }
 
@@ -128,13 +128,13 @@ export default function MyNFTs({ account }: { account: string }) {
          })
             .then((response) => response.json())
             .then((result: POAP[]) => {
-               console.log(`✅[GET][POAPs] ${account}:`, result)
+               log(`✅[GET][POAPs] ${account}:`, result)
                setPoaps(result)
             })
             .finally(() => {
                setIsFetchingPOAPs(false)
             })
-            .catch((error) => console.log(error))
+            .catch((error) => log(error))
       }
       fetchAllNfts()
       fetchPoaps()

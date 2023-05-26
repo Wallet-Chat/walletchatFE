@@ -5,6 +5,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { getIsWidgetContext } from '@/utils/context'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
+import { log } from '@/helpers/log'
 
 const isWidget = getIsWidgetContext()
 
@@ -36,7 +37,7 @@ const UnreadCountProvider = ({ children }: { children: any }) => {
         .then((response) => response.json())
         .then((data) => {
           if (!equal(data, unreadCount)) {
-            console.log('✅[GET][Unread Count]:', data)
+            log('✅[GET][Unread Count]:', data)
 
             // send message to parent for notifications when using widget
             if (isWidget) {

@@ -1,4 +1,5 @@
 import { ReducerStates } from '@/redux/store'
+import { log } from '@/helpers/log'
 
 export function createErrorResponse(call: string) {
 	return (response: any) => {
@@ -7,7 +8,7 @@ export function createErrorResponse(call: string) {
 			error: string
 		}
 
-		console.log(`🚨[GET][${call}]:`, errorResponse.error)
+		log(`🚨[GET][${call}]:`, errorResponse.error)
 
 		return errorResponse.status
 	}

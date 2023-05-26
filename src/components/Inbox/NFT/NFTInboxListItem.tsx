@@ -13,6 +13,7 @@ import NFTPortNFTCollection, {
 import POAPEvent from '../../../types/POAP/POAPEvent'
 import InboxItem from '../InboxListItem'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    const [nft, setNft] = useState<NFTCollection>()
@@ -36,12 +37,12 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
    useEffect(() => {
       const getNftMetadata = () => {
          if (!data?.nftaddr) {
-            console.log('Missing contract address')
+            log('Missing contract address')
             return
          }
          if (data?.chain === 'ethereum') {
             if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-               console.log('Missing OpenSea API Key')
+               log('Missing OpenSea API Key')
                return
             }
             fetch(
@@ -56,17 +57,17 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                .then((response) => response.json())
                .then((result: OpenSeaNFTCollection) => {
                   if (result?.collection?.name) {
-                     // console.log(`✅[GET][NFT Contract]:`, result)
+                     // log(`✅[GET][NFT Contract]:`, result)
                      setNft(openseaToGeneralNFTCollectionType(result))
                   }
                })
                .catch((error) => {
-                  console.log(`🚨[GET][NFT Contract]:`, error)
+                  log(`🚨[GET][NFT Contract]:`, error)
                   setIsError(error)
                })
          } else if (data?.chain === 'polygon') {
             if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
-               console.log('Missing NFT Port API Key')
+               log('Missing NFT Port API Key')
                return
             }
             fetch(
@@ -80,7 +81,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
             )
                .then((response) => response.json())
                .then((data: NFTPortNFTCollection) => {
-                  // console.log('✅[GET][NFT Metadata]:', data)
+                  // log('✅[GET][NFT Metadata]:', data)
 
                   let _transformed: NFTCollection =
                      nftPortToGeneralNFTCollectionType(data)
@@ -92,7 +93,7 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
                   })
                })
                .catch((error) => {
-                  console.log('🚨[GET][NFT Metadata]:', error)
+                  log('🚨[GET][NFT Metadata]:', error)
                   setIsError(error)
                })
          }
@@ -100,11 +101,11 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
 
       const getPOAPEvent = () => {
          if (!ENV.REACT_APP_POAP_API_KEY) {
-            console.log('Missing POAP API key')
+            log('Missing POAP API key')
             return
          }
          if (!poapId) {
-            console.log('Missing POAP id')
+            log('Missing POAP id')
             return
          }
 
@@ -117,10 +118,10 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
          })
             .then((response) => response.json())
             .then((result: POAPEvent) => {
-               console.log(`✅[GET][POAP Event]:`, result)
+               log(`✅[GET][POAP Event]:`, result)
                setPoapEvent(result)
             })
-            .catch((error) => console.log(error))
+            .catch((error) => log(error))
       }
       isPoap ? getPOAPEvent() : getNftMetadata()
    }, [data.nftaddr, data?.chain, poapId])
