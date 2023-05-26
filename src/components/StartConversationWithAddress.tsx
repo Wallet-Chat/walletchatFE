@@ -17,6 +17,7 @@ import { IconArrowRight } from '@tabler/icons'
 import { useWallet } from '../context/WalletProvider'
 import { addressIsValid } from '../helpers/address'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 const StartConversationWithAddress = () => {
   const [toAddr, setToAddr] = useState<string>('')
@@ -48,14 +49,14 @@ const StartConversationWithAddress = () => {
       })
          .then((response) => response.json())
          .then((result) => {
-            console.log(`✅[GET][Name Owned by ${address}]]:`, result)
+            log(`✅[GET][Name Owned by ${address}]]:`, result)
             if (result?.address?.length > 0) {
                setResolvedAddr(result.address)
                setIsSuggestionListOpen(true)
             }
          })
          .catch((error) =>
-            console.log(`🚨[GET][Owned by ${address}`, error)
+            log(`🚨[GET][Owned by ${address}`, error)
          )
          .finally(() => {
             setIsResolvingENS(false)

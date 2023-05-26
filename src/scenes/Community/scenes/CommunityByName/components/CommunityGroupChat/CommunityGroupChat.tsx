@@ -17,6 +17,7 @@ import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 import {
   GroupMessageType,
@@ -103,7 +104,7 @@ const CommunityGroupChat = ({
   const sendMessage = async () => {
     if (msgInput.length <= 0) return
     if (!account) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
 
@@ -158,7 +159,7 @@ const CommunityGroupChat = ({
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
+        log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
       })
       .catch((error) => {
         console.error(
@@ -180,7 +181,7 @@ const CommunityGroupChat = ({
     position: string,
     isFetching: boolean
   ) => {
-    console.log(`Add message to UI: ${message}`)
+    log(`Add message to UI: ${message}`)
 
     const newMsg: MessageUIType = {
       type,

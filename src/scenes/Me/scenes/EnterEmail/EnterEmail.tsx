@@ -25,6 +25,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { getCommunity } from '@/helpers/widget'
 import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
+import { log } from '@/helpers/log'
 
 const EnterEmail = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -69,7 +70,7 @@ const EnterEmail = () => {
     )
       .then((response) => response.json())
       .then((response) => {
-        console.log('✅[POST][NotifyDM]:', response)
+        log('✅[POST][NotifyDM]:', response)
         toast({
           title: 'Success',
           description: `Notifications updated!`,
@@ -105,7 +106,7 @@ const EnterEmail = () => {
     )
       .then((response) => response.json())
       .then((response) => {
-        console.log('✅[POST][Notify24]:', response)
+        log('✅[POST][Notify24]:', response)
         toast({
           title: 'Success',
           description: `Notifications updated!`,
@@ -150,7 +151,7 @@ const EnterEmail = () => {
       )
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[POST][Email]:', response)
+          log('✅[POST][Email]:', response)
           toast({
             title: 'Success',
             description: `Email updated to ${email}`,

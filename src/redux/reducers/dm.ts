@@ -7,6 +7,7 @@ import storage from '@/utils/storage'
 import Lit from '@/utils/lit'
 import { ChatMessageType, InboxMessageType } from '@/types/Message'
 import { PAGE_SIZE } from '@/scenes/DM/scenes/DMByAddress/DMByAddress'
+import { log } from '@/helpers/log'
 
 export const STORAGE_KEYS = Object.freeze({
   DM_DATA: 'dmData',
@@ -105,7 +106,7 @@ export async function decryptInboxMessages(
         decryptedMessages[i] = { ...messages[i], message }
         const newInboxValue = decryptedMessages[i]
 
-        console.log('✅[POST][Decrypted Inbox Message]: ', newInboxValue)
+        log('✅[POST][Decrypted Inbox Message]: ', newInboxValue)
 
         dispatch(
           updateQueryData('getInbox', account, () => {
@@ -123,7 +124,7 @@ export async function decryptInboxMessages(
       }
     }
 
-  console.log('ℹ️[POST][Decrypt Inbox Messages Begin]: ', messages)
+  log('ℹ️[POST][Decrypt Inbox Messages Begin]: ', messages)
 
   litDecryptionForMessages(
     account,
@@ -163,7 +164,7 @@ export async function decryptDMMessages(
         decryptedMessages[i] = { ...messages[i], message }
         const newMessage = decryptedMessages[i]
 
-        console.log('✅[POST][Decrypted DM Message]: ', newMessage)
+        log('✅[POST][Decrypted DM Message]: ', newMessage)
 
         dispatch(
           updateQueryChatData({ account, toAddr }, () => {
@@ -184,7 +185,7 @@ export async function decryptDMMessages(
       }
     }
 
-  console.log('ℹ️[POST][Decrypt DMs Begin]: ', messages)
+  log('ℹ️[POST][Decrypt DMs Begin]: ', messages)
 
   const onBeforeBegin = (messages: ChatMessageType[]) => {
     const currentChatData =
@@ -472,7 +473,7 @@ async function fetchAndStoreChatData(
         )
       ).data as unknown as ChatMessageType[]) || []
 
-    console.log('✅[GET][Chat items]: ', data)
+    log('✅[GET][Chat items]: ', data)
 
     if (data.length === 0) {
       return { data: JSON.stringify({ messages: localData }) }
@@ -510,7 +511,7 @@ async function fetchAndStoreChatData(
 
     await decryptDMMessages(dataToDecrypt, account, dispatch)
   } catch (error) {
-    console.log('🚨[GET][Chat items]:', error, queryArgs)
+    log('🚨[GET][Chat items]:', error, queryArgs)
   }
 
   return { data: null }
@@ -530,7 +531,7 @@ export const dmApi = createApi({
     getPfp: builder.query({
       query: (addr) => ({ url: `image/${addr}` }),
       transformResponse: async (response: any) => {
-        console.log('✅[GET][Image FromAddr]:', response)
+        log('✅[GET][Image FromAddr]:', response)
 
         const base64data = response[0]?.base64data
 
@@ -542,7 +543,7 @@ export const dmApi = createApi({
     getName: builder.query({
       query: (addr) => ({ url: `name/${addr}` }),
       transformResponse: async (response: any) => {
-        console.log('✅[GET][Name]:', response)
+        log('✅[GET][Name]:', response)
 
         const name = response[0]?.name
 
@@ -588,7 +589,7 @@ export const dmApi = createApi({
         const pendingMsgs = getPendingDmDataForAccountToAddr(account, toAddr)
 
         if (!pendingMsgs || pendingMsgs.length === 0) {
-          console.log('✅[GET][Updated Read Items]:')
+          log('✅[GET][Updated Read Items]:')
 
           updateLocalDmDataForAccountToAddr(account, toAddr, newLocalData)
         }
@@ -653,14 +654,14 @@ export const dmApi = createApi({
 
           // DM inbox messages -> go to the decryption queue
           if (newDms.length > 0) {
-            console.log('✅[GET][New Inbox Encrypted DMs]:', newDms)
+            log('✅[GET][New Inbox Encrypted DMs]:', newDms)
 
             await decryptInboxMessages(newDms, account, dispatch)
           }
 
           // Other inbox messages -> update local inbox data
           if (newDecryptedMessages.length > 0) {
-            console.log(
+            log(
               '✅[GET][New Plain Text Inbox Messages]:',
               newDecryptedMessages
             )
@@ -669,7 +670,7 @@ export const dmApi = createApi({
             return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
           }
         } catch (error) {
-          console.log('🚨[GET][Inbox]:', error)
+          log('🚨[GET][Inbox]:', error)
         }
 
         return { data: '' }

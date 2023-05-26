@@ -14,6 +14,7 @@ import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 import {
   MessageType,
@@ -76,11 +77,11 @@ const NFTChat = ({
   const getChatData = () => {
     // GET request to get off-chain data for RX user
     if (!ENV.REACT_APP_REST_API) {
-      console.log('REST API url not in .env', ENV)
+      log('REST API url not in .env', ENV)
       return
     }
     if (!account || !recipientAddr) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
     // setIsFetchingMessages(true)
@@ -98,7 +99,7 @@ const NFTChat = ({
       .then((response) => response.json())
       .then(async (data: MessageType[]) => {
         if (equal(data, chatData) === false) {
-          console.log('✅[GET][NFT][Messages]:', data)
+          log('✅[GET][NFT][Messages]:', data)
           setChatData(data)
         }
       })
@@ -137,7 +138,7 @@ const NFTChat = ({
 
     const latestLoadedMsgs = JSON.parse(JSON.stringify(loadedMsgs))
 
-    console.log('nft id from sendMessage: ', nftId)
+    log('nft id from sendMessage: ', nftId)
 
     let data = {
       message: msgInputCopy,
@@ -165,7 +166,7 @@ const NFTChat = ({
 
     // let toAddrPublicKey = await getPublicKeyFromSettings() //TODO: should only need to do this once per convo (@manapixels help move it)
 
-    // console.log('encrypt with public key: ', toAddrPublicKey)
+    // log('encrypt with public key: ', toAddrPublicKey)
     // const encryptedTo = await EthCrypto.encryptWithPublicKey(
     //    toAddrPublicKey,
     //    msgInputCopy
@@ -200,7 +201,7 @@ const NFTChat = ({
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[POST][NFT][Send message]:', data, latestLoadedMsgs)
+        log('✅[POST][NFT][Send message]:', data, latestLoadedMsgs)
         getChatData()
       })
       .catch((error) => {
@@ -226,7 +227,7 @@ const NFTChat = ({
     nftAddr: string | null,
     nftId: string | null
   ) => {
-    console.log(`Add message to UI: ${message}`)
+    log(`Add message to UI: ${message}`)
 
     const newMsg: MessageUIType = {
       message,
@@ -264,7 +265,7 @@ const NFTChat = ({
 
   const copyToClipboard = () => {
     if (recipientAddr) {
-      console.log('Copy to clipboard', recipientAddr)
+      log('Copy to clipboard', recipientAddr)
       let textField = document.createElement('textarea')
       textField.innerText = recipientAddr
       document.body.appendChild(textField)

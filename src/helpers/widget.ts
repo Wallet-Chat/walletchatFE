@@ -2,6 +2,7 @@ import storage from 'utils/extension-storage'
 import { AppAPI } from 'react-wallet-chat/dist/src/types'
 import * as ENV from '@/constants/env'
 import { getIsWidgetContext } from '@/utils/context'
+import { log } from '@/helpers/log'
 
 export const walletChatEth =
   '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
@@ -66,7 +67,7 @@ function getWidgetEnvSuffix(addDev?: boolean) {
 export function getCommunity() {
   const suffix = getWidgetEnvSuffix()
   const defaultCommunity = suffix ? ENV[`REACT_APP_DEFAULT_COMMUNITY${suffix}`] : 'walletchat'
-  console.log("Default community: ", defaultCommunity)
+  log("Default community: ", defaultCommunity)
   return defaultCommunity
 }
 export function getSupportWallet() {

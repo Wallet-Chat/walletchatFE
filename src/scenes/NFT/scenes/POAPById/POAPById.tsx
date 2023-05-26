@@ -27,6 +27,7 @@ import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
+import { log } from '@/helpers/log'
 
 const POAPById = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -46,7 +47,7 @@ const POAPById = () => {
 
   const getJoinStatus = () => {
     if (!poapId) {
-      console.log('Missing POAP id')
+      log('Missing POAP id')
       return
     }
     fetch(
@@ -62,7 +63,7 @@ const POAPById = () => {
     )
       .then((response) => response.json())
       .then((_joined: boolean) => {
-        console.log('✅[GET][POAP][Joined?]')
+        log('✅[GET][POAP][Joined?]')
         setJoined(_joined)
       })
       .catch((error) => {
@@ -89,7 +90,7 @@ const POAPById = () => {
     )
       .then((response) => response.json())
       .then(() => {
-        console.log('✅[POST][POAP][Join]')
+        log('✅[POST][POAP][Join]')
         setJoined(true)
       })
       .finally(() => {
@@ -119,7 +120,7 @@ const POAPById = () => {
     )
       .then((response) => response.json())
       .then((count: number) => {
-        console.log('✅[POST][POAP][Leave]')
+        log('✅[POST][POAP][Leave]')
         setJoined(false)
       })
       .finally(() => setIsFetchingJoining(false))
@@ -130,11 +131,11 @@ const POAPById = () => {
 
   const getPOAPEvent = () => {
     if (!ENV.REACT_APP_POAP_API_KEY) {
-      console.log('Missing POAP API key')
+      log('Missing POAP API key')
       return
     }
     if (!poapId) {
-      console.log('Missing POAP id')
+      log('Missing POAP id')
       return
     }
     setIsFetchingPoapEvent(true)
@@ -147,11 +148,11 @@ const POAPById = () => {
     })
       .then((response) => response.json())
       .then((result: POAPEvent) => {
-        console.log(`✅[GET][POAP Event]:`, result)
+        log(`✅[GET][POAP Event]:`, result)
         setPoapEvent(result)
       })
       .then(() => setIsFetchingPoapEvent(false))
-      .catch((error) => console.log(error))
+      .catch((error) => log(error))
   }
 
   return (

@@ -5,6 +5,7 @@ import { ethers } from 'ethers'
 import * as ENV from '@/constants/env'
 import { Network, Alchemy } from 'alchemy-sdk'
 import contractABI from './ENS.json'
+import { log } from '@/helpers/log'
 
 export async function reverseENSLookup(address: string) {
 	const web3 = new Alchemy({
@@ -15,13 +16,13 @@ export async function reverseENSLookup(address: string) {
 
 	let lookup = address.toLowerCase().substring(0, 2) + '.addr.reverse'
 	let ResolverContract = await web3.eth.ens.getResolver(lookup)
-	console.log('lookup', lookup, address, ResolverContract)
+	log('lookup', lookup, address, ResolverContract)
 	let nh = namehash.hash(lookup)
 	try {
 		let name = await ResolverContract.methods.name(nh).call()
 		if (name && name.length) {
 			const verifiedAddress = await web3.eth.ens.getAddress(name)
-			console.log(verifiedAddress)
+			log(verifiedAddress)
 			if (
 				verifiedAddress &&
 				verifiedAddress.toLowerCase() === address.toLowerCase()
@@ -49,14 +50,14 @@ export async function registrantENSLookup(domainName: string) {
 		contractAddress
 	)
 	try {
-		console.log('ens token id?: ' + derivedTokenId)
+		log('ens token id?: ' + derivedTokenId)
 		let registrant = await ENSRegistrarContract.methods
 			.ownerOf(derivedTokenId)
 			.call()
-		console.log(domainName + ' is owned by: ' + registrant)
+		log(domainName + ' is owned by: ' + registrant)
 		return registrant
 	} catch (e) {
-		console.log(e)
+		log(e)
 		return 'error'
 	}
 }

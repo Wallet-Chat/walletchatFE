@@ -53,6 +53,7 @@ import { API } from 'react-wallet-chat/dist/src/types'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
+import { log } from '@/helpers/log'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -216,11 +217,11 @@ export default function Sidebar() {
     chain: string
   ) => {
     if (ENV.REACT_APP_NFTPORT_API_KEY === undefined) {
-      console.log('Missing NFT Port API Key')
+      log('Missing NFT Port API Key')
       return
     }
     if (!nftContractAddr || !nftId) {
-      console.log('Missing contract address or id')
+      log('Missing contract address or id')
       return
     }
     fetch(
@@ -234,7 +235,7 @@ export default function Sidebar() {
     )
       .then((response) => response.json())
       .then((result: NFTPortNFTResponse) => {
-        console.log('✅[GET][NFT Metadata]:', result)
+        log('✅[GET][NFT Metadata]:', result)
 
         setNftData(result)
 
@@ -245,7 +246,7 @@ export default function Sidebar() {
           setImageUrl(responseUrl)
         }
       })
-      .catch((error) => console.log('error', error))
+      .catch((error) => log('error', error))
   }
 
   useEffect(() => {

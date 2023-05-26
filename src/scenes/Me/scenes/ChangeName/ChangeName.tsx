@@ -23,6 +23,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
+import { log } from '@/helpers/log'
 
 const ChangeName = () => {
   const {
@@ -94,7 +95,7 @@ const ChangeName = () => {
       })
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[POST][Image]:', response)
+          log('✅[POST][Image]:', response)
           toast({
             title: 'Success',
             description: `PFP updated!`,
@@ -125,7 +126,7 @@ const ChangeName = () => {
   useEffect(() => {
     const getOwnedENS = () => {
       if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-        console.log('Missing OpenSea API Key')
+        log('Missing OpenSea API Key')
         return
       }
       fetch(
@@ -139,12 +140,12 @@ const ChangeName = () => {
       )
         .then((response) => response.json())
         .then((result) => {
-          console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
+          log(`✅[GET][ENS Owned by ${account}]]:`, result)
           if (result?.assets?.length > 0) {
             setOwnedENS(result.assets)
           }
         })
-        .catch((error) => console.log(`🚨[GET][ENS Owned by ${account}`, error))
+        .catch((error) => log(`🚨[GET][ENS Owned by ${account}`, error))
     }
     if (account) {
       getOwnedENS()
@@ -171,7 +172,7 @@ const ChangeName = () => {
       })
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[PUT][Name]:', response)
+          log('✅[PUT][Name]:', response)
           globalSetName(values.name)
           toast({
             title: 'Success',
@@ -207,7 +208,7 @@ const ChangeName = () => {
       <form onSubmit={onSubmitPFP}>
         <FormControl>
           <FormLabel fontSize='xl'>Upload your PFP</FormLabel>
-          {console.log(filePreview)}
+          {log(filePreview)}
           <label>
             {file && (
               <Tooltip label='Change PFP'>

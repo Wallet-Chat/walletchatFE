@@ -7,6 +7,7 @@ import * as ENV from '@/constants/env'
 import CommentType from '../../../../types/Comment'
 import Comment from './components/Comment'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { log } from '@/helpers/log'
 
 const NFTComments = ({
   account,
@@ -47,7 +48,7 @@ const NFTComments = ({
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[GET][NFT][Comments]:', data)
+        log('✅[GET][NFT][Comments]:', data)
         const translatedData = data.map((item: any) => ({
           fromAddr: item.fromaddr,
           nftAddr: item.nftaddr,
@@ -103,8 +104,8 @@ const NFTComments = ({
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log('nft id: ', nftId)
-        console.log('✅[POST][NFT][Comment]:', data)
+        log('nft id: ', nftId)
+        log('✅[POST][NFT][Comment]:', data)
         addCommentToUI(
           account,
           nftContractAddr,
@@ -126,7 +127,7 @@ const NFTComments = ({
     timestamp: Date,
     message: string
   ) => {
-    console.log(`Add comment to UI: ${message}`)
+    log(`Add comment to UI: ${message}`)
 
     const newComment: CommentType = {
       fromAddr,
@@ -137,7 +138,7 @@ const NFTComments = ({
     }
     let newLoadedComments: CommentType[] = [...loadedComments] // copy the old array
     newLoadedComments = [newComment].concat(newLoadedComments) // place new comment in 0 index
-    console.log(newLoadedComments)
+    log(newLoadedComments)
     setLoadedComments(newLoadedComments)
   }
 

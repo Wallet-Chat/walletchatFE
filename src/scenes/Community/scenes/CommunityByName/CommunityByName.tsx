@@ -28,6 +28,7 @@ import CommunityType from '../../../../types/Community'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
+import { log } from '@/helpers/log'
 
 const CommunityByName = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -61,7 +62,7 @@ const CommunityByName = () => {
   const getCommunityData = () => {
     if (account) {
       if (!account) {
-        console.log('No account connected')
+        log('No account connected')
         return
       }
       fetch(
@@ -78,7 +79,7 @@ const CommunityByName = () => {
         .then((response) => response.json())
         .then(async (data: CommunityType) => {
           if (!equal(data?.messages, communityData?.messages)) {
-            console.log('✅[GET][Community]:', data)
+            log('✅[GET][Community]:', data)
             setCommunityData({
               ...data,
               twitter: data?.social?.find((i) => i.type === 'twitter')
@@ -124,7 +125,7 @@ const CommunityByName = () => {
       )
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[POST][Community][Join]', response)
+          log('✅[POST][Community][Join]', response)
           setJoined(true)
         })
         .catch((error) => {
@@ -156,7 +157,7 @@ const CommunityByName = () => {
       )
         .then((response) => response.json())
         .then((count: number) => {
-          console.log('✅[POST][Community][Leave]')
+          log('✅[POST][Community][Leave]')
           setJoined(false)
         })
         .catch((error) => {

@@ -18,6 +18,7 @@ import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import ReactGA from "react-ga4";
 import { getJwtForAccount } from '@/helpers/jwt'
+import { log } from '@/helpers/log'
 
 const NFTGroupChat = ({
   account,
@@ -57,7 +58,7 @@ const NFTGroupChat = ({
 
   const getChatData = async () => {
     if (!account) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
 
@@ -77,7 +78,7 @@ const NFTGroupChat = ({
       .then((response) => response.json())
       .then((data: GroupMessageType[]) => {
         if (equal(data, chatData) === false) {
-          console.log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
+          log('✅[GET][NFT][Group Chat Messages By Addr]:', data)
           setChatData(data)
         }
       })
@@ -101,7 +102,7 @@ const NFTGroupChat = ({
     
     if (msgInput.length <= 0) return
     if (!account) {
-      console.log('No account connected')
+      log('No account connected')
       return
     }
 
@@ -145,7 +146,7 @@ const NFTGroupChat = ({
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log('✅[POST][Message]:', data, latestLoadedMsgs)
+        log('✅[POST][Message]:', data, latestLoadedMsgs)
         getChatData()
       })
       .catch((error) => {
@@ -211,7 +212,7 @@ const NFTGroupChat = ({
       isFetching: boolean,
       nftaddr: string | null
     ) => {
-      console.log(`Add message to UI: ${message}`)
+      log(`Add message to UI: ${message}`)
 
       const newMsg: MessageUIType = {
         message,

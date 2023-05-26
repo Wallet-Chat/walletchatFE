@@ -6,6 +6,7 @@ import Tweet from './components/Tweet'
 import { Box, Divider, Flex, Spinner } from '@chakra-ui/react'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { log } from '@/helpers/log'
 
 const NFTTweets = ({
   account,
@@ -41,7 +42,7 @@ const NFTTweets = ({
       .then((response) => response.json())
       .then((data) => {
         if (equal(data, tweets) === false) {
-          console.log('✅[GET][NFT][Tweets]:', data)
+          log('✅[GET][NFT][Tweets]:', data)
           setTweets(data)
         }
       })

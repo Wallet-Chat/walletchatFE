@@ -1,5 +1,6 @@
 import { getJwtForAccount } from '@/helpers/jwt'
 import storage from '../utils/storage'
+import { log } from '@/helpers/log'
 
 const REACT_APP_REST_API = import.meta.env.VITE_REACT_APP_REST_API
 const REACT_APP_API_VERSION = import.meta.env.VITE_REACT_APP_API_VERSION
@@ -51,7 +52,7 @@ export default function WalletAccount(address) {
 
   async function getInboxCount() {
     if (address) {
-      // console.log(`[getInboxCount][${address}`)
+      // log(`[getInboxCount][${address}`)
 
       fetch(
         ` ${REACT_APP_REST_API}/${REACT_APP_API_VERSION}/get_unread_cnt/${address}`,
@@ -66,7 +67,7 @@ export default function WalletAccount(address) {
       )
         .then((response) => response.json())
         .then((count) => {
-          console.log('✅ [GET][Unread Count] UNREAD COUNT:', count)
+          log('✅ [GET][Unread Count] UNREAD COUNT:', count)
           handleSuccess(count)
         })
         .catch((error) => {
@@ -124,7 +125,7 @@ export default function WalletAccount(address) {
   }
 
   function logToConsole(text) {
-    if (verbose) console.log(text)
+    if (verbose) log(text)
   }
 
   // Starts the scheduler

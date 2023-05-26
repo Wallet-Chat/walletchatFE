@@ -17,6 +17,7 @@ import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { getAccessControlConditions } from '@/helpers/lit'
 import { useWallet } from '@/context/WalletProvider'
+import { log } from '@/helpers/log'
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
@@ -111,7 +112,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
               createMessageData.toaddr
           )
 
-          console.log(
+          log(
             'ℹ️[POST][Encrypting Message]',
             createMessageData.message,
             accessControlConditions
@@ -130,7 +131,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
           createMessageData.lit_access_conditions = JSON.stringify(
             accessControlConditions
           )
-          console.log('✅[POST][Encrypted Message]:', newMessage)
+          log('✅[POST][Encrypted Message]:', newMessage)
         }
 
         fetch(
@@ -139,14 +140,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         )
           .then((response) => response.json())
           .then((responseData) => {
-            console.log('✅[POST][Send Message]:', responseData)
+            log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
             if (pendingMsgs.current[0]?.timestamp === timestamp) {
               pendingMsgs.current.shift()
 
               if (pendingMsgs.current[0]) {
-                console.log('✅[POST][Retry Message - TODO debug]:', responseData)
+                log('✅[POST][Retry Message - TODO debug]:', responseData)
                 postMessage(
                   pendingMsgs.current[0].createMessageData,
                   pendingMsgs.current[0].newMessage,
@@ -228,7 +229,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
     ) {
       if (!ENV.REACT_APP_SLEEKPLAN_API_KEY) {
-        console.log('Missing REACT_APP_SLEEKPLAN_API_KEY')
+        log('Missing REACT_APP_SLEEKPLAN_API_KEY')
       } else {
         fetch(`https://api.sleekplan.com/v1/post`, {
           method: 'POST',
@@ -246,7 +247,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         })
           .then((response) => response.json())
           .then((responseData) => {
-            console.log('✅[POST][Feedback]:', responseData)
+            log('✅[POST][Feedback]:', responseData)
           })
           .catch((error) => {
             console.error(

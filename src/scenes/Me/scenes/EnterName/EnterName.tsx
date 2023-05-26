@@ -25,6 +25,7 @@ import Resizer from 'react-image-file-resizer'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
+import { log } from '@/helpers/log'
 
 const EnterName = () => {
   const {
@@ -89,7 +90,7 @@ const EnterName = () => {
       })
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[POST][Image]:', response)
+          log('✅[POST][Image]:', response)
           toast({
             title: 'Success',
             description: `PFP updated!`,
@@ -119,11 +120,11 @@ const EnterName = () => {
   useEffect(() => {
     const getOwnedENS = () => {
       if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-        console.log('Missing OpenSea API Key')
+        log('Missing OpenSea API Key')
         return
       }
       if (account) {
-        console.log('No account detected')
+        log('No account detected')
       }
       fetch(
         `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
@@ -136,12 +137,12 @@ const EnterName = () => {
       )
         .then((response) => response.json())
         .then((result) => {
-          console.log(`✅[GET][ENS Owned by ${account}]]:`, result)
+          log(`✅[GET][ENS Owned by ${account}]]:`, result)
           if (result?.assets?.length > 0) {
             setOwnedENS(result.assets)
           }
         })
-        .catch((error) => console.log(`🚨[GET][ENS Owned by ${account}`, error))
+        .catch((error) => log(`🚨[GET][ENS Owned by ${account}`, error))
     }
     if (account) {
       getOwnedENS()
@@ -149,12 +150,12 @@ const EnterName = () => {
   }, [account])
 
   useEffect(() => {
-    console.log(errors)
+    log(errors)
   }, [errors])
 
   const onSubmit = (values: any) => {
-    console.log('onSubmit')
-    console.log('Values are: ', values)
+    log('onSubmit')
+    log('Values are: ', values)
     if (!getJwtForAccount(account)) {
       toast({
         title: 'Error',
@@ -186,7 +187,7 @@ const EnterName = () => {
       })
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[POST][Name]:', response)
+          log('✅[POST][Name]:', response)
           globalSetName(name)
           navigate('/me/enter-email')
         })
@@ -261,7 +262,7 @@ const EnterName = () => {
                 required: true,
                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                   setName(e.target.value)
-                  // console.log(name)
+                  // log(name)
                 },
               })}
             />
@@ -271,9 +272,9 @@ const EnterName = () => {
               type='submit'
               isLoading={isFetching}
               onClick={() => {
-                console.log('SUBMIT BTN')
-                console.log(errors)
-                console.log(name)
+                log('SUBMIT BTN')
+                log(errors)
+                log(name)
               }}
             >
               <IconSend size='20' />

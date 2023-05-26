@@ -1,4 +1,5 @@
 import { isWithinInterval } from 'date-fns'
+import { log } from '@/helpers/log'
 
 const today = new Date()
 const yesterday = ((d) => new Date(d.setDate(d.getDate() - 1)))(new Date())
@@ -104,7 +105,7 @@ export const isDateTimePassed = (inputDate: string) => {
 }
 
 export const getFormattedDate = (inputDate: string) => {
-   // console.log(inputDate, isValidISODate(inputDate))
+   // log(inputDate, isValidISODate(inputDate))
    // if (!isValidISODate(inputDate)) return
    const monthNames = [
       'Jan',

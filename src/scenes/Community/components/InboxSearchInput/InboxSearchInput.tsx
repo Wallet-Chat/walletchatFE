@@ -14,6 +14,7 @@ import { useWallet } from '../../../../context/WalletProvider'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 export default function InboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -37,14 +38,14 @@ export default function InboxSearchInput() {
         })
            .then((response) => response.json())
            .then((result) => {
-              console.log(`✅[GET][Name Owned by ${address}]]:`, result)
+              log(`✅[GET][Name Owned by ${address}]]:`, result)
               if (result?.address?.length > 0) {
                  setResolvedAddr(result.address)
                  setIsSuggestionListOpen(true)
               }
            })
            .catch((error) =>
-              console.log(`🚨[GET][Owned by ${address}`, error)
+              log(`🚨[GET][Owned by ${address}`, error)
            )
            .finally(() => {
               setIsResolvingENS(false)

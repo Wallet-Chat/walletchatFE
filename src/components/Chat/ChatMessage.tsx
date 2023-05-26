@@ -41,6 +41,7 @@ import Avatar from '../Inbox/DM/Avatar'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { truncateAddressMore } from '@/helpers/truncateString'
 import { getJwtForAccount } from '@/helpers/jwt'
+import { log } from '@/helpers/log'
 
 const MessageBox = styled.div`
   position: relative;
@@ -184,13 +185,13 @@ const ChatMessage = ({
   useEffect(() => {
     const getNftMetadata = () => {
       if (!msg.nftAddr || !msg.nftId) {
-        // console.log('Missing contract address or id')
+        // log('Missing contract address or id')
         return
       }
 
       const fetchFromOpenSea = () => {
         if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-          console.log('Missing OpenSea API Key')
+          log('Missing OpenSea API Key')
           return
         }
         fetch(
@@ -205,19 +206,19 @@ const ChatMessage = ({
           .then((response) => response.json())
           .then((result: OpenSeaNFT) => {
             if (result?.collection?.name && !equal(result, nftData)) {
-              console.log(`✅[GET][NFT]:`, result)
+              log(`✅[GET][NFT]:`, result)
               setNftData(openseaToGeneralNFTType(result))
             }
           })
           .catch((error) => {
-            console.log(`🚨[GET][NFT Contract][OpenSea]:`, error)
+            log(`🚨[GET][NFT Contract][OpenSea]:`, error)
             fetchFromAlchemy()
           })
       }
 
       const fetchFromAlchemy = () => {
         if (ENV.REACT_APP_ALCHEMY_API_KEY_POLYGON === undefined) {
-          console.log('Missing Alchemy API Key')
+          log('Missing Alchemy API Key')
           return
         }
         fetch(
@@ -228,10 +229,10 @@ const ChatMessage = ({
         )
           .then((response) => response.json())
           .then((data: AlchemyNFT) => {
-            console.log('✅[GET][NFT Metadata]:', data)
+            log('✅[GET][NFT Metadata]:', data)
             setNftData(alchemyToGeneralNFTType(data))
           })
-          .catch((error) => console.log('error', error))
+          .catch((error) => log('error', error))
       }
 
       fetchFromOpenSea()
@@ -257,7 +258,7 @@ const ChatMessage = ({
       )
         .then((response) => response.json())
         .then((data) => {
-          console.log('✅[PUT][Message]:', data)
+          log('✅[PUT][Message]:', data)
 
           dispatch(
             updateQueryChatData({ account, toAddr: fromAddr }, () => {

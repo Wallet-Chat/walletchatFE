@@ -1,8 +1,9 @@
 import RawTweetsType from "../types/RawTweets"
 import TweetType from "../types/Tweet"
+import { log } from '@/helpers/log'
 
 export const transformTweets = (data: RawTweetsType) : TweetType[] => {
-    console.log("transformTweet function()", data)
+    log("transformTweet function()", data)
     if (data.data) {
         let user
         if (data.includes?.users && data.includes?.users[0]) {

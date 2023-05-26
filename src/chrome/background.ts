@@ -2,6 +2,7 @@
 // import chrome from 'webextension-polyfill'
 // import storage from '../utils/storage'
 // import * as ENV from '../constants/env'
+import { log } from '@/helpers/log'
 
 function getTabInfo(tabId: number) {
 	chrome.tabs.get(tabId)
@@ -38,7 +39,7 @@ chrome.runtime.onInstalled.addListener(() => {
 	// 		})
 
 	// 	function handleAccountsChanged(accounts: any) {
-	// 		console.log('[background.ts] handleAccountsChanged')
+	// 		log('[background.ts] handleAccountsChanged')
 	// 		if (accounts && accounts[0]) {
 	// 			chrome.storage.local.set({
 	// 				account: accounts[0],
@@ -47,12 +48,12 @@ chrome.runtime.onInstalled.addListener(() => {
 	// 		}
 	// 	}
 	// } catch (e) {
-	// 	console.log(e)
+	// 	log(e)
 	// }
 })
 
 function startAlarm() {
-	console.log('[background.ts] startAlarm')
+	log('[background.ts] startAlarm')
 	// Call fn immediately
 	chrome.storage.local.get(['account'])
 
@@ -73,24 +74,24 @@ const notify = (message: string) => {
 }
 
 chrome.runtime.onStartup.addListener(() => {
-	console.log('[background.ts] onStartup')
+	log('[background.ts] onStartup')
 	startAlarm()
 })
 chrome.runtime.onConnect.addListener((port: any) => {
-	console.log('[background.ts] onConnect', port)
+	log('[background.ts] onConnect', port)
 })
 chrome.runtime.onSuspend.addListener(() => {
-	console.log('[background.ts] onSuspend')
+	log('[background.ts] onSuspend')
 })
 chrome.runtime.onMessage.addListener((data: any) => {
-	console.log('[background.ts] onMessage', data)
+	log('[background.ts] onMessage', data)
 	if (data.type === 'notification') {
 		notify(data.message)
 	}
 })
 
 chrome.alarms.onAlarm.addListener((alarm: any) => {
-	console.log('[background.ts] onAlarm')
+	log('[background.ts] onAlarm')
 	if (alarm.name === 'badgeUpdate') {
 		chrome.storage.local.get(['account'])
 	}
@@ -138,7 +139,7 @@ chrome.runtime.onInstalled.addListener((details: any) => {
 // }
 
 // async function getInboxCount(account: string) {
-// 	console.log('[background.ts] getInboxCount', account)
+// 	log('[background.ts] getInboxCount', account)
 // 	if (account) {
 // 		fetch(
 // 			` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_unread_cnt/${account}`,
@@ -153,7 +154,7 @@ chrome.runtime.onInstalled.addListener((details: any) => {
 // 		)
 // 			.then((response) => response.json())
 // 			.then((count: number) => {
-// 				console.log('✅[GET][Unread Count]:', count)
+// 				log('✅[GET][Unread Count]:', count)
 // 				chrome.storage.local.get(['count'])
 // 			})
 // 			.catch((error) => {

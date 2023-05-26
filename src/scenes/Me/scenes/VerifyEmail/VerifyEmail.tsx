@@ -24,6 +24,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { getCommunity } from '@/helpers/widget'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
+import { log } from '@/helpers/log'
 
 const VerifyEmail = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -34,9 +35,9 @@ const VerifyEmail = () => {
 
   useEffect(() => {
     const currentPath = location.pathname
-    console.log(`Verify Email CurrentPath: ${currentPath}`)
+    log(`Verify Email CurrentPath: ${currentPath}`)
     const urlParams = new URLSearchParams(location.search)
-    console.log('test: ', urlParams.get('code'))
+    log('test: ', urlParams.get('code'))
     verificationcode = urlParams.get('code')
     verificationemail = urlParams.get('email')
   }, [location])
@@ -64,7 +65,7 @@ const VerifyEmail = () => {
     )
       .then((response) => response.json())
       .then((response) => {
-        console.log('✅[Get][VerifyEmail From Email Link]:', response)
+        log('✅[Get][VerifyEmail From Email Link]:', response)
         setFetchError(false)
         setIsVerifySuccess(true)
         navigate('/me/verify-success')
@@ -112,7 +113,7 @@ const VerifyEmail = () => {
       )
         .then((response) => response.json())
         .then((response) => {
-          console.log('✅[GET][Verify Email]:', response)
+          log('✅[GET][Verify Email]:', response)
           setFetchError(false)
           setIsVerifySuccess(true)
           toast({
@@ -147,11 +148,11 @@ const VerifyEmail = () => {
 
    const getSettings = () => {
       if (!ENV.REACT_APP_REST_API) {
-         console.log('REST API url not in .env', process.env)
+         log('REST API url not in .env', process.env)
          return
       }
       if (!account) {
-         console.log('No account connected')
+         log('No account connected')
          return
       }
       fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${account}`, {
@@ -164,13 +165,13 @@ const VerifyEmail = () => {
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log('✅[GET][Settings In Verify Email]:', data)
+            log('✅[GET][Settings In Verify Email]:', data)
             if (data[0]?.verified) {
-               console.log('-[Verified]:', data[0].verified)
+               log('-[Verified]:', data[0].verified)
                setEmailVerified(data[0].verified)
             }
             if (data[0]?.telegramcode) {
-               console.log('-[telegramcode]:', data[0].telegramcode)
+               log('-[telegramcode]:', data[0].telegramcode)
                setTelegramCode(data[0].telegramcode)
             }
 
