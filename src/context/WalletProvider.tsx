@@ -337,7 +337,7 @@ const WalletProviderContext = (chains: any) => {
 
         //TODO: do we need to connect yet again here? seems like we get 2 requests sometimes
         if (connectConfig || config) {
-          //connect(connectConfig || config)
+          connect(connectConfig || config)
           //todo: use wagmi injected connector instead of asking user for connection again?
         }
       }
@@ -441,10 +441,10 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
-            // if (!wagmiConnected) {
-            //   await connectAsync({ chainId: messageData.chainId, connector })
-            // }
-            // await disconnectAsync()
+            if (!wagmiConnected) {
+              await connectAsync({ chainId: messageData.chainId, connector })
+            }
+            await disconnectAsync()
 
             setConnectConfig({ chainId: messageData.chainId, connector })
             updateAccountFromWidget(
