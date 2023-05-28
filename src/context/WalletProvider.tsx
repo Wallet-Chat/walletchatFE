@@ -22,7 +22,7 @@ import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
-import { log } from '../helpers/log'
+import { log, enableDebugPrints, disableDebugPrints } from '../helpers/log'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
@@ -379,6 +379,14 @@ const WalletProviderContext = (chains: any) => {
       
       if (target === 'parent_provider') {
         log("*** Parent Provider ***", data)
+      }
+
+      if (target === 'debugON') {
+        enableDebugPrints()
+      }
+
+      if (target === 'debugOFF') {
+        disableDebugPrints()
       }
 
       if (target === 'sign_in' && messageData) {
