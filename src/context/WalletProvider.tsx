@@ -381,11 +381,11 @@ const WalletProviderContext = (chains: any) => {
         log("*** Parent Provider ***", data)
       }
 
-      if (target === 'debugON') {
+      if (data === 'debugON') {
         enableDebugPrints()
       }
 
-      if (target === 'debugOFF') {
+      if (data === 'debugOFF') {
         disableDebugPrints()
       }
 
