@@ -6,6 +6,7 @@ import { getIsWidgetContext } from '@/utils/context'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const isWidget = getIsWidgetContext()
 
@@ -16,13 +17,17 @@ const UnreadCountProvider = ({ children }: { children: any }) => {
   const [unreadCount, setUnreadCount] = React.useState(0)
   const [totalUnreadCount, setTotalUnreadCount] = React.useState(0)
 
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
   )
 
   const getUnreadCount = useCallback(() => {
     if (account) {
+      let delegate = storage.get('delegate')
+      if (delegate != '') {
+        account = delegate
+      }
       fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/unreadcount/${account}`,
         {

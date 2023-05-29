@@ -51,9 +51,10 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const NFTByContract = () => {
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
 
   const { nftContractAddr = '', chain = '' } = useParams()
 
@@ -174,6 +175,10 @@ const NFTByContract = () => {
   }
 
   const getTweetCount = () => {
+    let delegate = storage.get('delegate')
+    if (delegate != '') {
+      account = delegate
+    }
     if (account) {
       fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_twitter_cnt/${nftContractAddr}`,

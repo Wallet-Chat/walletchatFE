@@ -29,9 +29,10 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const CommunityByName = () => {
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
 
   const { community = '' } = useParams()
 
@@ -61,9 +62,9 @@ const CommunityByName = () => {
 
   const getCommunityData = () => {
     if (account) {
-      if (!account) {
-        log('No account connected')
-        return
+      let delegate = storage.get('delegate')
+      if (delegate != '') {
+        account = delegate
       }
       fetch(
         `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/community/${community}/${account}`,

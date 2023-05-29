@@ -522,7 +522,11 @@ export const dmApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/`,
     prepareHeaders: (headers: Headers, { getState }) => {
-      const account = selectAccount(getState())
+      let account = selectAccount(getState())
+      let delegate = storage.get('delegate')
+      if (delegate != '') {
+        account = delegate
+      }
       return prepareHeaderCredentials(headers, account)
     },
   }),
@@ -604,7 +608,11 @@ export const dmApi = createApi({
     getInbox: builder.query({
       queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
         try {
-          const account = queryArgs
+          let account = queryArgs
+          let delegate = storage.get('delegate')
+          if (delegate != '') {
+            account = delegate
+          }
 
           if (!ENV.REACT_APP_REST_API) {
             throw new Error('REST API url not in .env')

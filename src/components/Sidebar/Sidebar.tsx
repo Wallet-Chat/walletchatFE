@@ -54,6 +54,7 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -206,7 +207,7 @@ export default function Sidebar() {
   const { metadata } = nftData?.nft || {}
 
   const { disconnectWallet } = useWallet()
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -313,6 +314,12 @@ export default function Sidebar() {
     })
   }, [navigate])
 
+  if (account) {
+    let delegate = storage.get('delegate')
+    if (delegate != '') {
+      account = delegate
+    }
+  }
   return (
     <Flex
       justifyContent='space-between'

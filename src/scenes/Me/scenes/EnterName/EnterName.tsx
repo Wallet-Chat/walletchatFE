@@ -26,6 +26,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const EnterName = () => {
   const {
@@ -35,7 +36,7 @@ const EnterName = () => {
     setValue,
   } = useForm()
 
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
   const toast = useToast()
 
   const { setName: globalSetName } = useWallet()
@@ -118,6 +119,10 @@ const EnterName = () => {
     }
   }
   useEffect(() => {
+    let delegate = storage.get('delegate')
+    if (delegate != '') {
+      account = delegate
+    }
     const getOwnedENS = () => {
       if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
         log('Missing OpenSea API Key')

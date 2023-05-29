@@ -53,7 +53,10 @@ export default function WalletAccount(address) {
   async function getInboxCount() {
     if (address) {
       // log(`[getInboxCount][${address}`)
-
+      let delegate = storage.get('delegate')
+      if (delegate != '') {
+        address = delegate
+      }
       fetch(
         ` ${REACT_APP_REST_API}/${REACT_APP_API_VERSION}/get_unread_cnt/${address}`,
         {

@@ -39,12 +39,18 @@ import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
 
 export const App = () => {
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != '') {
+    account = delegate
+  }
+  
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
   )
@@ -53,7 +59,7 @@ export const App = () => {
   )
 
   const isSmallLayout = useIsSmallLayout()
-
+  
   if (!isAuthenticated) {
     return (
       <Flex flex={1} padding='15px'>

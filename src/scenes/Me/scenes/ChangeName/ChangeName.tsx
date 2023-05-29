@@ -24,6 +24,7 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const ChangeName = () => {
   const {
@@ -35,7 +36,7 @@ const ChangeName = () => {
 
   const { setName: globalSetName } = useWallet()
 
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
   const { currentData: _name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -124,6 +125,11 @@ const ChangeName = () => {
   }
 
   useEffect(() => {
+    let delegate = storage.get('delegate')
+    if (delegate != '') {
+      account = delegate
+    }
+
     const getOwnedENS = () => {
       if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
         log('Missing OpenSea API Key')
