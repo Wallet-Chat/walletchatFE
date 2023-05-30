@@ -9,13 +9,18 @@ import { POLLING_QUERY_OPTS, CHAT_CONTEXT_TYPES } from '@/constants'
 import { getInboxDmDataForAccount, useGetInboxQuery } from '@/redux/reducers/dm'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
+import storage from '@/utils/extension-storage'
 
 const InboxList = ({
   context,
 }: {
   context: (typeof CHAT_CONTEXT_TYPES)[number]
 }) => {
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != '') {
+    account = delegate
+  }
   const storedData = getInboxDmDataForAccount(account)
   const { currentData: fetchedData } = useGetInboxQuery(
     account,

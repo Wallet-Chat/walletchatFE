@@ -25,9 +25,14 @@ import { getCommunity } from '@/helpers/widget'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const VerifyEmail = () => {
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != '') {
+    account = delegate
+  }
 
   const location = useLocation()
   let verificationcode: string | null = null

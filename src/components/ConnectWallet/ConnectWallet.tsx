@@ -13,6 +13,7 @@ import {
   setAccount,
 } from '@/redux/reducers/account'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import storage from '@/utils/extension-storage'
 
 const isWidget = getIsWidgetContext()
 
@@ -29,7 +30,11 @@ const ConnectWalletButton = () => {
   } = useWallet()
   const dispatch = useAppDispatch()
 
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != '') {
+    account = delegate
+  }
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
   )

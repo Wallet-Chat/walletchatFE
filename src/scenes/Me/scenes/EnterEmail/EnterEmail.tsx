@@ -26,9 +26,14 @@ import { getCommunity } from '@/helpers/widget'
 import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const EnterEmail = () => {
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != '') {
+    account = delegate
+  }
 
   const {
     handleSubmit,

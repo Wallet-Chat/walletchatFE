@@ -23,9 +23,14 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const NFTInbox = () => {
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != '') {
+    account = delegate
+  }
   const { web3 } = useWallet()
 
   const { currentData: fetchedData, isFetching: isFetchingInboxData } =

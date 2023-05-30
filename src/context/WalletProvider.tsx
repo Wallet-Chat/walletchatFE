@@ -21,7 +21,7 @@ import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLega
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 
 import { API } from 'react-wallet-chat/dist/src/types'
-import storage from '../utils/extension-storage'
+import storage from '@/utils/extension-storage'
 import { log, enableDebugPrints, disableDebugPrints } from '../helpers/log'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'

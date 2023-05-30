@@ -1,4 +1,4 @@
-import storage from '../utils/extension-storage'
+import storage from '@/utils/extension-storage'
 
 export function storeJwtForAccount(account: string, jwt: string) {
   const currentJwtByAccount = storage.get('jwt') || {}
