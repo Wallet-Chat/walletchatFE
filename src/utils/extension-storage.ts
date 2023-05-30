@@ -41,6 +41,18 @@ const storage = {
     }
   },
 
+  delete: (key: StoreKeys) => {
+    try {
+      if (localStorage) {
+        localStorage.removeItem(key)
+      } else {
+        browser.storage.local.remove([key])
+      }
+    } catch (error) {
+      
+    }
+  },
+
   push: (key: StoreKeys, data: any) => {
     try {
       const currentData = localStorage.getItem(key)

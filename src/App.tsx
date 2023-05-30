@@ -47,10 +47,10 @@ window.debugOFF = disableDebugPrints
 export const App = () => {
   let account = useAppSelector((state) => selectAccount(state))
   let delegate = storage.get('delegate')
-  if (delegate != '') {
+  if (delegate != null) {
     account = delegate
   }
-  
+
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
   )

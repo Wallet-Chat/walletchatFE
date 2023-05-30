@@ -54,7 +54,7 @@ export default function WalletAccount(address) {
     if (address) {
       // log(`[getInboxCount][${address}`)
       let delegate = storage.get('delegate')
-      if (delegate != '') {
+      if (delegate != null) {
         address = delegate
       }
       fetch(

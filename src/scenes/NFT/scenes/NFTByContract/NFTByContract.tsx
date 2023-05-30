@@ -55,6 +55,10 @@ import storage from '@/utils/extension-storage'
 
 const NFTByContract = () => {
   let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != null) {
+    account = delegate
+  }
 
   const { nftContractAddr = '', chain = '' } = useParams()
 
@@ -176,7 +180,7 @@ const NFTByContract = () => {
 
   const getTweetCount = () => {
     let delegate = storage.get('delegate')
-    if (delegate != '') {
+    if (delegate != null) {
       account = delegate
     }
     if (account) {

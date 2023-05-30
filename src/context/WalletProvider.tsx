@@ -619,7 +619,7 @@ const WalletProviderContext = (chains: any) => {
             setDelegate(walletInJWT)
             storeJwtForAccount(walletInJWT, signInData.access)
             dispatch(setAccount(walletInJWT)) 
-            console.log(
+            log(
               '✅[Using Full Delegate Wallet]:',
               walletInJWT,
               accountAddress
@@ -633,15 +633,16 @@ const WalletProviderContext = (chains: any) => {
 
             //signIn(walletInJWT, signInData.access)
           } else {
-          storeJwtForAccount(accountAddress, signInData.access)
+            storage.delete('delegate')
+            storeJwtForAccount(accountAddress, signInData.access)
 
-          const currentSigs = storage.get('lit-auth-signature-by-account')
-          storage.set('lit-auth-signature-by-account', {
-            ...currentSigs,
-            [accountAddress.toLocaleLowerCase()]: authSig,
-          })
+            const currentSigs = storage.get('lit-auth-signature-by-account')
+            storage.set('lit-auth-signature-by-account', {
+              ...currentSigs,
+              [accountAddress.toLocaleLowerCase()]: authSig,
+            })
 
-          signIn(accountAddress, signInData.access)
+            signIn(accountAddress, signInData.access)
           }
         })
 

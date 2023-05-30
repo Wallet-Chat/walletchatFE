@@ -37,6 +37,10 @@ const ChangeName = () => {
   const { setName: globalSetName } = useWallet()
 
   let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != null) {
+    account = delegate
+  }
   const { currentData: _name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -126,7 +130,7 @@ const ChangeName = () => {
 
   useEffect(() => {
     let delegate = storage.get('delegate')
-    if (delegate != '') {
+    if (delegate != null) {
       account = delegate
     }
 

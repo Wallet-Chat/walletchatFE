@@ -524,7 +524,7 @@ export const dmApi = createApi({
     prepareHeaders: (headers: Headers, { getState }) => {
       let account = selectAccount(getState())
       let delegate = storage.get('delegate')
-      if (delegate != '') {
+      if (delegate != null) {
         account = delegate
       }
       return prepareHeaderCredentials(headers, account)
@@ -610,7 +610,7 @@ export const dmApi = createApi({
         try {
           let account = queryArgs
           let delegate = storage.get('delegate')
-          if (delegate != '') {
+          if (delegate != null) {
             account = delegate
           }
 

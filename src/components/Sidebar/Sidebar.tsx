@@ -316,7 +316,7 @@ export default function Sidebar() {
 
   if (account) {
     let delegate = storage.get('delegate')
-    if (delegate != '') {
+    if (delegate != null) {
       account = delegate
     }
   }

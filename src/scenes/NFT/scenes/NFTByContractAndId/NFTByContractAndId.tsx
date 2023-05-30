@@ -175,7 +175,7 @@ const NFTByContractAndId = () => {
 
   const getTweetCount = () => {
     let delegate = storage.get('delegate')
-    if (delegate != '') {
+    if (delegate != null) {
       account = delegate
     }
     if (account) {
@@ -205,7 +205,7 @@ const NFTByContractAndId = () => {
 
   const getUnreadDMCount = () => {
     let delegate = storage.get('delegate')
-    if (delegate != '') {
+    if (delegate != null) {
       account = delegate
     }
     if (account) {

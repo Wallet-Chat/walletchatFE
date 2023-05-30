@@ -18,16 +18,16 @@ const UnreadCountProvider = ({ children }: { children: any }) => {
   const [totalUnreadCount, setTotalUnreadCount] = React.useState(0)
 
   let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != null) {
+    account = delegate
+  }
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
   )
 
   const getUnreadCount = useCallback(() => {
     if (account) {
-      let delegate = storage.get('delegate')
-      if (delegate != '') {
-        account = delegate
-      }
       fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/unreadcount/${account}`,
         {

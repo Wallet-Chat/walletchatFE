@@ -33,6 +33,10 @@ import storage from '@/utils/extension-storage'
 
 const CommunityByName = () => {
   let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != null) {
+    account = delegate
+  }
 
   const { community = '' } = useParams()
 
@@ -62,10 +66,6 @@ const CommunityByName = () => {
 
   const getCommunityData = () => {
     if (account) {
-      let delegate = storage.get('delegate')
-      if (delegate != '') {
-        account = delegate
-      }
       fetch(
         `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/community/${community}/${account}`,
         {
