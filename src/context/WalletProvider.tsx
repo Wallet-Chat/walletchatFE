@@ -624,17 +624,13 @@ const WalletProviderContext = (chains: any) => {
               walletInJWT,
               accountAddress
             )
+
             const currentSigs = storage.get('lit-auth-signature-by-account')
-            const delegateAuthSig = {
-              sig: signature,
-              derivedVia: 'web3.eth.personal.sign',
-              signedMessage: messageToSign,
-              address: walletInJWT,
-            }
             storage.set('lit-auth-signature-by-account', {
-              ...currentSigs,
-              [walletInJWT.toLocaleLowerCase()]: delegateAuthSig,
-            })
+            ...currentSigs,
+            [walletInJWT.toLocaleLowerCase()]: authSig,
+          })
+
             //signIn(walletInJWT, signInData.access)
           } else {
           storeJwtForAccount(accountAddress, signInData.access)

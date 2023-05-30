@@ -22,6 +22,7 @@ import * as ENV from '@/constants/env'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { useWallet } from '@/context/WalletProvider'
+import storage from '@/utils/extension-storage'
 
 export const PAGE_SIZE = 25
 
@@ -49,7 +50,11 @@ const AlertBubble = ({
 
 const DMByAddress = () => {
   const { provider } = useWallet()
-  const account = useAppSelector((state) => selectAccount(state))
+  let account = useAppSelector((state) => selectAccount(state))
+  let delegate = storage.get('delegate')
+  if (delegate != '') {
+    account = delegate
+  }
 
   const supportHeader =
     ENV.REACT_APP_SUPPORT_HEADER ||
