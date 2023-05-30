@@ -31,7 +31,7 @@ import storage from '@/utils/extension-storage'
 const EnterEmail = () => {
   let account = useAppSelector((state) => selectAccount(state))
   let delegate = storage.get('delegate')
-  if (delegate != '') {
+  if (delegate != null) {
     account = delegate
   }
 

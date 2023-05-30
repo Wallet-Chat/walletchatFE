@@ -163,6 +163,10 @@ const ChatMessage = ({
   pending?: boolean
   hasPendingMsgs?: boolean
 }) => {
+  let delegate = storage.get('delegate')
+  if (delegate != null) {
+    account = delegate
+  }
   const sender = msg?.fromaddr || msg?.fromAddr
   const { data: senderName } = useGetNameQuery(sender, {
     selectFromResult: (options) =>
