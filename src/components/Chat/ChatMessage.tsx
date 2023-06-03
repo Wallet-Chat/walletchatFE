@@ -42,6 +42,7 @@ import { useAppDispatch } from '@/hooks/useDispatch'
 import { truncateAddressMore } from '@/helpers/truncateString'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { log } from '@/helpers/log'
+import storage from '@/utils/extension-storage'
 
 const MessageBox = styled.div`
   position: relative;
