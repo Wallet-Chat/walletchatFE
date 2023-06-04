@@ -198,6 +198,15 @@ const WalletProviderContext = (chains: any) => {
 
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
+      
+      window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: "npm:walletchat-metamask-snap",
+          request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
+        },
+      });
+
       Lit.connectManual()
 
       log('✅[INFO][JWT]:', jwt)

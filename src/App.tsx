@@ -8,6 +8,7 @@ import {
   Heading,
   Spinner,
   Tag,
+  Button,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
@@ -39,7 +40,9 @@ import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
+import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 
+//for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
 
@@ -98,6 +101,33 @@ export const App = () => {
             >
               <Image src={logoTwitter} width='25px' />
             </Link>
+          </HStack>
+
+          <HStack>
+          {!isMobile && !isChromeExtension() && (
+            <div>
+            <HStack><br></br></HStack>
+
+            <Heading size='s'>Receive Unread Count Notifications in Metamask Browser Extension:</Heading>
+            <Link href="https://metamask.io/flask/" target="_blank">
+                 MetaMask Flask Required for Notifications<FlaskFox />
+            </Link>
+            <Button
+                    variant='black'
+                    size='lg'
+                    onClick={() => {
+                      window.ethereum.request({
+                        method: 'wallet_requestSnaps',
+                        params: {
+                          ["npm:walletchat-metamask-snap"]: {},
+                        },
+                      });
+                    }}
+                  >
+                    Install WalletChat Metamask Snap
+            </Button> 
+            </div>
+          )} 
           </HStack>
         </Box>
       </Flex>
