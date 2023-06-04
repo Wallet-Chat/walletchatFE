@@ -104,13 +104,14 @@ export const App = () => {
           </HStack>
 
           <HStack>
-          {!isMobile && !isChromeExtension() && (
+          {/* {!isMobile && !isChromeExtension() && ( */}
             <div>
             <HStack><br></br></HStack>
 
-            <Heading size='s'>Receive Unread Count Notifications in Metamask Browser Extension:</Heading>
+            <Heading size='lg'>Receive Unread Count Notifications in Metamask Browser Extension:</Heading>
+            <Heading size='s'>*** Install Flash Version of Metamask in New Browser Profile  ***</Heading>
             <Link href="https://metamask.io/flask/" target="_blank">
-                 MetaMask Flask Required for Notifications<FlaskFox />
+                 MM Flask Required to Install WalletChat Snap - Install Here<FlaskFox />
             </Link>
             <Button
                     variant='black'
@@ -127,7 +128,7 @@ export const App = () => {
                     Install WalletChat Metamask Snap
             </Button> 
             </div>
-          )} 
+          {/* )}  */}
           </HStack>
         </Box>
       </Flex>
