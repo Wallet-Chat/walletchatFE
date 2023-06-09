@@ -114,18 +114,18 @@ export const App = () => {
                  MM Flask Required to Install WalletChat Snap - Install Here<FlaskFox />
             </Link>
             <Button
-                    variant='black'
-                    size='lg'
-                    onClick={() => {
-                      window.ethereum.request({
-                        method: 'wallet_requestSnaps',
-                        params: {
-                          ["npm:walletchat-metamask-snap"]: {},
-                        },
-                      });
-                    }}
-                  >
-                    Install WalletChat Metamask Snap
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: {},
+                    },
+                  });
+                }}
+              >
+                Install WalletChat Metamask Snap
             </Button> 
             </div>
           {/* )}  */}
