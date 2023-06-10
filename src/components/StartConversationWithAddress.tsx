@@ -25,6 +25,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
    const [resolvedAddr, setResolvedAddr] = useState<string|null>()
    const [isResolvingENS, setIsResolvingENS] = useState(false)
    const { account, provider } = useWallet()
+   const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false)
 
    const {
       handleSubmit,
@@ -127,7 +128,7 @@ const StartConversationWithAddress = ({ web3 }: { web3: any }) => {
                </Link>
             )}
             {isResolvingENS && <Spinner size="sm" mt={2} />}
-            {(toAddr.includes(".eth") || toAddr.includes(".bnb") || address.includes(".arb") || address.includes(".btc")) && resolvedAddr && !isResolvingENS && (
+            {(toAddr.includes(".eth") || toAddr.includes(".bnb") || toAddr.includes(".arb") || toAddr.includes(".btc")) && resolvedAddr && !isResolvingENS && (
                <Link to={`/dm/${resolvedAddr}`} style={{ textDecoration: 'none' }}>
                <Flex
                   alignItems="center"
