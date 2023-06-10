@@ -97,34 +97,34 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       }
 
       if (isNextMsg) {
-        const accessControlConditions = getAccessControlConditions(
-          createMessageData.fromaddr,
-          (createMessageData.toaddr.includes('.eth') &&
-            (await provider.resolveName(toAddr))) ||
-            createMessageData.toaddr
-        )
+        // const accessControlConditions = getAccessControlConditions(
+        //   createMessageData.fromaddr,
+        //   (createMessageData.toaddr.includes('.eth') &&
+        //     (await provider.resolveName(toAddr))) ||
+        //     createMessageData.toaddr
+        // )
 
-        console.log(
-          'ℹ️[POST][Encrypting Message]',
-          createMessageData.message,
-          accessControlConditions
-        )
+        // console.log(
+        //   'ℹ️[POST][Encrypting Message]',
+        //   createMessageData.message,
+        //   accessControlConditions
+        // )
 
-        const encrypted = await lit.encryptString(
-          account,
-          createMessageData.message,
-          accessControlConditions
-        )
-        createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
-        newMessage.encryptedMessage = createMessageData.message
-        updateSentMessage(newMessage, timestamp)
-        createMessageData.encrypted_sym_lit_key =
-          encrypted.encryptedSymmetricKey
-        createMessageData.lit_access_conditions = JSON.stringify(
-          accessControlConditions
-        )
+        // const encrypted = await lit.encryptString(
+        //   account,
+        //   createMessageData.message,
+        //   accessControlConditions
+        // )
+        // createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
+        // newMessage.encryptedMessage = createMessageData.message
+        // updateSentMessage(newMessage, timestamp)
+        // createMessageData.encrypted_sym_lit_key =
+        //   encrypted.encryptedSymmetricKey
+        // createMessageData.lit_access_conditions = JSON.stringify(
+        //   accessControlConditions
+        // )
 
-        console.log('✅[POST][Encrypted Message]:', newMessage)
+        // console.log('✅[POST][Encrypted Message]:', newMessage)
         fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
           postFetchOptions(createMessageData, account)
