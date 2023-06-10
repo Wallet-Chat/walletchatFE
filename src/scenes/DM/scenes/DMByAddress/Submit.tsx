@@ -101,38 +101,37 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       }
 
       if (isNextMsg) {
-
         //Currently only LIT works for EVM addresses (both to and from have to be EVM addrs)
-        if ((createMessageData.fromaddr.includes(".eth") || createMessageData.fromaddr.startsWith("0x")) &&
-            (createMessageData.toaddr.includes(".eth") || createMessageData.toaddr.startsWith("0x"))) {  //only encrypt ethereum for now
-          const accessControlConditions = getAccessControlConditions(
-            createMessageData.fromaddr,
-            (createMessageData.toaddr.includes('.eth') &&
-              (await provider.resolveName(toAddr))) ||
-              createMessageData.toaddr
-          )
+        // if ((createMessageData.fromaddr.includes(".eth") || createMessageData.fromaddr.startsWith("0x")) &&
+        //     (createMessageData.toaddr.includes(".eth") || createMessageData.toaddr.startsWith("0x"))) {  //only encrypt ethereum for now
+        //   const accessControlConditions = getAccessControlConditions(
+        //     createMessageData.fromaddr,
+        //     (createMessageData.toaddr.includes('.eth') &&
+        //       (await provider.resolveName(toAddr))) ||
+        //       createMessageData.toaddr
+        //   )
 
-          log(
-            'ℹ️[POST][Encrypting Message]',
-            createMessageData.message,
-            accessControlConditions
-          )
+        //   log(
+        //     'ℹ️[POST][Encrypting Message]',
+        //     createMessageData.message,
+        //     accessControlConditions
+        //   )
 
-          const encrypted = await lit.encryptString(
-            account,
-            createMessageData.message,
-            accessControlConditions
-          )
-          createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
-          newMessage.encryptedMessage = createMessageData.message
-          updateSentMessage(newMessage, timestamp)
-          createMessageData.encrypted_sym_lit_key =
-            encrypted.encryptedSymmetricKey
-          createMessageData.lit_access_conditions = JSON.stringify(
-            accessControlConditions
-          )
-          log('✅[POST][Encrypted Message]:', newMessage)
-        }
+        //   const encrypted = await lit.encryptString(
+        //     account,
+        //     createMessageData.message,
+        //     accessControlConditions
+        //   )
+        //   createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
+        //   newMessage.encryptedMessage = createMessageData.message
+        //   updateSentMessage(newMessage, timestamp)
+        //   createMessageData.encrypted_sym_lit_key =
+        //     encrypted.encryptedSymmetricKey
+        //   createMessageData.lit_access_conditions = JSON.stringify(
+        //     accessControlConditions
+        //   )
+        //   log('✅[POST][Encrypted Message]:', newMessage)
+        // }
 
         fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
