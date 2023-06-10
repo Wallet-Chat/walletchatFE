@@ -501,120 +501,121 @@ const DMByAddress = ({
       )
 
       //data.message = msgInputCopy
-      const _accessControlConditions = [
-         {
-           conditionType: 'evmBasic',
-           contractAddress: '',
-           standardContractType: '',
-           chain: 'ethereum',
-           method: '',
-           parameters: [
-             ':userAddress',
-           ],
-           returnValueTest: {
-             comparator: '=',
-             value: data.toAddr
-           }
-         },
-         {"operator": "or"},
-         {
-           conditionType: 'evmBasic',
-           contractAddress: '',
-           standardContractType: '',
-           chain: 'ethereum',
-           method: '',
-           parameters: [
-             ':userAddress',
-           ],
-           returnValueTest: {
-             comparator: '=',
-             value: data.fromAddr
-           }
-         },
-         {"operator": "or"}, //delegate.cash full wallet delegation
-         {
-            conditionType: "evmContract",
-            contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
-            functionName: "checkDelegateForAll",
-            functionParams: [":userAddress", data.toAddr],
-            functionAbi: {
-               inputs: [
-               {
-                  name: "delegate",
-                  type: "address",
-                  internalType: "address",
-               },
-               {
-                  name: "vault",
-                  type: "address",
-                  internalType: "address",
-               },
-               ],
-               name: "checkDelegateForAll",
-               outputs: [
-               {
-                  name: "",
-                  type: "bool",
-               },
-               ],
-               payable: false,
-               stateMutability: "view",
-               type: "function",
-            },
-            chain: "ethereum",
-            returnValueTest: {
-               key: "",
-               comparator: "=",
-               value: 'true',
-            },
-         },
-         {"operator": "or"}, //delegate.cash full wallet delegation
-         {
-            conditionType: "evmContract",
-            contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
-            functionName: "checkDelegateForAll",
-            functionParams: [":userAddress", data.fromAddr],
-            functionAbi: {
-               inputs: [
-               {
-                  name: "delegate",
-                  type: "address",
-                  internalType: "address",
-               },
-               {
-                  name: "vault",
-                  type: "address",
-                  internalType: "address",
-               },
-               ],
-               name: "checkDelegateForAll",
-               outputs: [
-               {
-                  name: "",
-                  type: "bool",
-               },
-               ],
-               payable: false,
-               stateMutability: "view",
-               type: "function",
-            },
-            chain: "ethereum",
-            returnValueTest: {
-               key: "",
-               comparator: "=",
-               value: 'true',
-            },
-         },
-       ]
+      
+      // const _accessControlConditions = [
+      //    {
+      //      conditionType: 'evmBasic',
+      //      contractAddress: '',
+      //      standardContractType: '',
+      //      chain: 'ethereum',
+      //      method: '',
+      //      parameters: [
+      //        ':userAddress',
+      //      ],
+      //      returnValueTest: {
+      //        comparator: '=',
+      //        value: data.toAddr
+      //      }
+      //    },
+      //    {"operator": "or"},
+      //    {
+      //      conditionType: 'evmBasic',
+      //      contractAddress: '',
+      //      standardContractType: '',
+      //      chain: 'ethereum',
+      //      method: '',
+      //      parameters: [
+      //        ':userAddress',
+      //      ],
+      //      returnValueTest: {
+      //        comparator: '=',
+      //        value: data.fromAddr
+      //      }
+      //    },
+      //    {"operator": "or"}, //delegate.cash full wallet delegation
+      //    {
+      //       conditionType: "evmContract",
+      //       contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
+      //       functionName: "checkDelegateForAll",
+      //       functionParams: [":userAddress", data.toAddr],
+      //       functionAbi: {
+      //          inputs: [
+      //          {
+      //             name: "delegate",
+      //             type: "address",
+      //             internalType: "address",
+      //          },
+      //          {
+      //             name: "vault",
+      //             type: "address",
+      //             internalType: "address",
+      //          },
+      //          ],
+      //          name: "checkDelegateForAll",
+      //          outputs: [
+      //          {
+      //             name: "",
+      //             type: "bool",
+      //          },
+      //          ],
+      //          payable: false,
+      //          stateMutability: "view",
+      //          type: "function",
+      //       },
+      //       chain: "ethereum",
+      //       returnValueTest: {
+      //          key: "",
+      //          comparator: "=",
+      //          value: 'true',
+      //       },
+      //    },
+      //    {"operator": "or"}, //delegate.cash full wallet delegation
+      //    {
+      //       conditionType: "evmContract",
+      //       contractAddress: "0x00000000000076A84feF008CDAbe6409d2FE638B",
+      //       functionName: "checkDelegateForAll",
+      //       functionParams: [":userAddress", data.fromAddr],
+      //       functionAbi: {
+      //          inputs: [
+      //          {
+      //             name: "delegate",
+      //             type: "address",
+      //             internalType: "address",
+      //          },
+      //          {
+      //             name: "vault",
+      //             type: "address",
+      //             internalType: "address",
+      //          },
+      //          ],
+      //          name: "checkDelegateForAll",
+      //          outputs: [
+      //          {
+      //             name: "",
+      //             type: "bool",
+      //          },
+      //          ],
+      //          payable: false,
+      //          stateMutability: "view",
+      //          type: "function",
+      //       },
+      //       chain: "ethereum",
+      //       returnValueTest: {
+      //          key: "",
+      //          comparator: "=",
+      //          value: 'true',
+      //       },
+      //    },
+      //  ]
        
-      console.log('✅[TEST][Delegate Wallet]:', delegate)
+      // console.log('✅[TEST][Delegate Wallet]:', delegate)
 
-      console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
-      const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
-      data.message = await lit.blobToB64(encrypted.encryptedFile)
-      data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
-      data.lit_access_conditions = JSON.stringify(_accessControlConditions)
-      console.log('✅[POST][Encrypted Message]:', data)
+      // console.log('✅[POST][Encrypting Message]:', msgInputCopy, _accessControlConditions)
+      // const encrypted = await lit.encryptString(msgInputCopy, _accessControlConditions);
+      // data.message = await lit.blobToB64(encrypted.encryptedFile)
+      // data.encrypted_sym_lit_key = encrypted.encryptedSymmetricKey
+      // data.lit_access_conditions = JSON.stringify(_accessControlConditions)
+      // console.log('✅[POST][Encrypted Message]:', data)
 
       setIsSendingMessage(true)
       fetch(` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_chatitem`, {
