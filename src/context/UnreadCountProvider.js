@@ -61,12 +61,27 @@ const UnreadCountProvider = React.memo(({ children }) => {
    }, [getUnreadCount])
 
    useEffect(() => {
-      const interval = setInterval(() => {
-         getUnreadCount()
-      }, 5000) // every 5s
+      if (account) {
+         const interval = setInterval(() => {
+            getUnreadCount()
+         }, 5000) // every 5s
 
-      return () => {
-         clearInterval(interval)
+         return () => {
+            clearInterval(interval)
+         }
+      }
+      else {
+         // send message to parent for notifications when using widget
+         if (window !== window.parent) {
+         setUnreadCount(1)
+         window.parent.postMessage(
+            {
+               data: 1,
+               target: 'unread_cnt',
+            },
+            '*' // targertOrigin should be a .env variable
+         )
+         }
       }
    }, [account, unreadCount, getUnreadCount])
 
