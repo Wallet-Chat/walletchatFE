@@ -37,6 +37,7 @@ import {
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { getIsWidgetContext } from '@/utils/context'
 import {
+  deleteJwtForAccount,
   getHasJwtForAccount,
   getJwtForAccount,
   parseJwt,
@@ -308,6 +309,7 @@ const WalletProviderContext = (chains: any) => {
           })
           .catch((welcomeError) => {
             log('🚨[GET][Welcome]:', welcomeError)
+            deleteJwtForAccount(accountAddress)
             getNonce(accountAddress)
           })
       }
