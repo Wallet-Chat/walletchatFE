@@ -10,6 +10,16 @@ export function storeJwtForAccount(account: string, jwt: string) {
   storage.set('jwt', newJwtByAccount)
 }
 
+export function deleteJwtForAccount(account: string) {
+  const currentJwtByAccount = storage.get('jwt') || {}
+
+  if (account) {
+    delete currentJwtByAccount[account.toLocaleLowerCase()]
+  }
+
+  storage.set('jwt', currentJwtByAccount)
+}
+
 export function getJwtForAccount(account: string) {
   if (account === undefined) {
     return null
