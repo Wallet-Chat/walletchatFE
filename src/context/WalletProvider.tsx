@@ -40,6 +40,7 @@ import {
   getJwtForAccount,
   parseJwt,
   storeJwtForAccount,
+  deleteJwtForAccount,
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
@@ -308,6 +309,7 @@ const WalletProviderContext = (chains: any) => {
           })
           .catch((welcomeError) => {
             log('🚨[GET][Welcome]:', welcomeError)
+            deleteJwtForAccount(accountAddress) //if JWT is invalid remove it
             getNonce(accountAddress)
           })
       }
