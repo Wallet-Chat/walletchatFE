@@ -1267,6 +1267,7 @@ const WalletProvider = React.memo(({ children }) => {
                   getName(_account)
                   getSettings(_account)
                   //setWeb3(_web3)
+                  setAppLoading(false)
                }
             },             
             userSession,
