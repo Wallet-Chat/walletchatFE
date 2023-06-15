@@ -47,9 +47,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
-  
-
-
   const pendingMsgs = React.useRef<
     {
       createMessageData: CreateChatMessageType
@@ -190,12 +187,12 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       site: document.referrer,
       account,
     })
-    ReactGA.event({
-      category: "SendMessageCategory",
-      action: "SendMessage",
-      label: "SendMessageLabel", // optional
-    });
-    analyticsGA4.track('SendMessageGA4', {
+    // ReactGA.event({
+    //   category: "SendMessageCategory",
+    //   action: "SendMessage",
+    //   label: "SendMessageLabel", // optional
+    // });
+    analyticsGA4.track('SendMessage', {
       site: document.referrer,
       account,
     })

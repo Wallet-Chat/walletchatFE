@@ -483,11 +483,15 @@ const WalletProviderContext = (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
-          ReactGA.event({
-            category: "ConnectWallet",
-            action: "ConnectWallet",
-            label: "TestLabel123", // optional
-          });
+          // ReactGA.event({
+          //   category: "ConnectWallet",
+          //   action: "ConnectWallet",
+          //   label: "TestLabel123", // optional
+          // });
+          analyticsGA4.track('ConnectWallet', {
+            site: document.referrer,
+            account: accountAddress,
+          })
           
           storage.set('last-wallet-connection-timestamp', currentTime)
         }
