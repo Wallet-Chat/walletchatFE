@@ -178,7 +178,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     ReactGA.event({
       category: "SendMessageCategory",
       action: "SendMessage",
-      label: "SendMessage", // optional
+      label: "SendMessageLabel", // optional
     });
     
 
