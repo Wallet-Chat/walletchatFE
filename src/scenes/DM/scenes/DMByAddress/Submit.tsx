@@ -239,41 +239,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     addPendingMessageToUI(newMessage)
 
     postMessage(createMessageData, newMessage, timestamp)
-
-    if (
-      toAddr.toLocaleLowerCase() ===
-      '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
-    ) {
-      if (!ENV.REACT_APP_SLEEKPLAN_API_KEY) {
-        log('Missing REACT_APP_SLEEKPLAN_API_KEY')
-      } else {
-        fetch(`https://api.sleekplan.com/v1/post`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${ENV.REACT_APP_SLEEKPLAN_API_KEY}`,
-          },
-          body: JSON.stringify({
-            title: account,
-            type: 'feedback',
-            description: value,
-            user: 347112,
-          }),
-        })
-          .then((response) => response.json())
-          .then((responseData) => {
-            log('✅[POST][Feedback]:', responseData)
-          })
-          .catch((error) => {
-            console.error(
-              '🚨[POST][Feedback]:',
-              error,
-              JSON.stringify(createMessageData)
-            )
-          })
-      }
-    }
   }
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
