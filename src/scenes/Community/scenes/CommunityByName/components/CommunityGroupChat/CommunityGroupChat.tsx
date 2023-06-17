@@ -17,6 +17,19 @@ import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
+
+/* Initialize analytics instance */
+const analyticsGA4 = Analytics({
+  app: 'WalletChatApp',
+  plugins: [
+    /* Load Google Analytics v4 */
+    googleAnalyticsPlugin({
+      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+    }),
+  ],
+})
 
 import {
   GroupMessageType,
@@ -107,6 +120,11 @@ const CommunityGroupChat = ({
 
     analytics.track('SendCommunityMessage', {
        site: document.referrer,
+       community,
+       account
+     });
+     analyticsGA4.track('SendCommunityMessage', {
+      site: document.referrer,
        community,
        account
      });

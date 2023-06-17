@@ -16,6 +16,19 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import { getJwtForAccount } from '@/helpers/jwt'
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
+
+/* Initialize analytics instance */
+const analyticsGA4 = Analytics({
+  app: 'WalletChatApp',
+  plugins: [
+    /* Load Google Analytics v4 */
+    googleAnalyticsPlugin({
+      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+    }),
+  ],
+})
 
 const NFTGroupChat = ({
   account,
@@ -89,6 +102,10 @@ const NFTGroupChat = ({
     analytics.track('SendNftGroupMessage', {
       site: document.referrer,
       account: account,
+    })
+    analyticsGA4.track('SendNftGroupMessage', {
+      site: document.referrer,
+      account,
     })
     if (msgInput.length <= 0) return
     if (!account) {

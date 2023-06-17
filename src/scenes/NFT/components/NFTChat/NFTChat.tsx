@@ -14,6 +14,8 @@ import equal from 'fast-deep-equal/es6'
 // import EthCrypto, { Encrypted } from 'eth-crypto'
 // import { parseIsolatedEntityName } from 'typescript'
 import * as ENV from '@/constants/env'
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
 
 import {
   MessageType,
@@ -28,6 +30,17 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import { getJwtForAccount } from '@/helpers/jwt'
+
+/* Initialize analytics instance */
+const analyticsGA4 = Analytics({
+  app: 'WalletChatApp',
+  plugins: [
+    /* Load Google Analytics v4 */
+    googleAnalyticsPlugin({
+      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+    }),
+  ],
+})
 
 const NFTChat = ({
   recipientAddr,
@@ -119,6 +132,10 @@ const NFTChat = ({
     analytics.track('SendNftMessage', {
       site: document.referrer,
       account: account,
+    })
+    analyticsGA4.track('SendNftMessage', {
+      site: document.referrer,
+      account,
     })
     if (msgInput.length <= 0) return
 
