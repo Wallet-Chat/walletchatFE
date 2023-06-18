@@ -415,13 +415,21 @@ export function updateLocalInboxDataForAccount(
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     )
 
-    localInboxData[item.context_type] = newMessages.reduce(
-      (acc, msg) => ({
-        ...acc,
-        [getInboxFrom(account, msg)]: msg,
-      }),
-      {}
-    )
+    //TODO: a better way to do this?
+    //have to start at the end so newer messages overwrite the older
+    for (let i = newMessages.length - 1; i >= 0; i--) {
+      const msg = newMessages[i];
+      const address = getInboxFrom(account, msg);
+      localInboxData[item.context_type][address]= msg;
+    }
+
+    // localInboxData[item.context_type] = newMessages.reduce(
+    //   (acc, msg) => ({
+    //     ...acc,
+    //     [getInboxFrom(account, msg)]: msg,
+    //   }),
+    //   {}
+    // )
   })
 
   storage.set(STORAGE_KEYS.INBOX_DATA, {
