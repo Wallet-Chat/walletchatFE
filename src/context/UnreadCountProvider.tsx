@@ -72,6 +72,19 @@ const UnreadCountProvider = ({ children }: { children: any }) => {
 
       return () => clearInterval(interval)
     }
+    else {
+      // send message to parent for notifications when using widget
+      if (isWidget) {
+        setUnreadCount(1)
+        window.parent.postMessage(
+          {
+            data: 1,
+            target: 'unread_cnt',
+          },
+          '*' // targertOrigin should be a .env variable
+        )
+      }
+    }
   }, [getUnreadCount, isAuthenticated])
 
   const value = React.useMemo(

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
 import { Textarea, Button, Flex, Icon, InputRightElement, InputGroup, Popover, PopoverTrigger, PopoverContent } from '@chakra-ui/react'
 import { BsEmojiSmile } from "react-icons/bs"
@@ -37,6 +39,16 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const [msgInput, setMsgInput] = useState<string>("")
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
+  })
+  /* Initialize analytics instance */
+  const analyticsGA4 = Analytics({
+    app: 'WalletChatApp',
+    plugins: [
+      /* Load Google Analytics v4 */
+      googleAnalyticsPlugin({
+        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+      }),
+    ],
   })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
@@ -108,36 +120,36 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       if (isNextMsg) {
 
         //Currently only LIT works for EVM addresses (both to and from have to be EVM addrs)
-        if ((createMessageData.fromaddr.includes(".eth") || createMessageData.fromaddr.startsWith("0x")) &&
-            (createMessageData.toaddr.includes(".eth") || createMessageData.toaddr.startsWith("0x"))) {  //only encrypt ethereum for now
-          const accessControlConditions = getAccessControlConditions(
-            createMessageData.fromaddr,
-            (createMessageData.toaddr.includes('.eth') &&
-              (await provider.resolveName(toAddr))) ||
-              createMessageData.toaddr
-          )
+        // if ((createMessageData.fromaddr.includes(".eth") || createMessageData.fromaddr.startsWith("0x")) &&
+        //     (createMessageData.toaddr.includes(".eth") || createMessageData.toaddr.startsWith("0x"))) {  //only encrypt ethereum for now
+        //   const accessControlConditions = getAccessControlConditions(
+        //     createMessageData.fromaddr,
+        //     (createMessageData.toaddr.includes('.eth') &&
+        //       (await provider.resolveName(toAddr))) ||
+        //       createMessageData.toaddr
+        //   )
 
-          log(
-            'ℹ️[POST][Encrypting Message]',
-            createMessageData.message,
-            accessControlConditions
-          )
+        //   log(
+        //     'ℹ️[POST][Encrypting Message]',
+        //     createMessageData.message,
+        //     accessControlConditions
+        //   )
 
-          const encrypted = await lit.encryptString(
-            account,
-            createMessageData.message,
-            accessControlConditions
-          )
-          createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
-          newMessage.encryptedMessage = createMessageData.message
-          updateSentMessage(newMessage, timestamp)
-          createMessageData.encrypted_sym_lit_key =
-            encrypted.encryptedSymmetricKey
-          createMessageData.lit_access_conditions = JSON.stringify(
-            accessControlConditions
-          )
-          log('✅[POST][Encrypted Message]:', newMessage)
-        }
+        //   const encrypted = await lit.encryptString(
+        //     account,
+        //     createMessageData.message,
+        //     accessControlConditions
+        //   )
+        //   createMessageData.message = await lit.blobToB64(encrypted.encryptedFile)
+        //   newMessage.encryptedMessage = createMessageData.message
+        //   updateSentMessage(newMessage, timestamp)
+        //   createMessageData.encrypted_sym_lit_key =
+        //     encrypted.encryptedSymmetricKey
+        //   createMessageData.lit_access_conditions = JSON.stringify(
+        //     accessControlConditions
+        //   )
+        //   log('✅[POST][Encrypted Message]:', newMessage)
+        // }
 
         fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_chatitem`,
@@ -180,11 +192,15 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       site: document.referrer,
       account,
     })
-    ReactGA.event({
-      category: "SendMessageCategory",
-      action: "SendMessage",
-      label: "SendMessage", // optional
-    });
+    // ReactGA.event({
+    //   category: "SendMessageCategory",
+    //   action: "SendMessage",
+    //   label: "SendMessageLabel", // optional
+    // });
+    analyticsGA4.track('SendMessage', {
+      site: document.referrer,
+      account,
+    })
     
 
     // clear input field
@@ -228,41 +244,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     addPendingMessageToUI(newMessage)
 
     postMessage(createMessageData, newMessage, timestamp)
-
-    if (
-      toAddr.toLocaleLowerCase() ===
-      '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
-    ) {
-      if (!ENV.REACT_APP_SLEEKPLAN_API_KEY) {
-        log('Missing REACT_APP_SLEEKPLAN_API_KEY')
-      } else {
-        fetch(`https://api.sleekplan.com/v1/post`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${ENV.REACT_APP_SLEEKPLAN_API_KEY}`,
-          },
-          body: JSON.stringify({
-            title: account,
-            type: 'feedback',
-            description: value,
-            user: 347112,
-          }),
-        })
-          .then((response) => response.json())
-          .then((responseData) => {
-            log('✅[POST][Feedback]:', responseData)
-          })
-          .catch((error) => {
-            console.error(
-              '🚨[POST][Feedback]:',
-              error,
-              JSON.stringify(createMessageData)
-            )
-          })
-      }
-    }
   }
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
