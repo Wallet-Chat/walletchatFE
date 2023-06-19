@@ -45,6 +45,8 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
+import { createWalletClient, custom } from 'viem'
+import { mainnet } from 'viem/chains'
 
 // help debug issues and watch for high traffic conditions
 const analytics = AnalyticsBrowser.load({
@@ -64,8 +66,23 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
 const isWidget = getIsWidgetContext()
 
+
+  // commented this out for now
+
+  // const client = createWalletClient({
+  //   chain: mainnet,
+  //   transport: custom(window.ethereum)
+  // })
+
+  // const triggerSignMessage = async (address: `0x${string}`) => {
+  //   await client.signMessage({
+  //     account: address,
+  //     message: 'SignIn to WalletChat',
+  //   })
+  // }
+
 /* eslint-disable react/display-name */
-const WalletProviderContext = (chains: any) => {
+const WalletProviderContext = async (chains: any) => {
   const dispatch = useAppDispatch()
 
   const didDisconnect = React.useRef<boolean>(false)
@@ -371,9 +388,7 @@ const WalletProviderContext = (chains: any) => {
       if (data.target === 'origin') {
         currentWidgetHost.current = data.data
       }
-
       const { data: messageData, target }: API = data
-
       if (target === 'signed_message') {
         //log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
@@ -382,15 +397,12 @@ const WalletProviderContext = (chains: any) => {
       if (target === 'parent_provider') {
         log("*** Parent Provider ***", data)
       }
-
       if (data === 'debugON') {
         enableDebugPrints()
       }
-
       if (data === 'debugOFF') {
         disableDebugPrints()
       }
-
       if (target === 'sign_in' && messageData) {
         const shouldRequestSignature = messageData.requestSignature
         const widgetAccountChanged =
@@ -413,7 +425,12 @@ const WalletProviderContext = (chains: any) => {
                 UNSTABLE_shimOnConnectSelectAccount: true,
               },
             })
+            //commented this out for now
 
+            // triggerSignMessage(messageData?.account)
+            // console.log("i got here")
+            // connector = messageData;
+            // console.log("connector:", connector);
             storage.set('current-widget-provider', 'metamask')
           }
 

@@ -4,9 +4,14 @@ import {
   Button,
   Flex,
   FormControl,
+  Icon, InputRightElement, InputGroup, Popover, PopoverTrigger, PopoverContent,
   Link as CLink,
   Text,
+  Textarea
 } from '@chakra-ui/react'
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
+import { BsEmojiSmile } from "react-icons/bs"
 import Blockies from 'react-blockies'
 import TextareaAutosize from 'react-textarea-autosize'
 import { IconCheck, IconCopy, IconExternalLink, IconSend } from '@tabler/icons'
@@ -343,6 +348,14 @@ const NFTChat = ({
     setLoadedMsgs(toAddToUI)
   }, [chatData, account])
 
+  const addEmoji = (e: any) => {
+    const sym = e.unified.split("_");
+    const codeArray: any[] = [];
+    sym.forEach((el: string) => codeArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codeArray)
+    setMsgInput(msgInput + emoji);
+  }
+
   return (
     <Flex flexDirection='column' height='100%'>
       {recipientAddr && (
@@ -423,33 +436,35 @@ const NFTChat = ({
       </DottedBackground>
 
       <Flex>
-        <FormControl style={{ flexGrow: 1 }}>
-          <TextareaAutosize
-            placeholder='Write a message...'
-            value={msgInput}
+        <InputGroup resize="none" w="100%" fontSize="md" background="lightgray.400" borderRadius="xl">
+          <Textarea
+            placeholder="Write a message..."
             onChange={(e) => setMsgInput(e.target.value)}
-            onKeyPress={(e) => handleMessageKeyPress(e)}
-            className='custom-scrollbar'
-            style={{
-              resize: 'none',
-              padding: '.5rem 1rem',
-              width: '100%',
-              fontSize: 'var(--chakra-fontSizes-md)',
-              background: 'var(--chakra-colors-lightgray-400)',
-              borderRadius: '0.3rem',
-              marginBottom: '-6px',
-            }}
-            maxRows={8}
+            value={msgInput}
+            onKeyPress={handleMessageKeyPress}
+            minH="full"
+            resize="none"
           />
-        </FormControl>
-        <Flex alignItems='flex-end'>
-          <Button
-            variant='black'
-            height='100%'
-            onClick={() => sendMessage()}
-            isLoading={isSendingMessage}
-          >
-            <IconSend size='20' />
+          <Popover placement="top-start" isLazy>
+            <PopoverTrigger>
+              <InputRightElement top="10px" right="10px">
+                <Icon as={BsEmojiSmile} color="red.500" h={5} w={5} />
+              </InputRightElement>
+            </PopoverTrigger>
+            <PopoverContent w="283px">
+              <Picker
+                data={data}
+                emojiSize={20}
+                emojiButtonSize={28}
+                onEmojiSelect={addEmoji}
+                maxFrequentRows={4}
+              />
+            </PopoverContent>
+          </Popover>
+        </InputGroup>
+        <Flex alignItems="flex-end">
+          <Button variant="black" height="100%" onClick={sendMessage} isLoading={isSendingMessage}>
+            <IconSend size="20" />
           </Button>
         </Flex>
       </Flex>
