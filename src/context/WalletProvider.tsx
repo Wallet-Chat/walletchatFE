@@ -40,6 +40,7 @@ import {
   getJwtForAccount,
   parseJwt,
   storeJwtForAccount,
+  deleteJwtForAccount,
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
@@ -315,6 +316,7 @@ const WalletProviderContext = (chains: any) => {
           })
           .catch((welcomeError) => {
             log('🚨[GET][Welcome]:', welcomeError)
+            deleteJwtForAccount(accountAddress) //if JWT is invalid remove it
             getNonce(accountAddress)
           })
       }
@@ -488,11 +490,15 @@ const WalletProviderContext = (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
-          ReactGA.event({
-            category: "ConnectWallet",
-            action: "ConnectWallet",
-            label: "TestLabel123", // optional
-          });
+          // ReactGA.event({
+          //   category: "ConnectWallet",
+          //   action: "ConnectWallet",
+          //   label: "TestLabel123", // optional
+          // });
+          analyticsGA4.track('ConnectWallet', {
+            site: document.referrer,
+            account: accountAddress,
+          })
           
           storage.set('last-wallet-connection-timestamp', currentTime)
         }

@@ -1,6 +1,8 @@
 import React from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
 import { Textarea, Button, Flex } from '@chakra-ui/react'
 import { postFetchOptions } from '@/helpers/fetch'
@@ -32,6 +34,16 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const msgInput = React.useRef<string>('')
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
+  })
+  /* Initialize analytics instance */
+  const analyticsGA4 = Analytics({
+    app: 'WalletChatApp',
+    plugins: [
+      /* Load Google Analytics v4 */
+      googleAnalyticsPlugin({
+        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+      }),
+    ],
   })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
@@ -174,11 +186,15 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       site: document.referrer,
       account,
     })
-    ReactGA.event({
-      category: "SendMessageCategory",
-      action: "SendMessage",
-      label: "SendMessage", // optional
-    });
+    // ReactGA.event({
+    //   category: "SendMessageCategory",
+    //   action: "SendMessage",
+    //   label: "SendMessageLabel", // optional
+    // });
+    analyticsGA4.track('SendMessage', {
+      site: document.referrer,
+      account,
+    })
     
 
     // clear input field
@@ -222,41 +238,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     addPendingMessageToUI(newMessage)
 
     postMessage(createMessageData, newMessage, timestamp)
-
-    if (
-      toAddr.toLocaleLowerCase() ===
-      '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
-    ) {
-      if (!ENV.REACT_APP_SLEEKPLAN_API_KEY) {
-        log('Missing REACT_APP_SLEEKPLAN_API_KEY')
-      } else {
-        fetch(`https://api.sleekplan.com/v1/post`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${ENV.REACT_APP_SLEEKPLAN_API_KEY}`,
-          },
-          body: JSON.stringify({
-            title: account,
-            type: 'feedback',
-            description: value,
-            user: 347112,
-          }),
-        })
-          .then((response) => response.json())
-          .then((responseData) => {
-            log('✅[POST][Feedback]:', responseData)
-          })
-          .catch((error) => {
-            console.error(
-              '🚨[POST][Feedback]:',
-              error,
-              JSON.stringify(createMessageData)
-            )
-          })
-      }
-    }
   }
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
