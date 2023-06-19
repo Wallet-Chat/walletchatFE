@@ -409,10 +409,10 @@ export default function Sidebar() {
           )}
         </SidebarLink>
 
-        {getSupportWallet() != "NONE" && (
-        <SidebarLink to={`/dm/${getSupportWallet()}`}>
-          <Image src={IconSupport} alt='' />
-        </SidebarLink>
+        {!window.parent.origin.includes("good") && (  //skip support for goodDollar
+          <SidebarLink to={`/dm/${getSupportWallet()}`}>
+            <Image src={IconSupport} alt='' />
+          </SidebarLink>
         )}
 
         {metadata && (
