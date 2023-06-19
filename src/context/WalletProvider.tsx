@@ -40,6 +40,7 @@ import {
   getJwtForAccount,
   parseJwt,
   storeJwtForAccount,
+  deleteJwtForAccount,
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
@@ -325,6 +326,7 @@ const WalletProviderContext = async (chains: any) => {
           })
           .catch((welcomeError) => {
             log('🚨[GET][Welcome]:', welcomeError)
+            deleteJwtForAccount(accountAddress) //if JWT is invalid remove it
             getNonce(accountAddress)
           })
       }
@@ -498,11 +500,15 @@ const WalletProviderContext = async (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
-          ReactGA.event({
-            category: "ConnectWallet",
-            action: "ConnectWallet",
-            label: "TestLabel123", // optional
-          });
+          // ReactGA.event({
+          //   category: "ConnectWallet",
+          //   action: "ConnectWallet",
+          //   label: "TestLabel123", // optional
+          // });
+          analyticsGA4.track('ConnectWallet', {
+            site: document.referrer,
+            account: accountAddress,
+          })
           
           storage.set('last-wallet-connection-timestamp', currentTime)
         }
@@ -572,7 +578,7 @@ const WalletProviderContext = async (chains: any) => {
 
       if (needsToRequestSIWE) {
         const domain = window.location.host
-        const origin = window.location.protocol + domain
+        const origin = window.location.protocol + "//" + domain
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
 

@@ -3,8 +3,7 @@
   "version": "3.0.3",
   "private": true,
   "dependencies": {
-    "@analytics/google-analytics": "^1.0.5",
-    "@chakra-ui/css-reset": "^2.1.2",
+    "@analytics/google-analytics": "^1.0.7",
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^1.8.6",
     "@emoji-mart/data": "^1.1.2",
@@ -23,7 +22,7 @@
     "@testing-library/user-event": "^12.8.3",
     "@walletconnect/ethereum-provider": "^2.4.6",
     "alchemy-sdk": "^2.4.3",
-    "analytics": "^0.8.1",
+    "analytics": "^0.8.7",
     "date-fns": "^2.28.0",
     "emoji-mart": "^5.5.2",
     "eth-crypto": "^2.3.0",
