@@ -416,21 +416,26 @@ export function updateLocalInboxDataForAccount(
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     )
 
-    //TODO: a better way to do this?
-    //have to start at the end so newer messages overwrite the older
-    for (let i = newMessages.length - 1; i >= 0; i--) {
+    //delete the older/duplicate messages (probably a better way TODO)
+    let duplicateMap = new Map()
+    for (let i = 0; i < newMessages.length - 1; i++) {
       const msg = newMessages[i];
       const address = getInboxFrom(account, msg);
-      localInboxData[item.context_type][address]= msg;
+      if(!duplicateMap.has(address)) {
+        duplicateMap.set(address, true)
+      } else {
+        delete newMessages[i]
+      }
     }
 
-    // localInboxData[item.context_type] = newMessages.reduce(
-    //   (acc, msg) => ({
-    //     ...acc,
-    //     [getInboxFrom(account, msg)]: msg,
-    //   }),
-    //   {}
-    // )
+    //brand new convos show up properly at the top of the inbox with this code
+    localInboxData[item.context_type] = newMessages.reduce(
+      (acc, msg) => ({
+        ...acc,
+        [getInboxFrom(account, msg)]: msg,
+      }),
+      {}
+    )
   })
 
   storage.set(STORAGE_KEYS.INBOX_DATA, {

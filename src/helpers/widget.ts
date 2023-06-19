@@ -71,7 +71,7 @@ export function getCommunity() {
   return defaultCommunity
 }
 export function getSupportWallet() {
-  const suffix = getWidgetEnvSuffix()
+  const suffix = getWidgetEnvSuffix(true)
   return suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
 }
 export function getWidgetUrl() {
