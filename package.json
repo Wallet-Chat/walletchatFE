@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@analytics/google-analytics": "^1.0.5",
+    "@chakra-ui/css-reset": "^2.1.2",
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^1.8.6",
     "@emoji-mart/data": "^1.1.2",
@@ -29,6 +30,7 @@
     "eth-ens-namehash": "^2.0.8",
     "ethers": "5.7.2",
     "fast-deep-equal": "^3.1.3",
+    "focus-visible": "^5.2.0",
     "framer-motion": "^4.1.17",
     "ipfs-http-client": "^56.0.1",
     "metamask-extension-provider": "^3.0.0",
@@ -48,6 +50,7 @@
     "siwe": "1.1.2",
     "styled-components": "^5.3.3",
     "uuid": "^8.3.2",
+    "viem": "^1.0.0",
     "wagmi": "^0.12.10",
     "web-vitals": "^0.2.4",
     "web3": "^1.8.2",

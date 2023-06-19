@@ -151,14 +151,17 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             if (pendingMsgs.current[0]?.timestamp === timestamp) {
               pendingMsgs.current.shift()
 
-              if (pendingMsgs.current[0]) {
-                log('✅[POST][Retry Message - TODO debug]:', responseData)
-                postMessage(
-                  pendingMsgs.current[0].createMessageData,
-                  pendingMsgs.current[0].newMessage,
-                  pendingMsgs.current[0].timestamp
-                )
-              }
+
+              //commented this out to fix the race condition issue
+              
+              // if (pendingMsgs.current[0]) {
+              //   log('✅[POST][Retry Message - TODO debug]:', responseData)
+              //   postMessage(
+              //     pendingMsgs.current[0].createMessageData,
+              //     pendingMsgs.current[0].newMessage,
+              //     pendingMsgs.current[0].timestamp
+              //   )
+              // }
             }
           })
           .catch((error) => {
@@ -306,10 +309,10 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
                 top: "10px",
                 right: "10px",
               }}   
-              children={<Icon as={BsEmojiSmile} color="red.500" h={5} w={5} />}
+              children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
             />
           </PopoverTrigger>
-          <PopoverContent width={285}>
+          <PopoverContent w="283px">  
             <Picker 
               data={data}
               emojiSize={20}
