@@ -1,13 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, Icon, InputRightElement, InputGroup, Popover, PopoverTrigger, PopoverContent } from '@chakra-ui/react'
-import { BsEmojiSmile } from "react-icons/bs"
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import { Textarea, Button, Flex } from '@chakra-ui/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
@@ -24,7 +21,6 @@ import { getAccessControlConditions } from '@/helpers/lit'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
 
-
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
 
@@ -35,8 +31,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const dispatch = useAppDispatch()
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
-  // const msgInput = React.useRef<string>('')
-  const [msgInput, setMsgInput] = useState<string>("")
+  const msgInput = React.useRef<string>('')
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
@@ -163,17 +158,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             if (pendingMsgs.current[0]?.timestamp === timestamp) {
               pendingMsgs.current.shift()
 
-
-              //commented this out to fix the race condition issue
-              
-              // if (pendingMsgs.current[0]) {
-              //   log('✅[POST][Retry Message - TODO debug]:', responseData)
-              //   postMessage(
-              //     pendingMsgs.current[0].createMessageData,
-              //     pendingMsgs.current[0].newMessage,
-              //     pendingMsgs.current[0].timestamp
-              //   )
-              // }
+              if (pendingMsgs.current[0]) {
+                log('✅[POST][Retry Message - TODO debug]:', responseData)
+                postMessage(
+                  pendingMsgs.current[0].createMessageData,
+                  pendingMsgs.current[0].newMessage,
+                  pendingMsgs.current[0].timestamp
+                )
+              }
             }
           })
           .catch((error) => {
@@ -187,7 +179,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   )
 
   const sendMessage = async () => {
-    const value = msgInput
+    const value = msgInput.current
 
     if (value.length <= 0) return
 
@@ -207,7 +199,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     
 
     // clear input field
-    setMsgInput("");
+    if (textAreaRef.current) textAreaRef.current.value = ''
 
     const createMessageData: CreateChatMessageType = {
       message: value,
@@ -256,55 +248,25 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     }
   }
 
-  const addEmoji = (e: any) => {
-    const sym = e.unified.split("_");
-    const codeArray: any[] = [];
-    sym.forEach((el: string) => codeArray.push("0x" + el));
-    let emoji = String.fromCodePoint(...codeArray)
-    setMsgInput(msgInput + emoji);
-  }
-
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <InputGroup
+      <Textarea
+        placeholder='Write a message...'
+        ref={textAreaRef}
+        onChange={(e) => {
+          msgInput.current = e.target.value
+        }}
+        onKeyPress={handleKeyPress}
+        minH='full'
         resize='none'
+        px='3'
+        py='3'
         w='100%'
         fontSize='md'
         background='lightgray.400'
         borderRadius='xl'
-      >
-        <Textarea 
-          placeholder='Write a messages...'
-          ref={textAreaRef}
-          onChange={(e) => setMsgInput(e.target.value)}
-          value={msgInput}
-          
-          onKeyPress={handleKeyPress}
-          minH='full'
-          resize='none'
-        />
-        <Popover placement='top-start'>
-          <PopoverTrigger>
-            <InputRightElement
-              style={{
-                top: "10px",
-                right: "10px",
-              }}   
-              children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
-            />
-          </PopoverTrigger>
-          <PopoverContent w="283px">  
-            <Picker 
-              data={data}
-              emojiSize={20}
-              emojiButtonSize={28}
-              onEmojiSelect={addEmoji}
-              maxFrequentRows={4}
-            />
-          </PopoverContent>
-        </Popover>
-      </InputGroup>
-        
+      />
+
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
