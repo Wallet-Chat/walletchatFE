@@ -113,7 +113,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       }
 
       if (isNextMsg) {
-
         //Currently only LIT works for EVM addresses (both to and from have to be EVM addrs)
         // if ((createMessageData.fromaddr.includes(".eth") || createMessageData.fromaddr.startsWith("0x")) &&
         //     (createMessageData.toaddr.includes(".eth") || createMessageData.toaddr.startsWith("0x"))) {  //only encrypt ethereum for now

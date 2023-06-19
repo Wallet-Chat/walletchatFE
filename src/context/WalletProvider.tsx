@@ -199,12 +199,19 @@ const WalletProviderContext = (chains: any) => {
 
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
+      
+      window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+          request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
+        },
+      });
+
+      Lit.setAuthSig(address)
       Lit.connectManual()
 
       log('✅[INFO][JWT]:', jwt)
-
-      Lit.setAuthSig(address)
-
       // if we log in with a full delegate, act as the vault
       const walletInJWT = parseJwt(jwt).sub
       if (walletInJWT.toLocaleLowerCase() !== address.toLocaleLowerCase()) {
