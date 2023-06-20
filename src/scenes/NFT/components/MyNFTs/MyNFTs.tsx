@@ -16,6 +16,7 @@ import { chains } from '../../../../constants'
 import ChainFilters from '../../../../components/ChainFilters'
 import MyNFTSkeleton from './components/MyNFTSkeleton'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
 
 export default function MyNFTs({ account }: { account: string }) {
    // NFTs
