@@ -108,11 +108,8 @@ export const App = () => {
             <div>
             <HStack><br></br></HStack>
 
-            <Heading size='lg'>Receive Unread Count Notifications in Metamask Browser Extension:</Heading>
-            <Heading size='s'>*** Install Flash Version of Metamask in New Browser Profile  ***</Heading>
-            <Link href="https://metamask.io/flask/" target="_blank">
-                 MM Flask Required to Install WalletChat Snap - Install Here<FlaskFox />
-            </Link>
+            {/* <Heading size='lg'>Receive Unread Count Notifications in Metamask Browser Extension:</Heading>
+            <Heading size='s'>*** Install Flash Version of Metamask in New Browser Profile  ***</Heading> */}
             <Button
                 variant='black'
                 size='lg'
@@ -127,6 +124,10 @@ export const App = () => {
               >
                 Install WalletChat Metamask Snap
             </Button> 
+            <HStack></HStack>
+            <Link href="https://metamask.io/flask/" target="_blank">
+                 MM Flask Required <FlaskFox />
+            </Link>
             </div>
           {/* )}  */}
           </HStack>
