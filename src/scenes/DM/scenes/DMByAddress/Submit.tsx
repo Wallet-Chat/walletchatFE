@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, Icon, InputRightElement, InputGroup, Popover, PopoverTrigger, PopoverContent } from '@chakra-ui/react'
+import { Textarea, Button, Flex, Icon, InputRightElement, Container, Popover, PopoverTrigger, PopoverContent } from '@chakra-ui/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -266,13 +266,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <InputGroup
-        resize='none'
-        w='100%'
-        fontSize='md'
-        background='lightgray.400'
-        borderRadius='xl'
-      >
+      <Container maxW='container.lg'>
         <Textarea 
           placeholder='Write a messages...'
           ref={textAreaRef}
@@ -280,16 +274,15 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
           value={msgInput}
           
           onKeyPress={handleKeyPress}
+          backgroundColor='lightgray.400'
           minH='full'
           resize='none'
         />
         <Popover placement='top-start'>
-          <PopoverTrigger>
+          <PopoverTrigger  >
             <InputRightElement
-              style={{
-                top: "10px",
-                right: "10px",
-              }}   
+              right="110px"
+              top={{ md: '93%', sm: '94%' }}
               children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
             />
           </PopoverTrigger>
@@ -303,7 +296,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             />
           </PopoverContent>
         </Popover>
-      </InputGroup>
+      </Container>
         
       <Flex alignItems='flex-end'>
         <Button

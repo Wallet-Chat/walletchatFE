@@ -20,7 +20,7 @@ import {
   Button,
 } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import {
   IconLogout,
@@ -31,7 +31,6 @@ import {
 } from '@tabler/icons'
 import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
-import { useDisconnect } from 'wagmi'
 
 import * as ENV from '@/constants/env'
 import IconDiscord from '../../images/icon-products/icon-discord.svg'
@@ -52,11 +51,9 @@ import Avatar from '../Inbox/DM/Avatar'
 import { getSupportWallet } from '@/helpers/widget'
 import { API } from 'react-wallet-chat/dist/src/types'
 import { useAppSelector } from '@/hooks/useSelector'
-import { selectAccount, setAccount, setIsAuthenticated } from '@/redux/reducers/account'
+import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
-import lit from '@/utils/lit'
-import { useAppDispatch } from '@/hooks/useDispatch'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -194,7 +191,6 @@ const UnreadBadge = ({ children }: { children: string }) => (
 export default function Sidebar() {
   const navigate = useNavigate()
   const location = useLocation()
-  const dispatch = useAppDispatch()
   const isSupportPage = location.pathname.includes(getSupportWallet())
   const isNewDMPage = location.pathname.startsWith('/dm/new')
 
@@ -205,35 +201,15 @@ export default function Sidebar() {
   const [chainName, setChainName] = useState('ethereum')
   const [nftData, setNftData] = useState<NFTPortNFTResponse>()
   const [imageUrl, setImageUrl] = useState<string>()
-  const [siweLastFailure, setSiweLastFailure] = React.useState<null | number>(
-    null
-  )
   const { unreadCount } = useUnreadCount()
 
   const { metadata } = nftData?.nft || {}
 
-  // const {  setSiweLastFailure,} = useWallet()
+  const { disconnectWallet } = useWallet()
   const account = useAppSelector((state) => selectAccount(state))
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
-  const { disconnect } = useDisconnect()
-
-
-
-  const disconnectWallet = () => {
-    didDisconnect.current = true
-
-    lit.disconnect()
-    disconnect()
-
-    widgetWalletDataRef.current = undefined
-    dispatch(setAccount(null))
-    setNonce(null)
-    setSiweLastFailure(null)
-    siweFailedRef.current = false
-    dispatch(setIsAuthenticated(false))
-  }
 
   const getNftMetadata = (
     nftContractAddr: string,
