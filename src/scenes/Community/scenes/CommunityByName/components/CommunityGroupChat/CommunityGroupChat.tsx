@@ -315,7 +315,7 @@ const CommunityGroupChat = ({
           <Popover placement="top-start" isLazy>
             <PopoverTrigger>
               <InputRightElement top="10px" right="10px">
-                <Icon as={BsEmojiSmile} color="red.500" h={5} w={5} />
+                <Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />
               </InputRightElement>
             </PopoverTrigger>
             <PopoverContent w="283px">
