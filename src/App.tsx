@@ -102,6 +102,34 @@ export const App = () => {
               <Image src={logoTwitter} width='25px' />
             </Link>
           </HStack>
+
+          <HStack>
+          {!isMobile && !isChromeExtension() && (
+            <div>
+            <HStack><br></br></HStack>
+
+            <Heading size='lg'>Receive Unread Count Notifications in Metamask Browser Extension:</Heading>
+            <Heading size='s'>*** Install Flash Version of Metamask in New Browser Profile  ***</Heading>
+            <Link href="https://metamask.io/flask/" target="_blank">
+                 MM Flask Required to Install WalletChat Snap - Install Here<FlaskFox />
+            </Link>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: {},
+                    },
+                  });
+                }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
+            </div>
+          }
+          </HStack>
         </Box>
       </Flex>
     )
