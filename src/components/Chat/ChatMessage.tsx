@@ -190,19 +190,15 @@ const ChatMessage = ({
       }
 
       const fetchFromOpenSea = () => {
-        if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-          log('Missing OpenSea API Key')
-          return
-        }
-        fetch(
-          `https://api.opensea.io/api/v1/asset/${msg.nftAddr}/${msg.nftId}?account_address=${account}`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
-            },
-          }
-        )
+        //`https://api.opensea.io/api/v1/asset/${msg.nftAddr}/${msg.nftId}?account_address=${account}`,
+        fetch(`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/opensea_asset/${msg.nftAddr}/${msg.nftId}/${account}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+             'Content-Type': 'application/json',
+             Authorization: `Bearer ${getJwtForAccount(account)}`,
+          },
+         })
           .then((response) => response.json())
           .then((result: OpenSeaNFT) => {
             if (result?.collection?.name && !equal(result, nftData)) {
