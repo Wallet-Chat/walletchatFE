@@ -128,7 +128,7 @@ export const App = () => {
                 Install WalletChat Metamask Snap
             </Button> 
             </div>
-          }
+          )}
           </HStack>
         </Box>
       </Flex>
