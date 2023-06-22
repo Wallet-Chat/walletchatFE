@@ -154,18 +154,18 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
-            if (pendingMsgs.current[0]?.timestamp === timestamp) {
-              pendingMsgs.current.shift()
+            // if (pendingMsgs.current[0]?.timestamp === timestamp) {
+            //   pendingMsgs.current.shift()
 
-              if (pendingMsgs.current[0]) {
-                log('✅[POST][Retry Message - TODO debug]:', responseData)
-                postMessage(
-                  pendingMsgs.current[0].createMessageData,
-                  pendingMsgs.current[0].newMessage,
-                  pendingMsgs.current[0].timestamp
-                )
-              }
-            }
+            //   if (pendingMsgs.current[0]) {
+            //     log('✅[POST][Retry Message - TODO debug]:', responseData)
+            //     postMessage(
+            //       pendingMsgs.current[0].createMessageData,
+            //       pendingMsgs.current[0].newMessage,
+            //       pendingMsgs.current[0].timestamp
+            //     )
+            //   }
+            // }
           })
           .catch((error) => {
             console.error('🚨[POST][Send message]:', error, createMessageData)
