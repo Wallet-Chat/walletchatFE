@@ -267,7 +267,7 @@ const ChatMessage = ({
                   return { ...currentChatData[i], read: true }
                 }
               })
-
+              
               updateLocalDmDataForAccountToAddr(
                 account,
                 fromAddr,
@@ -353,7 +353,7 @@ const ChatMessage = ({
                 </Text>
               </UserProfileContextMenu>
 
-              {pending && (
+              {/* {pending && (
                 <Text
                   marginLeft='2'
                   fontSize='md'
@@ -363,20 +363,20 @@ const ChatMessage = ({
                 >
                   Message being decrypted...
                 </Text>
-              )}
+              )} */}
             </Flex>
           )}
 
-          {pending ? (
+          {/* {pending ? (
             <SkeletonText
               width='200px'
               skeletonHeight='10px'
               noOfLines={1}
               marginBottom='2'
             />
-          ) : (
+          ) : ( */}
             <Box>{msg.message}</Box>
-          )}
+          {/* )} */}
           <Box
             d='inline-block'
             className='timestamp'
@@ -390,19 +390,22 @@ const ChatMessage = ({
           </Box>
 
           {msgPosition === 'right' &&
-            (msg.Id !== -1 ? (
+            //  (msg.Id !== -1 ? (
               <span className='read-status'>
                 {msg.read ? <IconChecks size={15} /> : <IconCheck size={15} />}
               </span>
-            ) : msg.failed ? (
-              <Tooltip label='Message Failed'>
-                <span className='read-status alert'>
-                  <IconAlertCircle size={15} color='red' />
-                </span>
-              </Tooltip>
-            ) : (
-              <Spinner size='xs' className='read-status' />
-            ))}
+            // ) : msg.failed ? (
+            //   <Tooltip label='Message Failed'>
+            //     <span className='read-status alert'>
+            //       <IconAlertCircle size={15} color='red' />
+            //     </span>
+            //   </Tooltip>
+            // )
+            // : (
+            //   <Spinner size='xs' className='read-status' />
+            // )
+            //)
+          }
         </Box>
         {msg.nftAddr && msg.nftId && account && (
           <Box mb={1}>
