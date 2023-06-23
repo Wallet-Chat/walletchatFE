@@ -11,6 +11,7 @@ import * as ENV from '@/constants/env'
 import {
   updateLocalDmDataForAccountToAddr,
   addLocalDmDataForAccountToAddr,
+  addPendingDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
@@ -61,7 +62,10 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         const currentChatData =
           getLocalDmDataForAccountToAddr(account, toAddr) || []
         currentChatData.push(newMessage)
-        updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData)
+        //TODO - clean up a bit once we got back to e2e encryption, sending might look slow with the status bar on send (only want for RX side)
+        addPendingDmDataForAccountToAddr(account, toAddr, newMessage) 
+        //updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData) //this was used originally, but race condition for "double message" occured
+                                                                              //it was because accessing Local Storage and operating on read items was out of sync
 
         const newChatData = getLocalDmDataForAccountToAddr(account, toAddr)
 
@@ -91,7 +95,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       })
     )
 
-  const postMessage = React.useCallback(
+  const postMessageToAPI = React.useCallback(
     async (
       createMessageData: CreateChatMessageType,
       newMessage: ChatMessageType,
@@ -154,18 +158,18 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
-            // if (pendingMsgs.current[0]?.timestamp === timestamp) {
-            //   pendingMsgs.current.shift()
+            if (pendingMsgs.current[0]?.timestamp === timestamp) {
+              pendingMsgs.current.shift()
 
-            //   if (pendingMsgs.current[0]) {
-            //     log('✅[POST][Retry Message - TODO debug]:', responseData)
-            //     postMessage(
-            //       pendingMsgs.current[0].createMessageData,
-            //       pendingMsgs.current[0].newMessage,
-            //       pendingMsgs.current[0].timestamp
-            //     )
-            //   }
-            // }
+              if (pendingMsgs.current[0]) {
+                log('✅[POST][************Retry Message - TODO debug]:')
+                postMessageToAPI(
+                  pendingMsgs.current[0].createMessageData,
+                  pendingMsgs.current[0].newMessage,
+                  pendingMsgs.current[0].timestamp
+                )
+              }
+            }
           })
           .catch((error) => {
             console.error('🚨[POST][Send message]:', error, createMessageData)
@@ -232,12 +236,13 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       nftaddr: '',
     }
 
+    //TODO: during cleartext testing, the spinner is gone for now, makes UI look slow
     // Already show message on the UI with the spinner as Loading
     // because it will begin to encrypt the message and only confirm
     // it was sent after a successful response
     addPendingMessageToUI(newMessage)
 
-    postMessage(createMessageData, newMessage, timestamp)
+    postMessageToAPI(createMessageData, newMessage, timestamp)
   }
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
