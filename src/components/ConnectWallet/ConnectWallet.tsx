@@ -13,6 +13,7 @@ import {
   setAccount,
 } from '@/redux/reducers/account'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import { getWidgetUrl, postMessage } from '@/helpers/widget'
 
 const isWidget = getIsWidgetContext()
 
@@ -53,13 +54,18 @@ const ConnectWalletButton = () => {
 
   const handleLogin = async () => {
     // setPending(true)
-    pendingConnect.current = true
 
-    resetWidgetDataWithSignature()
-    const canSignIn = await requestSIWEandFetchJWT()
-    if (canSignIn && account) {
-      signIn(account, getJwtForAccount(account) || '')
+    //pendingConnect.current = true
+
+    if (isWidget) {
+      postMessage({ target: 'do_parent_sign_in' })
     }
+
+    // resetWidgetDataWithSignature()
+    // const canSignIn = await requestSIWEandFetchJWT()
+    // if (canSignIn && account) {
+    //   signIn(account, getJwtForAccount(account) || '')
+    // }
   }
 
   // TODO: allow changing sign-in method after already selected wallet
@@ -99,10 +105,10 @@ const ConnectWalletButton = () => {
                     mr={2}
                     minWidth='unset'
                   >
-                    Connected
+                    Sign In
                   </Tag>
                   <Box whiteSpace='break-spaces'>
-                    Connect with {getWidgetOriginName() || 'App'}
+                    Sign Into {getWidgetOriginName() || 'WalletChat'}
                   </Box>
                 </Button>
               ) : (

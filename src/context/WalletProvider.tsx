@@ -116,10 +116,7 @@ const WalletProviderContext = (chains: any) => {
   )
 
   const initialJwt = accountAddress && storage.get('jwt')
-  const accountAuthenticated =
-    accountAddress && chainId && wagmiConnected
-      ? getHasJwtForAccount(accountAddress)
-      : null
+  const accountAuthenticated = getHasJwtForAccount(accountAddress || "")
 
   const [nonce, setNonce] = React.useState<string | null>()
   const [email, setEmail] = React.useState(null)
@@ -129,7 +126,7 @@ const WalletProviderContext = (chains: any) => {
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-    undefined | { signature: undefined | null | string; signedMsg: string }
+    undefined | { signature: undefined | null | string; msgToSign: string }
   >()
   const widgetSignature = widgetAuthSig?.signature
 
@@ -345,10 +342,10 @@ const WalletProviderContext = (chains: any) => {
         didDisconnect.current = false
 
         //TODO: do we need to connect yet again here? seems like we get 2 requests sometimes
-        if (connectConfig || config) {
-          connect(connectConfig || config)
-          //todo: use wagmi injected connector instead of asking user for connection again?
-        }
+        // if (connectConfig || config) {
+        //   connect(connectConfig || config)
+        //   //todo: use wagmi injected connector instead of asking user for connection again?
+        // }
       }
     },
     [connect, connectConfig, dispatch]
@@ -382,7 +379,7 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
-        //log("*** Setting Widget Auth Sig ***", messageData)
+        log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
       }
       
@@ -450,10 +447,10 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
-            if (!wagmiConnected) {
-              await connectAsync({ chainId: messageData.chainId, connector })
-            }
-            await disconnectAsync()
+            // if (!wagmiConnected) {
+            //   await connectAsync({ chainId: messageData.chainId, connector })
+            // }
+            // await disconnectAsync()
 
             setConnectConfig({ chainId: messageData.chainId, connector })
             updateAccountFromWidget(
@@ -549,12 +546,12 @@ const WalletProviderContext = (chains: any) => {
     const needsToRequestJwt =
       walletIsConnected && nonce && accountHasNoJwt && shouldRequestJwt
 
-    if (needsToRequestJwt) {
+    if (needsToRequestJwt || needsToRequestJwt == null) {
       setSiwePending(true)
       siwePendingRef.current = true
 
       let signature = widgetAuthSig?.signature
-      let messageToSign = widgetAuthSig?.signedMsg
+      let messageToSign = widgetAuthSig?.msgToSign
 
       const shouldRetrySignature = siweFailedRef.current
       const widgetRequestedSIWE =
