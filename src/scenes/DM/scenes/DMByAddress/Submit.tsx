@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, Icon, Popover, PopoverTrigger, PopoverContent } from '@chakra-ui/react'
+import { Textarea, Button, Flex, Icon, Popover, PopoverTrigger, PopoverContent, PopoverBody, InputRightElement, InputLeftElement, Container } from '@chakra-ui/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -266,29 +266,33 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <Popover>
-          <PopoverTrigger>
-            <Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />
-          </PopoverTrigger>
-          <PopoverContent left={{lg: "50%", md: "50%", sm: "25%"}} marginTop={{lg: "90%", md: "90%", sm: "120%"}} w="283px">  
-            <Picker 
-              data={data}
-              emojiSize={20}
-              emojiButtonSize={28}
-              onEmojiSelect={addEmoji}
-              maxFrequentRows={4}
-              />
-          </PopoverContent>
+      <Popover placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
+          />
+        </PopoverTrigger>
+        <PopoverContent w="283px">  
+          <Picker 
+            data={data}
+            emojiSize={20}
+            emojiButtonSize={28}
+            onEmojiSelect={addEmoji}
+            maxFrequentRows={4}
+          />
+        </PopoverContent>
       </Popover>
 
       <Textarea 
-        placeholder='Write a messages...'
+        placeholder='Write a message...'
         ref={textAreaRef}
         onChange={(e) => setMsgInput(e.target.value)}
         value={msgInput}
         onKeyPress={handleKeyPress}
         backgroundColor='lightgray.400'
         minH='full'
+        p={3}
         resize='none'
       />
         
