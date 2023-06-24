@@ -126,7 +126,8 @@ const WalletProviderContext = (chains: any) => {
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-    undefined | { signature: undefined | null | string; msgToSign: string }
+    undefined | { signature: undefined | null | string; msgToSign: string; 
+                  walletName: undefined | null | string; account: undefined | null | string; chainId: number }
   >()
   const widgetSignature = widgetAuthSig?.signature
 
@@ -341,10 +342,12 @@ const WalletProviderContext = (chains: any) => {
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
 
-        //TODO: do we need to connect yet again here? seems like we get 2 requests sometimes
-        // if (connectConfig || config) {
-        //   connect(connectConfig || config)
-        //   //todo: use wagmi injected connector instead of asking user for connection again?
+        //skip wallet connection if parent integration didn't send wallet connetion info
+        // if (widgetWalletDataRef == null) {
+        //   if (connectConfig || config) {
+        //     connect(connectConfig || config)
+        //     //todo: use wagmi injected connector instead of asking user for connection again?
+        //   }
         // }
       }
     },
@@ -447,10 +450,12 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
-            // if (!wagmiConnected) {
-            //   await connectAsync({ chainId: messageData.chainId, connector })
+            // if(messageData.) {
+            //   if (!wagmiConnected) {
+            //     await connectAsync({ chainId: messageData.chainId, connector })
+            //   }
+            //   await disconnectAsync()
             // }
-            // await disconnectAsync()
 
             setConnectConfig({ chainId: messageData.chainId, connector })
             updateAccountFromWidget(
@@ -552,6 +557,10 @@ const WalletProviderContext = (chains: any) => {
 
       let signature = widgetAuthSig?.signature
       let messageToSign = widgetAuthSig?.msgToSign
+      if(!accountAddress && widgetAuthSig?.account) { 
+         dispatch(setAccount(widgetAuthSig?.account)) 
+         getNonce(widgetAuthSig?.account)
+      }
 
       const shouldRetrySignature = siweFailedRef.current
       const widgetRequestedSIWE =
@@ -655,6 +664,7 @@ const WalletProviderContext = (chains: any) => {
   }, [requestSIWEandFetchJWT])
 
   const disconnectWallet = React.useCallback(async () => {
+    setWidgetAuthSig(undefined)
     didDisconnect.current = true
 
     Lit.disconnect()
@@ -662,7 +672,6 @@ const WalletProviderContext = (chains: any) => {
 
     widgetWalletDataRef.current = undefined
     dispatch(setAccount(null))
-    setNonce(null)
     setSiweLastFailure(null)
     siweFailedRef.current = false
     dispatch(setIsAuthenticated(false))
