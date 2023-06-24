@@ -532,10 +532,17 @@ const WalletProviderContext = (chains: any) => {
   }, [chain?.id])
 
   const requestSIWEandFetchJWT = React.useCallback(async () => {
-    const walletIsConnected = accountAddress && chainId
+    let _accountAddress = accountAddress
+    if(!accountAddress && widgetAuthSig?.account) {
+      dispatch(setAccount(widgetAuthSig?.account)) 
+      getNonce(widgetAuthSig?.account)
+      _accountAddress = widgetAuthSig?.account
+    }
+
+    const walletIsConnected = _accountAddress && chainId
 
     const accountHasNoJwt =
-      accountAddress && !getHasJwtForAccount(accountAddress)
+      _accountAddress && !getHasJwtForAccount(_accountAddress)
 
     const hasNewNonce = prevNonce.current !== nonce
     const requestAlreadyInitiated = siwePendingRef.current
@@ -551,16 +558,12 @@ const WalletProviderContext = (chains: any) => {
     const needsToRequestJwt =
       walletIsConnected && nonce && accountHasNoJwt && shouldRequestJwt
 
-    if (needsToRequestJwt || needsToRequestJwt == null) {
+    if (needsToRequestJwt) {
       setSiwePending(true)
       siwePendingRef.current = true
 
       let signature = widgetAuthSig?.signature
       let messageToSign = widgetAuthSig?.msgToSign
-      if(!accountAddress && widgetAuthSig?.account) { 
-         dispatch(setAccount(widgetAuthSig?.account)) 
-         getNonce(widgetAuthSig?.account)
-      }
 
       const shouldRetrySignature = siweFailedRef.current
       const widgetRequestedSIWE =

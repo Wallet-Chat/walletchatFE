@@ -54,12 +54,9 @@ const ConnectWalletButton = () => {
 
   const handleLogin = async () => {
     // setPending(true)
+    pendingConnect.current = true
 
-    //pendingConnect.current = true
-
-    if (isWidget) {
-      postMessage({ target: 'do_parent_sign_in' })
-    }
+    postMessage({ target: 'do_parent_sign_in' })
 
     // resetWidgetDataWithSignature()
     // const canSignIn = await requestSIWEandFetchJWT()
@@ -123,7 +120,7 @@ const ConnectWalletButton = () => {
                 </Button>
               )}
 
-              {(siweFailed || canUseWidgetConnection) && (
+              {/* {(siweFailed || canUseWidgetConnection) && (
                 <Button
                   variant='black'
                   size='lg'
@@ -134,13 +131,13 @@ const ConnectWalletButton = () => {
                 >
                   Sign in with another wallet
                 </Button>
-              )}
-
+              )} */}
+{/* 
               {siweFailed && (
                 <Tag variant='solid' colorScheme='red'>
                   Signature failed or rejected, please try again
                 </Tag>
-              )}
+              )} */}
             </Flex>
           )
         })()
