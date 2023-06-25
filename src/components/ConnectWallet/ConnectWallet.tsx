@@ -56,6 +56,7 @@ const ConnectWalletButton = () => {
     // setPending(true)
     pendingConnect.current = true
 
+    //TODO: check for existing JWT (account is usually null here though)
     postMessage({ target: 'do_parent_sign_in' })
 
     // resetWidgetDataWithSignature()
