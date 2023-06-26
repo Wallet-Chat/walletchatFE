@@ -12,7 +12,8 @@ import {
   Popover, 
   PopoverTrigger, 
   PopoverContent, 
-  Textarea, 
+  Textarea,
+  Container, 
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -302,36 +303,48 @@ const CommunityGroupChat = ({
         ></Box>
       </DottedBackground>
 
-      <Flex>
-        <InputGroup resize="none" w="100%" fontSize="md" background="lightgray.400" borderRadius="xl">
-          <Textarea
-            placeholder="Write a message..."
-            onChange={(e) => setMsgInput(e.target.value)}
-            value={msgInput}
-            onKeyPress={handleKeyPress}
-            minH="full"
-            resize="none"
-          />
-          <Popover placement="top-start" isLazy>
-            <PopoverTrigger>
-              <InputRightElement top="10px" right="10px">
-                <Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />
-              </InputRightElement>
-            </PopoverTrigger>
-            <PopoverContent w="283px">
-              <Picker
-                data={data}
-                emojiSize={20}
-                emojiButtonSize={28}
-                onEmojiSelect={addEmoji}
-                maxFrequentRows={4}
-              />
-            </PopoverContent>
-          </Popover>
-        </InputGroup>
-        <Flex alignItems="flex-end">
-          <Button variant="black" height="100%" onClick={sendMessage} isLoading={isSendingMessage}>
-            <IconSend size="20" />
+      <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+        <Popover placement='top-start' isLazy>
+          <PopoverTrigger>
+            <Container 
+              w={0}
+              children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
+            />
+          </PopoverTrigger>
+          <PopoverContent w="283px">  
+            <Picker 
+              data={data}
+              emojiSize={20}
+              emojiButtonSize={28}
+              onEmojiSelect={addEmoji}
+              maxFrequentRows={4}
+            />
+          </PopoverContent>
+        </Popover>
+
+        <Textarea 
+          placeholder='Write a message...'
+          onChange={(e) => setMsgInput(e.target.value)}
+          value={msgInput}
+          onKeyPress={handleKeyPress}
+          backgroundColor='lightgray.400'
+          minH='full'
+          pt={3.5}
+          resize='none'
+        />
+        
+        <Flex alignItems='flex-end'>
+          <Button
+            variant='black'
+            onClick={sendMessage}
+            borderRadius='full'
+            minH='full'
+            px='0'
+            py='0'
+            w='12'
+            h='12'
+          >
+            <IconSend size='22' />
           </Button>
         </Flex>
       </Flex>

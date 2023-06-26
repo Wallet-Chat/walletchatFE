@@ -160,8 +160,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
-            if (pendingMsgs.current[0]?.timestamp === timestamp) {
-              pendingMsgs.current.shift()
+            // if (pendingMsgs.current[0]?.timestamp === timestamp) {
+            //   pendingMsgs.current.shift()
 
 
               //commented this out to fix the race condition issue
@@ -174,7 +174,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
               //     pendingMsgs.current[0].timestamp
               //   )
               // }
-            }
+            // }
           })
           .catch((error) => {
             console.error('🚨[POST][Send message]:', error, createMessageData)
@@ -292,7 +292,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         onKeyPress={handleKeyPress}
         backgroundColor='lightgray.400'
         minH='full'
-        p={3}
+        pt={3.5}
         resize='none'
       />
         
