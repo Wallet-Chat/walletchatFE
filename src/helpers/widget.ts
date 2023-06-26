@@ -40,6 +40,7 @@ function getWidgetEnvSuffix(addDev?: boolean) {
 
   if (
     currentWidgetOrigin.toLowerCase().includes('gooddollar') ||
+    currentWidgetOrigin.toLowerCase().includes('gooddapp') ||
     currentWidgetOrigin.toLowerCase().includes('good-protocol')
   ) {
     return '_GOODDOLLAR'
