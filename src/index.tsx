@@ -4,13 +4,22 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 
 import '@rainbow-me/rainbowkit/styles.css'
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
-import { createClient, WagmiConfig, configureChains } from 'wagmi'
+import { getDefaultWallets, RainbowKitProvider, connectorsForWallets } from '@rainbow-me/rainbowkit'
+import {
+  metaMaskWallet,
+  ledgerWallet,
+  braveWallet,
+  walletConnectWallet,
+  coinbaseWallet,
+  injectedWallet,
+} from '@rainbow-me/rainbowkit/wallets'
+import { createConfig, WagmiConfig, configureChains } from 'wagmi'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 import { Provider } from 'react-redux'
 import { App } from './App'
@@ -24,39 +33,74 @@ import { store } from './redux/store'
 import * as ENV from '@/constants/env'
 import * as APP from './constants/app'
 
-export const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, polygon, optimism, avalanche, avalancheFuji, celo],
+// export const { chains, publicClient, webSocketPublicClient } = configureChains(
+//   [mainnet, polygon, optimism, avalanche, avalancheFuji, celo],
+//   [
+//     infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
+//     alchemyProvider({ apiKey: ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM }),
+//     publicProvider(),
+//   ]
+// )
+
+export const { chains, publicClient } = configureChains(
+  [mainnet, polygon, optimism, avalanche, avalancheFuji, celo], 
   [
     infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
     alchemyProvider({ apiKey: ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM }),
-    publicProvider(),
+    publicProvider()
   ]
 )
 
-export const { connectors } = getDefaultWallets({ appName: APP.NAME, chains })
-
-const wagmiClient = createClient({
-  autoConnect: false,
-  connectors: [
-    ...connectors(),
-    new MetaMaskConnector({
-      chains,
-      options: {
-        shimDisconnect: true,
-        UNSTABLE_shimOnConnectSelectAccount: true,
-      },
-    }),
-  ],
-  provider,
-  webSocketProvider,
+const { wallets } = getDefaultWallets({
+  appName: APP.NAME,
+  projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID,
+  chains
 })
+const connectors = connectorsForWallets([
+  ...wallets,
+  {
+    groupName: 'Other',
+    wallets: [
+      ledgerWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID, chains }),
+      coinbaseWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID, chains })
+    ]
+  }
+])
+
+const connector = new WalletConnectConnector({
+  chains,
+  options: {
+    projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID,
+  },
+})
+
+const wagmiClient = createConfig({
+  connectors: [connector],
+  publicClient,
+})
+
+// const wagmiClient = createConfig({
+//   autoConnect: false,
+//   connectors: [
+//     ...connectors(),
+//     new MetaMaskConnector({
+//       chains,
+//       options: {
+//         shimDisconnect: true,
+//         UNSTABLE_shimOnConnectSelectAccount: true,
+//       },
+//     }),
+//   ],
+//   publicClient,
+//   webSocketPublicClient,
+// })
 
 ReactDOM.render(
   <React.StrictMode>
     <ColorModeScript />
     <Provider store={store}>
       <BrowserRouter>
-        <WagmiConfig client={wagmiClient}>
+        <WagmiConfig config={wagmiClient}>
           <RainbowKitProvider chains={chains}>
             <WalletProvider chains={chains}>
               <UnreadCountProvider>

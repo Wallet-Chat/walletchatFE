@@ -25,6 +25,7 @@ import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
 import { getJwtForAccount } from '@/helpers/jwt'
+import Web3 from 'web3'
 
 export default function NFTInboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -33,7 +34,6 @@ export default function NFTInboxSearchInput() {
    const [nft, setNft] = useState<NFTCollection>()
    const [chain, setChain] = useState('ethereum')
    const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false)
-   const { web3 } = useWallet()
 
    const ref = useRef(null)
 
@@ -159,7 +159,7 @@ export default function NFTInboxSearchInput() {
          </FormControl>
 
          {toAddr !== '' &&
-            web3.utils.isAddress(toAddr) &&
+            Web3.utils.isAddress(toAddr) &&
             isSuggestionListOpen &&
             !(isFetchingEthereum || isFetchingPolygon) && (
                <Box

@@ -10,6 +10,7 @@ import {
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Blockies from 'react-blockies'
+import Web3 from 'web3'
 import { useWallet } from '../../../../context/WalletProvider'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import useOnClickOutside from '../../../../hooks/useOnClickOutside'
@@ -21,7 +22,7 @@ export default function InboxSearchInput() {
    const [resolvedAddr, setResolvedAddr] = useState<string | null>()
    const [isResolvingENS, setIsResolvingENS] = useState(false)
    const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false)
-   const { provider, web3 } = useWallet()
+   const { provider } = useWallet()
 
    const ref = useRef(null)
 
@@ -68,7 +69,7 @@ export default function InboxSearchInput() {
    useOnClickOutside(ref, handleClickOutside)
 
    let suggestedAddress: string = toAddr
-   if (web3.utils.isAddress(toAddr)) {
+   if (Web3.utils.isAddress(toAddr)) {
       suggestedAddress = toAddr
    } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc')) && resolvedAddr && !isResolvingENS) {
       suggestedAddress = resolvedAddr

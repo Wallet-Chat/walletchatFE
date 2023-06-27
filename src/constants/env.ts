@@ -7,6 +7,8 @@ export const REACT_APP_REST_API = import.meta.env.VITE_REACT_APP_REST_API
 export const REACT_APP_API_VERSION = import.meta.env.VITE_REACT_APP_API_VERSION
 export const REACT_APP_VERSION = import.meta.env.VITE_REACT_APP_VERSION
 export const REACT_APP_INFURA_ID = import.meta.env.VITE_REACT_APP_INFURA_ID
+export const REACT_APP_WALLETCONNECT_PROJECT_ID = import.meta.env
+  .VITE_REACT_APP_WALLETCONNECT_PROJECT_ID
 export const REACT_APP_IPFS_INFURA_API_KEY = import.meta.env
   .VITE_REACT_APP_IPFS_INFURA_API_KEY
 export const REACT_APP_ALCHEMY_API_KEY_POLYGON = import.meta.env
