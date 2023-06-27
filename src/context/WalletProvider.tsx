@@ -261,6 +261,23 @@ const WalletProviderContext = (chains: any) => {
       })
   }
 
+  async function getNonceAsync(address: string) {
+    let retVal = ""
+    await fetch(` ${ENV.REACT_APP_REST_API}/users/${address}/nonce`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then(async (usersData: { Nonce: string }) => {
+        log('✅[GET][Nonce Local]:', usersData)
+        retVal = usersData.Nonce
+      })
+      .catch((error) => {
+        log('🚨[GET][Nonce Local]:', error)
+      })
+      return retVal;
+  }
+
   React.useEffect(() => {
     if (isWidget) {
       if (!accountAddress) {
@@ -375,8 +392,49 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
+        //TODO, should probably clean this up to pass in account and chain ID?
         log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
+        const regex = /0x[a-fA-F0-9]{40}/;
+        const matches = messageData.msgToSign.match(regex);
+
+        const regexChainID = /Chain ID: (\d+)/;
+        const matchesChainID = messageData.msgToSign.match(regexChainID);
+
+        let chainID = '1'
+        if (matchesChainID && matchesChainID.length > 1) {
+           chainID = matches[1];
+        }
+
+        if (matches && matches.length > 0) {
+          const matchedAccount = matches[0]
+          let localNonce = await getNonceAsync(matchedAccount)
+          log("signed_message from: ", matchedAccount)
+          
+          fetch(`${ENV.REACT_APP_REST_API}/signin`, {
+            body: JSON.stringify({
+              name: chainID,
+              address: matchedAccount,
+              nonce: localNonce,
+              msg: messageData.msgToSign,
+              sig: messageData.signature,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          })
+            .then((response) => response.json())
+            .then(async (signInData) => {
+              storeJwtForAccount(matchedAccount, signInData.access)
+    
+              const currentSigs = storage.get('lit-auth-signature-by-account')
+              storage.set('lit-auth-signature-by-account', {
+                ...currentSigs,
+                [matchedAccount.toLocaleLowerCase()]: widgetAuthSig,
+              })
+    
+              signIn(matchedAccount, signInData.access)
+            })
+        }
       }
 
       if (target === 'sign_in' && messageData) {
