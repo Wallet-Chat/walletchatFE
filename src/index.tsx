@@ -43,10 +43,10 @@ const connectors = connectorsForWallets([
   {
     groupName: 'Recommended',
     wallets: [
+      metaMaskWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
+      trustWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
       rainbowWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
       walletConnectWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
-      trustWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
-      metaMaskWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains })
     ],
   },
 ]);
