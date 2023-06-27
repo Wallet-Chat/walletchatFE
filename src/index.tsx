@@ -34,7 +34,7 @@ export const { chains, provider, webSocketProvider } = configureChains(
   ]
 )
 
-export const { connectors } = getDefaultWallets({ appName: APP.NAME, chains })
+export const { connectors } = getDefaultWallets({ appName: APP.NAME, chains, projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID })
 
 const wagmiClient = createClient({
   autoConnect: false,
