@@ -51,19 +51,19 @@ const ChangeEmail = () => {
   const [isDialogOn, setIsDialogOn] = useState(false)
 
    const getSettings = async () => {
-    try {
-      const snapState = await window.ethereum.request({
-        method: 'wallet_invokeSnap',
-        params: {
-          snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
-          request: { method: 'get_snap_state', params: { apiKey: getJwtForAccount(account), address: account } },
-        },
-      });
-      //log('-[snap state]:', snapState)
-      setIsDialogOn(snapState?.isDialogOn)
-    } catch(error) {
-      console.error('🚨[GET][Snap State]:', error)
-    }   
+    // try {
+    //   const snapState = await window.ethereum.request({
+    //     method: 'wallet_invokeSnap',
+    //     params: {
+    //       snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+    //       request: { method: 'get_snap_state', params: { apiKey: getJwtForAccount(account), address: account } },
+    //     },
+    //   });
+    //   //log('-[snap state]:', snapState)
+    //   setIsDialogOn(snapState?.isDialogOn)
+    // } catch(error) {
+    //   console.error('🚨[GET][Snap State]:', error)
+    // }   
 
     if (!ENV.REACT_APP_REST_API) {
          log('REST API url not in .env', process.env)

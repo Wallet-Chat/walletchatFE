@@ -24,6 +24,7 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
+import { createResizedImage } from '@/utils/resizer'
 
 const ChangeName = () => {
   const {
@@ -49,9 +50,9 @@ const ChangeName = () => {
   const [file, setFile] = useState<Blob | MediaSource>()
   const [filePreview, setFilePreview] = useState('')
 
-  const resizeFile = (file: Blob) =>
+  const resizeFile = (file: File) =>
     new Promise((resolve) => {
-      Resizer.imageFileResizer(
+      createResizedImage(
         file,
         64,
         64,

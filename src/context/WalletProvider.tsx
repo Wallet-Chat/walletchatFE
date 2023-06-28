@@ -17,8 +17,8 @@ import {
   useProvider,
 } from 'wagmi'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
-import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
@@ -200,18 +200,19 @@ const WalletProviderContext = (chains: any) => {
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
       
-      window.ethereum.request({
-        method: 'wallet_invokeSnap',
-        params: {
-          snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
-          request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
-        },
-      });
+      // window.ethereum.request({
+      //   method: 'wallet_invokeSnap',
+      //   params: {
+      //     snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+      //     request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
+      //   },
+      // });
 
-      Lit.setAuthSig(address)
       Lit.connectManual()
 
       log('✅[INFO][JWT]:', jwt)
+
+      Lit.setAuthSig(address)
       // if we log in with a full delegate, act as the vault
       const walletInJWT = parseJwt(jwt).sub
       if (walletInJWT.toLocaleLowerCase() !== address.toLocaleLowerCase()) {
@@ -268,6 +269,22 @@ const WalletProviderContext = (chains: any) => {
       })
   }
 
+  async function getNonceAsync(address: string) {
+    let retVal = ""
+    await fetch(` ${ENV.REACT_APP_REST_API}/users/${address}/nonce`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then(async (usersData: { Nonce: string }) => {
+        log('✅[GET][Nonce Local]:', usersData)
+        retVal = usersData.Nonce
+      })
+      .catch((error) => {
+        log('🚨[GET][Nonce Local]:', error)
+      })
+      return retVal;
+  }
   React.useEffect(() => {
     if (isWidget) {
       if (!accountAddress) {
@@ -382,8 +399,49 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
-        //log("*** Setting Widget Auth Sig ***", messageData)
+        //TODO, should probably clean this up to pass in account and chain ID?
+        log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
+        // const regex = /0x[a-fA-F0-9]{40}/;
+        // const matches = messageData.msgToSign.match(regex);
+
+        // const regexChainID = /Chain ID: (\d+)/;
+        // const matchesChainID = messageData.msgToSign.match(regexChainID);
+
+        // let chainID = '1'
+        // if (matchesChainID && matchesChainID.length > 1) {
+        //    chainID = matches[1];
+        // }
+
+        // if (matches && matches.length > 0) {
+        //   const matchedAccount = matches[0]
+        //   let localNonce = await getNonceAsync(matchedAccount)
+        //   log("signed_message from: ", matchedAccount)
+          
+        //   fetch(`${ENV.REACT_APP_REST_API}/signin`, {
+        //     body: JSON.stringify({
+        //       name: chainID,
+        //       address: matchedAccount,
+        //       nonce: localNonce,
+        //       msg: messageData.msgToSign,
+        //       sig: messageData.signature,
+        //     }),
+        //     headers: { 'Content-Type': 'application/json' },
+        //     method: 'POST',
+        //   })
+        //     .then((response) => response.json())
+        //     .then(async (signInData) => {
+        //       storeJwtForAccount(matchedAccount, signInData.access)
+    
+        //       const currentSigs = storage.get('lit-auth-signature-by-account')
+        //       storage.set('lit-auth-signature-by-account', {
+        //         ...currentSigs,
+        //         [matchedAccount.toLocaleLowerCase()]: widgetAuthSig,
+        //       })
+    
+        //       signIn(matchedAccount, signInData.access)
+        //     })
+        // }
       }
       
       if (target === 'parent_provider') {
@@ -440,10 +498,11 @@ const WalletProviderContext = (chains: any) => {
             walletIs('gooddollar') ||
             walletIs('zengo')
           ) {
-            connector = new WalletConnectLegacyConnector({
+            connector = new WalletConnectConnector({
               chains,
               options: {
-                qrcode: true,
+                projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID
+                //qrcode: true,
               },
             })
             storage.set('current-widget-provider', 'wallet-connect')

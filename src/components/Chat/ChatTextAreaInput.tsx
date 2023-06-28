@@ -1,4 +1,18 @@
-import { Button, Flex, FormControl } from '@chakra-ui/react'
+import { 
+   Button, 
+   Flex, 
+   Icon, 
+   InputRightElement, 
+   InputGroup, 
+   Popover, 
+   PopoverTrigger, 
+   PopoverContent, 
+   Textarea,
+   Container
+} from '@chakra-ui/react'
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
+import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import React, { KeyboardEvent, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize'
@@ -24,38 +38,60 @@ const ChatTextAreaInput = ({
       setMsgInput('')
    }
 
+   const addEmoji = (e: any) => {
+      const sym = e.unified.split("_");
+      const codeArray: any[] = [];
+      sym.forEach((el: string) => codeArray.push("0x" + el));
+      let emoji = String.fromCodePoint(...codeArray)
+      setMsgInput(msgInput + emoji);
+    }
+
    return (
-      <Flex>
-         <FormControl style={{ flexGrow: 1 }}>
-            <ReactTextareaAutosize
-               placeholder="Write a message..."
-               value={msgInput}
-               onChange={(e) => setMsgInput(e.target.value)}
-               onKeyPress={(e) => handleKeyPress(e)}
-               className="custom-scrollbar"
-               style={{
-                  resize: 'none',
-                  padding: '.5rem 1rem',
-                  width: '100%',
-                  fontSize: 'var(--chakra-fontSizes-md)',
-                  background: 'var(--chakra-colors-lightgray-400)',
-                  borderRadius: '0.3rem',
-                  marginBottom: '-6px',
-               }}
-               maxRows={8}
-            />
-         </FormControl>
-         <Flex alignItems="flex-end">
-            <Button
-               variant="black"
-               height="100%"
-               onClick={() => handleSendMessage()}
-               isLoading={isSendingMessage}
-            >
-               <IconSend size="20" />
-            </Button>
-         </Flex>
+    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+      <Popover placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
+          />
+        </PopoverTrigger>
+        <PopoverContent w="283px">  
+          <Picker 
+            data={data}
+            emojiSize={20}
+            emojiButtonSize={28}
+            onEmojiSelect={addEmoji}
+            maxFrequentRows={4}
+          />
+        </PopoverContent>
+      </Popover>
+
+      <Textarea 
+        placeholder='Write a message...'
+        onChange={(e) => setMsgInput(e.target.value)}
+        value={msgInput}
+        onKeyPress={handleKeyPress}
+        backgroundColor='lightgray.400'
+        minH='full'
+        pt={3.5}
+        resize='none'
+      />
+      
+      <Flex alignItems='flex-end'>
+        <Button
+          variant='black'
+          onClick={() => sendMessage}
+          borderRadius='full'
+          minH='full'
+          px='0'
+          py='0'
+          w='12'
+          h='12'
+        >
+          <IconSend size='22' />
+        </Button>
       </Flex>
+    </Flex>
    )
 }
 
