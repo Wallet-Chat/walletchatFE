@@ -1,17 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex } from '@chakra-ui/react'
+import { Textarea, Button, Flex, Icon, Popover, PopoverTrigger, PopoverContent, PopoverBody, InputRightElement, InputLeftElement, Container } from '@chakra-ui/react'
+import { BsEmojiSmile } from "react-icons/bs"
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
 import {
   updateLocalDmDataForAccountToAddr,
   addLocalDmDataForAccountToAddr,
-  addPendingDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
@@ -21,6 +23,7 @@ import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { getAccessControlConditions } from '@/helpers/lit'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
+
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
@@ -32,7 +35,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const dispatch = useAppDispatch()
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
-  const msgInput = React.useRef<string>('')
+  // const msgInput = React.useRef<string>('')
+  const [msgInput, setMsgInput] = useState<string>("")
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
@@ -62,10 +66,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         const currentChatData =
           getLocalDmDataForAccountToAddr(account, toAddr) || []
         currentChatData.push(newMessage)
-        //TODO - clean up a bit once we got back to e2e encryption, sending might look slow with the status bar on send (only want for RX side)
-        addPendingDmDataForAccountToAddr(account, toAddr, newMessage) 
-        //updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData) //this was used originally, but race condition for "double message" occured
-                                                                              //it was because accessing Local Storage and operating on read items was out of sync
+        updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData)
 
         const newChatData = getLocalDmDataForAccountToAddr(account, toAddr)
 
@@ -95,7 +96,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       })
     )
 
-  const postMessageToAPI = React.useCallback(
+  const postMessage = React.useCallback(
     async (
       createMessageData: CreateChatMessageType,
       newMessage: ChatMessageType,
@@ -117,6 +118,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       }
 
       if (isNextMsg) {
+
         //Currently only LIT works for EVM addresses (both to and from have to be EVM addrs)
         // if ((createMessageData.fromaddr.includes(".eth") || createMessageData.fromaddr.startsWith("0x")) &&
         //     (createMessageData.toaddr.includes(".eth") || createMessageData.toaddr.startsWith("0x"))) {  //only encrypt ethereum for now
@@ -158,18 +160,21 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
-            if (pendingMsgs.current[0]?.timestamp === timestamp) {
-              pendingMsgs.current.shift()
+            // if (pendingMsgs.current[0]?.timestamp === timestamp) {
+            //   pendingMsgs.current.shift()
 
-              if (pendingMsgs.current[0]) {
-                log('✅[POST][************Retry Message - TODO debug]:')
-                postMessageToAPI(
-                  pendingMsgs.current[0].createMessageData,
-                  pendingMsgs.current[0].newMessage,
-                  pendingMsgs.current[0].timestamp
-                )
-              }
-            }
+
+              //commented this out to fix the race condition issue
+              
+              // if (pendingMsgs.current[0]) {
+              //   log('✅[POST][Retry Message - TODO debug]:', responseData)
+              //   postMessage(
+              //     pendingMsgs.current[0].createMessageData,
+              //     pendingMsgs.current[0].newMessage,
+              //     pendingMsgs.current[0].timestamp
+              //   )
+              // }
+            // }
           })
           .catch((error) => {
             console.error('🚨[POST][Send message]:', error, createMessageData)
@@ -182,7 +187,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   )
 
   const sendMessage = async () => {
-    const value = msgInput.current
+    const value = msgInput
 
     if (value.length <= 0) return
 
@@ -202,7 +207,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     
 
     // clear input field
-    if (textAreaRef.current) textAreaRef.current.value = ''
+    setMsgInput("");
 
     const createMessageData: CreateChatMessageType = {
       message: value,
@@ -236,13 +241,12 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       nftaddr: '',
     }
 
-    //TODO: during cleartext testing, the spinner is gone for now, makes UI look slow
     // Already show message on the UI with the spinner as Loading
     // because it will begin to encrypt the message and only confirm
     // it was sent after a successful response
     addPendingMessageToUI(newMessage)
 
-    postMessageToAPI(createMessageData, newMessage, timestamp)
+    postMessage(createMessageData, newMessage, timestamp)
   }
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -252,25 +256,46 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     }
   }
 
+  const addEmoji = (e: any) => {
+    const sym = e.unified.split("_");
+    const codeArray: any[] = [];
+    sym.forEach((el: string) => codeArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codeArray)
+    setMsgInput(msgInput + emoji);
+  }
+
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <Textarea
+      <Popover placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
+          />
+        </PopoverTrigger>
+        <PopoverContent w="283px">  
+          <Picker 
+            data={data}
+            emojiSize={20}
+            emojiButtonSize={28}
+            onEmojiSelect={addEmoji}
+            maxFrequentRows={4}
+          />
+        </PopoverContent>
+      </Popover>
+
+      <Textarea 
         placeholder='Write a message...'
         ref={textAreaRef}
-        onChange={(e) => {
-          msgInput.current = e.target.value
-        }}
+        onChange={(e) => setMsgInput(e.target.value)}
+        value={msgInput}
         onKeyPress={handleKeyPress}
+        backgroundColor='lightgray.400'
         minH='full'
+        pt={3.5}
         resize='none'
-        px='3'
-        py='3'
-        w='100%'
-        fontSize='md'
-        background='lightgray.400'
-        borderRadius='xl'
       />
-
+        
       <Flex alignItems='flex-end'>
         <Button
           variant='black'

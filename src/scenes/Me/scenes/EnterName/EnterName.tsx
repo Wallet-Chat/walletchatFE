@@ -26,6 +26,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
+import { createResizedImage } from '@/utils/resizer'
 
 const EnterName = () => {
   const {
@@ -47,9 +48,9 @@ const EnterName = () => {
 
   const [file, setFile] = useState<Blob | MediaSource>()
   const [filePreview, setFilePreview] = useState('')
-  const resizeFile = (file: Blob) =>
+  const resizeFile = (file: File) =>
     new Promise((resolve) => {
-      Resizer.imageFileResizer(
+      createResizedImage(
         file,
         64,
         64,
