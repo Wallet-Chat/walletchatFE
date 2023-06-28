@@ -17,8 +17,8 @@ import {
   useProvider,
 } from 'wagmi'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
-import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
@@ -433,10 +433,10 @@ const WalletProviderContext = (chains: any) => {
             walletIs('gooddollar') ||
             walletIs('zengo')
           ) {
-            connector = new WalletConnectLegacyConnector({
+            connector = new WalletConnectConnector({
               chains,
               options: {
-                qrcode: true,
+                projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID
               },
             })
             storage.set('current-widget-provider', 'wallet-connect')

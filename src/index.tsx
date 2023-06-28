@@ -2,11 +2,17 @@ import React from 'react'
 import { ColorModeScript, ChakraProvider, Flex } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
+import "focus-visible/dist/focus-visible"
 
 import '@rainbow-me/rainbowkit/styles.css'
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import {
+  rainbowWallet,
+  trustWallet,
+  walletConnectWallet,
+  metaMaskWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
-import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 import { mainnet, polygon, optimism } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
@@ -33,20 +39,21 @@ export const { chains, provider, webSocketProvider } = configureChains(
   ]
 )
 
-export const { connectors } = getDefaultWallets({ appName: APP.NAME, chains })
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [
+      metaMaskWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
+      trustWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
+      rainbowWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
+      walletConnectWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
+    ],
+  },
+]);
 
 const wagmiClient = createClient({
   autoConnect: false,
-  connectors: [
-    ...connectors(),
-    new MetaMaskConnector({
-      chains,
-      options: {
-        shimDisconnect: true,
-        UNSTABLE_shimOnConnectSelectAccount: true,
-      },
-    }),
-  ],
+  connectors,
   provider,
   webSocketProvider,
 })

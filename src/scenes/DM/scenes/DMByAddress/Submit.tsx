@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, Icon, InputRightElement, InputGroup, Popover, PopoverTrigger, PopoverContent } from '@chakra-ui/react'
+import { Textarea, Button, Flex, Icon, Popover, PopoverTrigger, PopoverContent, PopoverBody, InputRightElement, InputLeftElement, Container } from '@chakra-ui/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -160,18 +160,21 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
-            if (pendingMsgs.current[0]?.timestamp === timestamp) {
-              pendingMsgs.current.shift()
+            // if (pendingMsgs.current[0]?.timestamp === timestamp) {
+            //   pendingMsgs.current.shift()
 
-              if (pendingMsgs.current[0]) {
-                log('✅[POST][Retry Message - TODO debug]:', responseData)
-                postMessage(
-                  pendingMsgs.current[0].createMessageData,
-                  pendingMsgs.current[0].newMessage,
-                  pendingMsgs.current[0].timestamp
-                )
-              }
-            }
+
+              //commented this out to fix the race condition issue
+              
+              // if (pendingMsgs.current[0]) {
+              //   log('✅[POST][Retry Message - TODO debug]:', responseData)
+              //   postMessage(
+              //     pendingMsgs.current[0].createMessageData,
+              //     pendingMsgs.current[0].newMessage,
+              //     pendingMsgs.current[0].timestamp
+              //   )
+              // }
+            // }
           })
           .catch((error) => {
             console.error('🚨[POST][Send message]:', error, createMessageData)
@@ -263,44 +266,35 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <InputGroup
+      <Popover placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
+          />
+        </PopoverTrigger>
+        <PopoverContent w="283px">  
+          <Picker 
+            data={data}
+            emojiSize={20}
+            emojiButtonSize={28}
+            onEmojiSelect={addEmoji}
+            maxFrequentRows={4}
+          />
+        </PopoverContent>
+      </Popover>
+
+      <Textarea 
+        placeholder='Write a message...'
+        ref={textAreaRef}
+        onChange={(e) => setMsgInput(e.target.value)}
+        value={msgInput}
+        onKeyPress={handleKeyPress}
+        backgroundColor='lightgray.400'
+        minH='full'
+        pt={3.5}
         resize='none'
-        w='100%'
-        fontSize='md'
-        background='lightgray.400'
-        borderRadius='xl'
-      >
-        <Textarea 
-          placeholder='Write a messages...'
-          ref={textAreaRef}
-          onChange={(e) => setMsgInput(e.target.value)}
-          value={msgInput}
-          
-          onKeyPress={handleKeyPress}
-          minH='full'
-          resize='none'
-        />
-        <Popover placement='top-start'>
-          <PopoverTrigger>
-            <InputRightElement
-              style={{
-                top: "10px",
-                right: "10px",
-              }}   
-              children={<Icon as={BsEmojiSmile} color="red.500" h={5} w={5} />}
-            />
-          </PopoverTrigger>
-          <PopoverContent width={285}>
-            <Picker 
-              data={data}
-              emojiSize={20}
-              emojiButtonSize={28}
-              onEmojiSelect={addEmoji}
-              maxFrequentRows={4}
-            />
-          </PopoverContent>
-        </Popover>
-      </InputGroup>
+      />
         
       <Flex alignItems='flex-end'>
         <Button
