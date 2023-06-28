@@ -38,6 +38,14 @@ const ChatTextAreaInput = ({
       setMsgInput('')
    }
 
+   const addEmoji = (e: any) => {
+      const sym = e.unified.split("_");
+      const codeArray: any[] = [];
+      sym.forEach((el: string) => codeArray.push("0x" + el));
+      let emoji = String.fromCodePoint(...codeArray)
+      setMsgInput(msgInput + emoji);
+    }
+
    return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
       <Popover placement='top-start' isLazy>
