@@ -14,8 +14,9 @@ import POAPEvent from '../../../types/POAP/POAPEvent'
 import InboxItem from '../InboxListItem'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
+import { getJwtForAccount } from '@/helpers/jwt'
 
-const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
+const NFTInboxItem = ({ data, account }: { data: InboxItemType, account: string }) => {
    const [nft, setNft] = useState<NFTCollection>()
    const [poapEvent, setPoapEvent] = useState<POAPEvent>()
    const [isError, setIsError] = useState(false)
@@ -41,16 +42,14 @@ const NFTInboxItem = ({ data }: { data: InboxItemType }) => {
             return
          }
          if (data?.chain === 'ethereum') {
-            if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-               log('Missing OpenSea API Key')
-               return
-            }
             fetch(
-               `https://api.opensea.io/api/v1/asset_contract/${data.nftaddr}`,
+               `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/opensea_asset_contract/${data.nftaddr}`,
                {
                   method: 'GET',
+                  credentials: 'include',
                   headers: {
-                     Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
+                     'Content-Type': 'application/json',
+                     Authorization: `Bearer ${getJwtForAccount(account)}`,
                   },
                }
             )

@@ -193,6 +193,10 @@ export default function Sidebar() {
   const location = useLocation()
   const isSupportPage = location.pathname.includes(getSupportWallet())
   const isNewDMPage = location.pathname.startsWith('/dm/new')
+  const urlToCheck = (window.location != window.parent.location)
+                        ? document.referrer
+                        : document.location.href
+  const supportDisabled = urlToCheck.includes("good") //skip support for goodDollar
 
   const nftNotificationCount = 0
   const [url, setUrl] = useState<string | undefined>('')
@@ -409,9 +413,11 @@ export default function Sidebar() {
           )}
         </SidebarLink>
 
+        {!supportDisabled && (  //skip support for goodDollar
         <SidebarLink to={`/dm/${getSupportWallet()}`}>
           <Image src={IconSupport} alt='' />
         </SidebarLink>
+        )}
 
         {metadata && (
           <NFTSidebarLink to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>

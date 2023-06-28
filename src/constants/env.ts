@@ -9,8 +9,6 @@ export const REACT_APP_VERSION = import.meta.env.VITE_REACT_APP_VERSION
 export const REACT_APP_INFURA_ID = import.meta.env.VITE_REACT_APP_INFURA_ID
 export const REACT_APP_IPFS_INFURA_API_KEY = import.meta.env
   .VITE_REACT_APP_IPFS_INFURA_API_KEY
-export const REACT_APP_OPENSEA_API_KEY = import.meta.env
-  .VITE_REACT_APP_OPENSEA_API_KEY
 export const REACT_APP_ALCHEMY_API_KEY_POLYGON = import.meta.env
   .VITE_REACT_APP_ALCHEMY_API_KEY_POLYGON
 export const REACT_APP_POAP_API_KEY = import.meta.env
@@ -116,6 +114,8 @@ export const REACT_APP_APP_URL_LOCALHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_LOCALHOST
 export const REACT_APP_ORIGIN_NAME_LOCALHOST = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_LOCALHOST
+export const REACT_APP_SUPPORT_WALLET_TESTHOST = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_TESTHOST
   export const REACT_APP_APP_URL_TESTHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_TESTHOST
   export const REACT_APP_ORIGIN_NAME_TESTHOST = import.meta.env

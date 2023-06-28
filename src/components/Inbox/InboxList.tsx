@@ -35,6 +35,7 @@ const InboxList = ({
             <NFTInboxItem
               key={`${conversation.timestamp.toString()}${i}`}
               data={conversation}
+              account={account}
             />
           )
         }

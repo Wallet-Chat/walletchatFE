@@ -15,8 +15,9 @@ import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
 import ReactGA from "react-ga4";
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { log } from '@/helpers/log'
 
@@ -40,6 +41,16 @@ const NFTGroupChat = ({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
 })
 ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+  /* Initialize analytics instance */
+  const analyticsGA4 = Analytics({
+    app: 'WalletChatApp',
+    plugins: [
+      /* Load Google Analytics v4 */
+      googleAnalyticsPlugin({
+        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+      }),
+    ],
+  })
 
   useEffect(() => {
     getChatData()
@@ -94,11 +105,15 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       site: document.referrer,
       account: account,
     })
-    ReactGA.event({
-      category: "SendNftGroupMessageCategory",
-      action: "SendNftGroupMessage",
-      label: "SendNftGroupMessageLabel", // optional
-    });
+    // ReactGA.event({
+    //   category: "SendNftGroupMessageCategory",
+    //   action: "SendNftGroupMessage",
+    //   label: "SendNftGroupMessageLabel", // optional
+    // });
+    analyticsGA4.track('SendNftGroupMessage', {
+      site: document.referrer,
+      account: account,
+    })
     
     if (msgInput.length <= 0) return
     if (!account) {

@@ -39,6 +39,7 @@ function getWidgetEnvSuffix(addDev?: boolean) {
   }
   if (
     currentWidgetOrigin.toLowerCase().includes('gooddollar') ||
+    currentWidgetOrigin.toLowerCase().includes('gooddapp') ||
     currentWidgetOrigin.toLowerCase().includes('good-protocol')
   ) {
     return '_GOODDOLLAR'
@@ -69,8 +70,9 @@ export function getCommunity() {
   return defaultCommunity
 }
 export function getSupportWallet() {
-  const suffix = getWidgetEnvSuffix()
-  return suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
+  const suffix = getWidgetEnvSuffix(true)
+  const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
+  return retWallet ? retWallet : walletChatEth
 }
 export function getWidgetUrl() {
   const suffix = getWidgetEnvSuffix(true)

@@ -24,6 +24,7 @@ import NFTCollection from '../../../../types/NFTCollection'
 import { convertIpfsUriToUrl } from '../../../../helpers/ipfs'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 export default function NFTInboxSearchInput() {
    const [toAddr, setToAddr] = useState<string>('')
@@ -49,15 +50,14 @@ export default function NFTInboxSearchInput() {
    }
 
    const fetchEthereumContract = async (address: string) => {
-      if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-         log('Missing OpenSea API Key')
-         return
-      }
+      if (!address) {return}
       setIsFetchingEthereum(true)
-      fetch(`https://api.opensea.io/api/v1/asset_contract/${address}`, {
+      fetch(`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/opensea_asset_contract/${address}`, {
          method: 'GET',
+         credentials: 'include',
          headers: {
-            Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(address)}`,
          },
       })
          .then((response) => response.json())

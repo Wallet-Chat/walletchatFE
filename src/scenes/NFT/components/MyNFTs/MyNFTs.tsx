@@ -16,6 +16,8 @@ import { chains } from '../../../../constants'
 import ChainFilters from '../../../../components/ChainFilters'
 import MyNFTSkeleton from './components/MyNFTSkeleton'
 import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 export default function MyNFTs({ account }: { account: string }) {
    // NFTs
@@ -37,10 +39,6 @@ export default function MyNFTs({ account }: { account: string }) {
             log('Missing NFTPort API Key')
             return
          }
-         if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-            log('Missing OpenSea API Key')
-            return
-         }
          if (!account) {
             log('No account connected')
             return
@@ -58,10 +56,12 @@ export default function MyNFTs({ account }: { account: string }) {
                   },
                }
             ).then((res) => res.json()),
-            fetch(`https://api.opensea.io/api/v1/assets?owner=${account}`, {
+            fetch(`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/opensea_asset_owner/${account}`, {
                method: 'GET',
+               credentials: 'include',
                headers: {
-                  Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${getJwtForAccount(account)}`,
                },
             }).then((res) => res.json()),
          ])

@@ -2,7 +2,6 @@ import * as wagmi from '@wagmi/core'
 
 import React from 'react'
 import Web3 from 'web3'
-import { ethers }  from 'ethers'
 import { SiweMessage } from 'siwe'
 
 import { AnalyticsBrowser } from '@segment/analytics-next'
@@ -23,7 +22,7 @@ import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
-import { log } from '../helpers/log'
+import { log, enableDebugPrints, disableDebugPrints } from '../helpers/log'
 import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
@@ -37,11 +36,11 @@ import {
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { getIsWidgetContext } from '@/utils/context'
 import {
-  deleteJwtForAccount,
   getHasJwtForAccount,
   getJwtForAccount,
   parseJwt,
   storeJwtForAccount,
+  deleteJwtForAccount,
 } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
@@ -129,7 +128,7 @@ const WalletProviderContext = (chains: any) => {
   const [currentWidgetOrigin, setCurrentWidgetOrigin] = React.useState<null | string>(null)
   const [envURL, setEnvURL] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-    undefined | { signature: undefined | null | string; msgToSign: string }
+    undefined | { signature: undefined | null | string; signedMsg: string }
   >()
   const widgetSignature = widgetAuthSig?.signature
 
@@ -437,6 +436,13 @@ const WalletProviderContext = (chains: any) => {
         }
       }
 
+      if (data === 'debugON') {
+        enableDebugPrints()
+      }
+
+      if (data === 'debugOFF') {
+        disableDebugPrints()
+      }
       if (target === 'sign_in' && messageData) {
         const shouldRequestSignature = messageData.requestSignature
         const widgetAccountChanged =
@@ -530,15 +536,10 @@ const WalletProviderContext = (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
-          analyticsGA4.track('ConnectWallet_TRACK', {
+          analyticsGA4.track('ConnectWallet', {
             site: document.referrer,
             account: accountAddress,
           })
-          ReactGA.event({
-            category: "ConnectWallet",
-            action: "ConnectWallet",
-            label: "TestLabel123", // optional
-          });
           
           storage.set('last-wallet-connection-timestamp', currentTime)
         }
@@ -594,7 +595,7 @@ const WalletProviderContext = (chains: any) => {
       siwePendingRef.current = true
 
       let signature = widgetAuthSig?.signature
-      let messageToSign = widgetAuthSig?.msgToSign
+      let messageToSign = widgetAuthSig?.signedMsg
 
       const shouldRetrySignature = siweFailedRef.current
       const widgetRequestedSIWE =
@@ -607,16 +608,16 @@ const WalletProviderContext = (chains: any) => {
       const needsToRequestSIWE = !signature && shouldRequestSIWE
 
       if (needsToRequestSIWE) {
-        const _domain = window.location.host
-        const _origin = window.location.protocol + "//" + _domain
+        const domain = window.location.host
+        const origin = window.location.protocol + "//" + domain
         const statement =
           'You are signing a plain-text message to prove you own this wallet address. No gas fees or transactions will occur.'
 
         const siweMessage = new SiweMessage({
-          domain: _domain,
+          domain,
           address: accountAddress,
           statement,
-          uri: _origin,
+          uri: origin,
           version: '1',
           chainId,
           nonce,
@@ -624,12 +625,7 @@ const WalletProviderContext = (chains: any) => {
 
         messageToSign = siweMessage.prepareMessage()
 
-        let signer = await wagmi.fetchSigner()
-        //this covers the missing signer if no SSO, but LIT fails to work right without the wallet connection on the site directly 
-        // if (signer == null) {
-        //   const _provider = new ethers.providers.Web3Provider(window.ethereum);
-        //   signer = _provider.getSigner();
-        // }
+        const signer = await wagmi.fetchSigner()
 
         try {
           signature = await signer?.signMessage(messageToSign)
