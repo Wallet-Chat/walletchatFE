@@ -3,7 +3,6 @@ import {
   Button,
   Divider,
   Flex,
-  FormControl,
   Spinner,
   Tag,
   Text,
@@ -16,6 +15,9 @@ import {
   Textarea,
   Container, 
 } from '@chakra-ui/react'
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
+import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import { Link as RLink } from 'react-router-dom'
@@ -219,6 +221,14 @@ const CommunityGroupChat = ({
     let newLoadedMsgs: MessageUIType[] = [...loadedMsgs] // copy the old array
     newLoadedMsgs.push(newMsg)
     setLoadedMsgs(newLoadedMsgs)
+  }
+
+  const addEmoji = (e: any) => {
+    const sym = e.unified.split("_");
+    const codeArray: any[] = [];
+    sym.forEach((el: string) => codeArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codeArray)
+    setMsgInput(msgInput + emoji);
   }
 
   return (
