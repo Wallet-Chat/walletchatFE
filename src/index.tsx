@@ -10,6 +10,7 @@ import {
   trustWallet,
   walletConnectWallet,
   metaMaskWallet,
+  coinbaseWallet
 } from '@rainbow-me/rainbowkit/wallets';
 import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
@@ -46,7 +47,8 @@ const connectors = connectorsForWallets([
       metaMaskWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
       trustWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
       rainbowWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
-      walletConnectWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains }),
+      walletConnectWallet({ projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID , chains}),
+      coinbaseWallet({ appName: "WalletChat", chains })
     ],
   },
 ]);
