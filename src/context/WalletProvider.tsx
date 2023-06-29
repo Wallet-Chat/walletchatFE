@@ -463,11 +463,11 @@ const WalletProviderContext = (chains: any) => {
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
         if (currentTime - lastTimestamp > oneDay) {
-          analytics.track('ConnectWallet', {
+          analytics.track('ConnectWallet:Ledger', {
             site: document.referrer,
             account: accountAddress,
           })
-          analyticsGA4.track('ConnectWallet', {
+          analyticsGA4.track('ConnectWallet:Ledger', {
             site: document.referrer,
             account: accountAddress,
           })

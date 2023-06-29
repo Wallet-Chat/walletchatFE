@@ -129,11 +129,11 @@ const NFTChat = ({
   }
 
   const sendMessage = async () => {
-    analytics.track('SendNftMessage', {
+    analytics.track('SendNftMessage:Ledger', {
       site: document.referrer,
       account: account,
     })
-    analyticsGA4.track('SendNftMessage', {
+    analyticsGA4.track('SendNftMessage:Ledger', {
       site: document.referrer,
       account,
     })

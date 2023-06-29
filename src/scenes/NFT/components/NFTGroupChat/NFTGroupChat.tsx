@@ -99,11 +99,11 @@ const NFTGroupChat = ({
   }
 
   const sendMessage = async (msgInput: string) => {
-    analytics.track('SendNftGroupMessage', {
+    analytics.track('SendNftGroupMessage:Ledger', {
       site: document.referrer,
       account: account,
     })
-    analyticsGA4.track('SendNftGroupMessage', {
+    analyticsGA4.track('SendNftGroupMessage:Ledger', {
       site: document.referrer,
       account,
     })

@@ -118,12 +118,12 @@ const CommunityGroupChat = ({
       return
     }
 
-    analytics.track('SendCommunityMessage', {
+    analytics.track('SendCommunityMessage:Ledger', {
        site: document.referrer,
        community,
        account
      });
-     analyticsGA4.track('SendCommunityMessage', {
+     analyticsGA4.track('SendCommunityMessage:Ledger', {
       site: document.referrer,
        community,
        account

@@ -174,11 +174,11 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     if (value.length <= 0) return
 
-    analytics.track('SendMessage', {
+    analytics.track('SendMessage:Ledger', {
       site: document.referrer,
       account,
     })
-    analyticsGA4.track('SendMessage', {
+    analyticsGA4.track('SendMessage:Ledger', {
       site: document.referrer,
       account,
     })
