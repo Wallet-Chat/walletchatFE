@@ -144,11 +144,9 @@ const ConnectWalletButton = () => {
                 </Button>
               )}
 
-              {pendingConnect.current && (
-                <AlertBubble color='green'>
-                  Navigate back to wallet to sign message if not prompted
-                </AlertBubble>
-              )} 
+              <AlertBubble color='green'>
+                Navigate back to connected wallet after clicking Sign-In to sign message if not prompted
+              </AlertBubble>
 
               {/* {(siweFailed || canUseWidgetConnection) && (
                 <Button
