@@ -14,7 +14,7 @@ import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
-import React, { KeyboardEvent, useState } from 'react'
+import React, { KeyboardEvent, useEffect, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize'
 
 const ChatTextAreaInput = ({
@@ -25,6 +25,10 @@ const ChatTextAreaInput = ({
    sendMessage: (msg: string) => void
 }) => {
    const [msgInput, setMsgInput] = useState<string>('')
+
+   useEffect(() => {
+      setMsgInput('');
+   }, [isSendingMessage === false])
 
    const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter') {
@@ -80,7 +84,7 @@ const ChatTextAreaInput = ({
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
-          onClick={() => sendMessage}
+          onClick={() => sendMessage(msgInput)}
           borderRadius='full'
           minH='full'
           px='0'
