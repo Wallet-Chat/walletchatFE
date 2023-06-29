@@ -15,6 +15,28 @@ import {
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 
+const AlertBubble = ({
+  children,
+  color,
+}: {
+  children: string
+  color: 'green' | 'red'
+}) => (
+  <Flex
+    justifyContent='center'
+    alignItems='center'
+    borderRadius='lg'
+    background={color === 'green' ? 'green.200' : 'red.200'}
+    p={4}
+    position='sticky'
+    top={0}
+    right={0}
+    zIndex={1}
+  >
+    <Box fontSize='md'>{children}</Box>
+  </Flex>
+)
+
 const isWidget = getIsWidgetContext()
 
 const ConnectWalletButton = () => {
@@ -53,6 +75,7 @@ const ConnectWalletButton = () => {
   // }, [siweLastFailure])
 
   const handleLogin = async () => {
+    
     // setPending(true)
     pendingConnect.current = true
 
@@ -120,6 +143,12 @@ const ConnectWalletButton = () => {
                   {siweFailed ? 'Retry signature' : 'Sign in using wallet'}
                 </Button>
               )}
+
+              {pendingConnect.current && (
+                <AlertBubble color='green'>
+                  Navigate back to wallet to sign message if not prompted
+                </AlertBubble>
+              )} 
 
               {/* {(siweFailed || canUseWidgetConnection) && (
                 <Button
