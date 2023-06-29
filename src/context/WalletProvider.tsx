@@ -7,6 +7,7 @@ import { SiweMessage } from 'siwe'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
+import ReactGA from "react-ga4";
 import {
   useAccount,
   useConnect,
@@ -59,6 +60,7 @@ const analyticsGA4 = Analytics({
     }),
   ],
 })
+ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
 const isWidget = getIsWidgetContext()
 
