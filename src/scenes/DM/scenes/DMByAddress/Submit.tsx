@@ -160,21 +160,21 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             log('✅[POST][Send Message]:', responseData)
             updateSentMessage(responseData, timestamp)
 
-            // if (pendingMsgs.current[0]?.timestamp === timestamp) {
-            //   pendingMsgs.current.shift()
+            if (pendingMsgs.current[0]?.timestamp === timestamp) {
+              pendingMsgs.current.shift()
 
 
-              //commented this out to fix the race condition issue
+              // commented this out to fix the race condition issue
               
-              // if (pendingMsgs.current[0]) {
-              //   log('✅[POST][Retry Message - TODO debug]:', responseData)
-              //   postMessage(
-              //     pendingMsgs.current[0].createMessageData,
-              //     pendingMsgs.current[0].newMessage,
-              //     pendingMsgs.current[0].timestamp
-              //   )
-              // }
-            // }
+              if (pendingMsgs.current[0]) {
+                log('✅[POST][Retry Message - TODO debug]:', responseData)
+                postMessage(
+                  pendingMsgs.current[0].createMessageData,
+                  pendingMsgs.current[0].newMessage,
+                  pendingMsgs.current[0].timestamp
+                )
+              }
+            }
           })
           .catch((error) => {
             console.error('🚨[POST][Send message]:', error, createMessageData)
@@ -270,7 +270,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         <PopoverTrigger>
           <Container 
             w={0}
-            children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
+            centerContent
+            children={<Icon as={BsEmojiSmile} color="black.500" h={6} w={6} />}
           />
         </PopoverTrigger>
         <PopoverContent w="283px">  
