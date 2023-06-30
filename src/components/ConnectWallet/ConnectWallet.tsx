@@ -119,6 +119,7 @@ const ConnectWalletButton = () => {
           return (
             <Flex direction='column' gap={2} alignItems='start'>
               {canUseWidgetConnection ? (
+                <div>
                 <Button variant='black' size='lg' onClick={handleLogin}>
                   <Tag
                     variant='solid'
@@ -132,6 +133,10 @@ const ConnectWalletButton = () => {
                     Sign Into {getWidgetOriginName() || 'WalletChat'}
                   </Box>
                 </Button>
+                <AlertBubble color='green'>
+                  Navigate back to connected wallet after clicking Sign-In to sign message if not prompted
+                </AlertBubble>
+                </div>
               ) : (
                 <Button
                   variant='black'
@@ -143,10 +148,6 @@ const ConnectWalletButton = () => {
                   {siweFailed ? 'Retry signature' : 'Sign in using wallet'}
                 </Button>
               )}
-
-              <AlertBubble color='green'>
-                Navigate back to connected wallet after clicking Sign-In to sign message if not prompted
-              </AlertBubble>
 
               {/* {(siweFailed || canUseWidgetConnection) && (
                 <Button
