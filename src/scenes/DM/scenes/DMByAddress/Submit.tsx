@@ -186,7 +186,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   )
 
   const sendMessage = async () => {
-    const value = msgInput.current
+    const value = msgInput
 
     if (value.length <= 0) return
 
@@ -206,7 +206,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     
 
     // clear input field
-    if (textAreaRef.current) textAreaRef.current.value = ''
+    setMsgInput("");
 
     const createMessageData: CreateChatMessageType = {
       message: value,
