@@ -308,7 +308,8 @@ const CommunityGroupChat = ({
           <PopoverTrigger>
             <Container 
               w={0}
-              children={<Icon as={BsEmojiSmile} color="black.500" h={5} w={5} />}
+              centerContent
+              children={<Icon as={BsEmojiSmile} color="black.500" h={6} w={6} />}
             />
           </PopoverTrigger>
           <PopoverContent w="283px">  
