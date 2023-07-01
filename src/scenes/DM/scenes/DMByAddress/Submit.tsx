@@ -35,7 +35,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const dispatch = useAppDispatch()
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
-  const [msgInput, setMsgInput] = useState<string>('')
+  const [msgInput, setMsgInput] = useState<string>("")
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
@@ -203,10 +203,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       site: document.referrer,
       account,
     })
-    
 
-    // clear input field
-    setMsgInput("");
+    // // clear input field
+    setMsgInput('');
 
     const createMessageData: CreateChatMessageType = {
       message: value,
@@ -289,6 +288,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         placeholder='Write a message...'
         ref={textAreaRef}
         onChange={(e) => setMsgInput(e.target.value)}
+        value={msgInput}
         onKeyPress={handleKeyPress}
         minH='full'
         resize='none'
