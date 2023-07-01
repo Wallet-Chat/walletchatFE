@@ -17,6 +17,7 @@ import {
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
+  addPendingDmDataForAccountToAddr,
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
@@ -66,7 +67,11 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         const currentChatData =
           getLocalDmDataForAccountToAddr(account, toAddr) || []
         currentChatData.push(newMessage)
-        updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData)
+        
+        //TODO - clean up a bit once we got back to e2e encryption, sending might look slow with the status bar on send (only want for RX side)
+        addPendingDmDataForAccountToAddr(account, toAddr, newMessage) 
+        //updateLocalDmDataForAccountToAddr(account, toAddr, currentChatData) //this was used originally, but race condition for "double message" occured
+                                                                              //it was because accessing Local Storage and operating on read items was out 
 
         const newChatData = getLocalDmDataForAccountToAddr(account, toAddr)
 
@@ -164,8 +169,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
               pendingMsgs.current.shift()
 
 
-              // commented this out to fix the race condition issue
-              
               if (pendingMsgs.current[0]) {
                 log('✅[POST][Retry Message - TODO debug]:', responseData)
                 postMessage(
