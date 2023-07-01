@@ -41,15 +41,30 @@ const ChangeEmail = () => {
   const { email: _email, setEmail: globalSetEmail } = useWallet()
   const { notifyDM: _notifyDM, setNotifyDM: globalSetNotifyDM } = useWallet()
   const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
-   const { telegramHandle, setTelegramHandle } = useWallet()
-   const { telegramCode, setTelegramCode } = useWallet()
+  const { telegramHandle, setTelegramHandle } = useWallet()
+  const { telegramCode, setTelegramCode } = useWallet()
   const dmBool = _notifyDM === 'true'
   const dailyBool = _notify24 === 'true'
   const [email, setEmail] = useState('')
-   const [telegramhandle, setTgHandle] = useState('')
+  const [telegramhandle, setTgHandle] = useState('')
   const [isFetching, setIsFetching] = useState(false)
+  const [isDialogOn, setIsDialogOn] = useState(false)
 
-   const getSettings = () => {
+   const getSettings = async () => {
+    // try {
+    //   const snapState = await window.ethereum.request({
+    //     method: 'wallet_invokeSnap',
+    //     params: {
+    //       snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+    //       request: { method: 'get_snap_state', params: { apiKey: getJwtForAccount(account), address: account } },
+    //     },
+    //   });
+    //   //log('-[snap state]:', snapState)
+    //   setIsDialogOn(snapState?.isDialogOn)
+    // } catch(error) {
+    //   console.error('🚨[GET][Snap State]:', error)
+    // }   
+
     if (!ENV.REACT_APP_REST_API) {
          log('REST API url not in .env', process.env)
          return
@@ -157,6 +172,20 @@ const ChangeEmail = () => {
       })
   }
 
+  const handleChangeMM = async (checked: boolean) => {
+    setIsDialogOn(checked)
+    const method = checked ? 'set_dialog_on' : 'set_dialog_off'
+
+    // const result = await window.ethereum.request({
+    //   method: 'wallet_invokeSnap',
+    //   params: {
+    //     snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+    //     request: { method: method, params: { apiKey: getJwtForAccount(account), address: account } },
+    //   },
+    // });
+    // log('✅[SNAPS][Update Dialog On]:', result)
+  }
+
   const onSubmit = (values: any) => {
       if (values?.email || values?.telegramhandle) {
       setIsFetching(true)
@@ -221,8 +250,14 @@ const ChangeEmail = () => {
             isChecked={dailyBool}
             onChange={(e) => handleChangeTwo(e.target.checked)}
           >
-            Receive notifications summary email every 24 hours (DM, NFT,
-            Community)
+            Receive notifications summary email every 24 hours
+          </Checkbox>
+          <Checkbox
+            size='lg'
+            isChecked={isDialogOn}
+            onChange={(e) => handleChangeMM(e.target.checked)}
+          >
+            Receive New Message Pop-Ups/Respond to New Messages In Metmask
           </Checkbox>
         </Stack>
         <Divider

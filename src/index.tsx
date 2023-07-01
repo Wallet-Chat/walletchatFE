@@ -14,7 +14,7 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
-import { mainnet, polygon, optimism } from 'wagmi/chains'
+import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
@@ -32,7 +32,7 @@ import * as ENV from '@/constants/env'
 import * as APP from './constants/app'
 
 export const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, polygon, optimism],
+  [mainnet, polygon, optimism, avalanche, avalancheFuji, celo],
   [
     infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
     alchemyProvider({ apiKey: ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM }),

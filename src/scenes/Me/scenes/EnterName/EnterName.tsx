@@ -120,22 +120,17 @@ const EnterName = () => {
   }
   useEffect(() => {
     const getOwnedENS = () => {
-      if (ENV.REACT_APP_OPENSEA_API_KEY === undefined) {
-        log('Missing OpenSea API Key')
-        return
-      }
       if (account) {
         log('No account detected')
       }
-      fetch(
-        `https://api.opensea.io/api/v1/assets?owner=${account}&collection=ens`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: ENV.REACT_APP_OPENSEA_API_KEY,
-          },
-        }
-      )
+      fetch(`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/opensea_asset_owner_ens/${account}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+           'Content-Type': 'application/json',
+           Authorization: `Bearer ${getJwtForAccount(account)}`,
+        },
+       })
         .then((response) => response.json())
         .then((result) => {
           log(`✅[GET][ENS Owned by ${account}]]:`, result)
