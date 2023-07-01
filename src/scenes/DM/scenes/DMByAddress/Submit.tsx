@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent } from '@chakra-ui/react'
+import { BsEmojiSmile } from 'react-icons/bs';
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
@@ -32,7 +35,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const dispatch = useAppDispatch()
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
-  const msgInput = React.useRef<string>('')
+  const [msgInput, setMsgInput] = useState<string>('')
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
@@ -253,6 +256,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     }
   }
 
+  const addEmoji = (e: any) => {
+    const sym = e.unified.split("_");
+    const codeArray: any[] = [];
+    sym.forEach((el: string) => codeArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codeArray)
+    setMsgInput(msgInput + emoji);
+  }
+
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
       <Popover placement='top-start' isLazy>
@@ -277,9 +288,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       <Textarea 
         placeholder='Write a message...'
         ref={textAreaRef}
-        onChange={(e) => {
-          msgInput.current = e.target.value
-        }}
+        onChange={(e) => setMsgInput(e.target.value)}
         onKeyPress={handleKeyPress}
         minH='full'
         resize='none'
