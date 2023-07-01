@@ -11,7 +11,6 @@ import * as ENV from '@/constants/env'
 import {
   updateLocalDmDataForAccountToAddr,
   addLocalDmDataForAccountToAddr,
-  addPendingDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
