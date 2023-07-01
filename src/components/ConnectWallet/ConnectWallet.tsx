@@ -134,7 +134,7 @@ const ConnectWalletButton = () => {
                   </Box>
                 </Button>
                 <AlertBubble color='green'>
-                  Navigate back to connected wallet after clicking Sign-In to sign message if not prompted
+                Please approve sign-in in your wallet
                 </AlertBubble>
                 </div>
               ) : (
