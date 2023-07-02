@@ -19,7 +19,8 @@ export const REACT_APP_ALCHEMY_API_KEY_ETHEREUM = import.meta.env
   .VITE_REACT_APP_ALCHEMY_API_KEY_ETHEREUM
 export const REACT_APP_SLEEKPLAN_API_KEY = import.meta.env
   .VITE_REACT_APP_SLEEKPLAN_API_KEY
-export const REACT_APP_SEGMENT_KEY = import.meta.env.VITE_REACT_APP_SEGMENT_KEY
+export const REACT_APP_GOOGLE_GA4_KEY = import.meta.env.VITE_REACT_APP_GOOGLE_GA4_KEY
+  export const REACT_APP_SEGMENT_KEY = import.meta.env.VITE_REACT_APP_SEGMENT_KEY
 export const REACT_APP_DEFAULT_COMMUNITY = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY
 export const REACT_APP_SUPPORT_WALLET = import.meta.env
