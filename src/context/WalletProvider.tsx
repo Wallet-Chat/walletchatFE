@@ -14,7 +14,7 @@ import {
   useConnect,
   useDisconnect,
   useNetwork,
-  useProvider,
+  usePublicClient,
 } from 'wagmi'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
@@ -98,7 +98,7 @@ const WalletProviderContext = (chains: any) => {
     undefined | { chainId: number; connector: any }
   >()
 
-  const currentProvider = useProvider()
+  const currentProvider = usePublicClient();
 
   const { chain } = useNetwork()
   const [chainId, setChainId] = React.useState(chain?.id)

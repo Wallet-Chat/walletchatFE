@@ -12,7 +12,7 @@ import {
   metaMaskWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
-import { createClient, WagmiConfig, configureChains } from 'wagmi'
+import { createConfig, WagmiConfig, configureChains } from 'wagmi'
 import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagmi/chains'
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
@@ -30,7 +30,7 @@ import { store } from './redux/store'
 import * as ENV from '@/constants/env'
 import * as APP from './constants/app'
 
-export const { chains, provider, webSocketProvider } = configureChains(
+export const { chains, publicClient, webSocketPublicClient } = configureChains(
   [mainnet, polygon, optimism, avalanche, avalancheFuji, celo],
   [
     infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
@@ -51,11 +51,11 @@ const connectors = connectorsForWallets([
   },
 ]);
 
-const wagmiClient = createClient({
+const wagmiClient = createConfig({
   autoConnect: false,
   connectors,
-  provider,
-  webSocketProvider,
+  publicClient,
+  webSocketPublicClient,
 })
 
 ReactDOM.render(
@@ -63,7 +63,7 @@ ReactDOM.render(
     <ColorModeScript />
     <Provider store={store}>
       <BrowserRouter>
-        <WagmiConfig client={wagmiClient}>
+        <WagmiConfig config={wagmiClient}>
           <RainbowKitProvider chains={chains}>
             <WalletProvider chains={chains}>
               <UnreadCountProvider>
