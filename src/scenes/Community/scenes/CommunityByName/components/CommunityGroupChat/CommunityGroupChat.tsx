@@ -130,7 +130,7 @@ const CommunityGroupChat = ({
       return
     }
 
-    analytics.track('SendCommunityMessage', {
+    analytics.track('SendCommunityMessage:GoodDollar', {
        site: document.referrer,
        community,
        account
@@ -140,7 +140,7 @@ const CommunityGroupChat = ({
     //   action: "SendCommunityMessage",
     //   label: "SendCommunityLabel", // optional
     // });
-    analyticsGA4.track('SendCommunityMessage', {
+    analyticsGA4.track('SendCommunityMessage:GoodDollar', {
       site: document.referrer,
       community,
       account

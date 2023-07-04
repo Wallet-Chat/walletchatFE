@@ -131,7 +131,7 @@ const NFTChat = ({
   }
 
   const sendMessage = async () => {
-    analytics.track('SendNftMessage', {
+    analytics.track('SendNftMessage:GoodDollar', {
       site: document.referrer,
       account: account,
     })
@@ -140,7 +140,7 @@ const NFTChat = ({
     //   action: "SendNftMessage",
     //   label: "SendNftMessageLabel", // optional
     // });
-    analyticsGA4.track('SendNftMessage_TRACK', {
+    analyticsGA4.track('SendNftMessage:GoodDollar', {
       site: document.referrer,
       account: account,
     })

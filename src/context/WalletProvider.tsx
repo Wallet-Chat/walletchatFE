@@ -489,7 +489,7 @@ const WalletProviderContext = (chains: any) => {
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
         if (currentTime - lastTimestamp > oneDay) {
-          analytics.track('ConnectWallet', {
+          analytics.track('ConnectWallet:GoodDollar', {
             site: document.referrer,
             account: accountAddress,
           })
@@ -498,7 +498,7 @@ const WalletProviderContext = (chains: any) => {
           //   action: "ConnectWallet",
           //   label: "TestLabel123", // optional
           // });
-          analyticsGA4.track('ConnectWallet', {
+          analyticsGA4.track('ConnectWallet:GoodDollar', {
             site: document.referrer,
             account: accountAddress,
           })

@@ -101,7 +101,7 @@ const NFTGroupChat = ({
   }
 
   const sendMessage = async (msgInput: string) => {
-    analytics.track('SendNftGroupMessage', {
+    analytics.track('SendNftGroupMessage:GoodDollar', {
       site: document.referrer,
       account: account,
     })
@@ -110,7 +110,7 @@ const NFTGroupChat = ({
     //   action: "SendNftGroupMessage",
     //   label: "SendNftGroupMessageLabel", // optional
     // });
-    analyticsGA4.track('SendNftGroupMessage', {
+    analyticsGA4.track('SendNftGroupMessage:GoodDollar', {
       site: document.referrer,
       account: account,
     })
