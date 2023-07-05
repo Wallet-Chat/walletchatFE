@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Box, Flex, Spinner, Tag, Button, Alert } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getIsWidgetContext } from '@/utils/context'
@@ -51,6 +51,7 @@ const ConnectWalletButton = () => {
     previousWidgetData,
   } = useWallet()
   const dispatch = useAppDispatch()
+  const [isClicked, setIsClicked] = useState<boolean>(false);
 
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
@@ -75,6 +76,7 @@ const ConnectWalletButton = () => {
   // }, [siweLastFailure])
 
   const handleLogin = async () => {
+    setIsClicked(true);
     
     // setPending(true)
     pendingConnect.current = true
@@ -120,22 +122,24 @@ const ConnectWalletButton = () => {
             <Flex direction='column' gap={2} alignItems='start'>
               {canUseWidgetConnection ? (
                 <div>
-                <Button variant='black' size='lg' onClick={handleLogin}>
-                  <Tag
-                    variant='solid'
-                    colorScheme='green'
-                    mr={2}
-                    minWidth='unset'
-                  >
-                    Sign In
-                  </Tag>
-                  <Box whiteSpace='break-spaces'>
-                    Sign Into {getWidgetOriginName() || 'WalletChat'}
-                  </Box>
-                </Button>
-                <AlertBubble color='green'>
-                Please approve sign-in in your wallet
-                </AlertBubble>
+                  <Button variant='black' size='lg' onClick={handleLogin}>
+                    <Tag
+                      variant='solid'
+                      colorScheme='green'
+                      mr={2}
+                      minWidth='unset'
+                    >
+                      Sign In
+                    </Tag>
+                    <Box whiteSpace='break-spaces'>
+                      Sign Into {getWidgetOriginName() || 'WalletChat'}
+                    </Box>
+                  </Button>
+                  {isClicked && (
+                    <AlertBubble color='green'>
+                      Please approve sign-in in your wallet
+                    </AlertBubble>
+                  )}
                 </div>
               ) : (
                 <Button
