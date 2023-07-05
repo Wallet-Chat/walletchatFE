@@ -76,7 +76,7 @@ const ConnectWalletButton = () => {
   // }, [siweLastFailure])
 
   const handleLogin = async () => {
-    setIsClicked(!isClicked);
+    setIsClicked(true);
     
     // setPending(true)
     pendingConnect.current = true
@@ -84,6 +84,7 @@ const ConnectWalletButton = () => {
     //TODO: check for existing JWT (account is usually null here though)
     postMessage({ target: 'do_parent_sign_in' })
 
+    setIsClicked(false);
     // resetWidgetDataWithSignature()
     // const canSignIn = await requestSIWEandFetchJWT()
     // if (canSignIn && account) {
