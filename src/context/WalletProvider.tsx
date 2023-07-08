@@ -98,7 +98,7 @@ const WalletProviderContext = (chains: any) => {
     undefined | { chainId: number; connector: any }
   >()
 
-  const currentProvider = useProvider()
+  const currentProvider = useProvider();
 
   const { chain } = useNetwork()
   const [chainId, setChainId] = React.useState(chain?.id)
