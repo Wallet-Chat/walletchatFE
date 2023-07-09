@@ -12,7 +12,7 @@
     "@emotion/styled": "^11.8.1",
     "@ensdomains/eth-ens-namehash": "^2.0.15",
     "@fontsource/roboto": "^4.5.3",
-    "@lit-protocol/lit-node-client": "^2.1.114",
+    "@lit-protocol/lit-node-client": "2.1.114",
     "@rainbow-me/rainbowkit": "^0.12.8",
     "@reduxjs/toolkit": "^1.9.2",
     "@segment/analytics-next": "^1.51.2",
@@ -57,7 +57,7 @@
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
-    "@lit-protocol/types": "^2.1.114",
+    "@lit-protocol/types": "2.1.114",
     "@types/chrome": "0.0.184",
     "@types/google-map-react": "^2.1.5",
     "@types/jest": "^25.2.3",
