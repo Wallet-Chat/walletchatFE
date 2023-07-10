@@ -63,7 +63,6 @@ export const App = () => {
 
       if (data) {
         const { contractAddress, itemId, network, redirect, ownerAddress } = data
-        console.log("navigate to dm: ", data, ownerAddress)
 
         if (ownerAddress) {
           navigate(`/dm/${ownerAddress}`)
