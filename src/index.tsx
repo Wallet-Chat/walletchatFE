@@ -3,6 +3,13 @@ import { ColorModeScript, ChakraProvider, Flex } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 
+import {
+  rainbowWallet,
+  trustWallet,
+  walletConnectWallet,
+  metaMaskWallet,
+  coinbaseWallet
+} from '@rainbow-me/rainbowkit/wallets';
 import '@rainbow-me/rainbowkit/styles.css'
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
