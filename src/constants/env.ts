@@ -25,6 +25,8 @@ export const REACT_APP_SUPPORT_WALLET = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET
 export const REACT_APP_SUPPORT_HEADER = import.meta.env
   .VITE_REACT_APP_SUPPORT_HEADER
+export const REACT_APP_WALLETCONNECT_PROJECT_ID = import.meta.env
+  .VITE_REACT_APP_WALLETCONNECT_PROJECT_ID
 
 // --- GoodDollar ---
 

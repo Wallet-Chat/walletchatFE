@@ -86,16 +86,7 @@ const connectors = connectorsForWallets([
 
 const wagmiClient = createClient({
   autoConnect: false,
-  connectors: [
-    ...connectors(),
-    new MetaMaskConnector({
-      chains,
-      options: {
-        shimDisconnect: true,
-        UNSTABLE_shimOnConnectSelectAccount: true,
-      },
-    }),
-  ],
+  connectors,
   provider,
   webSocketProvider,
 })
