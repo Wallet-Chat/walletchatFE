@@ -380,7 +380,9 @@ const WalletProviderContext = (chains: any) => {
       }
 
       const currentOrigin = storage.get('current-widget-origin')
-      if (currentOrigin !== origin) {
+      //don't overwrite the current-widget-origin with the current host (weird metamask messages when changing chain)
+      const currentSite = window.location.protocol + "//" + window.location.host
+      if (currentOrigin !== origin && origin != currentSite) {
         storage.set('current-widget-origin', origin)
       }
 
@@ -547,7 +549,7 @@ const WalletProviderContext = (chains: any) => {
 
       analyticsRecord()
 
-      const origin = window.parent //storage.get('current-widget-origin')
+      const origin = storage.get('current-widget-origin')
       storage.push('widget-logins', origin)
     }
   }, [accountAddress, isAuthenticated, wagmiConnected])
