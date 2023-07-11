@@ -370,10 +370,10 @@ const WalletProviderContext = (chains: any) => {
         postMessage({ data: getWidgetUrl(), target: 'url_env' })
       }
 
-      const currentOrigin = storage.get('current-widget-origin')
-      if (currentOrigin !== origin) {
-        storage.set('current-widget-origin', origin)
-      }
+      // const currentOrigin = storage.get('current-widget-origin')
+      // if (currentOrigin !== origin) {
+      //   storage.set('current-widget-origin', origin)
+      // }
 
       if (data.target === 'origin') {
         currentWidgetHost.current = data.data
@@ -506,8 +506,8 @@ const WalletProviderContext = (chains: any) => {
 
       analyticsRecord()
 
-      const origin = storage.get('current-widget-origin')
-      storage.push('widget-logins', origin)
+      //const origin = storage.get('current-widget-origin')
+      storage.push('widget-logins', document.referrer)
     }
   }, [accountAddress, isAuthenticated, wagmiConnected])
 
