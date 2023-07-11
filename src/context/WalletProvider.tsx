@@ -381,7 +381,8 @@ const WalletProviderContext = (chains: any) => {
 
       const currentOrigin = storage.get('current-widget-origin')
       //don't overwrite the current-widget-origin with the current host (weird metamask messages when changing chain)
-      if (currentOrigin !== origin && origin != window.location.protocol + window.location.host) {
+      const currentSite = window.location.protocol + "//" + window.location.host
+      if (currentOrigin !== origin && origin != currentSite) {
         storage.set('current-widget-origin', origin)
       }
 
