@@ -7,29 +7,27 @@ import { log } from '@/helpers/log'
 export const walletChatEth =
   '0x17FA0A61bf1719D12C08c61F211A063a58267A19'.toLocaleLowerCase()
 
-// export function getAutoConnect() {
-//   const isWidget = getIsWidgetContext()
-//   if (!isWidget) return true
+export function getAutoConnect() {
+  const isWidget = getIsWidgetContext()
+  if (!isWidget) return true
 
-//   const widgetLogins: { [origin: string]: string } =
-//     storage.get('widget-logins')
-//   const currentWidgetOrigin = storage.get('current-widget-origin')
-//   const currentWidgetProvider = storage.get('current-widget-provider')
-//   const alreadyLoggedIn =
-//     widgetLogins &&
-//     widgetLogins[currentWidgetOrigin] &&
-//     widgetLogins[currentWidgetOrigin] === currentWidgetProvider
+  const widgetLogins: { [origin: string]: string } =
+    storage.get('widget-logins')
+  const currentWidgetOrigin = storage.get('current-widget-origin')
+  const currentWidgetProvider = storage.get('current-widget-provider')
+  const alreadyLoggedIn =
+    widgetLogins &&
+    widgetLogins[currentWidgetOrigin] &&
+    widgetLogins[currentWidgetOrigin] === currentWidgetProvider
 
-//   return Boolean(alreadyLoggedIn)
-// }
+  return Boolean(alreadyLoggedIn)
+}
 
 function getWidgetEnvSuffix(addDev?: boolean) {
   const isWidget = getIsWidgetContext()
   if (!isWidget) return null
 
-  //metamask was sending a bunch of "origin" messages as well so had to change this to document.referrer
-  //do we even need to have widget send the origin, this seems much easier.
-  const currentWidgetOrigin = document.referrer //storage.get('current-widget-origin')
+  const currentWidgetOrigin = storage.get('current-widget-origin')
   if (!currentWidgetOrigin) return null
 
   if (addDev && currentWidgetOrigin.toLowerCase().includes('localhost')) {
