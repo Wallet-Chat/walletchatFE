@@ -1,14 +1,15 @@
 {
-  "rewrites":  [
+  "rewrites": [
     {
       "source": "/(.*)", 
-      "headers": [
-          {
-            "key": "X-Content-Type-Options",
-            "value": "nosniff"
-          }
-        ],
-        "destination": "/"
+      "has": [
+        {
+          "type": "header",
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ],
+      "destination": "/"
     }
   ]
 }
