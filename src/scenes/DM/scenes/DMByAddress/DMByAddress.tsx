@@ -298,7 +298,7 @@ const DMByAddress = ({
             setIsFetchingChatData(false)
             semaphore = false;
          })
-         //since we are only loading new messages, we need to update read status async and even after we aren't get new messages
+         //since we are only loading new messages, we need to update read status async and even after we aren't getting new messages
          //in the case its a while before a user reads the message
          fetch(
             ` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/getread_chatitems/${account}/${toAddr}`,
