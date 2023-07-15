@@ -1,20 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent } from '@chakra-ui/react'
+import { BsEmojiSmile } from 'react-icons/bs';
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
 import {
   updateLocalDmDataForAccountToAddr,
   addLocalDmDataForAccountToAddr,
-  addPendingDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
+  addPendingDmDataForAccountToAddr,
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
@@ -32,7 +35,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const dispatch = useAppDispatch()
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
-  const msgInput = React.useRef<string>('')
+  const [msgInput, setMsgInput] = useState<string>("")
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
 })
@@ -182,7 +185,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
   )
 
   const sendMessage = async () => {
-    const value = msgInput.current
+    const value = msgInput
 
     if (value.length <= 0) return
 
@@ -201,8 +204,8 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     })
     
 
-    // clear input field
-    if (textAreaRef.current) textAreaRef.current.value = ''
+    // // clear input field
+    setMsgInput('');
 
     const createMessageData: CreateChatMessageType = {
       message: value,
@@ -253,14 +256,38 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     }
   }
 
+  const addEmoji = (e: any) => {
+    const sym = e.unified.split("_");
+    const codeArray: any[] = [];
+    sym.forEach((el: string) => codeArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codeArray)
+    setMsgInput(msgInput + emoji);
+  }
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+      <Popover placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            centerContent
+            children={<Icon as={BsEmojiSmile} color="black.500" h={6} w={6} />}
+          />
+        </PopoverTrigger>
+        <PopoverContent w="283px">  
+          <Picker 
+            data={data}
+            emojiSize={20}
+            emojiButtonSize={28}
+            onEmojiSelect={addEmoji}
+            maxFrequentRows={4}
+          />
+        </PopoverContent>
+      </Popover>
       <Textarea
         placeholder='Write a message...'
         ref={textAreaRef}
-        onChange={(e) => {
-          msgInput.current = e.target.value
-        }}
+        onChange={(e) => setMsgInput(e.target.value)}
+        value={msgInput}
         onKeyPress={handleKeyPress}
         minH='full'
         resize='none'

@@ -17,8 +17,8 @@ import {
   useProvider,
 } from 'wagmi'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
-import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 import { API } from 'react-wallet-chat/dist/src/types'
 import storage from '../utils/extension-storage'
@@ -98,7 +98,7 @@ const WalletProviderContext = (chains: any) => {
     undefined | { chainId: number; connector: any }
   >()
 
-  const currentProvider = useProvider()
+  const currentProvider = useProvider();
 
   const { chain } = useNetwork()
   const [chainId, setChainId] = React.useState(chain?.id)
@@ -125,8 +125,6 @@ const WalletProviderContext = (chains: any) => {
   const [notifyDM, setNotifyDM] = React.useState('true')
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
-  const [currentWidgetOrigin, setCurrentWidgetOrigin] = React.useState<null | string>(null)
-  const [envURL, setEnvURL] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
     undefined | { signature: undefined | null | string; signedMsg: string }
   >()
@@ -198,11 +196,18 @@ const WalletProviderContext = (chains: any) => {
 
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
+      // window.ethereum.request({
+      //   method: 'wallet_invokeSnap',
+      //   params: {
+      //     snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+      //     request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
+      //   },
+      // });
+      Lit.setAuthSig(address)
       Lit.connectManual()
 
       log('✅[INFO][JWT]:', jwt)
 
-      Lit.setAuthSig(address)
 
       // if we log in with a full delegate, act as the vault
       const walletInJWT = parseJwt(jwt).sub
@@ -325,7 +330,7 @@ const WalletProviderContext = (chains: any) => {
           })
           .catch((welcomeError) => {
             log('🚨[GET][Welcome]:', welcomeError)
-            deleteJwtForAccount(accountAddress)
+            deleteJwtForAccount(accountAddress) //if JWT is invalid remove it
             getNonce(accountAddress)
           })
       }
@@ -342,8 +347,7 @@ const WalletProviderContext = (chains: any) => {
       }
 
       if (widgetWalletDataRef.current) {
-        // log("Remove 1 - setWidgetAuthSig UNDEFINED")
-        // setWidgetAuthSig(undefined)
+        setWidgetAuthSig(undefined)
 
         widgetWalletDataRef.current = {
           ...widgetWalletDataRef.current,
@@ -488,10 +492,10 @@ const WalletProviderContext = (chains: any) => {
             walletIs('gooddollar') ||
             walletIs('zengo')
           ) {
-            connector = new WalletConnectLegacyConnector({
+            connector = new WalletConnectConnector({
               chains,
               options: {
-                qrcode: true,
+                projectId: ENV.REACT_APP_WALLETCONNECT_PROJECT_ID
               },
             })
             storage.set('current-widget-provider', 'wallet-connect')
@@ -538,6 +542,11 @@ const WalletProviderContext = (chains: any) => {
             site: document.referrer,
             account: accountAddress,
           })
+          // ReactGA.event({
+          //   category: "ConnectWallet",
+          //   action: "ConnectWallet",
+          //   label: "TestLabel123", // optional
+          // });
           analyticsGA4.track('ConnectWallet', {
             site: document.referrer,
             account: accountAddress,

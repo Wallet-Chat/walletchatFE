@@ -95,7 +95,7 @@ ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
       })
       .catch((error) => {
         console.error('🚨[GET][NFT][Group Chat Messages By Addr]:', error)
-        // navigate(`/nft_error`)
+        navigate(`/nft_error`)
       })
     // .finally(() => setIsFetchingMessages(false))
   }
