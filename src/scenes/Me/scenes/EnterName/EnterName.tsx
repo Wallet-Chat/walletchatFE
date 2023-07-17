@@ -230,12 +230,12 @@ const EnterName = () => {
             site: document.referrer,
             account,
           })
-          // ReactGA.event({
-          //   category: "ConnectWallet",
-          //   action: "ConnectWallet",
-          //   label: "TestLabel123", // optional
-          // });
-          analyticsGA4.track('NewSignup', {
+          ReactGA.event({
+            category: "NewSignup_ReactGA4",
+            action: "NewSignupAction",
+            label: "NewSignupLabel", // optional
+          });
+          analyticsGA4.track('NewSignup_AnalyticsGA4', {
             site: document.referrer,
             account,
           })
