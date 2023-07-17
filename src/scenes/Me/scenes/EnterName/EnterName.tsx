@@ -27,6 +27,11 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
 import { createResizedImage } from '@/utils/resizer'
+import { getCommunity } from '@/helpers/widget'
+import { AnalyticsBrowser } from '@segment/analytics-next'
+import Analytics from 'analytics'
+import googleAnalyticsPlugin from '@analytics/google-analytics'
+import ReactGA from "react-ga4";
 
 const EnterName = () => {
   const {
@@ -35,6 +40,22 @@ const EnterName = () => {
     formState: { errors },
     setValue,
   } = useForm()
+
+  // help debug issues and watch for high traffic conditions
+  const analytics = AnalyticsBrowser.load({
+    writeKey: ENV.REACT_APP_SEGMENT_KEY,
+  })
+  /* Initialize analytics instance */
+  const analyticsGA4 = Analytics({
+    app: 'WalletChatApp',
+    plugins: [
+      /* Load Google Analytics v4 */
+      googleAnalyticsPlugin({
+        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+      }),
+    ],
+  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const account = useAppSelector((state) => selectAccount(state))
   const toast = useToast()
@@ -185,6 +206,41 @@ const EnterName = () => {
         .then((response) => {
           log('✅[POST][Name]:', response)
           globalSetName(name)
+
+          try {
+          //auto join users to default community
+          fetch(
+            ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_bookmark`,
+            {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getJwtForAccount(account)}`,
+              },
+              body: JSON.stringify({
+                walletaddr: account,
+                nftaddr: getCommunity(),
+              }),
+            }
+          )
+          
+          //log new user event
+          analytics.track('NewSignup', {
+            site: document.referrer,
+            account,
+          })
+          // ReactGA.event({
+          //   category: "ConnectWallet",
+          //   action: "ConnectWallet",
+          //   label: "TestLabel123", // optional
+          // });
+          analyticsGA4.track('NewSignup', {
+            site: document.referrer,
+            account,
+          })
+        } catch { log ("failed to auto-join user to community") }
+          
           navigate('/me/enter-email')
         })
         .catch((error) => {

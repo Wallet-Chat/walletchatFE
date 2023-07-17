@@ -46,27 +46,27 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
 
-// help debug issues and watch for high traffic conditions
-const analytics = AnalyticsBrowser.load({
-  writeKey: ENV.REACT_APP_SEGMENT_KEY,
-})
-/* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
-})
-ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
-
 const isWidget = getIsWidgetContext()
 
 /* eslint-disable react/display-name */
 const WalletProviderContext = (chains: any) => {
   const dispatch = useAppDispatch()
+
+  // help debug issues and watch for high traffic conditions
+  const analytics = AnalyticsBrowser.load({
+    writeKey: ENV.REACT_APP_SEGMENT_KEY,
+  })
+  /* Initialize analytics instance */
+  const analyticsGA4 = Analytics({
+    app: 'WalletChatApp',
+    plugins: [
+      /* Load Google Analytics v4 */
+      googleAnalyticsPlugin({
+        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+      }),
+    ],
+  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const didDisconnect = React.useRef<boolean>(false)
   const prevAccount = React.useRef<null | string>()
