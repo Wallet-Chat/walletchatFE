@@ -23,9 +23,11 @@ export function getAutoConnect() {
   return Boolean(alreadyLoggedIn)
 }
 
-function getWidgetEnvSuffix(addDev?: boolean) {
-  const isWidget = getIsWidgetContext()
-  if (!isWidget) return null
+function getWidgetEnvSuffix(addDev?: boolean, bypass?: boolean) {
+  if(!bypass) {
+    const isWidget = getIsWidgetContext()
+    if (!isWidget) return null
+  }
 
   const currentWidgetOrigin = storage.get('current-widget-origin')
   if (!currentWidgetOrigin) return null
@@ -66,22 +68,22 @@ function getWidgetEnvSuffix(addDev?: boolean) {
 }
 
 export function getCommunity() {
-  const suffix = getWidgetEnvSuffix()
+  const suffix = getWidgetEnvSuffix(false, true)
   const defaultCommunity = suffix ? ENV[`REACT_APP_DEFAULT_COMMUNITY${suffix}`] : 'walletchat'
   log("Default community: ", defaultCommunity)
   return defaultCommunity
 }
 export function getSupportWallet() {
-  const suffix = getWidgetEnvSuffix(true)
+  const suffix = getWidgetEnvSuffix(true, false)
   const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
   return retWallet ? retWallet : walletChatEth
 }
 export function getWidgetUrl() {
-  const suffix = getWidgetEnvSuffix(true)
+  const suffix = getWidgetEnvSuffix(true, false)
   return suffix && ENV[`REACT_APP_APP_URL${suffix}`]  //TODO can we have local .env overrride the vercel setting for debug/localhost
 }
 export function getWidgetOriginName() {
-  const suffix = getWidgetEnvSuffix(true)
+  const suffix = getWidgetEnvSuffix(true, false)
   return suffix && ENV[`REACT_APP_ORIGIN_NAME${suffix}`]
 }
 
