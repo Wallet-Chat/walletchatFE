@@ -24,12 +24,14 @@ export function getAutoConnect() {
 }
 
 function getWidgetEnvSuffix(addDev?: boolean, bypass?: boolean) {
+  let currentWidgetOrigin = storage.get('current-widget-origin')
+  const isWidget = getIsWidgetContext()
   if(!bypass) {
-    const isWidget = getIsWidgetContext()
     if (!isWidget) return null
+  } else {
+    if (!isWidget) currentWidgetOrigin = window.location.host
   }
 
-  const currentWidgetOrigin = storage.get('current-widget-origin')
   if (!currentWidgetOrigin) return null
 
   if (addDev && currentWidgetOrigin.toLowerCase().includes('localhost')) {
