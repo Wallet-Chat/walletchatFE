@@ -1,5 +1,7 @@
+import { truncateAddressMore } from "./truncateString";
+
 //export const getIsWidgetContext = () => window.parent !== window
-var DEBUG=false;
+var DEBUG=true;
 export var log = function(){
     if(DEBUG){
         console.log.apply(console, arguments);
