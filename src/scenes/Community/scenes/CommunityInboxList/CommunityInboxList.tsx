@@ -39,9 +39,8 @@ const CommunityInboxList = () => {
 
 	const getInboxData = () => {
 		// GET request to get off-chain data for RX user
-		if (!process.env.REACT_APP_REST_API) {
-			console.log('REST API url not in .env', process.env)
-			return
+		if (!ENV.REACT_APP_REST_API) {
+			throw new Error('REST API url not in .env')
 		}
 		if (!account) {
 			console.log('No account connected')
@@ -58,13 +57,13 @@ const CommunityInboxList = () => {
 		setIsFetchingInboxData(true)
 		semaphore = true
 		fetch(
-			` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/get_inbox/${account}`,
+			` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_inbox/${account}`,
 			{
 				method: 'GET',
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+					Authorization: `Bearer ${getJwtForAccount(account)}`,
 				},
 			}
 		)

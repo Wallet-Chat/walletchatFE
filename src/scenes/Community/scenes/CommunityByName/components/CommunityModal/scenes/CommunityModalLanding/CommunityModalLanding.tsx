@@ -21,6 +21,7 @@ import { useDebounce } from '../../../../../../../../hooks/useDebounce'
 import CommunityType from '../../../../../../../../types/Community'
 import User from '../../../../../../../../types/User'
 import CommunityModalMember from '../../components/CommunityModalMember'
+import * as ENV from '@/constants/env'
 
 const CommunityModalLanding = ({
 	setPageState,
@@ -119,13 +120,13 @@ const CommunityModalLanding = ({
 			}
 
 			fetch(
-				` ${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/image`,
+				` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/image`,
 				{
 					method: 'PUT',
 					credentials: 'include',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+						Authorization: `Bearer ${getJwtForAccount(account)}`,
 					},
 					body: JSON.stringify({
 						base64data: image,

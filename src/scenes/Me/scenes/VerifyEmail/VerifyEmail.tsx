@@ -148,7 +148,7 @@ const VerifyEmail = () => {
 
    const getSettings = () => {
       if (!ENV.REACT_APP_REST_API) {
-         log('REST API url not in .env', process.env)
+         log('REST API url not in .env')
          return
       }
       if (!account) {

@@ -37,6 +37,7 @@ import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
 import { log } from '@/helpers/log'
 import CommunityModal from './components/CommunityModal'
+import pluralize from 'pluralize'
 
 const CommunityByName = () => {
   const account = useAppSelector((state) => selectAccount(state))

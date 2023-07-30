@@ -57,19 +57,18 @@ const CreateNewCommunity = () => {
 
 		setIsFetching(true)
 
-		if (!process.env.REACT_APP_REST_API) {
-			console.log('REST API url not in .env', process.env)
-			return
+		if (!ENV.REACT_APP_REST_API) {
+			throw new Error('REST API url not in .env')
 		}
 
 		fetch(
-			`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_community`,
+			`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_community`,
 			{
 				method: 'POST',
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+					Authorization: `Bearer ${getJwtForAccount(account)}`,
 				},
 				body: JSON.stringify({
 					name: values?.name,
