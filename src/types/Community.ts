@@ -3,7 +3,7 @@ import TweetType from './Tweet'
 
 export default interface CommunityType {
    name: string
-   members: number
+   member_count: number
    logo: string
    is_verified: boolean
    joined: boolean
