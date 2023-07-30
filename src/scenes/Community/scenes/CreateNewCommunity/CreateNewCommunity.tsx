@@ -22,6 +22,10 @@ import {
 	IconChevronLeft,
 } from '@tabler/icons'
 import { useWallet } from '../../../../context/WalletProvider'
+import * as ENV from '@/constants/env'
+import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
 
 const CreateNewCommunity = () => {
 	const [name, setName] = useState<string>('')
@@ -29,7 +33,7 @@ const CreateNewCommunity = () => {
 	const [twitterActive, setTwitterActive] = useState(false)
 	const [discord, setDiscord] = useState<string>('')
 	const [discordActive, setDiscordActive] = useState(false)
-
+	const account = useAppSelector((state) => selectAccount(state))
 	const [isFetching, setIsFetching] = useState(false)
 
 	let navigate = useNavigate()

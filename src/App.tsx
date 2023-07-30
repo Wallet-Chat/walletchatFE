@@ -43,6 +43,7 @@ import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
+import CreateNewCommunity from './scenes/Community/scenes/CreateNewCommunity'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -303,6 +304,27 @@ export const App = () => {
                   <Flex flexGrow={1}>
                     <Community />
 
+                    {!isSmallLayout && (
+                      <Flex
+                        background='lightgray.200'
+                        flex='1'
+                        alignItems='center'
+                        justifyContent='center'
+                      >
+                        <Tag background='white'>
+                          Select a chat to start messaging
+                        </Tag>
+                      </Flex>
+                    )}
+                  </Flex>
+                }
+              />
+
+              <Route
+                path='new'
+                element={
+                  <Flex flexGrow={1}>
+                    <CreateNewCommunity />
                     {!isSmallLayout && (
                       <Flex
                         background='lightgray.200'
