@@ -280,24 +280,32 @@ const NFTByContractAndId = () => {
       log('Missing chain info')
       return
     }
-    fetch(
-      `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
-        },
-      }
-    )
+    // fetch(
+    //   `https://api.nftport.xyz/v0/transactions/stats/${nftContractAddr}?chain=${chain}`,
+    //   {
+    //     method: 'GET',
+    //     headers: {
+    //       Authorization: ENV.REACT_APP_NFTPORT_API_KEY,
+    //     },
+    //   }
+    // )
+    fetch(`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/opensea_collection_stats/${nftContractAddr}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+         'Content-Type': 'application/json',
+         Authorization: `Bearer ${getJwtForAccount(account)}`,
+      },
+    })
       .then((response) => response.json())
       .then((result) => {
         if (
           result &&
-          result.statistics &&
-          !equal(result.statistics, nftStatistics)
+          result.stats &&
+          !equal(result.stats, nftStatistics)
         ) {
           log('✅[GET][NFT Statistics]:', result)
-          setNftStatistics(result.statistics)
+          setNftStatistics(result.stats)
         }
       })
       .catch((error) => {
