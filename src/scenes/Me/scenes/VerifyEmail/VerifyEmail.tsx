@@ -68,7 +68,10 @@ const VerifyEmail = () => {
         log('✅[Get][VerifyEmail From Email Link]:', response)
         setFetchError(false)
         setIsVerifySuccess(true)
-        navigate('/me/verify-success')
+
+        if(!_telegramcode) {
+          navigate('/me/verify-success')
+        }
       })
       .catch((error) => {
         console.error('🚨[GET][Verify Email From Email Link]:', error)
@@ -124,7 +127,7 @@ const VerifyEmail = () => {
             duration: 2000,
             isClosable: true,
           })
-          navigate(`/community/${getCommunity()}`)
+          //navigate(`/community/${getCommunity()}`)
         })
         .catch((error) => {
           console.error('🚨[GET][Verify Email]:', error)
@@ -186,7 +189,7 @@ const VerifyEmail = () => {
    const urlParams = new URLSearchParams(location.search);
   verificationcode = urlParams.get('code')
   verificationemail = urlParams.get('email')
-  if (isVerifySuccess) {
+  if (isVerifySuccess && !_telegramcode) {
     return (
       <Box p={6} pt={16} background='white' width='100%'>
         <form>
