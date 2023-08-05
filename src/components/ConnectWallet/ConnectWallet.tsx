@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Box, Flex, Spinner, Tag, Button, Alert } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getIsWidgetContext } from '@/utils/context'
@@ -13,6 +13,29 @@ import {
   setAccount,
 } from '@/redux/reducers/account'
 import { useAppDispatch } from '@/hooks/useDispatch'
+import { getWidgetUrl, postMessage } from '@/helpers/widget'
+
+const AlertBubble = ({
+  children,
+  color,
+}: {
+  children: string
+  color: 'green' | 'red'
+}) => (
+  <Flex
+    justifyContent='center'
+    alignItems='center'
+    borderRadius='lg'
+    background={color === 'green' ? 'green.200' : 'red.200'}
+    p={4}
+    position='sticky'
+    top={0}
+    right={0}
+    zIndex={1}
+  >
+    <Box fontSize='md'>{children}</Box>
+  </Flex>
+)
 
 const isWidget = getIsWidgetContext()
 
@@ -28,6 +51,7 @@ const ConnectWalletButton = () => {
     previousWidgetData,
   } = useWallet()
   const dispatch = useAppDispatch()
+  const [isClicked, setIsClicked] = useState<boolean>(false);
 
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
@@ -52,14 +76,19 @@ const ConnectWalletButton = () => {
   // }, [siweLastFailure])
 
   const handleLogin = async () => {
+    setIsClicked(true);
+    
     // setPending(true)
     pendingConnect.current = true
 
-    resetWidgetDataWithSignature()
-    const canSignIn = await requestSIWEandFetchJWT()
-    if (canSignIn && account) {
-      signIn(account, getJwtForAccount(account) || '')
-    }
+    //TODO: check for existing JWT (account is usually null here though)
+    postMessage({ target: 'do_parent_sign_in' })
+
+    // resetWidgetDataWithSignature()
+    // const canSignIn = await requestSIWEandFetchJWT()
+    // if (canSignIn && account) {
+    //   signIn(account, getJwtForAccount(account) || '')
+    // }
   }
 
   // TODO: allow changing sign-in method after already selected wallet
@@ -92,19 +121,26 @@ const ConnectWalletButton = () => {
           return (
             <Flex direction='column' gap={2} alignItems='start'>
               {canUseWidgetConnection ? (
-                <Button variant='black' size='lg' onClick={handleLogin}>
-                  <Tag
-                    variant='solid'
-                    colorScheme='green'
-                    mr={2}
-                    minWidth='unset'
-                  >
-                    Connected
-                  </Tag>
-                  <Box whiteSpace='break-spaces'>
-                    Connect with {getWidgetOriginName() || 'App'}
-                  </Box>
-                </Button>
+                <div>
+                  <Button variant='black' size='lg' onClick={handleLogin}>
+                    <Tag
+                      variant='solid'
+                      colorScheme='green'
+                      mr={2}
+                      minWidth='unset'
+                    >
+                      Sign In
+                    </Tag>
+                    <Box whiteSpace='break-spaces'>
+                      Sign Into {getWidgetOriginName() || 'WalletChat'}
+                    </Box>
+                  </Button>
+                  {isClicked && (
+                    <AlertBubble color='green'>
+                      Please approve sign-in in your wallet
+                    </AlertBubble>
+                  )}
+                </div>
               ) : (
                 <Button
                   variant='black'
@@ -117,7 +153,7 @@ const ConnectWalletButton = () => {
                 </Button>
               )}
 
-              {(siweFailed || canUseWidgetConnection) && (
+              {/* {(siweFailed || canUseWidgetConnection) && (
                 <Button
                   variant='black'
                   size='lg'
@@ -128,13 +164,13 @@ const ConnectWalletButton = () => {
                 >
                   Sign in with another wallet
                 </Button>
-              )}
-
+              )} */}
+{/* 
               {siweFailed && (
                 <Tag variant='solid' colorScheme='red'>
                   Signature failed or rejected, please try again
                 </Tag>
-              )}
+              )} */}
             </Flex>
           )
         })()

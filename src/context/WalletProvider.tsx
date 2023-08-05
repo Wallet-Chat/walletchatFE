@@ -116,10 +116,7 @@ const WalletProviderContext = (chains: any) => {
   )
 
   const initialJwt = accountAddress && storage.get('jwt')
-  const accountAuthenticated =
-    accountAddress && chainId && wagmiConnected
-      ? getHasJwtForAccount(accountAddress)
-      : null
+  const accountAuthenticated = getHasJwtForAccount(accountAddress || "")
 
   const [nonce, setNonce] = React.useState<string | null>()
   const [email, setEmail] = React.useState(null)
@@ -129,7 +126,8 @@ const WalletProviderContext = (chains: any) => {
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-    undefined | { signature: undefined | null | string; signedMsg: string }
+    undefined | { signature: undefined | null | string; msgToSign: string; 
+                  walletName: undefined | null | string; account: undefined | null | string; chainId: number }
   >()
   const widgetSignature = widgetAuthSig?.signature
 
@@ -200,6 +198,7 @@ const WalletProviderContext = (chains: any) => {
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
       
+      //TODO: make sure this request doesn't get called on mobile (window.ethereum doesn;'t exist here)
       // window.ethereum.request({
       //   method: 'wallet_invokeSnap',
       //   params: {
@@ -360,11 +359,13 @@ const WalletProviderContext = (chains: any) => {
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
 
-        //TODO: do we need to connect yet again here? seems like we get 2 requests sometimes
-        if (connectConfig || config) {
-          connect(connectConfig || config)
-          //todo: use wagmi injected connector instead of asking user for connection again?
-        }
+        //skip wallet connection if parent integration didn't send wallet connetion info
+        // if (widgetWalletDataRef == null) {
+        //   if (connectConfig || config) {
+        //     connect(connectConfig || config)
+        //     //todo: use wagmi injected connector instead of asking user for connection again?
+        //   }
+        // }
       }
     },
     [connect, connectConfig, dispatch]
@@ -505,10 +506,12 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
-            if (!wagmiConnected) {
-              await connectAsync({ chainId: messageData.chainId, connector })
-            }
-            await disconnectAsync()
+            // if(messageData.) {
+            //   if (!wagmiConnected) {
+            //     await connectAsync({ chainId: messageData.chainId, connector })
+            //   }
+            //   await disconnectAsync()
+            // }
 
             setConnectConfig({ chainId: messageData.chainId, connector })
             updateAccountFromWidget(
@@ -541,7 +544,7 @@ const WalletProviderContext = (chains: any) => {
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
         if (currentTime - lastTimestamp > oneDay) {
-          analytics.track('ConnectWallet', {
+          analytics.track('ConnectWallet_GoodDollar', {
             site: document.referrer,
             account: accountAddress,
           })
@@ -550,7 +553,7 @@ const WalletProviderContext = (chains: any) => {
           //   action: "ConnectWallet",
           //   label: "TestLabel123", // optional
           // });
-          analyticsGA4.track('ConnectWallet', {
+          analyticsGA4.track('ConnectWallet_GoodDollar', {
             site: document.referrer,
             account: accountAddress,
           })
@@ -585,10 +588,16 @@ const WalletProviderContext = (chains: any) => {
   }, [chain?.id])
 
   const requestSIWEandFetchJWT = React.useCallback(async () => {
-    const walletIsConnected = accountAddress && chainId
+    let _accountAddress = accountAddress
+    if(!accountAddress && widgetAuthSig?.account) {
+      dispatch(setAccount(widgetAuthSig?.account)) 
+      getNonce(widgetAuthSig?.account)
+      _accountAddress = widgetAuthSig?.account
+    }
+    const walletIsConnected = _accountAddress && chainId
 
     const accountHasNoJwt =
-      accountAddress && !getHasJwtForAccount(accountAddress)
+      _accountAddress && !getHasJwtForAccount(_accountAddress)
 
     const hasNewNonce = prevNonce.current !== nonce
     const requestAlreadyInitiated = siwePendingRef.current
@@ -713,6 +722,7 @@ const WalletProviderContext = (chains: any) => {
   }, [requestSIWEandFetchJWT])
 
   const disconnectWallet = React.useCallback(async () => {
+    setWidgetAuthSig(undefined)
     didDisconnect.current = true
 
     Lit.disconnect()
@@ -720,7 +730,6 @@ const WalletProviderContext = (chains: any) => {
 
     widgetWalletDataRef.current = undefined
     dispatch(setAccount(null))
-    setNonce(null)
     setSiweLastFailure(null)
     siweFailedRef.current = false
     dispatch(setIsAuthenticated(false))

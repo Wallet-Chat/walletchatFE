@@ -190,7 +190,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     if (value.length <= 0) return
 
-    analytics.track('SendMessage', {
+    analytics.track('SendMessage:GoodDollar', {
       site: document.referrer,
       account,
     })
@@ -199,7 +199,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     //   action: "SendMessage",
     //   label: "SendMessageLabel", // optional
     // });
-    analyticsGA4.track('SendMessage', {
+    analyticsGA4.track('SendMessage:GoodDollar', {
       site: document.referrer,
       account,
     })
