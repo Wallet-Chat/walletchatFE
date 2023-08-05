@@ -245,11 +245,11 @@ const WalletProviderContext = (chains: any) => {
   }, [dispatch, initialJwt, accountAuthenticated])
 
   React.useEffect(() => {
-    // if (analytics && accountAddress && name && email) {
-    //   analytics.identify(accountAddress, { name, email })
-    //   analyticsGA4.identify(accountAddress, { name, email })
+    if (analytics && accountAddress && name && email) {
+      analytics.identify(accountAddress, { name, email })
+      analyticsGA4.identify(accountAddress, { name, email })
       
-    // }
+    }
   }, [accountAddress, email, name])
 
   function getNonce(address: string) {
