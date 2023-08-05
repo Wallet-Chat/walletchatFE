@@ -36,8 +36,6 @@ import {
 import generateItems from '../../../../helpers/generateGroupedByDays'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 
 const CommunityGroupChat = ({
@@ -58,17 +56,7 @@ const CommunityGroupChat = ({
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
- ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
-   /* Initialize analytics instance */
-   const analyticsGA4 = Analytics({
-    app: 'WalletChatApp',
-    plugins: [
-      /* Load Google Analytics v4 */
-      googleAnalyticsPlugin({
-        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-      }),
-    ],
-  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -130,20 +118,17 @@ const CommunityGroupChat = ({
       return
     }
 
+    //segment
     analytics.track('SendCommunityMessage:GoodDollar', {
        site: document.referrer,
        community,
        account
      });
-    // ReactGA.event({
-    //   category: "SendCommunityMessageCategory",
-    //   action: "SendCommunityMessage",
-    //   label: "SendCommunityLabel", // optional
-    // });
-    analyticsGA4.track('SendCommunityMessage:GoodDollar', {
-      site: document.referrer,
-      community,
-      account
+     
+    ReactGA.event({
+      category: "SendCommunityMessage_GoodDollar",
+      action: "SendCommunityAction",
+      label: "SendCommunityLabel", // optional
     });
 
     // Make a copy and clear input field

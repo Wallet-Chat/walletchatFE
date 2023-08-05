@@ -29,8 +29,6 @@ import { log } from '@/helpers/log'
 import { createResizedImage } from '@/utils/resizer'
 import { getCommunity } from '@/helpers/widget'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 
 const EnterName = () => {
@@ -44,16 +42,6 @@ const EnterName = () => {
   // help debug issues and watch for high traffic conditions
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY,
-  })
-  /* Initialize analytics instance */
-  const analyticsGA4 = Analytics({
-    app: 'WalletChatApp',
-    plugins: [
-      /* Load Google Analytics v4 */
-      googleAnalyticsPlugin({
-        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-      }),
-    ],
   })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
@@ -230,15 +218,11 @@ const EnterName = () => {
             site: document.referrer,
             account,
           })
-          // ReactGA.event({
-          //   category: "ConnectWallet",
-          //   action: "ConnectWallet",
-          //   label: "TestLabel123", // optional
-          // });
-          analyticsGA4.track('NewSignup_GoodDollar', {
-            site: document.referrer,
-            account,
-          })
+          ReactGA.event({
+            category: "NewSignup_GoodDollar",
+            action: "NewSignupAction",
+            label: "NewSignupLabel", // optional
+          });
         } catch { log ("failed to auto-join user to community") }
           
           navigate('/me/enter-email')
