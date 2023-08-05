@@ -126,7 +126,7 @@ const WalletProviderContext = (chains: any) => {
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-    undefined | { signature: undefined | null | string; signedMsg: string; 
+    undefined | { signature: undefined | null | string; msgToSign: string; 
                   walletName: undefined | null | string; account: undefined | null | string; chainId: number }
   >()
   const widgetSignature = widgetAuthSig?.signature
@@ -618,7 +618,7 @@ const WalletProviderContext = (chains: any) => {
       siwePendingRef.current = true
 
       let signature = widgetAuthSig?.signature
-      let messageToSign = widgetAuthSig?.signedMsg
+      let messageToSign = widgetAuthSig?.msgToSign
 
       const shouldRetrySignature = siweFailedRef.current
       const widgetRequestedSIWE =
