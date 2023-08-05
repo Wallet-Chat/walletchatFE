@@ -3,10 +3,7 @@ import {
   Button,
   Flex,
   Image,
-  SkeletonText,
-  Spinner,
   Text,
-  Tooltip,
 } from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -14,7 +11,6 @@ import {
   IconCheck,
   IconChecks,
   IconExternalLink,
-  IconAlertCircle,
 } from '@tabler/icons'
 import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
@@ -375,7 +371,14 @@ const ChatMessage = ({
               marginBottom='2'
             />
           ) : ( */}
-            <Box>{msg.message}</Box>
+            <Box>
+              {msg.message?.includes("https") 
+                ? 
+                  <Image src={msg.message} alt='' height={60} width={60} />
+                : 
+                  msg.message
+              }
+            </Box>
           {/* )} */}
           <Box
             d='inline-block'

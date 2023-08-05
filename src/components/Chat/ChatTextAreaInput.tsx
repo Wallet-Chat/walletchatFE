@@ -2,20 +2,26 @@ import {
    Button, 
    Flex, 
    Icon, 
-   InputRightElement, 
-   InputGroup, 
+   Input,
+   Text,
+   Box,
    Popover, 
    PopoverTrigger, 
    PopoverContent, 
    Textarea,
    Container
 } from '@chakra-ui/react'
+import { GiphyFetch } from "@giphy/js-fetch-api";
+import { IGif } from '@giphy/js-types';
+import { Grid } from "@giphy/react-components";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import React, { KeyboardEvent, useEffect, useState } from 'react'
-import ReactTextareaAutosize from 'react-textarea-autosize'
+import * as ENV from '@/constants/env'
+
+const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
 const ChatTextAreaInput = ({
    isSendingMessage,
@@ -25,6 +31,14 @@ const ChatTextAreaInput = ({
    sendMessage: (msg: string) => void
 }) => {
    const [msgInput, setMsgInput] = useState<string>('')
+   const [searchInput, setSearchInput] = useState<string>("")
+
+   const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
+
+    function FetchSearchedGIfs() {
+      const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
+      return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
+    }
 
    useEffect(() => {
       setMsgInput('');
@@ -50,6 +64,15 @@ const ChatTextAreaInput = ({
       setMsgInput(msgInput + emoji);
     }
 
+    const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+      e.preventDefault();
+  
+      const gifUrl = gif.images.original.url;
+      const updatedMsgInput = msgInput + gifUrl;
+  
+      sendMessage(updatedMsgInput);
+    }
+
    return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
       <Popover placement='top-start' isLazy>
@@ -68,6 +91,56 @@ const ChatTextAreaInput = ({
             onEmojiSelect={addEmoji}
             maxFrequentRows={4}
           />
+        </PopoverContent>
+      </Popover>
+      <Popover placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            centerContent
+            bgColor="lightgray.500"
+            borderRadius={2}
+            cursor="pointer"
+            children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
+          />
+        </PopoverTrigger>
+        <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
+          <Box 
+            maxH="100%" 
+            overflowY="scroll" 
+            alignItems="center"
+            css={{
+              "&::-webkit-scrollbar": {
+                width: "0.4em",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "rgba(0, 0, 0, 0)",
+              },
+            }}
+          >
+            <Input 
+              my={5}
+              placeholder='Search GiFs' 
+              size='md' 
+              bgColor="black"
+              border="none"
+              focusBorderColor="black"
+              color="white"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            {searchInput ? (
+              <FetchSearchedGIfs />
+            ) : (
+              <Grid
+                onGifClick={onGifClick}
+                fetchGifs={fetchGifs}
+                width={400}
+                columns={4}
+                gutter={6}
+              />
+            )}
+          </Box>
         </PopoverContent>
       </Popover>
 
