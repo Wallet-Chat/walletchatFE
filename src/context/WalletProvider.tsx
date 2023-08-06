@@ -46,11 +46,7 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
 
-const isWidget = getIsWidgetContext()
 
-/* eslint-disable react/display-name */
-const WalletProviderContext = (chains: any) => {
-  const dispatch = useAppDispatch()
 
   // help debug issues and watch for high traffic conditions
   const analytics = AnalyticsBrowser.load({
@@ -67,6 +63,10 @@ const WalletProviderContext = (chains: any) => {
     ],
   })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+const isWidget = getIsWidgetContext()
+/* eslint-disable react/display-name */
+const WalletProviderContext = (chains: any) => {
+  const dispatch = useAppDispatch()
 
   const didDisconnect = React.useRef<boolean>(false)
   const prevAccount = React.useRef<null | string>()
@@ -116,10 +116,7 @@ const WalletProviderContext = (chains: any) => {
   )
 
   const initialJwt = accountAddress && storage.get('jwt')
-  const accountAuthenticated =
-    accountAddress && chainId && wagmiConnected
-      ? getHasJwtForAccount(accountAddress)
-      : null
+  const accountAuthenticated = getHasJwtForAccount(accountAddress || "")
 
   const [nonce, setNonce] = React.useState<string | null>()
   const [email, setEmail] = React.useState(null)
@@ -361,10 +358,9 @@ const WalletProviderContext = (chains: any) => {
         didDisconnect.current = false
 
         //TODO: do we need to connect yet again here? seems like we get 2 requests sometimes
-        if (connectConfig || config) {
-          connect(connectConfig || config)
-          //todo: use wagmi injected connector instead of asking user for connection again?
-        }
+        // if ((connectConfig || config)) {
+        //   connect(connectConfig || config)
+        // }
       }
     },
     [connect, connectConfig, dispatch]
@@ -459,7 +455,8 @@ const WalletProviderContext = (chains: any) => {
           widgetWalletDataRef?.current?.account !== messageData.account &&
           !didDisconnect.current
 
-        if (widgetAccountChanged && widgetWalletDataRef.current !== null) {
+        //if (widgetAccountChanged && widgetWalletDataRef.current !== null) {
+        if (widgetWalletDataRef.current !== null) {
           widgetWalletDataRef.current = messageData
           setWidgetWalletData(widgetWalletDataRef.current)
 
@@ -505,10 +502,10 @@ const WalletProviderContext = (chains: any) => {
           }
 
           if (connector) {
-            if (!wagmiConnected) {
-              await connectAsync({ chainId: messageData.chainId, connector })
-            }
-            await disconnectAsync()
+            // if (!wagmiConnected) {
+            //   await connectAsync({ chainId: messageData.chainId, connector })
+            // }
+            // await disconnectAsync()
 
             setConnectConfig({ chainId: messageData.chainId, connector })
             updateAccountFromWidget(

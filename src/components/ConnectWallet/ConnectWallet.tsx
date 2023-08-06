@@ -99,11 +99,11 @@ const ConnectWalletButton = () => {
                     mr={2}
                     minWidth='unset'
                   >
-                    Connected
+                    Please Sign-In on Main DApp
                   </Tag>
-                  <Box whiteSpace='break-spaces'>
+                  {/* <Box whiteSpace='break-spaces'>
                     Connect with {getWidgetOriginName() || 'App'}
-                  </Box>
+                  </Box> */}
                 </Button>
               ) : (
                 <Button
@@ -117,7 +117,7 @@ const ConnectWalletButton = () => {
                 </Button>
               )}
 
-              {(siweFailed || canUseWidgetConnection) && (
+              {/* {(siweFailed || canUseWidgetConnection) && (
                 <Button
                   variant='black'
                   size='lg'
@@ -128,13 +128,13 @@ const ConnectWalletButton = () => {
                 >
                   Sign in with another wallet
                 </Button>
-              )}
+              )} */}
 
-              {siweFailed && (
+              {/* {siweFailed && (
                 <Tag variant='solid' colorScheme='red'>
                   Signature failed or rejected, please try again
                 </Tag>
-              )}
+              )} */}
             </Flex>
           )
         })()
