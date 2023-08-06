@@ -10,6 +10,7 @@ import {
   FormHelperText,
   FormLabel,
   Input,
+  Link,
   Stack,
   Text,
   toast,
@@ -318,15 +319,24 @@ const ChangeEmail = () => {
                   Changed accounts must re-verify
                </Alert>
                {telegramCode && (
-                  <div>
+                   <div>
+                   <br />
+                   <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                     Verify Telegram
                      <br />
-                     <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-                           Verify Telegram
-                           <br />
-                        </Text>
-                        <Text fontSize="xl" mb={1}>Message <a href="https://t.me/Wallet_Chat_Bot" target="_blank">@Wallet_Chat_Bot</a> the code to verify: <b>{telegramCode}</b>
-                     </Text>
-                  </div>
+                   </Text>
+                   <Text fontSize="xl" mb={1}>
+                     Send Telegram message to {' '}
+                     <Link href="https://t.me/Wallet_Chat_Bot" target="_blank" textDecoration="underline" color="blue.500">
+                       @Wallet_Chat_Bot
+                     </Link>{' '}
+                     with the following code to verify: 
+                     <br />
+                     <b>{telegramCode}</b>
+                   </Text>
+                   <Text fontSize="lg" mb={1}>You should receive a confirmation message from Wallet_Chat_Bot within 15 seconds of sending the verification code.               
+                   </Text>
+                   </div>
                )}
           {errors.email && errors.email.type === 'required' && (
             <FormErrorMessage>No blank email please</FormErrorMessage>
