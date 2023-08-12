@@ -224,10 +224,14 @@ const WalletProviderContext = (chains: any) => {
         dispatch(setAccount(walletInJWT))
       }
 
-      dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
-
       getSettings(address)
       dispatch(setIsAuthenticated(true))
+
+      if(accountAddress) {
+        dispatch(endpoints.getName.initiate(accountAddress.toLocaleLowerCase()))
+      } else {
+        dispatch(endpoints.getName.initiate(address.toLocaleLowerCase()))
+      }
 
       pendingConnect.current = false
     },
