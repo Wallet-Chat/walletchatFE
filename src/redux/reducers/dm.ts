@@ -418,13 +418,30 @@ export function updateLocalInboxDataForAccount(
 
     //delete the older/duplicate messages (probably a better way TODO)
     let duplicateMap = new Map()
+    let duplicateIdx = new Map()
     for (let i = 0; i < newMessages.length - 1; i++) {
       const msg = newMessages[i];
       const address = getInboxFrom(account, msg);
       if(!duplicateMap.has(address)) {
-        duplicateMap.set(address, true)
+        duplicateMap.set(address, msg)
+        duplicateIdx.set(address, i)
       } else {
-        delete newMessages[i]
+        const dupMsg = duplicateMap.get(address) as InboxMessageType
+        if (dupMsg.Id != msg.Id){
+          //keep newer one
+          if(new Date(dupMsg.timestamp).getTime() > new Date(msg.timestamp).getTime()) {
+            delete newMessages[i]
+          } else {
+            delete newMessages[duplicateIdx.get(address)]
+          }
+        } else {
+          //message is the same, one is read and one unread
+          if(msg.read) {
+            delete newMessages[duplicateIdx.get(address)]
+          } else {
+            delete newMessages[i]
+          }
+        }
       }
     }
 

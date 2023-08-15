@@ -254,8 +254,35 @@ const CommunityGroupChat = ({
     onClose();
   }
 
+  const supportHeader =
+    ENV.REACT_APP_SUPPORT_HEADER ||
+    'Please use the support tab on the left for direct team support'
+
+  const AlertBubble = ({
+      children,
+      color,
+    }: {
+      children: string
+      color: 'green' | 'red'
+    }) => (
+      <Flex
+        justifyContent='center'
+        alignItems='center'
+        borderRadius='lg'
+        background={color === 'green' ? 'green.200' : 'red.200'}
+        p={4}
+        position='sticky'
+        top={0}
+        right={0}
+        zIndex={1}
+      >
+        <Box fontSize='md'>{children}</Box>
+      </Flex>
+    )
+
   return (
     <Flex flexDirection='column' height='100%'>
+      <AlertBubble color='green'>{supportHeader}</AlertBubble>
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex

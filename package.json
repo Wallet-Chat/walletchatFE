@@ -60,7 +60,7 @@
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
-    "@lit-protocol/types": "^2.1.114",
+    "@lit-protocol/types": "2.1.114",
     "@types/chrome": "0.0.184",
     "@types/google-map-react": "^2.1.5",
     "@types/jest": "^25.2.3",

@@ -46,27 +46,27 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
 
-// help debug issues and watch for high traffic conditions
-const analytics = AnalyticsBrowser.load({
-  writeKey: ENV.REACT_APP_SEGMENT_KEY,
-})
-/* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
-})
-ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
-
 const isWidget = getIsWidgetContext()
 
 /* eslint-disable react/display-name */
 const WalletProviderContext = (chains: any) => {
   const dispatch = useAppDispatch()
+
+  // help debug issues and watch for high traffic conditions
+  const analytics = AnalyticsBrowser.load({
+    writeKey: ENV.REACT_APP_SEGMENT_KEY,
+  })
+  /* Initialize analytics instance */
+  const analyticsGA4 = Analytics({
+    app: 'WalletChatApp',
+    plugins: [
+      /* Load Google Analytics v4 */
+      googleAnalyticsPlugin({
+        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+      }),
+    ],
+  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const didDisconnect = React.useRef<boolean>(false)
   const prevAccount = React.useRef<null | string>()
@@ -129,7 +129,7 @@ const WalletProviderContext = (chains: any) => {
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
   const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-    undefined | { signature: undefined | null | string; signedMsg: string }
+    undefined | { signature: undefined | null | string; msgToSign: string }
   >()
   const widgetSignature = widgetAuthSig?.signature
 
@@ -268,6 +268,22 @@ const WalletProviderContext = (chains: any) => {
       })
   }
 
+  async function getNonceAsync(address: string) {
+    let retVal = ""
+    await fetch(` ${ENV.REACT_APP_REST_API}/users/${address}/nonce`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then(async (usersData: { Nonce: string }) => {
+        log('✅[GET][Nonce Local]:', usersData)
+        retVal = usersData.Nonce
+      })
+      .catch((error) => {
+        log('🚨[GET][Nonce Local]:', error)
+      })
+      return retVal;
+  }
   React.useEffect(() => {
     if (isWidget) {
       if (!accountAddress) {
@@ -371,7 +387,9 @@ const WalletProviderContext = (chains: any) => {
       }
 
       const currentOrigin = storage.get('current-widget-origin')
-      if (currentOrigin !== origin) {
+      //don't overwrite the current-widget-origin with the current host (weird metamask messages when changing chain)
+      const currentSite = window.location.protocol + "//" + window.location.host
+      if (currentOrigin !== origin && origin != currentSite) {
         storage.set('current-widget-origin', origin)
       }
 
@@ -382,12 +400,49 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
-        //log("*** Setting Widget Auth Sig ***", messageData)
+        //TODO, should probably clean this up to pass in account and chain ID?
+        log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
-      }
-      
-      if (target === 'parent_provider') {
-        log("*** Parent Provider ***", data)
+        const regex = /0x[a-fA-F0-9]{40}/;
+        const matches = messageData.msgToSign.match(regex);
+
+        const regexChainID = /Chain ID: (\d+)/;
+        const matchesChainID = messageData.msgToSign.match(regexChainID);
+
+        let chainID = '1'
+        if (matchesChainID && matchesChainID.length > 1) {
+           chainID = matches[1];
+        }
+
+        if (matches && matches.length > 0) {
+          const matchedAccount = matches[0]
+          let localNonce = await getNonceAsync(matchedAccount)
+          log("signed_message from: ", matchedAccount)
+          
+          fetch(`${ENV.REACT_APP_REST_API}/signin`, {
+            body: JSON.stringify({
+              name: chainID,
+              address: matchedAccount,
+              nonce: localNonce,
+              msg: messageData.msgToSign,
+              sig: messageData.signature,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          })
+            .then((response) => response.json())
+            .then(async (signInData) => {
+              storeJwtForAccount(matchedAccount, signInData.access)
+    
+              const currentSigs = storage.get('lit-auth-signature-by-account')
+              storage.set('lit-auth-signature-by-account', {
+                ...currentSigs,
+                [matchedAccount.toLocaleLowerCase()]: widgetAuthSig,
+              })
+    
+              signIn(matchedAccount, signInData.access)
+            })
+        }
       }
 
       if (data === 'debugON') {
@@ -554,7 +609,7 @@ const WalletProviderContext = (chains: any) => {
       siwePendingRef.current = true
 
       let signature = widgetAuthSig?.signature
-      let messageToSign = widgetAuthSig?.signedMsg
+      let messageToSign = widgetAuthSig?.msgToSign
 
       const shouldRetrySignature = siweFailedRef.current
       const widgetRequestedSIWE =

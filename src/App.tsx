@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, Outlet } from 'react-router-dom'
+import { Route, Routes, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import {
   Link,
   HStack,
@@ -42,7 +42,8 @@ import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
-
+import { useEffect } from 'react'
+import { API } from 'react-wallet-chat/dist/src/types'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -55,6 +56,20 @@ export const App = () => {
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
+  const navigate = useNavigate()
+  useEffect(() => {
+    window.addEventListener('message', (e) => {
+      const { target, data }: API = e.data
+
+      if (data) {
+        const { contractAddress, itemId, network, redirect, ownerAddress } = data
+
+        if (ownerAddress) {
+          navigate(`/dm/${ownerAddress}`)
+        }
+      }
+    })
+  }, [navigate])
 
   const isSmallLayout = useIsSmallLayout()
   const { colorMode } = useColorMode();

@@ -140,7 +140,7 @@ const NFTChat = ({
     //   action: "SendNftMessage",
     //   label: "SendNftMessageLabel", // optional
     // });
-    analyticsGA4.track('SendNftMessage_TRACK', {
+    analyticsGA4.track('SendNftMessage', {
       site: document.referrer,
       account: account,
     })

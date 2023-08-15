@@ -69,13 +69,6 @@ export default function InboxSearchInput() {
 
    useOnClickOutside(ref, handleClickOutside)
 
-   let suggestedAddress: string = toAddr
-   if (web3?.utils.isAddress(toAddr)) {
-      suggestedAddress = toAddr
-   } else if ((toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc')) && resolvedAddr && !isResolvingENS) {
-      suggestedAddress = resolvedAddr
-   }
-
    return (
       <Box position={'relative'} ref={ref}>
          <FormControl pos="relative">
@@ -105,9 +98,7 @@ export default function InboxSearchInput() {
             )}
          </FormControl>
 
-         {suggestedAddress !== '' &&
-            isSuggestionListOpen &&
-            //suggestedAddress !== toAddr &&
+         {  toAddr &&
             !isResolvingENS && (
                <Box
                   position="absolute"
@@ -123,36 +114,62 @@ export default function InboxSearchInput() {
                   <Text color="darkgray.500" fontSize="md" mb={1}>
                      Start chatting with
                   </Text>
-                  <Link
-                     to={`/dm/${suggestedAddress}`}
-                     onClick={() => {
-                        setIsSuggestionListOpen(false)
-                        setToAddr('')
-                     }}
-                     style={{ textDecoration: 'none', width: '100%' }}
-                  >
-                     <Flex
-                        alignItems="center"
-                        justifyContent="flex-start"
+                  {web3?.utils.isAddress(toAddr) && (
+                     <Link 
+                        to={`/dm/${toAddr}`} 
+                        onClick={() => {
+                           setIsSuggestionListOpen(false)
+                           setToAddr('')
+                        }}
+                        style={{ textDecoration: 'none' }}>
+                        <Flex
+                        alignItems='center'
+                        justifyContent='flex-start'
                         p={3}
-                        background="lightgray.300"
-                        borderRadius="md"
+                        background='lightgray.300'
+                        borderRadius='md'
+                        mt={2}
                         as={Button}
-                        width="100%"
-                     >
-                        <Blockies
-                           seed={suggestedAddress.toLocaleLowerCase()}
-                           scale={3}
-                        />
-                        <Text fontWeight="bold" fontSize="md" ml={2}>
-                           {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc'))
-                              ? toAddr
-                              : truncateAddress(toAddr)}{' '}
-                           {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc')) &&
-                              `(${truncateAddress(suggestedAddress)})`}
+                        >
+                        <Blockies seed={toAddr.toLocaleLowerCase()} scale={3} />
+                        <Text fontWeight='bold' fontSize='md' ml={2}>
+                           {truncateAddress(toAddr)}
                         </Text>
-                     </Flex>
-                  </Link>
+                        </Flex>
+                     </Link>
+                  )}
+                  {(toAddr.includes('.eth') || toAddr.includes(".bnb") || toAddr.includes(".arb") || toAddr.includes(".btc")) && resolvedAddr && !isResolvingENS && (
+                     <Link
+                        to={`/dm/${resolvedAddr}`}
+                        onClick={() => {
+                           setIsSuggestionListOpen(false)
+                           setToAddr('')
+                        }}
+                        style={{ textDecoration: 'none', width: '100%' }}
+                     >
+                        <Flex
+                           alignItems="center"
+                           justifyContent="flex-start"
+                           p={3}
+                           background="lightgray.300"
+                           borderRadius="md"
+                           as={Button}
+                           width="100%"
+                        >
+                           <Blockies
+                              seed={resolvedAddr.toLocaleLowerCase()}
+                              scale={3}
+                           />
+                           <Text fontWeight="bold" fontSize="md" ml={2}>
+                              {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc'))
+                                 ? toAddr
+                                 : truncateAddress(toAddr)}{' '}
+                              {(toAddr.endsWith('.eth') || toAddr.endsWith('.bnb') || toAddr.endsWith('.arb') || toAddr.endsWith('.btc')) &&
+                                 `(${truncateAddress(resolvedAddr)})`}
+                           </Text>
+                        </Flex>
+                     </Link>
+                  )}
                </Box>
             )}
       </Box>

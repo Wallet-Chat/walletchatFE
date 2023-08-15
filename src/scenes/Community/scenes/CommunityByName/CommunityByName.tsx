@@ -269,9 +269,9 @@ const CommunityByName = () => {
               )}
               <Divider orientation='vertical' height='12px' mx={2} />
 
-              {communityData?.members && (
+              {communityData?.member_count && (
                 <Box>
-                  <Text fontSize='md'>{communityData.members} members</Text>
+                  <Text fontSize='md'>{communityData.member_count} members</Text>
                 </Box>
               )}
             </Flex>

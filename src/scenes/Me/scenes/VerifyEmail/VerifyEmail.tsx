@@ -9,6 +9,7 @@ import {
   FormHelperText,
   FormLabel,
   Input,
+  Link,
   Stack,
   Text,
   toast,
@@ -68,7 +69,10 @@ const VerifyEmail = () => {
         log('✅[Get][VerifyEmail From Email Link]:', response)
         setFetchError(false)
         setIsVerifySuccess(true)
-        navigate('/me/verify-success')
+
+        if(!_telegramcode) {
+          navigate('/me/verify-success')
+        }
       })
       .catch((error) => {
         console.error('🚨[GET][Verify Email From Email Link]:', error)
@@ -124,7 +128,7 @@ const VerifyEmail = () => {
             duration: 2000,
             isClosable: true,
           })
-          navigate(`/community/${getCommunity()}`)
+          //navigate(`/community/${getCommunity()}`)
         })
         .catch((error) => {
           console.error('🚨[GET][Verify Email]:', error)
@@ -186,7 +190,7 @@ const VerifyEmail = () => {
    const urlParams = new URLSearchParams(location.search);
   verificationcode = urlParams.get('code')
   verificationemail = urlParams.get('email')
-  if (isVerifySuccess) {
+  if (isVerifySuccess && !_telegramcode) {
     return (
       <Box p={6} pt={16} background='white' width='100%'>
         <form>
@@ -244,15 +248,22 @@ const VerifyEmail = () => {
             )}
             <br />
             {_telegramcode && (
-                <div>
-                <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
-                      Verify Telegram
-                      <br />
-                  </Text>
-                  <Text fontSize="xl" mb={1}>Message <a href="https://t.me/Wallet_Chat_Bot" target="_blank">@Wallet_Chat_Bot</a> the code to verify: <b>{_telegramcode}</b>
-                  </Text>
-                  <br />
-                  <Text fontSize="lg" mb={1}>You should receive a confirmation TG message in less than 1 minute after messaging the verification code.               
+              <div>
+              <br />
+              <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                Verify Telegram
+                <br />
+              </Text>
+              <Text fontSize="xl" mb={1}>
+                Send Telegram message to {' '}
+                <Link href="https://t.me/Wallet_Chat_Bot" target="_blank" textDecoration="underline" color="blue.500">
+                  @Wallet_Chat_Bot
+                </Link>{' '}
+                with the following code to verify: 
+                <br />
+                <b>{_telegramcode}</b>
+                </Text>
+                <Text fontSize="lg" mb={1}>You should receive a confirmation message from Wallet_Chat_Bot within 15 seconds of sending the verification code.               
                 </Text>
                 </div>
             )}

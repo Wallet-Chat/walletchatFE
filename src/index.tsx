@@ -2,9 +2,7 @@ import React from 'react'
 import { ColorModeScript, ChakraProvider, Flex } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
-import "focus-visible/dist/focus-visible"
 
-import '@rainbow-me/rainbowkit/styles.css'
 import {
   rainbowWallet,
   trustWallet,
@@ -12,6 +10,7 @@ import {
   metaMaskWallet,
   coinbaseWallet
 } from '@rainbow-me/rainbowkit/wallets';
+import '@rainbow-me/rainbowkit/styles.css'
 import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
 import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagmi/chains'

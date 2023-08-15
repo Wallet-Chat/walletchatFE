@@ -63,6 +63,22 @@ export const REACT_APP_ORIGIN_NAME_MYSTICSWAP = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_MYSTICSWAP
 // ------------------
 
+// --- Segmint.io ---
+
+// Community
+export const REACT_APP_DEFAULT_COMMUNITY_SEGMINT = import.meta.env
+  .VITE_REACT_APP_DEFAULT_COMMUNITY_SEGMINT
+// Support Wallet
+export const REACT_APP_SUPPORT_WALLET_SEGMINT = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_SEGMINT
+// App Url
+export const REACT_APP_APP_URL_SEGMINT = import.meta.env
+  .VITE_REACT_APP_APP_URL_SEGMINT
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_SEGMINT = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_SEGMINT
+// ------------------
+
 // --- OpenPeer ---
 
 // Community
