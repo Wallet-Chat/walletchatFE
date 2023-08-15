@@ -13,6 +13,7 @@ import {
   PopoverContent, 
   Textarea,
   Container, 
+  useDisclosure
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
 import { GiphyFetch } from "@giphy/js-fetch-api";
@@ -59,6 +60,7 @@ const CommunityGroupChat = ({
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
   const [searchInput, setSearchInput] = useState<string>("")
+  const { onClose } = useDisclosure();
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
@@ -249,6 +251,7 @@ const CommunityGroupChat = ({
     const updatedMsgInput = msgInput + gifUrl;
 
     sendMessage(updatedMsgInput);
+    onClose();
   }
 
   return (
@@ -342,7 +345,7 @@ const CommunityGroupChat = ({
             />
           </PopoverContent>
         </Popover>
-        <Popover placement='top-start' isLazy>
+        <Popover placement='top-start' isLazy onClose={onClose}>
           <PopoverTrigger>
             <Container 
               w={0}

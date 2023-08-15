@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Button, Flex, Text, Link as CLink } from '@chakra-ui/react'
+import { Box, Button, Flex, Text, Link as CLink, useColorMode } from '@chakra-ui/react'
 import { useParams, Link } from 'react-router-dom'
 import {
   IconArrowLeft,
@@ -14,6 +14,7 @@ import Avatar from '@/components/Inbox/DM/Avatar'
 
 const DMHeader = () => {
   const isSmallLayout = useIsSmallLayout()
+  const { colorMode } = useColorMode();
 
   const { address: toAddr = '' } = useParams()
 
@@ -48,6 +49,7 @@ const DMHeader = () => {
       p={5}
       pb={3}
       borderBottom='1px solid var(--chakra-colors-lightgray-400)'
+      // background={colorMode}
     >
       {isSmallLayout && (
         <Box mb={4}>
@@ -72,12 +74,12 @@ const DMHeader = () => {
                   <Text fontWeight='bold' color='darkgray.800' fontSize='md'>
                     {name}
                   </Text>
-                  <Text fontSize='sm' color='darkgray.500'>
+                  <Text fontSize='sm' color={colorMode === "dark" ? "white" : "darkgray.500"}>
                     {truncateAddress(toAddr)}
                   </Text>
                 </Box>
               ) : (
-                <Text fontWeight='bold' color='darkgray.800' fontSize='md'>
+                <Text fontWeight='bold' color={colorMode === "dark" ? "white" : "darkgray.500"} fontSize='md'>
                   {truncateAddress(toAddr)}
                 </Text>
               )}
@@ -93,13 +95,13 @@ const DMHeader = () => {
               {copiedAddr ? (
                 <IconCheck
                   size={20}
-                  color='var(--chakra-colors-darkgray-500)'
+                  color={colorMode === "dark" ? "white" : "var(--chakra-colors-darkgray-500)"}
                   stroke='1.5'
                 />
               ) : (
                 <IconCopy
                   size={20}
-                  color='var(--chakra-colors-lightgray-900)'
+                  color={colorMode === "dark" ? "white" : "var(--chakra-colors-lightgray-900)"}
                   stroke='1.5'
                 />
               )}
@@ -113,7 +115,7 @@ const DMHeader = () => {
             >
               <IconExternalLink
                 size={20}
-                color='var(--chakra-colors-lightgray-900)'
+                color={colorMode === "dark" ? "white" : "var(--chakra-colors-lightgray-900)"}
                 stroke='1.5'
               />
             </Button>

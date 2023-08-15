@@ -31,6 +31,7 @@ import {
 } from '@tabler/icons'
 import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
+import { useColorMode } from "@chakra-ui/color-mode";
 
 import * as ENV from '@/constants/env'
 import IconDiscord from '../../images/icon-products/icon-discord.svg'
@@ -54,6 +55,7 @@ import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
+import ToggleColorMode from '../ToggleColorMode'
 
 interface URLChangedEvent extends Event {
   detail?: string
@@ -206,6 +208,7 @@ export default function Sidebar() {
   const [nftData, setNftData] = useState<NFTPortNFTResponse>()
   const [imageUrl, setImageUrl] = useState<string>()
   const { unreadCount } = useUnreadCount()
+  const { colorMode } = useColorMode();
 
   const { metadata } = nftData?.nft || {}
 
@@ -323,7 +326,7 @@ export default function Sidebar() {
       alignItems='center'
       flexDirection={isMobile ? 'row' : 'column'}
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
-      background='white'
+      background={colorMode}
       height={isMobile ? 'auto' : '100vh'}
       py={isMobile ? 'var(--chakra-space-1)' : '0.2rem'}
       px={isMobile ? 'var(--chakra-space-2)' : '0.2rem'}
@@ -445,6 +448,7 @@ export default function Sidebar() {
         )}
       </Flex>
       <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
+        <ToggleColorMode />
         <SidebarLink to='/dm/new'>
           <Button
             size='sm'

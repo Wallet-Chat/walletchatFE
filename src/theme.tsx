@@ -16,8 +16,8 @@ const breakpoints = createBreakpoints({
 })
 
 const config: ThemeConfig = {
-   initialColorMode: 'light',
-   useSystemColorMode: false,
+   initialColorMode: 'dark',
+   useSystemColorMode: true,
 }
 
 export const theme = extendTheme(
@@ -50,7 +50,7 @@ export const theme = extendTheme(
             body: {
                pos: 'relative',
                initialColorMode: 'light',
-               bg: 'utility.light80',
+               // bg: 'utility.light80',
                color: 'black',
                minHeight: '100vh',
             },

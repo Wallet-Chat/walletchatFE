@@ -9,7 +9,8 @@ import {
    PopoverTrigger, 
    PopoverContent, 
    Textarea,
-   Container
+   Container,
+   useDisclosure
 } from '@chakra-ui/react'
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import { IGif } from '@giphy/js-types';
@@ -32,6 +33,7 @@ const ChatTextAreaInput = ({
 }) => {
    const [msgInput, setMsgInput] = useState<string>('')
    const [searchInput, setSearchInput] = useState<string>("")
+   const { onClose } = useDisclosure();
 
    const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
 
@@ -71,6 +73,7 @@ const ChatTextAreaInput = ({
       const updatedMsgInput = msgInput + gifUrl;
   
       sendMessage(updatedMsgInput);
+      onClose();
     }
 
    return (
@@ -93,7 +96,7 @@ const ChatTextAreaInput = ({
           />
         </PopoverContent>
       </Popover>
-      <Popover placement='top-start' isLazy>
+      <Popover placement='top-start' isLazy onClose={onClose}>
         <PopoverTrigger>
           <Container 
             w={0}

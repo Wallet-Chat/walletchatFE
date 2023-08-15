@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input, useDisclosure, useColorMode } from '@chakra-ui/react'
 import { BsEmojiSmile } from 'react-icons/bs';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -29,6 +29,8 @@ const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
+  const { onOpen, onClose, } = useDisclosure();
+  const { colorMode } = useColorMode();
 
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
@@ -39,6 +41,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const [msgInput, setMsgInput] = useState<string>("")
   const [searchInput, setSearchInput] = useState<string>("")
+  const [onShow, setOnShow] = useState<boolean>(true)
 
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
@@ -279,13 +282,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
     e.preventDefault();
-
+    
     const gifUrl = gif.images.original.url;
     const updatedMsgInput = msgInput + gifUrl;
-
+    
     sendMessage(updatedMsgInput);
+    onClose();
   }
-
+  
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
       <Popover placement='top-start' isLazy>
@@ -294,7 +298,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             w={0}
             centerContent
             cursor="pointer"
-            children={<Icon as={BsEmojiSmile} color="black.500" h={6} w={6} />}
+            children={<Icon as={BsEmojiSmile} color={colorMode === "dark" ? "white" : "black.500"} h={6} w={6} />}
           />
         </PopoverTrigger>
         <PopoverContent w="283px">  
@@ -307,12 +311,12 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
           />
         </PopoverContent>
       </Popover>
-      <Popover placement='top-start' isLazy>
+      <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
         <PopoverTrigger>
           <Container 
             w={0}
             centerContent
-            bgColor="lightgray.500"
+            bgColor={colorMode === "dark" ? "white" : "lightgray.500"}
             borderRadius={2}
             cursor="pointer"
             children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
@@ -370,7 +374,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         py='3'
         w='100%'
         fontSize='md'
-        background='lightgray.400'
+        _placeholder={{ color: colorMode === "dark" ? "darkgray.500" : "lightgray.900"  }}
+        background={colorMode === "dark" ? "white" : "lightgray.400"}
         borderRadius='xl'
       />
 

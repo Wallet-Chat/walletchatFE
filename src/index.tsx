@@ -93,7 +93,7 @@ const wagmiClient = createClient({
 
 ReactDOM.render(
   <React.StrictMode>
-    <ColorModeScript />
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <Provider store={store}>
       <BrowserRouter>
         <WagmiConfig client={wagmiClient}>
