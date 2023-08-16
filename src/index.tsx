@@ -14,7 +14,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
 import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagmi/chains'
-import { infuraProvider } from '@wagmi/core/providers/infura'
+import { infuraProvider } from 'wagmi/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
 
@@ -92,7 +92,7 @@ const wagmiClient = createClient({
 
 ReactDOM.render(
   <React.StrictMode>
-    <ColorModeScript />
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <Provider store={store}>
       <BrowserRouter>
         <WagmiConfig client={wagmiClient}>

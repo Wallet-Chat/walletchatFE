@@ -9,6 +9,7 @@ import {
   Spinner,
   Tag,
   Button,
+  useColorMode,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
@@ -71,10 +72,11 @@ export const App = () => {
   }, [navigate])
 
   const isSmallLayout = useIsSmallLayout()
+  const { colorMode } = useColorMode();
 
   if (!isAuthenticated) {
     return (
-      <Flex flex={1} padding='15px'>
+      <Flex bg="lightgray" flex={1} padding='15px'>
         <ExtensionCloseButton />
 
         <Box
@@ -199,12 +201,12 @@ export const App = () => {
 
                     {!isSmallLayout && (
                       <Flex
-                        background='lightgray.200'
+                        background={colorMode}
                         flex='1'
                         alignItems='center'
                         justifyContent='center'
                       >
-                        <Tag background='white'>
+                        <Tag color={colorMode === "dark" ? "white": ""}>
                           Select a chat to start messaging
                         </Tag>
                       </Flex>
@@ -264,12 +266,14 @@ export const App = () => {
 
                     {!isSmallLayout && (
                       <Flex
-                        background='lightgray.200'
+                        background={colorMode}
                         flex='1'
                         alignItems='center'
                         justifyContent='center'
                       >
-                        <Tag background='white'>Explore NFT groups</Tag>
+                        <Tag color={colorMode === "dark" ? "white": ""}>
+                          Explore NFT groups
+                        </Tag>
                       </Flex>
                     )}
                   </Flex>
@@ -305,12 +309,12 @@ export const App = () => {
 
                     {!isSmallLayout && (
                       <Flex
-                        background='lightgray.200'
+                        background={colorMode}
                         flex='1'
                         alignItems='center'
                         justifyContent='center'
                       >
-                        <Tag background='white'>
+                        <Tag color={colorMode === "dark" ? "white": ""}>
                           Select a chat to start messaging
                         </Tag>
                       </Flex>

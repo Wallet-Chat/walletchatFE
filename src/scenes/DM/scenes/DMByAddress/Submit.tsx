@@ -4,16 +4,17 @@ import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input, useDisclosure, useColorMode } from '@chakra-ui/react'
 import { BsEmojiSmile } from 'react-icons/bs';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
+import { GiphyFetch } from "@giphy/js-fetch-api";
+import { IGif } from '@giphy/js-types';
+import { Grid } from "@giphy/react-components";
 import { postFetchOptions } from '@/helpers/fetch'
-import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
 import {
   updateLocalDmDataForAccountToAddr,
-  addLocalDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
@@ -21,12 +22,15 @@ import {
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
-import { getAccessControlConditions } from '@/helpers/lit'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
 
+const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
+
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
+  const { onOpen, onClose, } = useDisclosure();
+  const { colorMode } = useColorMode();
 
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
@@ -36,9 +40,13 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const [msgInput, setMsgInput] = useState<string>("")
+  const [searchInput, setSearchInput] = useState<string>("")
+  const [onShow, setOnShow] = useState<boolean>(true)
+
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
   })
+
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
     app: 'WalletChatApp',
@@ -58,6 +66,13 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       timestamp: string
     }[]
   >([])
+
+  const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
+
+  function FetchSearchedGIfs() {
+    const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
+    return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
+  }
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
@@ -185,8 +200,10 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     [account]
   )
 
-  const sendMessage = async () => {
+  const sendMessage = async (msgInput: string) => {
     const value = msgInput
+
+    console.log("the value:", value)
 
     if (value.length <= 0) return
 
@@ -251,7 +268,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      sendMessage()
+      sendMessage(msgInput)
     }
   }
 
@@ -263,6 +280,16 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     setMsgInput(msgInput + emoji);
   }
 
+  const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+    e.preventDefault();
+    
+    const gifUrl = gif.images.original.url;
+    const updatedMsgInput = msgInput + gifUrl;
+    
+    sendMessage(updatedMsgInput);
+    onClose();
+  }
+  
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
       <Popover placement='top-start' isLazy>
@@ -270,7 +297,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
           <Container 
             w={0}
             centerContent
-            children={<Icon as={BsEmojiSmile} color="black.500" h={6} w={6} />}
+            cursor="pointer"
+            children={<Icon as={BsEmojiSmile} color={colorMode === "dark" ? "white" : "black.500"} h={6} w={6} />}
           />
         </PopoverTrigger>
         <PopoverContent w="283px">  
@@ -281,6 +309,56 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             onEmojiSelect={addEmoji}
             maxFrequentRows={4}
           />
+        </PopoverContent>
+      </Popover>
+      <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            centerContent
+            bgColor={colorMode === "dark" ? "white" : "lightgray.500"}
+            borderRadius={2}
+            cursor="pointer"
+            children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
+          />
+        </PopoverTrigger>
+        <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
+          <Box 
+            maxH="100%" 
+            overflowY="scroll" 
+            alignItems="center"
+            css={{
+              "&::-webkit-scrollbar": {
+                width: "0.4em",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "rgba(0, 0, 0, 0)",
+              },
+            }}
+          >
+            <Input 
+              my={5}
+              placeholder='Search GiFs' 
+              size='md' 
+              bgColor="black"
+              border="none"
+              focusBorderColor="black"
+              color="white"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            {searchInput ? (
+              <FetchSearchedGIfs />
+            ) : (
+              <Grid
+                onGifClick={onGifClick}
+                fetchGifs={fetchGifs}
+                width={400}
+                columns={4}
+                gutter={6}
+              />
+            )}
+          </Box>
         </PopoverContent>
       </Popover>
 
@@ -296,14 +374,15 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         py='3'
         w='100%'
         fontSize='md'
-        background='lightgray.400'
+        _placeholder={{ color: colorMode === "dark" ? "darkgray.500" : "lightgray.900"  }}
+        background={colorMode === "dark" ? "white" : "lightgray.400"}
         borderRadius='xl'
       />
 
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
-          onClick={sendMessage}
+          onClick={() => sendMessage(msgInput)}
           borderRadius='full'
           minH='full'
           px='0'

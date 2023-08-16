@@ -7,21 +7,23 @@ import {
   Tag,
   Text,
   Icon, 
-  InputRightElement,
-  InputGroup, 
+  Input,
   Popover, 
   PopoverTrigger, 
   PopoverContent, 
   Textarea,
   Container, 
+  useDisclosure
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
+import { GiphyFetch } from "@giphy/js-fetch-api";
+import { IGif } from '@giphy/js-types';
+import { Grid } from "@giphy/react-components";
 import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
 import { Link as RLink } from 'react-router-dom'
-import TextareaAutosize from 'react-textarea-autosize'
 import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
@@ -40,6 +42,8 @@ import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 
+const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
+
 const CommunityGroupChat = ({
   account,
   community,
@@ -55,6 +59,8 @@ const CommunityGroupChat = ({
   const [msgInput, setMsgInput] = useState<string>('')
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+  const [searchInput, setSearchInput] = useState<string>("")
+  const { onClose } = useDisclosure();
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
@@ -69,6 +75,13 @@ const CommunityGroupChat = ({
       }),
     ],
   })
+
+  const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
+
+  function FetchSearchedGIfs() {
+    const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
+    return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
+  }
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -119,11 +132,11 @@ const CommunityGroupChat = ({
   const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      sendMessage()
+      sendMessage(msgInput)
     }
   }
 
-  const sendMessage = async () => {
+  const sendMessage = async (msgInput: string) => {
     if (msgInput.length <= 0) return
     if (!account) {
       log('No account connected')
@@ -229,6 +242,16 @@ const CommunityGroupChat = ({
     sym.forEach((el: string) => codeArray.push("0x" + el));
     let emoji = String.fromCodePoint(...codeArray)
     setMsgInput(msgInput + emoji);
+  }
+
+  const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+    e.preventDefault();
+
+    const gifUrl = gif.images.original.url;
+    const updatedMsgInput = msgInput + gifUrl;
+
+    sendMessage(updatedMsgInput);
+    onClose();
   }
 
   const supportHeader =
@@ -349,6 +372,56 @@ const CommunityGroupChat = ({
             />
           </PopoverContent>
         </Popover>
+        <Popover placement='top-start' isLazy onClose={onClose}>
+          <PopoverTrigger>
+            <Container 
+              w={0}
+              centerContent
+              bgColor="lightgray.500"
+              borderRadius={2}
+              cursor="pointer"
+              children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
+            />
+          </PopoverTrigger>
+          <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
+            <Box 
+              maxH="100%" 
+              overflowY="scroll" 
+              alignItems="center"
+              css={{
+                "&::-webkit-scrollbar": {
+                  width: "0.4em",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0, 0, 0, 0)",
+                },
+              }}
+            >
+              <Input 
+                my={5}
+                placeholder='Search GiFs' 
+                size='md' 
+                bgColor="black"
+                border="none"
+                focusBorderColor="black"
+                color="white"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              {searchInput ? (
+                <FetchSearchedGIfs />
+              ) : (
+                <Grid
+                  onGifClick={onGifClick}
+                  fetchGifs={fetchGifs}
+                  width={400}
+                  columns={4}
+                  gutter={6}
+                />
+              )}
+            </Box>
+          </PopoverContent>
+        </Popover>
 
         <Textarea 
           placeholder='Write a message...'
@@ -364,7 +437,7 @@ const CommunityGroupChat = ({
         <Flex alignItems='flex-end'>
           <Button
             variant='black'
-            onClick={sendMessage}
+            onClick={() => sendMessage(msgInput)}
             borderRadius='full'
             minH='full'
             px='0'
