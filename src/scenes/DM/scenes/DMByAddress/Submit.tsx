@@ -311,7 +311,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
           />
         </PopoverContent>
       </Popover>
-      <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
+      {/* <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
         <PopoverTrigger>
           <Container 
             w={0}
@@ -360,7 +360,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             )}
           </Box>
         </PopoverContent>
-      </Popover>
+      </Popover> */}
 
       <Textarea 
         placeholder='Write a message...'

@@ -96,7 +96,7 @@ const ChatTextAreaInput = ({
           />
         </PopoverContent>
       </Popover>
-      <Popover placement='top-start' isLazy onClose={onClose}>
+      {/* <Popover placement='top-start' isLazy onClose={onClose}>
         <PopoverTrigger>
           <Container 
             w={0}
@@ -145,7 +145,7 @@ const ChatTextAreaInput = ({
             )}
           </Box>
         </PopoverContent>
-      </Popover>
+      </Popover> */}
 
       <Textarea 
         placeholder='Write a message...'
