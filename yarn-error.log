@@ -8,22 +8,22 @@ Yarn version:
   1.22.18
 
 Node version: 
-  18.15.0
+  16.14.2
 
 Platform: 
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz: ESOCKETTIMEDOUT
+  Error: https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.4.tgz: ESOCKETTIMEDOUT
       at ClientRequest.<anonymous> (C:\Users\Onukw\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141510:19)
-      at Object.onceWrapper (node:events:627:28)
-      at ClientRequest.emit (node:events:513:28)
-      at TLSSocket.emitRequestTimeout (node:_http_client:848:9)
-      at Object.onceWrapper (node:events:627:28)
-      at TLSSocket.emit (node:events:525:35)
-      at Socket._onTimeout (node:net:570:8)
-      at listOnTimeout (node:internal/timers:569:17)
-      at process.processTimers (node:internal/timers:512:7)
+      at Object.onceWrapper (node:events:645:28)
+      at ClientRequest.emit (node:events:526:28)
+      at TLSSocket.emitRequestTimeout (node:_http_client:758:9)
+      at Object.onceWrapper (node:events:645:28)
+      at TLSSocket.emit (node:events:538:35)
+      at TLSSocket.Socket._onTimeout (node:net:501:8)
+      at listOnTimeout (node:internal/timers:559:17)
+      at processTimers (node:internal/timers:502:7)
 
 npm manifest: 
   {
@@ -40,6 +40,8 @@ npm manifest:
       "@emotion/styled": "^11.8.1",
       "@ensdomains/eth-ens-namehash": "^2.0.15",
       "@fontsource/roboto": "^4.5.3",
+      "@giphy/js-fetch-api": "^5.0.0",
+      "@giphy/react-components": "^7.1.0",
       "@lit-protocol/lit-node-client": "^2.1.114",
       "@rainbow-me/rainbowkit": "^0.12.8",
       "@reduxjs/toolkit": "^1.9.2",
@@ -71,6 +73,7 @@ npm manifest:
       "react-icons": "^4.10.1",
       "react-image-file-resizer": "^0.4.8",
       "react-redux": "^8.0.5",
+      "react-resize-observer": "^1.1.1",
       "react-router-dom": "^6.2.2",
       "react-textarea-autosize": "^8.3.3",
       "redux": "^4.2.1",
@@ -85,7 +88,7 @@ npm manifest:
       "webextension-polyfill": "^0.10.0"
     },
     "devDependencies": {
-      "@lit-protocol/types": "^2.1.114",
+      "@lit-protocol/types": "2.1.114",
       "@types/chrome": "0.0.184",
       "@types/google-map-react": "^2.1.5",
       "@types/jest": "^25.2.3",
