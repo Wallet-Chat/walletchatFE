@@ -411,7 +411,7 @@ export default function Sidebar() {
         )}
       </Flex>
       <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
-        <ToggleColorMode />
+        {/* <ToggleColorMode /> */}
         <SidebarLink to='/dm/new'>
           <Button
             size='sm'
