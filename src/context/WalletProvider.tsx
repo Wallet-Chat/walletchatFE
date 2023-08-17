@@ -540,7 +540,7 @@ const WalletProviderContext = (chains: any) => {
         const currentTime = new Date().getTime()
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
-        if (currentTime - lastTimestamp > oneDay) {
+        //if (currentTime - lastTimestamp > oneDay) {
           analytics.track('ConnectWallet', {
             site: document.referrer,
             account: accountAddress,
@@ -556,7 +556,7 @@ const WalletProviderContext = (chains: any) => {
           })
           
           storage.set('last-wallet-connection-timestamp', currentTime)
-        }
+        //}
       }
 
       analyticsRecord()
