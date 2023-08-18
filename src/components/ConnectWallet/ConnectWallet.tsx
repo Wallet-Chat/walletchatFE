@@ -7,6 +7,7 @@ import { getWidgetOriginName } from '@/helpers/widget'
 import { log } from '@/helpers/log'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
+import storage from '@/utils/extension-storage'
 import {
   selectAccount,
   selectIsAuthenticated,
@@ -99,6 +100,7 @@ const ConnectWalletButton = () => {
         React.useEffect(() => {
           if (connectedAccount) {
             // setNonce(null)
+            storage.set('current-address', connectedAccount.address)
             dispatch(setAccount(connectedAccount.address))
           }
         }, [connectedAccount])
