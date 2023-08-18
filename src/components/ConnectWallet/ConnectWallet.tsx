@@ -100,7 +100,7 @@ const ConnectWalletButton = () => {
         React.useEffect(() => {
           if (connectedAccount) {
             // setNonce(null)
-            storage.set('current-address', connectedAccount.address)
+            //storage.set('current-address', connectedAccount.address)
             dispatch(setAccount(connectedAccount.address))
           }
         }, [connectedAccount])

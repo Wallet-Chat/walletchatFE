@@ -109,7 +109,7 @@ const WalletProviderContext = (chains: any) => {
   const { disconnect, disconnectAsync } = useDisconnect()
 
   const accountAddress = useAppSelector(
-    (state) => selectAccount(state) || wagmiAddress || storage.get('current-address')
+    (state) => selectAccount(state) || wagmiAddress
   )
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
