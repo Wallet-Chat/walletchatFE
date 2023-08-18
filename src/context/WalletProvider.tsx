@@ -582,6 +582,7 @@ const WalletProviderContext = (chains: any) => {
         // revert prevAccount to default state so can log back in
         prevAccount.current = undefined
       }
+      return //we don't want to overwrite account to undefined (ex: GoodDollar)
     } else {
       didDisconnect.current = false
     }
