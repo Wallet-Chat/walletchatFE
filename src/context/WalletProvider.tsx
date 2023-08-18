@@ -109,7 +109,7 @@ const WalletProviderContext = (chains: any) => {
   const { disconnect, disconnectAsync } = useDisconnect()
 
   const accountAddress = useAppSelector(
-    (state) => selectAccount(state) || wagmiAddress
+    (state) => selectAccount(state) || wagmiAddress //|| storage.get('current-address')
   )
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
@@ -359,6 +359,8 @@ const WalletProviderContext = (chains: any) => {
           requestSignature: Boolean(withSignature),
         }
 
+        console.log("set account 5: updateAccountFromWidget: ", widgetWalletDataRef.current.account)
+        //storage.set('current-address', widgetWalletDataRef.current.account)
         dispatch(setAccount(widgetWalletDataRef.current.account))
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
@@ -584,6 +586,7 @@ const WalletProviderContext = (chains: any) => {
       didDisconnect.current = false
     }
 
+    console.log("set account 3: wagmiAddress: ", wagmiAddress)
     dispatch(setAccount(wagmiAddress))
   }, [wagmiAddress, dispatch])
 
@@ -594,6 +597,7 @@ const WalletProviderContext = (chains: any) => {
   const requestSIWEandFetchJWT = React.useCallback(async () => {
     let _accountAddress = accountAddress
     if(!accountAddress && widgetAuthSig?.account) {
+      console.log("set account 2: requestSIWEandFetchJWT: ", widgetAuthSig?.account)
       dispatch(setAccount(widgetAuthSig?.account)) 
       getNonce(widgetAuthSig?.account)
       _accountAddress = widgetAuthSig?.account
@@ -733,6 +737,7 @@ const WalletProviderContext = (chains: any) => {
     disconnect()
 
     widgetWalletDataRef.current = undefined
+    console.log("set account 1: disconnectWallet")
     dispatch(setAccount(null))
     setSiweLastFailure(null)
     siweFailedRef.current = false
