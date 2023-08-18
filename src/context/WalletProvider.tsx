@@ -108,14 +108,8 @@ const WalletProviderContext = (chains: any) => {
   const { connect, connectAsync } = useConnect()
   const { disconnect, disconnectAsync } = useDisconnect()
 
-  const [widgetAuthSig, setWidgetAuthSig] = React.useState<
-  undefined | { signature: undefined | null | string; msgToSign: string; 
-                walletName: undefined | null | string; account: undefined | null | string; chainId: number }
->()
-const widgetSignature = widgetAuthSig?.signature
-
   const accountAddress = useAppSelector(
-    (state) => selectAccount(state) || wagmiAddress || widgetAuthSig?.account
+    (state) => selectAccount(state) || wagmiAddress //|| storage.get('current-address')
   )
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
@@ -131,7 +125,11 @@ const widgetSignature = widgetAuthSig?.signature
   const [notifyDM, setNotifyDM] = React.useState('true')
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
-
+  const [widgetAuthSig, setWidgetAuthSig] = React.useState<
+    undefined | { signature: undefined | null | string; msgToSign: string; 
+                  walletName: undefined | null | string; account: undefined | null | string; chainId: number }
+  >()
+  const widgetSignature = widgetAuthSig?.signature
 
   const [siwePending, setSiwePending] = React.useState<boolean>(false)
   const [siweLastFailure, setSiweLastFailure] = React.useState<null | number>(
