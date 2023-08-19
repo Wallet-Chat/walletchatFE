@@ -85,7 +85,8 @@ const ConnectWalletButton = () => {
     //TODO: check for existing JWT (account is usually null here though)
     postMessage({ target: 'do_parent_sign_in' })
 
-    resetWidgetDataWithSignature()
+    //resetWidgetDataWithSignature()
+    
     // const canSignIn = await requestSIWEandFetchJWT()
     // if (canSignIn && account) {
     //   signIn(account, getJwtForAccount(account) || '')

@@ -259,7 +259,7 @@ const CommunityGroupChat = ({
 
   return (
     <Flex flexDirection='column' height='100%'>
-      <AlertBubble color='green'>{supportHeader}</AlertBubble>
+      {/* <AlertBubble color='green'>{supportHeader}</AlertBubble> */}
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex
