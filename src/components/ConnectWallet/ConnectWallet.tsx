@@ -135,7 +135,7 @@ const ConnectWalletButton = () => {
                       Sign In
                     </Tag>
                     <Box whiteSpace='break-spaces'>
-                      Sign Into {handleLogin()}
+                      Sign Into {getWidgetOriginName() || 'WalletChat'}
                     </Box>
                   </Button>
                   {isClicked && (
