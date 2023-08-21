@@ -196,7 +196,7 @@ export default function Sidebar() {
   const urlToCheck = (window.location != window.parent.location)
                         ? document.referrer
                         : document.location.href
-  const supportDisabled = urlToCheck.includes("good") //skip support for goodDollar
+  const supportDisabled = false //urlToCheck.includes("good") //skip support for goodDollar
 
   const nftNotificationCount = 0
   const [url, setUrl] = useState<string | undefined>('')
