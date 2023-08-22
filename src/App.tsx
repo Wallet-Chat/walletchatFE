@@ -63,7 +63,10 @@ export const App = () => {
       if (data) {
         const { contractAddress, itemId, network, redirect, ownerAddress } = data
 
+        console.log("got message with data: ", data)
+
         if (ownerAddress) {
+          console.log("got message with ownerAddress: ", ownerAddress)
           navigate(`/dm/${ownerAddress}`)
         }
       }
