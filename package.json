@@ -14,7 +14,7 @@
     "@fontsource/roboto": "^4.5.3",
     "@giphy/js-fetch-api": "^5.0.0",
     "@giphy/react-components": "^7.1.0",
-    "@lit-protocol/lit-node-client": "^2.1.114",
+    "@lit-protocol/lit-node-client": "2.1.114",
     "@rainbow-me/rainbowkit": "^0.12.8",
     "@reduxjs/toolkit": "^1.9.2",
     "@segment/analytics-next": "^1.51.2",
