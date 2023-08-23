@@ -73,6 +73,11 @@ export const App = () => {
     })
   }, [navigate])
 
+  useEffect(() => {
+    console.log("goodwallet is awake!")
+    postMessage({ target: 'goodwallet_is_awake' })
+  }, [])
+
   const isSmallLayout = useIsSmallLayout()
 
   if (!isAuthenticated) {
