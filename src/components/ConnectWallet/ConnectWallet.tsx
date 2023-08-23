@@ -22,6 +22,7 @@ const ConnectWalletButton = () => {
     siwePending,
     requestSIWEandFetchJWT,
     signIn,
+    forceRefresh,
     resetWidgetDataWithSignature,
     pendingConnect,
     clearWidgetData,
@@ -110,7 +111,7 @@ const ConnectWalletButton = () => {
                   variant='black'
                   size='lg'
                   onClick={
-                    siweFailed ? requestSIWEandFetchJWT : openConnectModal
+                    siweFailed ? requestSIWEandFetchJWT : forceRefresh
                   }
                 >
                   {siweFailed ? 'Retry signature' : 'Sign in using wallet'}

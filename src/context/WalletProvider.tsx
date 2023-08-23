@@ -18,6 +18,7 @@ import {
 } from 'wagmi'
 import { CoinbaseWalletConnector } from '@wagmi/core/connectors/coinbaseWallet'
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
+import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 import { API } from 'react-wallet-chat/dist/src/types'
@@ -45,6 +46,7 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
+import { ethers } from 'ethers'
 
 const isWidget = getIsWidgetContext()
 
@@ -117,7 +119,7 @@ const WalletProviderContext = (chains: any) => {
 
   const initialJwt = accountAddress && storage.get('jwt')
   const accountAuthenticated =
-    accountAddress && chainId && wagmiConnected
+    accountAddress && chainId
       ? getHasJwtForAccount(accountAddress)
       : null
 
@@ -585,6 +587,14 @@ const WalletProviderContext = (chains: any) => {
   }, [chain?.id])
 
   const requestSIWEandFetchJWT = React.useCallback(async () => {
+      console.log('FORCING LEDGER IFRAME PROVIDER FOR LEDGER LIVE')
+      const _instance = new IFrameEthereumProvider()
+      const _provider = new ethers.providers.Web3Provider(_instance);
+      const _account = await _provider.getSigner().getAddress()
+      const network = await _provider.getNetwork()
+      await setChainId(network.chainId)
+      const _signer = await _provider.getSigner()
+      await dispatch(setAccount(_account))
     const walletIsConnected = accountAddress && chainId
 
     const accountHasNoJwt =
@@ -639,7 +649,7 @@ const WalletProviderContext = (chains: any) => {
 
         messageToSign = siweMessage.prepareMessage()
 
-        const signer = await wagmi.fetchSigner()
+        let signer = _signer  //await wagmi.fetchSigner()
 
         try {
           signature = await signer?.signMessage(messageToSign)
@@ -726,6 +736,9 @@ const WalletProviderContext = (chains: any) => {
     dispatch(setIsAuthenticated(false))
   }, [disconnect, dispatch])
 
+  const forceRefresh = React.useCallback(async () => {
+    dispatch(setIsAuthenticated(true))
+  }, [dispatch])
   React.useEffect(() => {
     if (widgetWalletData) {
       previousWidgetData.current = widgetWalletData
@@ -746,6 +759,7 @@ const WalletProviderContext = (chains: any) => {
       setNotifyDM,
       setNotify24,
       disconnectWallet,
+      forceRefresh,
       web3: currentProvider && new Web3(currentProvider),
       signIn,
       provider: currentProvider,
@@ -773,6 +787,7 @@ const WalletProviderContext = (chains: any) => {
       siwePending,
       requestSIWEandFetchJWT,
       disconnectWallet,
+      forceRefresh,
       updateAccountFromWidget,
       widgetWalletData,
       pendingConnect,

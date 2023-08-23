@@ -1,0 +1,42 @@
+{
+    "id": "walletchat_2",
+    "name": "WalletChat_2",
+    "url": "http://127.0.0.1",
+    "params": {
+      "dappUrl": "http://127.0.0.1:5173",
+      "nanoApp": "WalletChat_2",
+      "dappName": "WalletChat_2",
+      "networks": [
+        {
+          "currency": "ethereum",
+          "chainID": 1,
+          "nodeURL": "wss://eth-mainnet.ws.alchemyapi.io/v2/xxx"
+        }
+      ]
+    },
+    "homepageUrl": "https://walletchat.fun",
+    "icon": "https://walletchat-pfp-storage.sgp1.digitaloceanspaces.com/WalletChat.jpg",
+    "platform": "all",
+    "apiVersion": "0.0.1",
+    "manifestVersion": "1",
+    "branch": "stable",
+    "categories": [
+      "nfts",
+      "defi"
+    ],
+     "currencies": [
+      "ethereum"
+    ],
+    "content": {
+      "shortDescription": {
+        "en": "WalletChat: The Web3 Social Layer"
+      },
+      "description": {
+        "en": "Message any web3 wallet, from your existing wallet. DApps can also integrate WalletChat messaging for their users, using our simple widget."
+      }
+    },
+    "permissions": [],
+    "domains": [
+      "https://*"
+    ]
+}
