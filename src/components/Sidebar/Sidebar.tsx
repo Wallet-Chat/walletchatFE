@@ -511,7 +511,7 @@ export default function Sidebar() {
                 mt={2}
               >
                 <Text fontSize='sm' mt={2} color='lightgray.900'>
-                  WalletChat Ver. {ENV.REACT_APP_VERSION}
+                  WalletChat Ver. 2.1 LL
                 </Text>
                 <Flex alignItems='center'>
                   <CLink href='https://twitter.com/wallet_chat' target='_blank'>
