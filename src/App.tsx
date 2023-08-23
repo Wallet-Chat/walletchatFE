@@ -43,6 +43,7 @@ import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
+import { postMessage } from '@/helpers/widget'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
