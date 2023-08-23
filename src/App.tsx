@@ -40,7 +40,6 @@ import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
-import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
@@ -108,11 +107,7 @@ export const App = () => {
             <div>
             <HStack><br></br></HStack>
 
-            <Heading size='lg'>Receive Unread Count Notifications in Metamask Browser Extension:</Heading>
-            <Heading size='s'>*** Install Flash Version of Metamask in New Browser Profile  ***</Heading>
-            <Link href="https://metamask.io/flask/" target="_blank">
-                 MM Flask Required to Install WalletChat Snap - Install Here<FlaskFox />
-            </Link>
+            <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
             <Button
                 variant='black'
                 size='lg'
