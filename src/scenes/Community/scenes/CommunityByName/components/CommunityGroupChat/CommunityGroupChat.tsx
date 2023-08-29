@@ -23,13 +23,15 @@ import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
-import { Link as RLink } from 'react-router-dom'
+import { Link, Link as RLink } from 'react-router-dom'
+import TextareaAutosize from 'react-textarea-autosize'
 import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
 import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
+import { getSupportWallet } from '@/helpers/widget'
 
 import {
   GroupMessageType,
@@ -256,33 +258,37 @@ const CommunityGroupChat = ({
 
   const supportHeader =
     ENV.REACT_APP_SUPPORT_HEADER ||
-    'Please use the support tab on the left for direct team support'
+    'Click Here for Direct Team Support'
 
-  const AlertBubble = ({
+    const AlertBubble = ({
       children,
       color,
+      to, // Add a prop to specify the target route
     }: {
-      children: string
-      color: 'green' | 'red'
+      children: string;
+      color: 'green' | 'red';
+      to: string; // Specify the target route
     }) => (
-      <Flex
-        justifyContent='center'
-        alignItems='center'
-        borderRadius='lg'
-        background={color === 'green' ? 'green.200' : 'red.200'}
-        p={4}
-        position='sticky'
-        top={0}
-        right={0}
-        zIndex={1}
-      >
-        <Box fontSize='md'>{children}</Box>
-      </Flex>
-    )
+      <Link to={to}>
+        <Flex
+          justifyContent='center'
+          alignItems='center'
+          borderRadius='lg'
+          background={color === 'green' ? 'green.200' : 'red.200'}
+          p={4}
+          position='sticky'
+          top={0}
+          right={0}
+          zIndex={1}
+        >
+          <Box fontSize='md'>{children}</Box>
+        </Flex>
+      </Link>
+    );
 
   return (
     <Flex flexDirection='column' height='100%'>
-      <AlertBubble color='green'>{supportHeader}</AlertBubble>
+      <AlertBubble to={`/dm/${getSupportWallet()}`}color="green">{supportHeader}</AlertBubble>
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex
