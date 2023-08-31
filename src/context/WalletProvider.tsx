@@ -27,6 +27,8 @@ import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
 import { endpoints, upsertQueryData } from '@/redux/reducers/dm'
+import { isMobile } from 'react-device-detect'
+
 import {
   selectAccount,
   selectIsAuthenticated,
@@ -199,14 +201,16 @@ const WalletProviderContext = (chains: any) => {
 
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
-      
-      // window.ethereum.request({
-      //   method: 'wallet_invokeSnap',
-      //   params: {
-      //     snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
-      //     request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
-      //   },
-      // });
+     
+      if(!isMobile) {
+        window.ethereum.request({
+          method: 'wallet_invokeSnap',
+          params: {
+            snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+            request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
+          },
+        });
+      }
 
       Lit.setAuthSig(address)
       Lit.connectManual()
@@ -540,7 +544,7 @@ const WalletProviderContext = (chains: any) => {
         const currentTime = new Date().getTime()
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
-        //if (currentTime - lastTimestamp > oneDay) {
+        if (currentTime - lastTimestamp > oneDay) {
           analytics.track('ConnectWallet', {
             site: document.referrer,
             account: accountAddress,
@@ -556,7 +560,7 @@ const WalletProviderContext = (chains: any) => {
           })
           
           storage.set('last-wallet-connection-timestamp', currentTime)
-        //}
+        }
       }
 
       analyticsRecord()

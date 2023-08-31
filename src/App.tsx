@@ -41,7 +41,7 @@ import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
-import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
+
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 //for debug printing manually on/off from console
@@ -118,6 +118,30 @@ export const App = () => {
             >
               <Image src={logoTwitter} width='25px' />
             </Link>
+          </HStack>
+
+          <HStack>
+          {!isMobile && !isChromeExtension() && (
+            <div>
+            <HStack><br></br></HStack>
+
+            <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: {},
+                    },
+                  });
+                }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
+            </div>
+          )}
           </HStack>
         </Box>
       </Flex>

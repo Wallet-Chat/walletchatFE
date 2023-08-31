@@ -7,16 +7,14 @@ import {
   useReducer,
 } from 'react';
 import { Snap } from '../types';
-import { isFlask, getSnap } from '../utils';
+import { getSnap } from '../utils';
 
 export type MetamaskState = {
-  isFlask: boolean;
   installedSnap?: Snap;
   error?: Error;
 };
 
 const initialState: MetamaskState = {
-  isFlask: false,
   error: undefined,
 };
 
@@ -33,7 +31,6 @@ export const MetaMaskContext = createContext<
 
 export enum MetamaskActions {
   SetInstalled = 'SetInstalled',
-  SetFlaskDetected = 'SetFlaskDetected',
   SetError = 'SetError',
 }
 
@@ -43,12 +40,6 @@ const reducer: Reducer<MetamaskState, MetamaskDispatch> = (state, action) => {
       return {
         ...state,
         installedSnap: action.payload,
-      };
-
-    case MetamaskActions.SetFlaskDetected:
-      return {
-        ...state,
-        isFlask: action.payload,
       };
 
     case MetamaskActions.SetError:
@@ -77,15 +68,6 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    async function detectFlask() {
-      const isFlaskDetected = await isFlask();
-
-      dispatch({
-        type: MetamaskActions.SetFlaskDetected,
-        payload: isFlaskDetected,
-      });
-    }
-
     async function detectSnapInstalled() {
       const installedSnap = await getSnap();
       dispatch({
@@ -94,12 +76,8 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
       });
     }
 
-    detectFlask();
-
-    if (state.isFlask) {
-      detectSnapInstalled();
-    }
-  }, [state.isFlask, window.ethereum]);
+    detectSnapInstalled();
+  }, [window.ethereum]);
 
   useEffect(() => {
     let timeoutId: number;
