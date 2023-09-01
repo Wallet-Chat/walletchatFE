@@ -44,6 +44,7 @@ import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
+import EnterReferral from './scenes/Me/scenes/EnterReferral/EnterReferral'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -121,6 +122,35 @@ export const App = () => {
           </HStack>
         </Box>
       </Flex>
+    )
+  }
+
+  if (isAuthenticated && !referral_code) {
+    return (
+      <Box>
+        <Flex
+          flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
+          minHeight={isSmallLayout ? '100vh' : 'unset'}
+          width='100vw'
+        >
+          <ExtensionCloseButton />
+
+          <Sidebar />
+
+          {referral_code === undefined ? (
+            <Flex
+              flexGrow={1}
+              justifyContent='center'
+              alignItems='center'
+              width='100%'
+            >
+              <Spinner />
+            </Flex>
+          ) : (
+            <EnterReferral />
+          )}
+        </Flex>
+      </Box>
     )
   }
 
