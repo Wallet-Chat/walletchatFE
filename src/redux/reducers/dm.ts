@@ -587,7 +587,9 @@ export const dmApi = createApi({
       transformResponse: async (response: any) => {
         log('✅[GET][ReferredUser]:', response)
 
-        return response[0]?.referralcode
+        const resp = response[0]?.referralcode
+
+        return resp || null
       },
       transformErrorResponse: createErrorResponse('Referral'),
     }),

@@ -23,6 +23,8 @@ import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { useWallet } from '@/context/WalletProvider'
+import { endpoints } from '@/redux/reducers/dm'
+import { useAppDispatch } from '@/hooks/useDispatch'
 
 const EnterReferral = () => {
   const {
@@ -51,6 +53,7 @@ const EnterReferral = () => {
 
   const [code, setCode] = useState('')
   const [isFetching, setIsFetching] = useState(false)
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     log(errors)
@@ -84,6 +87,9 @@ const EnterReferral = () => {
         .then((response) => response.json())
         .then((response) => {
             log('✅[POST][ReferralCode Valid!]:', response)
+
+            //update client side global variable referral_code
+            dispatch(endpoints.getReferredUser.initiate(account?.toLocaleLowerCase()));
 
             ReactGA.event({
               category: "EnteredReferralCode",
