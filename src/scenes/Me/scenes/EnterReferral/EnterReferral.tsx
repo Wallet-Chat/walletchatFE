@@ -4,6 +4,7 @@ import {
   Divider,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
   Input,
   Text,
@@ -118,12 +119,6 @@ const EnterReferral = () => {
         d='inline-block'
         verticalAlign='middle'
       />
-      <Divider
-        orientation='horizontal'
-        height='15px'
-        d='inline-block'
-        verticalAlign='middle'
-      />
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormControl>
           <FormLabel fontSize='2xl'>Please Enter the Referral Code:</FormLabel>
@@ -155,9 +150,9 @@ const EnterReferral = () => {
               <IconSend size='20' />
             </Button>
           </Flex>
-          {/* <FormHelperText>
-            format is wc-xxxxxxxxxx
-          </FormHelperText> */}
+          <FormHelperText>
+            If you do not have a code please reach out to <a href="https://twitter.com/@wallet_chat">@wallet_chat</a> on Twitter!
+          </FormHelperText>
           {errors.referralCode &&
             errors.referralCode.type === 'required' &&
             // <FormErrorMessage>No blank code please</FormErrorMessage>
