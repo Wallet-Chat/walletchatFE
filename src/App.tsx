@@ -130,7 +130,9 @@ export const App = () => {
     )
   }
 
-  if (isAuthenticated && typeof referralCode === "string" && (referralCode != "existinguser" && !referralCode.startsWith("wc-"))) {
+  if (isAuthenticated &&
+      (typeof referralCode !== "string" ||
+      (referralCode !== "existinguser" && !referralCode.startsWith("wc-")))) {
     return (
       <Box>
         <Flex
