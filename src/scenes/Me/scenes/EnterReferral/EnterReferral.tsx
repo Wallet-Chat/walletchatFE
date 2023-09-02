@@ -107,6 +107,7 @@ const EnterReferral = () => {
             duration: 2500,
             isClosable: true,
           })
+          setReferredUserStatus(account)
           console.error('🚨[POST][Name]:', error)
         })
         .then(() => {

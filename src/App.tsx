@@ -29,6 +29,7 @@ import EnterEmail from './scenes/Me/scenes/EnterEmail'
 import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
 import VerifySuccess from './scenes/Me/scenes/VerifySuccess'
+import EnterReferral from './scenes/Me/scenes/EnterReferral/EnterReferral'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -44,7 +45,6 @@ import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
-import EnterReferral from './scenes/Me/scenes/EnterReferral/EnterReferral'
 import { useWallet } from './context/WalletProvider'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints

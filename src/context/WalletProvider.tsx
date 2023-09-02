@@ -158,7 +158,15 @@ const WalletProviderContext = (chains: any) => {
 
   const updateReferralStatus = React.useCallback(
     (address: undefined | string) =>
-    dispatch(endpoints.getReferredUser.initiate(address?.toLocaleLowerCase())),
+    dispatch(
+      upsertQueryData(
+        'getReferredUser',
+        address
+          ? address.toLocaleLowerCase()
+          : accountAddress?.toLocaleLowerCase(),
+        null
+      )
+    ),
     [accountAddress, dispatch]
   )
 
