@@ -10,10 +10,8 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { IconSend } from '@tabler/icons'
-import OpenSeaNFT from '../../../../types/OpenSea/NFT'
 import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
@@ -23,8 +21,6 @@ import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { useWallet } from '@/context/WalletProvider'
-import { endpoints } from '@/redux/reducers/dm'
-import { useAppDispatch } from '@/hooks/useDispatch'
 
 const EnterReferral = () => {
   const {
@@ -50,11 +46,7 @@ const EnterReferral = () => {
   const { setReferredUserStatus: globalSetReferredUserStatus } = useWallet()
   const account = useAppSelector((state) => selectAccount(state))
   const toast = useToast()
-
-  const navigate = useNavigate()
-
   const [isFetching, setIsFetching] = useState(false)
-  const dispatch = useAppDispatch()
 
   useEffect(() => {
     log(errors)
