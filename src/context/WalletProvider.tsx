@@ -226,6 +226,7 @@ const WalletProviderContext = (chains: any) => {
       }
 
       dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
+      dispatch(endpoints.getReferredUser.initiate(accountAddress?.toLocaleLowerCase()))
 
       getSettings(address)
       dispatch(setIsAuthenticated(true))
