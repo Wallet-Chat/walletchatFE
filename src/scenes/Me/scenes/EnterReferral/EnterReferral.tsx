@@ -46,6 +46,7 @@ const EnterReferral = () => {
   })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
+  const { setReferredUserStatus } = useWallet()
   const account = useAppSelector((state) => selectAccount(state))
   const toast = useToast()
 
@@ -89,15 +90,13 @@ const EnterReferral = () => {
             log('✅[POST][ReferralCode Valid!]:', response)
 
             //update client side global variable referral_code
-            dispatch(endpoints.getReferredUser.initiate(account?.toLocaleLowerCase()));
+            setReferredUserStatus(account)
 
             ReactGA.event({
               category: "EnteredReferralCode",
               action: "EnteredReferralCode",
               label: "EnteredReferralCode", // optional
             });
-    
-          navigate('/me/entername')
         })
         .catch((error) => {
           toast({

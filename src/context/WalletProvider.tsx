@@ -156,6 +156,12 @@ const WalletProviderContext = (chains: any) => {
     [accountAddress, dispatch]
   )
 
+  const updateReferralStatus = React.useCallback(
+    (address: undefined | string) =>
+    dispatch(endpoints.getReferredUser.initiate(address?.toLocaleLowerCase())),
+    [accountAddress, dispatch]
+  )
+
   const getSettings = React.useCallback((address: string) => {
     fetch(
       ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${address}`,
@@ -338,7 +344,7 @@ const WalletProviderContext = (chains: any) => {
           })
       }
     }
-  }, [accountAddress, updateName, signIn])
+  }, [accountAddress, updateName, updateReferralStatus, signIn])
 
   // Updates the necessary state to signIn to WalletChat with an account based on widget provided data
   // Currently only needs account address & chainId
@@ -739,6 +745,7 @@ const WalletProviderContext = (chains: any) => {
       notifyDM,
       notify24,
       setName: updateName,
+      setReferredUserStatus: updateReferralStatus,
       telegramCode,
       telegramHandle,
       setEmail,
@@ -769,6 +776,7 @@ const WalletProviderContext = (chains: any) => {
       telegramHandle,
       currentProvider,
       updateName,
+      updateReferralStatus,
       signIn,
       siweLastFailure,
       siwePending,
