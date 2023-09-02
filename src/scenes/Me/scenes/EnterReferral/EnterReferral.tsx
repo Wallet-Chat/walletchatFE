@@ -82,7 +82,7 @@ const EnterReferral = () => {
             log('✅[POST][ReferralCode Valid!]:', response)
 
             //update client side global variable referral_code
-            globalSetReferredUserStatus(account)
+            globalSetReferredUserStatus("existinguser", account)
 
             ReactGA.event({
               category: "EnteredReferralCode",
@@ -99,7 +99,6 @@ const EnterReferral = () => {
             duration: 2500,
             isClosable: true,
           })
-          globalSetReferredUserStatus(account)
           console.error('🚨[POST][Name]:', error)
         })
         .then(() => {

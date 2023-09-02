@@ -157,14 +157,14 @@ const WalletProviderContext = (chains: any) => {
   )
 
   const updateReferralStatus = React.useCallback(
-    (address: undefined | string) =>
+    (newCode: null | string, address: undefined | string) =>
     dispatch(
       upsertQueryData(
         'getReferredUser',
         address
           ? address.toLocaleLowerCase()
           : accountAddress?.toLocaleLowerCase(),
-        null
+        newCode
       )
     ),
     [accountAddress, dispatch]
@@ -315,6 +315,23 @@ const WalletProviderContext = (chains: any) => {
         accountAddress.toLocaleLowerCase()
       ) {
         prevAccount.current = accountAddress.toLocaleLowerCase()
+
+        fetch(
+          ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_valid_referred_user`,
+          getFetchOptions(accountAddress)
+        )
+          .then((response) => response.json())
+          .then(async (response) => {
+            log('✅[GET][ReferralStatus]:', response)
+            if(response[0]?.referralcode) {
+              updateReferralStatus(response[0]?.referralcode, accountAddress)
+            } else {
+              log('✅[GET][ReferralStatus - Not Validated!]:')
+            }
+          })
+          .catch((error) => {
+            log('🚨[GET][ReferralStatus]:', error)
+          })
 
         fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,

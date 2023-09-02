@@ -60,7 +60,7 @@ export const App = () => {
   )
   const { currentData: referralCode } = endpoints.getReferredUser.useQueryState(
     account?.toLocaleLowerCase()
-  )
+  ) 
 
   const navigate = useNavigate()
   useEffect(() => {
@@ -130,7 +130,7 @@ export const App = () => {
     )
   }
 
-  if (isAuthenticated && !referralCode) {
+  if (isAuthenticated && typeof referralCode === "string" && (referralCode != "existinguser" && !referralCode.startsWith("wc-"))) {
     return (
       <Box>
         <Flex
