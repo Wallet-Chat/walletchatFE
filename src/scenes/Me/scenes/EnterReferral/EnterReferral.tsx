@@ -46,13 +46,13 @@ const EnterReferral = () => {
   })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
-  const { setReferredUserStatus } = useWallet()
+  const [referralCode, setReferralCode] = useState('')
+  const { setReferredUserStatus: globalSetReferredUserStatus } = useWallet()
   const account = useAppSelector((state) => selectAccount(state))
   const toast = useToast()
 
   const navigate = useNavigate()
 
-  const [code, setCode] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const dispatch = useAppDispatch()
 
@@ -75,10 +75,10 @@ const EnterReferral = () => {
       return
     }
 
-    if (values?.code) {
+    if (values?.referralCode) {
       setIsFetching(true)
 
-      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/redeem_referral_code/${code}`, {
+      fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/redeem_referral_code/${referralCode}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -90,7 +90,7 @@ const EnterReferral = () => {
             log('✅[POST][ReferralCode Valid!]:', response)
 
             //update client side global variable referral_code
-            setReferredUserStatus(account)
+            globalSetReferredUserStatus(account)
 
             ReactGA.event({
               category: "EnteredReferralCode",
@@ -107,7 +107,7 @@ const EnterReferral = () => {
             duration: 2500,
             isClosable: true,
           })
-          setReferredUserStatus(account)
+          globalSetReferredUserStatus(account)
           console.error('🚨[POST][Name]:', error)
         })
         .then(() => {
@@ -140,13 +140,13 @@ const EnterReferral = () => {
             <Input
               type='text'
               size='lg'
-              value={code}
+              value={referralCode}
               placeholder='wc-xxxxxxxxx'
               borderColor='black'
-              {...register('code', {
+              {...register('referralCode', {
                 required: true,
                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                  setCode(e.target.value)
+                  setReferralCode(e.target.value)
                 },
               })}
             />
@@ -158,7 +158,7 @@ const EnterReferral = () => {
               onClick={() => {
                 log('SUBMIT BTN')
                 log(errors)
-                log(code)
+                log(referralCode)
               }}
             >
               <IconSend size='20' />
@@ -167,12 +167,12 @@ const EnterReferral = () => {
           {/* <FormHelperText>
             format is wc-xxxxxxxxxx
           </FormHelperText> */}
-          {errors.code &&
-            errors.code.type === 'required' &&
+          {errors.referralCode &&
+            errors.referralCode.type === 'required' &&
             // <FormErrorMessage>No blank code please</FormErrorMessage>
             toast({
               title: 'FAILED',
-              description: `No blank/invalid code please ${errors.code}`,
+              description: `No blank/invalid code please ${errors.referralCode}`,
               status: 'error',
               position: 'top',
               duration: 2000,

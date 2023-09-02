@@ -58,7 +58,7 @@ export const App = () => {
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
-  const { currentData: referral_code } = endpoints.getReferredUser.useQueryState(
+  const { currentData: referralCode } = endpoints.getReferredUser.useQueryState(
     account?.toLocaleLowerCase()
   )
 
@@ -130,7 +130,7 @@ export const App = () => {
     )
   }
 
-  if (isAuthenticated && !referral_code) {
+  if (isAuthenticated && !referralCode) {
     return (
       <Box>
         <Flex
@@ -142,7 +142,7 @@ export const App = () => {
 
           <Sidebar />
 
-          {referral_code === undefined ? (
+          {referralCode === undefined ? (
             <Flex
               flexGrow={1}
               justifyContent='center'
