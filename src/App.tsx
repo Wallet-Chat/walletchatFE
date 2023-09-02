@@ -45,6 +45,7 @@ import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 import EnterReferral from './scenes/Me/scenes/EnterReferral/EnterReferral'
+import { useWallet } from './context/WalletProvider'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -57,6 +58,10 @@ export const App = () => {
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
+  const { currentData: referral_code } = endpoints.getReferredUser.useQueryState(
+    account?.toLocaleLowerCase()
+  )
+
   const navigate = useNavigate()
   useEffect(() => {
     window.addEventListener('message', (e) => {

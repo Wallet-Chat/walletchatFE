@@ -22,6 +22,7 @@ import { log } from '@/helpers/log'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
+import { useWallet } from '@/context/WalletProvider'
 
 const EnterReferral = () => {
   const {
@@ -50,34 +51,6 @@ const EnterReferral = () => {
 
   const [code, setCode] = useState('')
   const [isFetching, setIsFetching] = useState(false)
-  const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
- 
-  useEffect(() => {
-    const getOwnedENS = () => {
-      if (account) {
-        log('No account detected')
-      }
-      fetch(`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/opensea_asset_owner_ens/${account}`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-           'Content-Type': 'application/json',
-           Authorization: `Bearer ${getJwtForAccount(account)}`,
-        },
-       })
-        .then((response) => response.json())
-        .then((result) => {
-          log(`✅[GET][ENS Owned by ${account}]]:`, result)
-          if (result?.assets?.length > 0) {
-            setOwnedENS(result.assets)
-          }
-        })
-        .catch((error) => log(`🚨[GET][ENS Owned by ${account}`, error))
-    }
-    if (account) {
-      getOwnedENS()
-    }
-  }, [account])
 
   useEffect(() => {
     log(errors)
