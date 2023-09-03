@@ -29,6 +29,7 @@ import EnterEmail from './scenes/Me/scenes/EnterEmail'
 import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
 import VerifySuccess from './scenes/Me/scenes/VerifySuccess'
+import EnterReferral from './scenes/Me/scenes/EnterReferral/EnterReferral'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -44,6 +45,7 @@ import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
+import { useWallet } from './context/WalletProvider'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -56,6 +58,10 @@ export const App = () => {
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
+  const { currentData: referralCode } = endpoints.getReferredUser.useQueryState(
+    account?.toLocaleLowerCase()
+  ) 
+
   const navigate = useNavigate()
   useEffect(() => {
     window.addEventListener('message', (e) => {
@@ -145,6 +151,37 @@ export const App = () => {
           </HStack>
         </Box>
       </Flex>
+    )
+  }
+
+  if (isAuthenticated &&
+      (typeof referralCode !== "string" ||
+      (referralCode !== "existinguser" && !referralCode.startsWith("wc-")))) {
+    return (
+      <Box>
+        <Flex
+          flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
+          minHeight={isSmallLayout ? '100vh' : 'unset'}
+          width='100vw'
+        >
+          <ExtensionCloseButton />
+
+          <Sidebar />
+
+          {referralCode === undefined ? (
+            <Flex
+              flexGrow={1}
+              justifyContent='center'
+              alignItems='center'
+              width='100%'
+            >
+              <Spinner />
+            </Flex>
+          ) : (
+            <EnterReferral />
+          )}
+        </Flex>
+      </Box>
     )
   }
 

@@ -158,6 +158,20 @@ const WalletProviderContext = (chains: any) => {
     [accountAddress, dispatch]
   )
 
+  const updateReferralStatus = React.useCallback(
+    (newCode: null | string, address: undefined | string) =>
+    dispatch(
+      upsertQueryData(
+        'getReferredUser',
+        address
+          ? address.toLocaleLowerCase()
+          : accountAddress?.toLocaleLowerCase(),
+        newCode
+      )
+    ),
+    [accountAddress, dispatch]
+  )
+
   const getSettings = React.useCallback((address: string) => {
     fetch(
       ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${address}`,
@@ -230,6 +244,7 @@ const WalletProviderContext = (chains: any) => {
       }
 
       dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
+      dispatch(endpoints.getReferredUser.initiate(accountAddress?.toLocaleLowerCase()))
 
       getSettings(address)
       dispatch(setIsAuthenticated(true))
@@ -306,6 +321,23 @@ const WalletProviderContext = (chains: any) => {
         prevAccount.current = accountAddress.toLocaleLowerCase()
 
         fetch(
+          ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_valid_referred_user`,
+          getFetchOptions(accountAddress)
+        )
+          .then((response) => response.json())
+          .then(async (response) => {
+            log('✅[GET][ReferralStatus]:', response)
+            if(response[0]?.referralcode) {
+              updateReferralStatus(response[0]?.referralcode, accountAddress)
+            } else {
+              log('✅[GET][ReferralStatus - Not Validated!]:')
+            }
+          })
+          .catch((error) => {
+            log('🚨[GET][ReferralStatus]:', error)
+          })
+
+        fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,
           getFetchOptions(accountAddress)
         )
@@ -341,7 +373,7 @@ const WalletProviderContext = (chains: any) => {
           })
       }
     }
-  }, [accountAddress, updateName, signIn])
+  }, [accountAddress, updateName, updateReferralStatus, signIn])
 
   // Updates the necessary state to signIn to WalletChat with an account based on widget provided data
   // Currently only needs account address & chainId
@@ -742,6 +774,7 @@ const WalletProviderContext = (chains: any) => {
       notifyDM,
       notify24,
       setName: updateName,
+      setReferredUserStatus: updateReferralStatus,
       telegramCode,
       telegramHandle,
       setEmail,
@@ -772,6 +805,7 @@ const WalletProviderContext = (chains: any) => {
       telegramHandle,
       currentProvider,
       updateName,
+      updateReferralStatus,
       signIn,
       siweLastFailure,
       siwePending,
