@@ -1,14 +1,17 @@
 // Leaderboard.tsx
 
 import React, { useEffect, useState } from 'react';
-//import { useAppSelector } from './hooks/useSelector'
-//import { selectAccount } from './redux/reducers/account'
+import { useAppSelector } from './hooks/useSelector'
+import { selectAccount } from './redux/reducers/account'
 import axios from 'axios';
-
-//const account = useAppSelector((state) => selectAccount(state))
+import * as ENV from '@/constants/env'
+import { getJwtForAccount } from '@/helpers/jwt'
 
 const Leaderboard = () => {
+  const account = useAppSelector((state) => selectAccount(state))
+
   const [leaderboardData, setLeaderboardData] = useState([]);
+  const [referralCodes, setReferralCodes] = useState([]);
 
   useEffect(() => {
     axios.get('https://api.v2.walletchat.fun/get_leaderboard_data')
@@ -18,10 +21,56 @@ const Leaderboard = () => {
       .catch((error) => {
         console.error('Error fetching leaderboard data:', error);
       });
+
+      fetch(
+        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_referral_code`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((response) => {
+            setReferralCodes(response);
+          })
+        .catch((error) => {
+          console.error('🚨[GET][Get Referral Codes Failed]:', error)
+        })
   }, []);
 
   return (
     <div className="leaderboard">
+
+      <h2>Referral Codes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {referralCodes.map((code) => (
+            <tr key={code.Id}>
+              <td>
+                {code.redeemed ? (
+                  <del>{code.code}</del>
+                ) : (
+                  <>
+                    {code.code}
+                  </>
+                )}
+              </td>
+              <td>{code.redeemed ? 'Redeemed' : 'Not Redeemed'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <h1>Leaderboard</h1>
       <table>
         <thead>
