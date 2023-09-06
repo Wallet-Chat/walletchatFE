@@ -205,7 +205,7 @@ const VerifyEmail = () => {
    const urlParams = new URLSearchParams(location.search);
   verificationcode = urlParams.get('code')
   verificationemail = urlParams.get('email')
-  if (isVerifySuccess && !_telegramcode) {
+  if (isVerifySuccess && !_telegramcode && (twitterVerified == "true" || twitterVerified == '')) {
     return (
       <Box p={6} pt={16} background='white' width='100%'>
         <form>
@@ -223,7 +223,7 @@ const VerifyEmail = () => {
         </Alert>
       </Box>
     )
-  } else if (verificationcode === null) {
+  } else if (verificationcode === null || twitterVerified == "false") {
     getSettings()
 
     return (
