@@ -44,10 +44,13 @@ const ChangeEmail = () => {
   const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
   const { telegramHandle, setTelegramHandle } = useWallet()
   const { telegramCode, setTelegramCode } = useWallet()
+  const { twitterUsername, setTwitterUsername } = useWallet()
+  const { twitterVerified, setTwitterVerified } = useWallet()
   const dmBool = _notifyDM === 'true'
   const dailyBool = _notify24 === 'true'
   const [email, setEmail] = useState('')
   const [telegramhandle, setTgHandle] = useState('')
+  const [twitterusername, setTwitterUsernameLocal] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [isDialogOn, setIsDialogOn] = useState(false)
 
@@ -188,7 +191,7 @@ const ChangeEmail = () => {
   }
 
   const onSubmit = (values: any) => {
-      if (values?.email || values?.telegramhandle) {
+      if (values?.email || values?.telegramhandle || values?.twitterusername) {
       setIsFetching(true)
 
       fetch(
@@ -206,18 +209,25 @@ const ChangeEmail = () => {
             walletaddr: account,
             signupsite: document.referrer,
             domain: document.domain,
+            twitteruser: values.twitterusername,
           }),
         }
       )
         .then((response) => response.json())
         .then((response) => {
-          log('✅[POST][Email]:', response)
+          log('✅[POST][Update Settings]:', response)
 
           if (values?.email) {
             globalSetEmail(values.email)
           }
           if (values?.telegramhandle) {
             setTelegramHandle(values.telegramhandle)
+          }
+          if (values?.twitterusername) {
+            setTwitterUsername(values.twitterusername)
+          }
+          if (values?.twitterverified) {
+            setTwitterVerified(values.twitterverified)
           }
           navigate('/me/verify-email')
         })
@@ -305,6 +315,22 @@ const ChangeEmail = () => {
                   }
               />
             </Flex>
+            <Text color="darkgray.300" fontSize="md" mb={1}>Current Twitter Username: <b>{twitterUsername}</b>     Verified w/WalletChat: <b>{twitterVerified}</b></Text>
+            <Flex>
+              <Input
+                  type="text"
+                  size="lg"
+                  value={twitterusername}
+                  placeholder="@yourTwitterUsername"
+                  borderColor="black"
+                  {...register('twitterusername', {
+                    required: false,
+                  })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTwitterUsernameLocal(e.target.value)
+                  }
+              />
+            </Flex>
             <Flex>
               <Button
                 variant='black'
@@ -338,9 +364,26 @@ const ChangeEmail = () => {
                    </Text>
                    </div>
                )}
-          {errors.email && errors.email.type === 'required' && (
-            <FormErrorMessage>No blank email please</FormErrorMessage>
-          )}
+               {twitterUsername && (twitterVerified != "true") && (
+                   <div>
+                   <br />
+                   <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                     Verify Twitter
+                     <br />
+                   </Text>
+                   <Text fontSize="xl" mb={1}>
+                      <a
+                        href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(Lets%20F'n%20Chat!)%20%40wallet_chat"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Tweet Via This Link To Verify!
+                      </a>
+                   </Text>
+                   <Text fontSize="lg" mb={1}>Twitter verification will occur within one minute after Tweeting the above verification.              
+                   </Text>
+                   </div>
+               )}
         </FormControl>
       </form>
     </Box>
