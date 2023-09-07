@@ -29,6 +29,7 @@ import EnterEmail from './scenes/Me/scenes/EnterEmail'
 import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
 import VerifySuccess from './scenes/Me/scenes/VerifySuccess'
+import EnterReferral from './scenes/Me/scenes/EnterReferral/EnterReferral'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -41,9 +42,10 @@ import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
-import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
+
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
+import { useWallet } from './context/WalletProvider'
 import Leaderboard from './Leaderboard';
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
@@ -57,6 +59,10 @@ export const App = () => {
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
+  const { currentData: referralCode } = endpoints.getReferredUser.useQueryState(
+    account?.toLocaleLowerCase()
+  ) 
+
   const navigate = useNavigate()
   useEffect(() => {
     window.addEventListener('message', (e) => {
@@ -120,8 +126,63 @@ export const App = () => {
               <Image src={logoTwitter} width='25px' />
             </Link>
           </HStack>
+
+          <HStack>
+          {!isMobile && !isChromeExtension() && (
+            <div>
+            <HStack><br></br></HStack>
+
+            <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: {},
+                    },
+                  });
+                }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
+            </div>
+          )}
+          </HStack>
         </Box>
       </Flex>
+    )
+  }
+
+  if (isAuthenticated &&
+      (typeof referralCode !== "string" ||
+      (referralCode !== "existinguser" && !referralCode.startsWith("wc-")))) {
+    return (
+      <Box>
+        <Flex
+          flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
+          minHeight={isSmallLayout ? '100vh' : 'unset'}
+          width='100vw'
+        >
+          <ExtensionCloseButton />
+
+          <Sidebar />
+
+          {referralCode === undefined ? (
+            <Flex
+              flexGrow={1}
+              justifyContent='center'
+              alignItems='center'
+              width='100%'
+            >
+              <Spinner />
+            </Flex>
+          ) : (
+            <EnterReferral />
+          )}
+        </Flex>
+      </Box>
     )
   }
 

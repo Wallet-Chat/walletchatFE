@@ -27,6 +27,8 @@ import Lit from '../utils/lit'
 import * as ENV from '@/constants/env'
 import { getFetchOptions } from '@/helpers/fetch'
 import { endpoints, upsertQueryData } from '@/redux/reducers/dm'
+import { isMobile } from 'react-device-detect'
+
 import {
   selectAccount,
   selectIsAuthenticated,
@@ -158,6 +160,20 @@ const WalletProviderContext = (chains: any) => {
     [accountAddress, dispatch]
   )
 
+  const updateReferralStatus = React.useCallback(
+    (newCode: null | string, address: undefined | string) =>
+    dispatch(
+      upsertQueryData(
+        'getReferredUser',
+        address
+          ? address.toLocaleLowerCase()
+          : accountAddress?.toLocaleLowerCase(),
+        newCode
+      )
+    ),
+    [accountAddress, dispatch]
+  )
+
   const getSettings = React.useCallback((address: string) => {
     fetch(
       ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_settings/${address}`,
@@ -209,14 +225,16 @@ const WalletProviderContext = (chains: any) => {
 
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
-      
-      // window.ethereum.request({
-      //   method: 'wallet_invokeSnap',
-      //   params: {
-      //     snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
-      //     request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
-      //   },
-      // });
+     
+      if(!isMobile) {
+        window.ethereum.request({
+          method: 'wallet_invokeSnap',
+          params: {
+            snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+            request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
+          },
+        });
+      }
 
       Lit.setAuthSig(address)
       Lit.connectManual()
@@ -236,6 +254,7 @@ const WalletProviderContext = (chains: any) => {
       }
 
       dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
+      dispatch(endpoints.getReferredUser.initiate(accountAddress?.toLocaleLowerCase()))
 
       getSettings(address)
       dispatch(setIsAuthenticated(true))
@@ -312,6 +331,23 @@ const WalletProviderContext = (chains: any) => {
         prevAccount.current = accountAddress.toLocaleLowerCase()
 
         fetch(
+          ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_valid_referred_user`,
+          getFetchOptions(accountAddress)
+        )
+          .then((response) => response.json())
+          .then(async (response) => {
+            log('✅[GET][ReferralStatus]:', response)
+            if(response[0]?.referralcode) {
+              updateReferralStatus(response[0]?.referralcode, accountAddress)
+            } else {
+              log('✅[GET][ReferralStatus - Not Validated!]:')
+            }
+          })
+          .catch((error) => {
+            log('🚨[GET][ReferralStatus]:', error)
+          })
+
+        fetch(
           ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/welcome`,
           getFetchOptions(accountAddress)
         )
@@ -347,7 +383,7 @@ const WalletProviderContext = (chains: any) => {
           })
       }
     }
-  }, [accountAddress, updateName, signIn])
+  }, [accountAddress, updateName, updateReferralStatus, signIn])
 
   // Updates the necessary state to signIn to WalletChat with an account based on widget provided data
   // Currently only needs account address & chainId
@@ -550,7 +586,7 @@ const WalletProviderContext = (chains: any) => {
         const currentTime = new Date().getTime()
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
-        //if (currentTime - lastTimestamp > oneDay) {
+        if (currentTime - lastTimestamp > oneDay) {
           analytics.track('ConnectWallet', {
             site: document.referrer,
             account: accountAddress,
@@ -566,7 +602,7 @@ const WalletProviderContext = (chains: any) => {
           })
           
           storage.set('last-wallet-connection-timestamp', currentTime)
-        //}
+        }
       }
 
       analyticsRecord()
@@ -748,6 +784,7 @@ const WalletProviderContext = (chains: any) => {
       notifyDM,
       notify24,
       setName: updateName,
+      setReferredUserStatus: updateReferralStatus,
       telegramCode,
       telegramHandle,
       twitterUsername,
@@ -784,6 +821,7 @@ const WalletProviderContext = (chains: any) => {
       twitterVerified,
       currentProvider,
       updateName,
+      updateReferralStatus,
       signIn,
       siweLastFailure,
       siwePending,
