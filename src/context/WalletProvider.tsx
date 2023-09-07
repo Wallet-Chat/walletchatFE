@@ -227,6 +227,14 @@ const WalletProviderContext = (chains: any) => {
     (address: string, jwt: string) => {
      
       if(!isMobile) {
+        //make sure to connect first 
+        window.ethereum.request({
+          method: 'wallet_requestSnaps',
+          params: {
+            ["npm:walletchat-metamask-snap"]: {},
+          },
+        });
+
         window.ethereum.request({
           method: 'wallet_invokeSnap',
           params: {
