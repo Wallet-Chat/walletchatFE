@@ -150,9 +150,17 @@ const EnterReferral = () => {
               <IconSend size='20' />
             </Button>
           </Flex>
-          <FormHelperText>
-            If you do not have a code please reach out to <a href="https://twitter.com/@wallet_chat">@wallet_chat</a> on Twitter!
-          </FormHelperText>
+          <FormLabel fontSize="l">
+            If you do not have a code please&nbsp;       
+            <a
+              href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(I%20need%20a%20code!)%20%40wallet_chat"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'blue', textDecoration: 'underline' }}
+            >
+                Tweet @wallet_chat!
+            </a> or email us: contact@walletchat.fun
+          </FormLabel>
           {errors.referralCode &&
             errors.referralCode.type === 'required' &&
             // <FormErrorMessage>No blank code please</FormErrorMessage>

@@ -382,6 +382,7 @@ const ChangeEmail = () => {
                         href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(Lets%20F'n%20Chat!)%20%40wallet_chat"
                         target="_blank"
                         rel="noopener noreferrer"
+                        style={{ color: 'blue', textDecoration: 'underline' }}
                       >
                         Tweet Via This Link To Verify!
                       </a>
