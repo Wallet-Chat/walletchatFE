@@ -127,6 +127,8 @@ const WalletProviderContext = (chains: any) => {
   const [email, setEmail] = React.useState(null)
   const [telegramCode, setTelegramCode] = React.useState(null)
   const [telegramHandle, setTelegramHandle] = React.useState(null)
+  const [twitterUsername, setTwitterUsername] = React.useState(null)
+  const [twitterVerified, setTwitterVerified] = React.useState(null)
   const [notifyDM, setNotifyDM] = React.useState('true')
   const [notify24, setNotify24] = React.useState('true')
   const [delegate, setDelegate] = React.useState<null | string>(null)
@@ -206,6 +208,14 @@ const WalletProviderContext = (chains: any) => {
         if (data[0]?.telegramhandle) {
           log('-[telegramcode]:', data[0].telegramhandle)
           setTelegramHandle(data[0].telegramhandle)
+        }
+        if (data[0]?.twitteruser) {
+          log('-[twitteruser]:', data[0].twitteruser)
+          setTwitterUsername(data[0].twitteruser)
+        }
+        if (data[0]?.twitterverified) {
+          log('-[twitterverified]:', data[0].twitterverified)
+          setTwitterVerified(data[0].twitterverified)
         }
       })
       .catch((error: any) => {
@@ -777,9 +787,13 @@ const WalletProviderContext = (chains: any) => {
       setReferredUserStatus: updateReferralStatus,
       telegramCode,
       telegramHandle,
+      twitterUsername,
+      twitterVerified,
       setEmail,
       setTelegramCode,
       setTelegramHandle,
+      setTwitterUsername,
+      setTwitterVerified,
       setNotifyDM,
       setNotify24,
       disconnectWallet,
@@ -803,6 +817,8 @@ const WalletProviderContext = (chains: any) => {
       notifyDM,
       telegramCode,
       telegramHandle,
+      twitterUsername,
+      twitterVerified,
       currentProvider,
       updateName,
       updateReferralStatus,

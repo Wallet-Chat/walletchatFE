@@ -46,6 +46,7 @@ import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 import { useWallet } from './context/WalletProvider'
+import Leaderboard from './Leaderboard';
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -394,6 +395,15 @@ export const App = () => {
                 }
               />
             </Route>
+
+            <Route
+                path='/leaderboard'
+                element={
+                  <Flex flexGrow={1}>
+                    <Leaderboard />
+                  </Flex>
+                }
+              />
 
             <Route path='/' element={<Navigate to='/dm' replace />} />
             <Route path='/index.html' element={<Navigate to='/dm' replace />} />

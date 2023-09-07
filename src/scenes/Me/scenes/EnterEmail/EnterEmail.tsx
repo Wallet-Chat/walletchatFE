@@ -46,7 +46,8 @@ const EnterEmail = () => {
   const dmBool = _notifyDM === 'true'
   const dailyBool = _notify24 === 'true'
   const [email, setEmail] = useState('')
-   const [tgHandle, setTgHandle] = useState('')
+  const [tgHandle, setTgHandle] = useState('')
+  const [twitterUsername, setTwitterUsername] = useState('')
   const [isFetching, setIsFetching] = useState(false)
 
   const handleChangeOne = (checked: boolean) => {
@@ -126,7 +127,7 @@ const EnterEmail = () => {
   }
 
   const onSubmit = (values: any) => {
-      if (values?.email || values?.telegramhandle) {
+      if (values?.email || values?.telegramhandle || values?.twitterusername) {
       setIsFetching(true)
 
       fetch(
@@ -140,21 +141,22 @@ const EnterEmail = () => {
           },
           body: JSON.stringify({
             email: values.email,
-               telegramhandle: values.telegramhandle,
+            telegramhandle: values.telegramhandle,
             walletaddr: account,
             notify24: _notify24,
             notifyDM: _notifyDM,
             signupsite: document.referrer,
             domain: document.domain,
+            twitteruser: values.twitterusername
           }),
         }
       )
         .then((response) => response.json())
         .then((response) => {
-          log('✅[POST][Email]:', response)
+          log('✅[POST][Update Settings]:', response)
           toast({
             title: 'Success',
-            description: `Email updated to ${email}`,
+            description: `Settings Updated Successfully`,
             status: 'success',
             position: 'top',
             duration: 2000,
@@ -165,6 +167,9 @@ const EnterEmail = () => {
           }
           if (values?.telegramhandle) {
             setTelegramHandle(values.telegramhandle)
+          }
+          if (values?.twitterusername) {
+            setTwitterUsername(values.twitterusername)
           }
           navigate('/me/verify-email')
         })
@@ -238,6 +243,21 @@ const EnterEmail = () => {
                   })}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setTgHandle(e.target.value)
+                  }
+              />
+            </Flex>
+            <Flex>
+              <Input
+                  type="text"
+                  size="lg"
+                  value={twitterUsername}
+                  placeholder="@funTwitterUsername"
+                  borderColor="black"
+                  {...register('twitterusername', {
+                    required: false,
+                  })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTwitterUsername(e.target.value)
                   }
               />
             </Flex>

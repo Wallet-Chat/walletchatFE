@@ -52,7 +52,9 @@ const VerifyEmail = () => {
    let navigate = useNavigate()
   const toast = useToast()
   const { email: _email, setEmail: globalSetEmail } = useWallet()
-   const { telegramCode: _telegramcode, setTelegramCode } = useWallet()
+  const { telegramCode: _telegramcode, setTelegramCode } = useWallet()
+  const { twitterUsername, setTwitterUsername } = useWallet()
+  const { twitterVerified, setTwitterVerified } = useWallet()
   const [isFetching, setIsFetching] = useState(false)
   const [fetchError, setFetchError] = useState(false)
   const [emailVerified, setEmailVerified] = useState("")
@@ -178,8 +180,21 @@ const VerifyEmail = () => {
                log('-[telegramcode]:', data[0].telegramcode)
                setTelegramCode(data[0].telegramcode)
             }
+            if (data[0]?.twitteruser) {
+              log('-[twitteruser]:', data[0].twitteruser)
+              setTwitterUsername(data[0].twitteruser)
+            }
+            if (data[0]?.twitterverified) {
+              log('-[twitterverified]:', data[0].twitterverified)
+              setTwitterVerified(data[0].twitterverified)
+            }
 
-            if ((data[0]?.verified == "true" || data[0]?.verified == '') && data[0]?.telegramcode == '') {
+            //if (email is verified or no email entered) AND 
+            //telegramcode is empty (either not entered or its cleared after verification) AND
+            //
+            if ((data[0]?.verified == "true" || data[0]?.verified == '') && 
+                (data[0]?.telegramcode == '') &&
+                (data[0]?.twitterverified == "true" || data[0]?.twitterverified == '')) {
               navigate(`/community/${getCommunity()}`)
             }
          })
@@ -190,7 +205,7 @@ const VerifyEmail = () => {
    const urlParams = new URLSearchParams(location.search);
   verificationcode = urlParams.get('code')
   verificationemail = urlParams.get('email')
-  if (isVerifySuccess && !_telegramcode) {
+  if (isVerifySuccess && !_telegramcode && (twitterVerified == "true" || twitterVerified == '')) {
     return (
       <Box p={6} pt={16} background='white' width='100%'>
         <form>
@@ -208,7 +223,7 @@ const VerifyEmail = () => {
         </Alert>
       </Box>
     )
-  } else if (verificationcode === null) {
+  } else if (verificationcode === null || twitterVerified == "false") {
     getSettings()
 
     return (
@@ -267,6 +282,26 @@ const VerifyEmail = () => {
                 </Text>
                 </div>
             )}
+            {twitterUsername && (twitterVerified != "true") && (
+                   <div>
+                   <br />
+                   <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                     Verify Twitter
+                     <br />
+                   </Text>
+                   <Text fontSize="xl" mb={1}>
+                      <a
+                        href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(Lets%20F'n%20Chat!)%20%40wallet_chat"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Tweet Via This Link To Verify!
+                      </a>
+                   </Text>
+                   <Text fontSize="lg" mb={1}>Twitter verification will occur within one minute after Tweeting the above verification.              
+                   </Text>
+                   </div>
+               )}
           </FormControl>
         </form>
         {fetchError && (
