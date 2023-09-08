@@ -433,7 +433,7 @@ const WalletProviderContext = (chains: any) => {
               const currentSigs = storage.get('lit-auth-signature-by-account')
               storage.set('lit-auth-signature-by-account', {
                 ...currentSigs,
-                [matchedAccount.toLocaleLowerCase()]: widgetAuthSig,
+                [matchedAccount.toLocaleLowerCase()]: messageData,
               })
     
               signIn(matchedAccount, signInData.access)

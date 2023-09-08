@@ -69,7 +69,9 @@ function litDecryptionForMessages(
           : { unifiedAccessControlConditions: accessControlConditions }
       )
         .then(onDecryptionSuccess(i))
-        .catch(() => {
+        .catch((error) => {
+          console.error("Error during LIT decryption:", error)
+
           // const messagesLeft = messages.slice(i)
           // setTimeout(
           //   () =>
