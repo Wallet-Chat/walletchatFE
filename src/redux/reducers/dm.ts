@@ -70,7 +70,7 @@ function litDecryptionForMessages(
       )
         .then(onDecryptionSuccess(i))
         .catch((error) => {
-          console.error("Error during LIT decryption:", error)
+          log("Error during LIT decryption:", error)
 
           // const messagesLeft = messages.slice(i)
           // setTimeout(

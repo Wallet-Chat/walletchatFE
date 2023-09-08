@@ -1,5 +1,5 @@
 //export const getIsWidgetContext = () => window.parent !== window
-var DEBUG=true;
+var DEBUG=false;
 export var log = function(){
     if(DEBUG){
         console.log.apply(console, arguments);
