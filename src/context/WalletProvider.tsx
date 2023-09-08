@@ -211,6 +211,7 @@ const WalletProviderContext = (chains: any) => {
       log('✅[INFO][JWT]:', jwt)
       // if we log in with a full delegate, act as the vault
       const walletInJWT = parseJwt(jwt).sub
+      dispatch(setAccount(walletInJWT))
       if (walletInJWT.toLocaleLowerCase() !== address.toLocaleLowerCase()) {
         log(
           '✅[Using Full Delegate Wallet]:',
@@ -219,7 +220,6 @@ const WalletProviderContext = (chains: any) => {
         )
         storage.set('delegate', address)
         setDelegate(address) // not sure this is used anymore
-        dispatch(setAccount(walletInJWT))
       }
 
       dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
