@@ -386,15 +386,18 @@ export default function Sidebar() {
           </SidebarLink>
         )}
 
-        <SidebarLink to='/leaderboard'>
+          {/* active this when we finally add the leaderboard into the app */}
+        {/* <SidebarLink to='/leaderboard'>
           <Image src={IconLeaderboard} alt='' />
-        </SidebarLink>
+        </SidebarLink> */}
 
-        {/* <Flex align="center">
-        <Image src={IconLeaderboard} alt='' />
-          <button onClick={() => window.open('https://leaderboard.walletchat.fun', '_blank')}>
-        </button>
-        </Flex> */}
+        <Flex align="center">
+          <a href="https://leaderboard.walletchat.fun" target="_blank">
+            <button>
+              <Image src={IconLeaderboard} alt='leaderboard icon'/>
+            </button>
+          </a>
+        </Flex>
 
         {metadata && (
           <NFTSidebarLink to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
