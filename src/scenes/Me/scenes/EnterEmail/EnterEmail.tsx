@@ -9,6 +9,7 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
+  Heading,
   Input,
   Stack,
   Text,
@@ -26,6 +27,7 @@ import { getCommunity } from '@/helpers/widget'
 import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
 import { log } from '@/helpers/log'
+import { isMobile } from 'react-device-detect'
 
 const EnterEmail = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -49,6 +51,7 @@ const EnterEmail = () => {
   const [tgHandle, setTgHandle] = useState('')
   const [twitterUsername, setTwitterUsername] = useState('')
   const [isFetching, setIsFetching] = useState(false)
+  const [isDialogOn, setIsDialogOn] = useState(false)
 
   const handleChangeOne = (checked: boolean) => {
     //setCheckedItems([checked, checkedItems[1]])
@@ -120,6 +123,22 @@ const EnterEmail = () => {
       .catch((error) => {
         console.error('🚨[POST][Notify24]:', error)
       })
+  }
+
+  const handleChangeMM = async (checked: boolean) => {
+    setIsDialogOn(checked)
+    const method = checked ? 'set_dialog_on' : 'set_dialog_off'
+
+    if(!isMobile) {
+      const result = await window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+          request: { method: method, params: { apiKey: getJwtForAccount(account), address: account } },
+        },
+      });
+      log('✅[SNAPS][Update Dialog On]:', result)
+    }
   }
 
   const handleCancel = () => {
@@ -206,6 +225,29 @@ const EnterEmail = () => {
               Receive notifications summary email every 24 hours (DM, NFT,
               Community)
             </Checkbox>
+            {/* <Checkbox
+            size='lg'
+            isChecked={isDialogOn}
+            onChange={(e) => handleChangeMM(e.target.checked)}
+          >
+            Receive New Message Pop-Ups/Respond to New Messages In Metamask
+          </Checkbox> */}
+          <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: {},
+                    },
+                  });
+                }}
+                style={{ maxWidth: 'fit-content' }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
           </Stack>
           <Divider
             orientation='horizontal'

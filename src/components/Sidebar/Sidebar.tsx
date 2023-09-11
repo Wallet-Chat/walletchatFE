@@ -47,6 +47,7 @@ import IconDM from '../../images/icon-dm.svg'
 import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
 import IconSupport from '../../images/icon-feedback.svg'
+import IconLeaderboard from '../../images/icon-leaderboard.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
 import { getSupportWallet } from '@/helpers/widget'
@@ -384,6 +385,16 @@ export default function Sidebar() {
             <Image src={IconSupport} alt='' />
           </SidebarLink>
         )}
+
+        <SidebarLink to='/leaderboard'>
+          <Image src={IconLeaderboard} alt='' />
+        </SidebarLink>
+
+        {/* <Flex align="center">
+        <Image src={IconLeaderboard} alt='' />
+          <button onClick={() => window.open('https://leaderboard.walletchat.fun', '_blank')}>
+        </button>
+        </Flex> */}
 
         {metadata && (
           <NFTSidebarLink to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>
