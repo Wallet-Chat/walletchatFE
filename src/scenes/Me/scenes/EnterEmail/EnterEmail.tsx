@@ -134,6 +134,7 @@ const EnterEmail = () => {
         method: 'wallet_invokeSnap',
         params: {
           snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+          snapVersion: ENV.REACT_APP_SNAP_VERSION,
           request: { method: method, params: { apiKey: getJwtForAccount(account), address: account } },
         },
       });
@@ -240,7 +241,7 @@ const EnterEmail = () => {
                   window.ethereum.request({
                     method: 'wallet_requestSnaps',
                     params: {
-                      ["npm:walletchat-metamask-snap"]: {},
+                      ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
                     },
                   });
                 }}
