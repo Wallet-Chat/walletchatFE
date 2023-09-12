@@ -42,6 +42,7 @@ import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
+import * as ENV from '@/constants/env'
 
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
@@ -140,7 +141,7 @@ export const App = () => {
                   window.ethereum.request({
                     method: 'wallet_requestSnaps',
                     params: {
-                      ["npm:walletchat-metamask-snap"]: {},
+                      ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
                     },
                   });
                 }}

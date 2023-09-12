@@ -231,7 +231,7 @@ const WalletProviderContext = (chains: any) => {
         window.ethereum.request({
           method: 'wallet_requestSnaps',
           params: {
-            ["npm:walletchat-metamask-snap"]: {},
+            ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
           },
         });
 
@@ -239,6 +239,7 @@ const WalletProviderContext = (chains: any) => {
           method: 'wallet_invokeSnap',
           params: {
             snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+            snapVersion: ENV.REACT_APP_SNAP_VERSION,
             request: { method: 'set_snap_state', params: { apiKey: jwt, address } },
           },
         });

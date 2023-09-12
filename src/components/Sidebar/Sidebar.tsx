@@ -47,6 +47,7 @@ import IconDM from '../../images/icon-dm.svg'
 import IconCommunity from '../../images/icon-community.svg'
 import IconNFT from '../../images/icon-nft.svg'
 import IconSupport from '../../images/icon-feedback.svg'
+import IconLeaderboard from '../../images/icon-leaderboard.svg'
 import { isChromeExtension } from '../../helpers/chrome'
 import Avatar from '../Inbox/DM/Avatar'
 import { getSupportWallet } from '@/helpers/widget'
@@ -384,6 +385,19 @@ export default function Sidebar() {
             <Image src={IconSupport} alt='' />
           </SidebarLink>
         )}
+
+          {/* active this when we finally add the leaderboard into the app */}
+        {/* <SidebarLink to='/leaderboard'>
+          <Image src={IconLeaderboard} alt='' />
+        </SidebarLink> */}
+
+        <Flex align="center">
+          <a href="https://leaderboard.walletchat.fun" target="_blank">
+            <button>
+              <Image src={IconLeaderboard} alt='leaderboard icon'/>
+            </button>
+          </a>
+        </Flex>
 
         {metadata && (
           <NFTSidebarLink to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>

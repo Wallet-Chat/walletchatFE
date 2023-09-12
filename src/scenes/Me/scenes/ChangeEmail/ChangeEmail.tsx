@@ -9,6 +9,7 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
+  Heading,
   Input,
   Link,
   Stack,
@@ -54,20 +55,32 @@ const ChangeEmail = () => {
   const [twitterusername, setTwitterUsernameLocal] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [isDialogOn, setIsDialogOn] = useState(false)
+  const [isSnapInstalled, setIsSnapInstalled] = useState(false)
 
    const getSettings = async () => {
     //MM Snaps is not usable on mobile right now
     if(!isMobile) {
       try {
-        const snapState = await window.ethereum.request({
-          method: 'wallet_invokeSnap',
-          params: {
-            snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
-            request: { method: 'get_snap_state', params: { apiKey: getJwtForAccount(account), address: account } },
-          },
-        });
-        //log('-[snap state]:', snapState)
-        setIsDialogOn(snapState?.isDialogOn)
+        const snaps = await window.ethereum.request({
+          method: 'wallet_getSnaps',
+        }); 
+        if( Object.keys(snaps).includes('npm:walletchat-metamask-snap') ) { 
+          setIsSnapInstalled(true)
+
+          const snapState = await window.ethereum.request({
+            method: 'wallet_invokeSnap',
+            params: {
+              snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+              snapVersion: ENV.REACT_APP_SNAP_VERSION,
+              request: { method: 'get_snap_state', params: { apiKey: getJwtForAccount(account), address: account } },
+            },
+          });
+
+          //log('-[snap state]:', snapState)
+          setIsDialogOn(snapState?.isDialogOn)
+        } else {
+          setIsSnapInstalled(false)
+        }
       } catch(error) {
         console.error('🚨[GET][Snap State]:', error)
       }   
@@ -188,7 +201,8 @@ const ChangeEmail = () => {
       const result = await window.ethereum.request({
         method: 'wallet_invokeSnap',
         params: {
-          snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+          snapId: "npm:walletchat-metamask-snap",
+          snapVersion: ENV.REACT_APP_SNAP_VERSION,
           request: { method: method, params: { apiKey: getJwtForAccount(account), address: account } },
         },
       });
@@ -274,8 +288,28 @@ const ChangeEmail = () => {
             isChecked={isDialogOn}
             onChange={(e) => handleChangeMM(e.target.checked)}
           >
-            Receive New Message Pop-Ups/Respond to New Messages In Metmask
+            Receive New Message Pop-Ups/Respond to New Messages In Metamask
           </Checkbox>
+          {!isSnapInstalled && (
+          <div>
+          <Heading size='m'>Use WalletChat in the Metamask Browser Extension:</Heading>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
+                    },
+                  });
+                }}
+                style={{ maxWidth: 'fit-content' }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
+            </div>
+        )}
         </Stack>
         <Divider
           orientation='horizontal'
