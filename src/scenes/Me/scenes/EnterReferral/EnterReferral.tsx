@@ -159,7 +159,7 @@ const EnterReferral = () => {
               style={{ color: 'blue', textDecoration: 'underline' }}
             >
                 Tweet @wallet_chat!
-            </a> or email us: contact@walletchat.fun
+            </a>
           </FormLabel>
           {errors.referralCode &&
             errors.referralCode.type === 'required' &&
