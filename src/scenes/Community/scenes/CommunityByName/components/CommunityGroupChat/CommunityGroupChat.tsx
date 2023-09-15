@@ -258,7 +258,7 @@ const CommunityGroupChat = ({
 
   const supportHeader =
     ENV.REACT_APP_SUPPORT_HEADER ||
-    'Click Here for Direct Team Support'
+    'Check the leaderboard, share referral codes to earn more points! Chat to earn!'
 
     const AlertBubble = ({
       children,
@@ -288,7 +288,7 @@ const CommunityGroupChat = ({
 
   return (
     <Flex flexDirection='column' height='100%'>
-      <AlertBubble to={`/dm/${getSupportWallet()}`}color="green">{supportHeader}</AlertBubble>
+      <AlertBubble to={`https://leaderboard.walletchat.fun`}color="green">{supportHeader}</AlertBubble>
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex
