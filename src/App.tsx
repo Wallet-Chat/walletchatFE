@@ -95,7 +95,7 @@ export const App = () => {
         >
           <Image src={logoThumb} mb={5} width='40px' />
           <Heading size='2xl' mb={8}>
-            Login to start chatting
+          Log in to start chatting & earning 🏆
           </Heading>
 
           <ConnectWalletButton />
