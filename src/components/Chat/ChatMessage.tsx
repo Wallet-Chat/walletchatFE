@@ -372,12 +372,7 @@ const ChatMessage = ({
             />
           ) : ( */}
             <Box>
-              {msg.message?.includes("https") 
-                ? 
-                  <Image src={msg.message} alt='' height={60} width={60} />
-                : 
-                  msg.message
-              }
+              {msg.message}
             </Box>
           {/* )} */}
           <Box
