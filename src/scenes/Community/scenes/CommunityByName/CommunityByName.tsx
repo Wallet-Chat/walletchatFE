@@ -53,6 +53,7 @@ const CommunityByName = () => {
     // Insert the script content
     script.innerHTML = `
       // Twitter conversion tracking event code
+      console.log('Twitter pixel event code executed'); // Add this log
       twq('event', 'tw-ofu6x-ognnd', {
         value: null,
         conversion_id: null,
