@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
@@ -42,6 +42,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const [msgInput, setMsgInput] = useState<string>("")
   const [searchInput, setSearchInput] = useState<string>("")
   const [onShow, setOnShow] = useState<boolean>(true)
+  const prevMessage = useRef<null | string>()
 
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
@@ -207,6 +208,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     if (value.length <= 0) return
 
+    if(prevMessage.current == msgInput) return;
+
     analytics.track('SendMessage', {
       site: document.referrer,
       account,
@@ -220,6 +223,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       site: document.referrer,
       account,
     })
+
+    prevMessage.current = msgInput
 
     // // clear input field
     setMsgInput('');

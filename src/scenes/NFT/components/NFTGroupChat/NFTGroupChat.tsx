@@ -36,6 +36,7 @@ const NFTGroupChat = ({
   const [userPfpImage, setUserPfpImage] = useState<PfpType[]>([])
   let navigate = useNavigate()
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+  const prevMessage = useRef<null | string>()
 
   const analytics = AnalyticsBrowser.load({
     writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
@@ -121,6 +122,9 @@ const NFTGroupChat = ({
       return
     }
 
+    if(prevMessage.current == msgInput) return;
+
+    prevMessage.current = msgInput
     // Make a copy
     const msgInputCopy = (' ' + msgInput).slice(1)
 

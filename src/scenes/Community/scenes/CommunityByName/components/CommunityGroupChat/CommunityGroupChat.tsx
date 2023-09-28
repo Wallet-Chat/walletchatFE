@@ -63,6 +63,7 @@ const CommunityGroupChat = ({
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
   const [searchInput, setSearchInput] = useState<string>("")
   const { onClose } = useDisclosure();
+  const prevMessage = useRef<null | string>()
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
   const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
@@ -145,6 +146,8 @@ const CommunityGroupChat = ({
       return
     }
 
+    if(prevMessage.current == msgInput) return;
+
     analytics.track('SendCommunityMessage', {
        site: document.referrer,
        community,
@@ -163,6 +166,7 @@ const CommunityGroupChat = ({
 
     // Make a copy and clear input field
     const msgInputCopy = (' ' + msgInput).slice(1)
+    prevMessage.current = msgInput
     setMsgInput('')
 
     const timestamp = new Date()
