@@ -291,7 +291,7 @@ const VerifyEmail = () => {
                    </Text>
                    <Text fontSize="xl" mb={1}>
                       <a
-                        href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(Lets%20F'n%20Chat!)%20%40wallet_chat"
+                        href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(Lets%20F'n%20Chat!)%20%40wallet_chat%20%23chat2earn"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ color: 'blue', textDecoration: 'underline' }}

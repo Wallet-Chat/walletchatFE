@@ -153,7 +153,7 @@ const EnterReferral = () => {
           <FormLabel fontSize="l">
             If you do not have a code please&nbsp;       
             <a
-              href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(I%20need%20a%20code!)%20%40wallet_chat"
+              href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(I%20need%20a%20code!)%20%40wallet_chat%20%23chat2earn"
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: 'blue', textDecoration: 'underline' }}
