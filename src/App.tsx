@@ -87,25 +87,25 @@ export const App = () => {
     })
   }, [navigate])
 
-  // listener to receive msgs from react native
-  useEffect(() => {
-    const messageListener = window.addEventListener('message', (nativeEvent) => {
-      //console.log(nativeEvent?.data);
+  // // listener to receive msgs from react native
+  // useEffect(() => {
+  //   const messageListener = window.addEventListener('message', (nativeEvent) => {
+  //     //console.log(nativeEvent?.data);
 
-      //debug Android App
-      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-        body: JSON.stringify({
-          event: nativeEvent?.data,
-          debug: "kevin from main app",
-          origin: origin,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-      //end debug android app webview
-    });
-    return messageListener;
-  }, []);
+  //     //debug Android App
+  //     fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+  //       body: JSON.stringify({
+  //         event: nativeEvent?.data,
+  //         debug: "kevin from main app",
+  //         origin: origin,
+  //       }),
+  //       headers: { 'Content-Type': 'application/json' },
+  //       method: 'POST',
+  //     })
+  //     //end debug android app webview
+  //   });
+  //   return messageListener;
+  // }, []);
 
   useEffect(() => {
     console.log("goodwallet is awake!")
