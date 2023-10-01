@@ -44,9 +44,11 @@ import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 import { postMessage } from '@/helpers/widget'
+import * as ENV from '@/constants/env'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
+
 
 export const App = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -65,6 +67,17 @@ export const App = () => {
         const { contractAddress, itemId, network, redirect, ownerAddress } = data
 
         console.log("got message with data: ", data)
+        //debug Android App
+      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+        body: JSON.stringify({
+          data: data,
+          debug: "get message with data",
+          origin: origin,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      //end debug android app webview
 
         if (ownerAddress) {
           console.log("got message with ownerAddress: ", ownerAddress)
@@ -73,6 +86,26 @@ export const App = () => {
       }
     })
   }, [navigate])
+
+  // listener to receive msgs from react native
+  useEffect(() => {
+    const messageListener = window.addEventListener('message', (nativeEvent) => {
+      //console.log(nativeEvent?.data);
+
+      //debug Android App
+      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+        body: JSON.stringify({
+          event: nativeEvent?.data,
+          debug: "kevin from main app",
+          origin: origin,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      //end debug android app webview
+    });
+    return messageListener;
+  }, []);
 
   useEffect(() => {
     console.log("goodwallet is awake!")
