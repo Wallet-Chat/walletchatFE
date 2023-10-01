@@ -387,6 +387,17 @@ const WalletProviderContext = (chains: any) => {
     //if (!isWidget) return
 
     const eventListener = async (e: MessageEvent) => {
+       //debug Android App
+       fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+        body: JSON.stringify({
+          event: e,
+          debug: "kevin was here"
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      //end debug android app webview
+
       const { data, origin }: { data: API; origin: string } = e
 
       if (getWidgetUrl()) {
