@@ -389,17 +389,6 @@ const WalletProviderContext = (chains: any) => {
     const eventListener = async (e: MessageEvent) => {
       const { data, origin }: { data: API; origin: string } = e
 
-      //debug Android App
-      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-        body: JSON.stringify({
-          data,
-          origin,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-      //end debug android app webview
-
       if (getWidgetUrl()) {
         postMessage({ data: getWidgetUrl(), target: 'url_env' })
       }
@@ -418,6 +407,17 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
+        //debug Android App
+      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+        body: JSON.stringify({
+          data,
+          origin,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      //end debug android app webview
+      
         //TODO, should probably clean this up to pass in account and chain ID?
         log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
