@@ -384,25 +384,7 @@ const WalletProviderContext = (chains: any) => {
   }, [])
 
   React.useEffect(() => {
-    const messageListener = window.addEventListener('message', (nativeEvent) => {
-      console.log("You get here", nativeEvent?.data);
-    });
-    return messageListener;
-  }, []);
-
-  React.useEffect(() => {
-    if (!isWidget) {
-      //debug Android App
-      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-        body: JSON.stringify({
-          message: "you never made it"
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-      //end debug android app webview
-      return
-    }
+    //if (!isWidget) return
 
     const eventListener = async (e: MessageEvent) => {
       const { data, origin }: { data: API; origin: string } = e
