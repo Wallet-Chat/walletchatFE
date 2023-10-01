@@ -391,10 +391,7 @@ const WalletProviderContext = (chains: any) => {
 
       //debug Android App
       fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-        body: JSON.stringify({
-          data,
-          origin,
-        }),
+        body: data,
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
       })
