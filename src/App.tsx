@@ -70,6 +70,7 @@ export const App = () => {
           //debug Android App
           fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
             body: JSON.stringify({
+              debug: "APP.TSX print",
               event: e,
               data: data,
               origin: origin,
