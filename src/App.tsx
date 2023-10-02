@@ -67,18 +67,18 @@ export const App = () => {
 
         console.log("got message with data: ", data)
 
-          //debug Android App
-          fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-            body: JSON.stringify({
-              debug: "APP.TSX print",
-              event: e,
-              data: data,
-              origin: origin,
-            }),
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-          })
-          //end debug android app webview
+          // //debug Android App
+          // fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+          //   body: JSON.stringify({
+          //     debug: "APP.TSX print",
+          //     event: e,
+          //     data: data,
+          //     origin: origin,
+          //   }),
+          //   headers: { 'Content-Type': 'application/json' },
+          //   method: 'POST',
+          // })
+          // //end debug android app webview
 
         if (ownerAddress) {
           console.log("got message with ownerAddress: ", ownerAddress)
