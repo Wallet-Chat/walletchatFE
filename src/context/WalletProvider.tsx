@@ -389,18 +389,6 @@ const WalletProviderContext = (chains: any) => {
     const eventListener = async (e: MessageEvent) => {
       const { data, origin }: { data: API; origin: string } = e
 
-      //debug Android App
-      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-      body: JSON.stringify({
-        event: e,
-        data: data,
-        origin: origin,
-      }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
-    })
-    //end debug android app webview
-
       if (getWidgetUrl()) {
         postMessage({ data: getWidgetUrl(), target: 'url_env' })
       }
