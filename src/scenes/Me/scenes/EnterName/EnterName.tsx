@@ -28,7 +28,6 @@ import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
 import { createResizedImage } from '@/utils/resizer'
 import { getCommunity } from '@/helpers/widget'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
@@ -41,10 +40,6 @@ const EnterName = () => {
     setValue,
   } = useForm()
 
-  // help debug issues and watch for high traffic conditions
-  const analytics = AnalyticsBrowser.load({
-    writeKey: ENV.REACT_APP_SEGMENT_KEY,
-  })
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
     app: 'WalletChatApp',
@@ -226,15 +221,11 @@ const EnterName = () => {
           )
           
           //log new user event
-          analytics.track('NewSignup', {
-            site: document.referrer,
-            account,
-          })
-          ReactGA.event({
-            category: "NewSignup_ReactGA4",
-            action: "NewSignupAction",
-            label: "NewSignupLabel", // optional
-          });
+          // ReactGA.event({
+          //   category: "NewSignup_ReactGA4",
+          //   action: "NewSignupAction",
+          //   label: "NewSignupLabel", // optional
+          // });
           analyticsGA4.track('NewSignup_AnalyticsGA4', {
             site: document.referrer,
             account,

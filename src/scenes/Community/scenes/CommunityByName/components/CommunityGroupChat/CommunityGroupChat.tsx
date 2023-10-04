@@ -38,7 +38,6 @@ import {
   MessageUIType,
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
@@ -66,18 +65,17 @@ const CommunityGroupChat = ({
   const prevMessage = useRef<null | string>()
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
-  const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
- ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
-   /* Initialize analytics instance */
-   const analyticsGA4 = Analytics({
-    app: 'WalletChatApp',
-    plugins: [
-      /* Load Google Analytics v4 */
-      googleAnalyticsPlugin({
-        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-      }),
-    ],
-  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+    /* Initialize analytics instance */
+    const analyticsGA4 = Analytics({
+      app: 'WalletChatApp',
+      plugins: [
+        /* Load Google Analytics v4 */
+        googleAnalyticsPlugin({
+          measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+        }),
+      ],
+    })
 
   const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
 
@@ -148,11 +146,6 @@ const CommunityGroupChat = ({
 
     if(prevMessage.current == msgInput) return;
 
-    analytics.track('SendCommunityMessage', {
-       site: document.referrer,
-       community,
-       account
-     });
     // ReactGA.event({
     //   category: "SendCommunityMessageCategory",
     //   action: "SendCommunityMessage",
