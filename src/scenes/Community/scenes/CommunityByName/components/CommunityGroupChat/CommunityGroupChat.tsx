@@ -146,11 +146,11 @@ const CommunityGroupChat = ({
 
     if(prevMessage.current == msgInput) return;
 
-    ReactGA.event({
-      category: "SendCommunityMessageCategory",
-      action: "SendCommunityMessage",
-      label: "SendCommunityLabel", // optional
-    });
+    // ReactGA.event({
+    //   category: "SendCommunityMessageCategory",
+    //   action: "SendCommunityMessage",
+    //   label: "SendCommunityLabel", // optional
+    // });
     analyticsGA4.track('SendCommunityMessage', {
       site: document.referrer,
       community,

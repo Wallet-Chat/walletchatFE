@@ -127,11 +127,11 @@ const NFTChat = ({
   }
 
   const sendMessage = async () => {
-    ReactGA.event({
-      category: "SendNftMessageCategory",
-      action: "SendNftMessage",
-      label: "SendNftMessageLabel", // optional
-    });
+    // ReactGA.event({
+    //   category: "SendNftMessageCategory",
+    //   action: "SendNftMessage",
+    //   label: "SendNftMessageLabel", // optional
+    // });
     analyticsGA4.track('SendNftMessage', {
       site: document.referrer,
       account: account,
