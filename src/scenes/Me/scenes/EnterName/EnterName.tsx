@@ -221,11 +221,11 @@ const EnterName = () => {
           )
           
           //log new user event
-          // ReactGA.event({
-          //   category: "NewSignup_ReactGA4",
-          //   action: "NewSignupAction",
-          //   label: "NewSignupLabel", // optional
-          // });
+          ReactGA.event({
+            category: "NewSignup_ReactGA4",
+            action: "NewSignupAction",
+            label: "NewSignupLabel", // optional
+          });
           analyticsGA4.track('NewSignup_AnalyticsGA4', {
             site: document.referrer,
             account,

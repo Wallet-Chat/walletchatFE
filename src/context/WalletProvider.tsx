@@ -589,11 +589,11 @@ const WalletProviderContext = (chains: any) => {
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
         if (currentTime - lastTimestamp > oneDay) {
-          // ReactGA.event({
-          //   category: "ConnectWallet",
-          //   action: "ConnectWallet",
-          //   label: "TestLabel123", // optional
-          // });
+          ReactGA.event({
+            category: "ConnectWallet",
+            action: "ConnectWallet",
+            label: "TestLabel123", // optional
+          });
           analyticsGA4.track('ConnectWallet', {
             site: document.referrer,
             account: accountAddress,

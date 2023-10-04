@@ -205,11 +205,11 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     if(prevMessage.current == msgInput) return;
 
-    // ReactGA.event({
-    //   category: "SendMessageCategory",
-    //   action: "SendMessage",
-    //   label: "SendMessageLabel", // optional
-    // });
+    ReactGA.event({
+      category: "SendMessageCategory",
+      action: "SendMessage",
+      label: "SendMessageLabel", // optional
+    });
     analyticsGA4.track('SendMessage', {
       site: document.referrer,
       account,
