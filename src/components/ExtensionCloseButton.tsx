@@ -12,7 +12,7 @@ function ExtensionCloseButton() {
   }
 
   return (
-    <Flex textAlign='right' position='fixed' top={0} right={0} zIndex={10000}>
+    <Flex textAlign='right' position='fixed' top={20} right={0} zIndex={10000}>
       <Button
         borderBottomLeftRadius='lg'
         borderBottomRightRadius='lg'
