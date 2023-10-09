@@ -53,7 +53,6 @@ const Inbox = () => {
           >
             + New
           </Button>
-          <ExtensionCloseButton />
         </Flex>
         <InboxSearchInput />
       </Box>
