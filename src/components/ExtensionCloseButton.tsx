@@ -24,12 +24,51 @@ function ExtensionCloseButton() {
         h='4'
         w='12'
         onClick={() => {
+          //debug Android App
+          fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+            body: JSON.stringify({
+              event: "onClick() occured!!!!!"
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          })
+          //end debug android app webview
           if (isExtension) { 
+            //debug Android App
+            fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+              body: JSON.stringify({
+                event: "isExtension"
+              }),
+              headers: { 'Content-Type': 'application/json' },
+              method: 'POST',
+            })
+            //end debug android app webview
             window.close();
           } else if (window.parent) {
+            //debug Android App
+          fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+            body: JSON.stringify({
+              event: "window.parent was defined...",
+              data: window.parent,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          })
+          //end debug android app webview
             window.parent.postMessage({ target: 'close_widget' }, '*');
           } else {
-            window.ReactNativeWebView.postMessage(JSON.stringify({ target: 'close_widget' }));
+            const message = {
+              target: 'close_widget',
+              data: 'No need to have this',
+            };
+             //debug Android App
+            fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+              body: JSON.stringify(message),
+              headers: { 'Content-Type': 'application/json' },
+              method: 'POST',
+            })
+            //end debug android app webview
+            window.ReactNativeWebView.postMessage(JSON.stringify(message));
           }
         }}
       >
