@@ -49,7 +49,7 @@ function ExtensionCloseButton() {
             const isLoadedInWebView = window.ReactNativeWebView.extraData.isLoadedInWebView;
           
             if (isLoadedInWebView) {
-              code specific to being loaded in a WebView
+              //code specific to being loaded in a WebView
               const message = {
                 target: 'close_widget',
                 data: 'No need to have this',
