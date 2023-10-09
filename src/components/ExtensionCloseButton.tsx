@@ -49,7 +49,7 @@ function ExtensionCloseButton() {
             //debug Android App
           fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
             body: JSON.stringify({
-              event: "window.parent was defined..."
+              event: "window.parent was defined..." + window.parent
             }),
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
