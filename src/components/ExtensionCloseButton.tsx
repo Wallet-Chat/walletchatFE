@@ -49,8 +49,7 @@ function ExtensionCloseButton() {
             //debug Android App
           fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
             body: JSON.stringify({
-              event: "window.parent was defined...",
-              data: window.parent,
+              event: "window.parent was defined..."
             }),
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
@@ -63,8 +62,10 @@ function ExtensionCloseButton() {
               data: 'No need to have this',
             };
              //debug Android App
-            fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-              body: JSON.stringify(message),
+             fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+              body: JSON.stringify({
+                event: "close_widget case"
+              }),
               headers: { 'Content-Type': 'application/json' },
               method: 'POST',
             })
