@@ -45,31 +45,11 @@ function ExtensionCloseButton() {
             })
             //end debug android app webview
             window.close();
-          } else if (window.ReactNativeWebView && window.ReactNativeWebView.extraData) {
-            const isLoadedInWebView = window.ReactNativeWebView.extraData.isLoadedInWebView;
-          
-            if (isLoadedInWebView) {
-              //code specific to being loaded in a WebView
-              const message = {
-                target: 'close_widget',
-                data: 'No need to have this',
-              };
-               //debug Android App
-               fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-                body: JSON.stringify({
-                  event: "close_widget case"
-                }),
-                headers: { 'Content-Type': 'application/json' },
-                method: 'POST',
-              })
-              //end debug android app webview
-              window.ReactNativeWebView.postMessage(JSON.stringify(message));
-            }
           } else if (window.parent) {
             //debug Android App
           fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
             body: JSON.stringify({
-              event: "window.parent was defined..."
+              event: "window.parent was defined..." + window.parent.location.href
             }),
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
