@@ -23,13 +23,15 @@ function ExtensionCloseButton() {
         px={1}
         h='4'
         w='12'
-        onClick={() =>
-          isExtension
-            ? window.close()
-            : window.parent 
-              ? window.parent.postMessage({ target: 'close_widget' }, '*')
-              : window.postMessage({ target: 'close_widget' }, 'https://gooddollar.walletchat.fun')
-        }
+        onClick={() => {
+          if (isExtension) { 
+            window.close();
+          } else if (window.parent) {
+            window.parent.postMessage({ target: 'close_widget' }, '*');
+          } else {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ target: 'close_widget' }));
+          }
+        }}
       >
         <IconX size={14} color='var(--chakra-colors-darkgray-700)' />
       </Button>
