@@ -2,6 +2,7 @@ import { IconX } from '@tabler/icons'
 import { Button, Flex } from '@chakra-ui/react'
 import { isChromeExtension } from '@/helpers/chrome'
 import { getIsWidgetContext } from '@/utils/context'
+import * as ENV from '@/constants/env'
 
 const isWidget = getIsWidgetContext()
 const isExtension = isChromeExtension()
