@@ -7,9 +7,9 @@ const isWidget = getIsWidgetContext()
 const isExtension = isChromeExtension()
 
 function ExtensionCloseButton() {
-  if (!isExtension && !isWidget) {
-    return null
-  }
+  // if (!isExtension && !isWidget) {
+  //   return null
+  // }
 
   return (
     <Flex textAlign='right' position='fixed' top={0} right={0} zIndex={10000}>
