@@ -26,7 +26,9 @@ function ExtensionCloseButton() {
         onClick={() =>
           isExtension
             ? window.close()
-            : window.parent.postMessage({ target: 'close_widget' }, '*')
+            : window.parent 
+              ? window.parent.postMessage({ target: 'close_widget' }, '*')
+              : window.postMessage({ target: 'close_widget' }, 'https://gooddollar.walletchat.fun')
         }
       >
         <IconX size={14} color='var(--chakra-colors-darkgray-700)' />

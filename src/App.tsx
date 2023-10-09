@@ -65,20 +65,7 @@ export const App = () => {
       if (data) {
         const { contractAddress, itemId, network, redirect, ownerAddress } = data
 
-        console.log("got message with data: ", data)
-
-          // //debug Android App
-          // fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-          //   body: JSON.stringify({
-          //     debug: "APP.TSX print",
-          //     event: e,
-          //     data: data,
-          //     origin: origin,
-          //   }),
-          //   headers: { 'Content-Type': 'application/json' },
-          //   method: 'POST',
-          // })
-          // //end debug android app webview
+        //console.log("got message with data: ", data)
 
         if (ownerAddress) {
           console.log("got message with ownerAddress: ", ownerAddress)
