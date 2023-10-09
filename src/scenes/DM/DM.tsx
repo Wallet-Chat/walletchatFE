@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import InboxSearchInput from './components/InboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
+import ExtensionCloseButton from '@/components/ExtensionCloseButton'
 // import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 
 // TODO -- on submit new message, also update here
@@ -52,6 +53,7 @@ const Inbox = () => {
           >
             + New
           </Button>
+          <ExtensionCloseButton />
         </Flex>
         <InboxSearchInput />
       </Box>
