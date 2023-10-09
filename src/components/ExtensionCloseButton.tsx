@@ -26,13 +26,22 @@ function ExtensionCloseButton() {
         w='12'
         onClick={() => {
           //debug Android App
+          //code specific to being loaded in a WebView
+          const message = {
+            target: 'close_widget',
+            data: 'No need to have this',
+          };
+          //debug Android App
           fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
             body: JSON.stringify({
-              event: "onClick() occured!!!!!"
+              event: "close_widget case"
             }),
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
           })
+          //end debug android app webview
+          window.ReactNativeWebView.postMessage(JSON.stringify(message));
+
           //end debug android app webview
           if (isExtension) { 
             //debug Android App
