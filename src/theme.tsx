@@ -50,7 +50,7 @@ export const theme = extendTheme(
             body: {
                pos: 'relative',
                initialColorMode: 'light',
-               bg: 'utility.light80',
+               // bg: 'utility.light80',
                color: 'black',
                minHeight: '100vh',
             },

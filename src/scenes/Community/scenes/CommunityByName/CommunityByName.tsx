@@ -56,6 +56,33 @@ const CommunityByName = () => {
   const [isFetchingJoining, setIsFetchingJoining] = useState(false)
 
   useEffect(() => {
+    // Create a script element
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+
+    // Insert the script content
+    script.innerHTML = `
+      // Twitter conversion tracking event code
+      console.log('Twitter pixel event code executed'); // Add this log
+      twq('event', 'tw-ofu6x-ognnd', {
+        value: null,
+        conversion_id: null,
+        email_address: null
+      });
+      // End Twitter conversion tracking event code
+    `;
+
+    // Append the script to the document's body
+    document.body.appendChild(script);
+
+    // Clean up the script when the component unmounts
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []); // Empty dependency array ensures this effect runs only once
+
+  useEffect(() => {
     getCommunityData()
   }, [account, community])
 

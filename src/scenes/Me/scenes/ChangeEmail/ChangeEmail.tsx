@@ -9,6 +9,7 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
+  Heading,
   Input,
   Link,
   Stack,
@@ -26,6 +27,7 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
+import { isMobile } from 'react-device-detect'
 
 const ChangeEmail = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -44,27 +46,45 @@ const ChangeEmail = () => {
   const { notify24: _notify24, setNotify24: globalSetNotify24 } = useWallet()
   const { telegramHandle, setTelegramHandle } = useWallet()
   const { telegramCode, setTelegramCode } = useWallet()
+  const { twitterUsername, setTwitterUsername } = useWallet()
+  const { twitterVerified, setTwitterVerified } = useWallet()
   const dmBool = _notifyDM === 'true'
   const dailyBool = _notify24 === 'true'
   const [email, setEmail] = useState('')
   const [telegramhandle, setTgHandle] = useState('')
+  const [twitterusername, setTwitterUsernameLocal] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [isDialogOn, setIsDialogOn] = useState(false)
+  const [isSnapInstalled, setIsSnapInstalled] = useState(false)
 
    const getSettings = async () => {
-    // try {
-    //   const snapState = await window.ethereum.request({
-    //     method: 'wallet_invokeSnap',
-    //     params: {
-    //       snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
-    //       request: { method: 'get_snap_state', params: { apiKey: getJwtForAccount(account), address: account } },
-    //     },
-    //   });
-    //   //log('-[snap state]:', snapState)
-    //   setIsDialogOn(snapState?.isDialogOn)
-    // } catch(error) {
-    //   console.error('🚨[GET][Snap State]:', error)
-    // }   
+    //MM Snaps is not usable on mobile right now
+    if(!isMobile) {
+      try {
+        const snaps = await window.ethereum.request({
+          method: 'wallet_getSnaps',
+        }); 
+        if( Object.keys(snaps).includes('npm:walletchat-metamask-snap') ) { 
+          setIsSnapInstalled(true)
+
+          const snapState = await window.ethereum.request({
+            method: 'wallet_invokeSnap',
+            params: {
+              snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+              snapVersion: ENV.REACT_APP_SNAP_VERSION,
+              request: { method: 'get_snap_state', params: { apiKey: getJwtForAccount(account), address: account } },
+            },
+          });
+
+          //log('-[snap state]:', snapState)
+          setIsDialogOn(snapState?.isDialogOn)
+        } else {
+          setIsSnapInstalled(false)
+        }
+      } catch(error) {
+        console.error('🚨[GET][Snap State]:', error)
+      }   
+    }
 
     if (!ENV.REACT_APP_REST_API) {
          log('REST API url not in .env', process.env)
@@ -177,18 +197,21 @@ const ChangeEmail = () => {
     setIsDialogOn(checked)
     const method = checked ? 'set_dialog_on' : 'set_dialog_off'
 
-    // const result = await window.ethereum.request({
-    //   method: 'wallet_invokeSnap',
-    //   params: {
-    //     snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
-    //     request: { method: method, params: { apiKey: getJwtForAccount(account), address: account } },
-    //   },
-    // });
-    // log('✅[SNAPS][Update Dialog On]:', result)
+    if(!isMobile) {
+      const result = await window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: "npm:walletchat-metamask-snap",
+          snapVersion: ENV.REACT_APP_SNAP_VERSION,
+          request: { method: method, params: { apiKey: getJwtForAccount(account), address: account } },
+        },
+      });
+      log('✅[SNAPS][Update Dialog On]:', result)
+    }
   }
 
   const onSubmit = (values: any) => {
-      if (values?.email || values?.telegramhandle) {
+      if (values?.email || values?.telegramhandle || values?.twitterusername) {
       setIsFetching(true)
 
       fetch(
@@ -206,18 +229,25 @@ const ChangeEmail = () => {
             walletaddr: account,
             signupsite: document.referrer,
             domain: document.domain,
+            twitteruser: values.twitterusername,
           }),
         }
       )
         .then((response) => response.json())
         .then((response) => {
-          log('✅[POST][Email]:', response)
+          log('✅[POST][Update Settings]:', response)
 
           if (values?.email) {
             globalSetEmail(values.email)
           }
           if (values?.telegramhandle) {
             setTelegramHandle(values.telegramhandle)
+          }
+          if (values?.twitterusername) {
+            setTwitterUsername(values.twitterusername)
+          }
+          if (values?.twitterverified) {
+            setTwitterVerified(values.twitterverified)
           }
           navigate('/me/verify-email')
         })
@@ -258,8 +288,28 @@ const ChangeEmail = () => {
             isChecked={isDialogOn}
             onChange={(e) => handleChangeMM(e.target.checked)}
           >
-            Receive New Message Pop-Ups/Respond to New Messages In Metmask
+            Receive New Message Pop-Ups/Respond to New Messages In Metamask
           </Checkbox>
+          {!isSnapInstalled && (
+          <div>
+          <Heading size='m'>Use WalletChat in the Metamask Browser Extension:</Heading>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
+                    },
+                  });
+                }}
+                style={{ maxWidth: 'fit-content' }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
+            </div>
+        )}
         </Stack>
         <Divider
           orientation='horizontal'
@@ -305,6 +355,22 @@ const ChangeEmail = () => {
                   }
               />
             </Flex>
+            <Text color="darkgray.300" fontSize="md" mb={1}>Current Twitter Username: <b>{twitterUsername}</b>     Verified w/WalletChat: <b>{twitterVerified}</b></Text>
+            <Flex>
+              <Input
+                  type="text"
+                  size="lg"
+                  value={twitterusername}
+                  placeholder="@yourTwitterUsername"
+                  borderColor="black"
+                  {...register('twitterusername', {
+                    required: false,
+                  })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTwitterUsernameLocal(e.target.value)
+                  }
+              />
+            </Flex>
             <Flex>
               <Button
                 variant='black'
@@ -338,9 +404,27 @@ const ChangeEmail = () => {
                    </Text>
                    </div>
                )}
-          {errors.email && errors.email.type === 'required' && (
-            <FormErrorMessage>No blank email please</FormErrorMessage>
-          )}
+               {twitterUsername && (twitterVerified != "true") && (
+                   <div>
+                   <br />
+                   <Text fontSize="3xl" fontWeight="bold" maxWidth="280px" mb={4}>
+                     Verify Twitter
+                     <br />
+                   </Text>
+                   <Text fontSize="xl" mb={1}>
+                      <a
+                        href="https://twitter.com/intent/tweet?text=LFC%20is%20the%20new%20LFG!%20(Lets%20F'n%20Chat!)%20%40wallet_chat%20%23chat2earn"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'blue', textDecoration: 'underline' }}
+                      >
+                        Tweet Via This Link To Verify!
+                      </a>
+                   </Text>
+                   <Text fontSize="lg" mb={1}>Twitter verification will occur within one minute after Tweeting the above verification.              
+                   </Text>
+                   </div>
+               )}
         </FormControl>
       </form>
     </Box>

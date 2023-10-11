@@ -9,6 +9,7 @@ import {
   Spinner,
   Tag,
   Button,
+  useColorMode,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
@@ -28,6 +29,7 @@ import EnterEmail from './scenes/Me/scenes/EnterEmail'
 import ChangeEmail from './scenes/Me/scenes/ChangeEmail'
 import VerifyEmail from './scenes/Me/scenes/VerifyEmail'
 import VerifySuccess from './scenes/Me/scenes/VerifySuccess'
+import EnterReferral from './scenes/Me/scenes/EnterReferral/EnterReferral'
 import NFTByContractAndId from './scenes/NFT/scenes/NFTByContractAndId'
 import Community from './scenes/Community'
 import { isChromeExtension } from './helpers/chrome'
@@ -40,9 +42,12 @@ import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
-import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
+import * as ENV from '@/constants/env'
+
 import { useEffect } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
+import { useWallet } from './context/WalletProvider'
+import Leaderboard from './Leaderboard';
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -55,6 +60,10 @@ export const App = () => {
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
+  const { currentData: referralCode } = endpoints.getReferredUser.useQueryState(
+    account?.toLocaleLowerCase()
+  ) 
+
   const navigate = useNavigate()
   useEffect(() => {
     window.addEventListener('message', (e) => {
@@ -71,10 +80,11 @@ export const App = () => {
   }, [navigate])
 
   const isSmallLayout = useIsSmallLayout()
+  const { colorMode } = useColorMode();
 
   if (!isAuthenticated) {
     return (
-      <Flex flex={1} padding='15px'>
+      <Flex bg="lightgray" flex={1} padding='15px'>
         <ExtensionCloseButton />
 
         <Box
@@ -85,7 +95,7 @@ export const App = () => {
         >
           <Image src={logoThumb} mb={5} width='40px' />
           <Heading size='2xl' mb={8}>
-            Login to start chatting
+          Log in to start chatting & earning 🏆
           </Heading>
 
           <ConnectWalletButton />
@@ -117,8 +127,63 @@ export const App = () => {
               <Image src={logoTwitter} width='25px' />
             </Link>
           </HStack>
+
+          <HStack>
+          {!isMobile && !isChromeExtension() && (
+            <div>
+            <HStack><br></br></HStack>
+
+            <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
+                    },
+                  });
+                }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
+            </div>
+          )}
+          </HStack>
         </Box>
       </Flex>
+    )
+  }
+
+  if (isAuthenticated &&
+      (typeof referralCode !== "string" ||
+      (referralCode !== "existinguser" && !referralCode.startsWith("wc-")))) {
+    return (
+      <Box>
+        <Flex
+          flexDirection={isMobile && !isChromeExtension() ? 'column' : 'row'}
+          minHeight={isSmallLayout ? '100vh' : 'unset'}
+          width='100vw'
+        >
+          <ExtensionCloseButton />
+
+          <Sidebar />
+
+          {referralCode === undefined ? (
+            <Flex
+              flexGrow={1}
+              justifyContent='center'
+              alignItems='center'
+              width='100%'
+            >
+              <Spinner />
+            </Flex>
+          ) : (
+            <EnterReferral />
+          )}
+        </Flex>
+      </Box>
     )
   }
 
@@ -199,12 +264,12 @@ export const App = () => {
 
                     {!isSmallLayout && (
                       <Flex
-                        background='lightgray.200'
+                        background={colorMode}
                         flex='1'
                         alignItems='center'
                         justifyContent='center'
                       >
-                        <Tag background='white'>
+                        <Tag color={colorMode === "dark" ? "white": ""}>
                           Select a chat to start messaging
                         </Tag>
                       </Flex>
@@ -264,12 +329,14 @@ export const App = () => {
 
                     {!isSmallLayout && (
                       <Flex
-                        background='lightgray.200'
+                        background={colorMode}
                         flex='1'
                         alignItems='center'
                         justifyContent='center'
                       >
-                        <Tag background='white'>Explore NFT groups</Tag>
+                        <Tag color={colorMode === "dark" ? "white": ""}>
+                          Explore NFT groups
+                        </Tag>
                       </Flex>
                     )}
                   </Flex>
@@ -305,12 +372,12 @@ export const App = () => {
 
                     {!isSmallLayout && (
                       <Flex
-                        background='lightgray.200'
+                        background={colorMode}
                         flex='1'
                         alignItems='center'
                         justifyContent='center'
                       >
-                        <Tag background='white'>
+                        <Tag color={colorMode === "dark" ? "white": ""}>
                           Select a chat to start messaging
                         </Tag>
                       </Flex>
@@ -329,6 +396,15 @@ export const App = () => {
                 }
               />
             </Route>
+
+            <Route
+                path='/leaderboard'
+                element={
+                  <Flex flexGrow={1}>
+                    <Leaderboard />
+                  </Flex>
+                }
+              />
 
             <Route path='/' element={<Navigate to='/dm' replace />} />
             <Route path='/index.html' element={<Navigate to='/dm' replace />} />

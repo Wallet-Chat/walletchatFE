@@ -9,6 +9,7 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
+  Heading,
   Input,
   Stack,
   Text,
@@ -26,6 +27,7 @@ import { getCommunity } from '@/helpers/widget'
 import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
 import { log } from '@/helpers/log'
+import { isMobile } from 'react-device-detect'
 
 const EnterEmail = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -46,8 +48,10 @@ const EnterEmail = () => {
   const dmBool = _notifyDM === 'true'
   const dailyBool = _notify24 === 'true'
   const [email, setEmail] = useState('')
-   const [tgHandle, setTgHandle] = useState('')
+  const [tgHandle, setTgHandle] = useState('')
+  const [twitterUsername, setTwitterUsername] = useState('')
   const [isFetching, setIsFetching] = useState(false)
+  const [isDialogOn, setIsDialogOn] = useState(false)
 
   const handleChangeOne = (checked: boolean) => {
     //setCheckedItems([checked, checkedItems[1]])
@@ -121,12 +125,29 @@ const EnterEmail = () => {
       })
   }
 
+  const handleChangeMM = async (checked: boolean) => {
+    setIsDialogOn(checked)
+    const method = checked ? 'set_dialog_on' : 'set_dialog_off'
+
+    if(!isMobile) {
+      const result = await window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: "npm:walletchat-metamask-snap", //"local:http://localhost:8080",
+          snapVersion: ENV.REACT_APP_SNAP_VERSION,
+          request: { method: method, params: { apiKey: getJwtForAccount(account), address: account } },
+        },
+      });
+      log('✅[SNAPS][Update Dialog On]:', result)
+    }
+  }
+
   const handleCancel = () => {
     navigate(`/community/${getCommunity()}`)
   }
 
   const onSubmit = (values: any) => {
-      if (values?.email || values?.telegramhandle) {
+      if (values?.email || values?.telegramhandle || values?.twitterusername) {
       setIsFetching(true)
 
       fetch(
@@ -140,21 +161,22 @@ const EnterEmail = () => {
           },
           body: JSON.stringify({
             email: values.email,
-               telegramhandle: values.telegramhandle,
+            telegramhandle: values.telegramhandle,
             walletaddr: account,
             notify24: _notify24,
             notifyDM: _notifyDM,
             signupsite: document.referrer,
             domain: document.domain,
+            twitteruser: values.twitterusername
           }),
         }
       )
         .then((response) => response.json())
         .then((response) => {
-          log('✅[POST][Email]:', response)
+          log('✅[POST][Update Settings]:', response)
           toast({
             title: 'Success',
-            description: `Email updated to ${email}`,
+            description: `Settings Updated Successfully`,
             status: 'success',
             position: 'top',
             duration: 2000,
@@ -165,6 +187,9 @@ const EnterEmail = () => {
           }
           if (values?.telegramhandle) {
             setTelegramHandle(values.telegramhandle)
+          }
+          if (values?.twitterusername) {
+            setTwitterUsername(values.twitterusername)
           }
           navigate('/me/verify-email')
         })
@@ -201,6 +226,29 @@ const EnterEmail = () => {
               Receive notifications summary email every 24 hours (DM, NFT,
               Community)
             </Checkbox>
+            {/* <Checkbox
+            size='lg'
+            isChecked={isDialogOn}
+            onChange={(e) => handleChangeMM(e.target.checked)}
+          >
+            Receive New Message Pop-Ups/Respond to New Messages In Metamask
+          </Checkbox> */}
+          <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
+            <Button
+                variant='black'
+                size='lg'
+                onClick={() => {
+                  window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                      ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
+                    },
+                  });
+                }}
+                style={{ maxWidth: 'fit-content' }}
+              >
+                Install WalletChat Metamask Snap
+            </Button> 
           </Stack>
           <Divider
             orientation='horizontal'
@@ -238,6 +286,21 @@ const EnterEmail = () => {
                   })}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setTgHandle(e.target.value)
+                  }
+              />
+            </Flex>
+            <Flex>
+              <Input
+                  type="text"
+                  size="lg"
+                  value={twitterUsername}
+                  placeholder="@funTwitterUsername"
+                  borderColor="black"
+                  {...register('twitterusername', {
+                    required: false,
+                  })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTwitterUsername(e.target.value)
                   }
               />
             </Flex>

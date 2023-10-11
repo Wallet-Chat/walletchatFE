@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner } from '@chakra-ui/react'
+import { Box, Flex, Spinner, useColorMode } from '@chakra-ui/react'
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { createSelector } from '@reduxjs/toolkit'
@@ -49,6 +49,7 @@ const AlertBubble = ({
 
 const DMByAddress = () => {
   const { provider } = useWallet()
+  const { colorMode } = useColorMode();
   const account = useAppSelector((state) => selectAccount(state))
 
   const supportHeader =
@@ -283,7 +284,7 @@ const DMByAddress = () => {
   }
 
   return (
-    <Flex background='white' flexDirection='column' flex='1'>
+    <Flex background={colorMode} flexDirection='column' flex='1'>
       <DMHeader />
 
       <DottedBackground ref={infiniteScrollRef} className='custom-scrollbar'>

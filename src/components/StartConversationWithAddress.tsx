@@ -9,6 +9,7 @@ import {
   Input,
   Spinner,
   Text,
+  useColorMode,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import Blockies from 'react-blockies'
@@ -24,6 +25,7 @@ const StartConversationWithAddress = () => {
   const [resolvedAddr, setResolvedAddr] = useState<string | null>()
   const [isResolvingENS, setIsResolvingENS] = useState(false)
   const { provider, web3 } = useWallet()
+  const { colorMode } = useColorMode();
 
   const {
     handleSubmit,
@@ -82,12 +84,14 @@ const StartConversationWithAddress = () => {
           type='text'
           value={toAddr}
           placeholder='Enter ENS/BNB/BTC/ARB or (0x...) to chat'
+          _placeholder={{ color: colorMode === "dark" ? "white" : ""}}
           {...register('toAddr', {
             validate: (val) => addressIsValid(web3, val),
           })}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setToAddr(e.target.value)
           }
+          background={colorMode === "dark" ? "lightgray.300" : ""}
         />
         {web3?.utils.isAddress(toAddr) && (
           <Link to={`/dm/${toAddr}`} style={{ textDecoration: 'none' }}>

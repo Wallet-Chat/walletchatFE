@@ -582,6 +582,18 @@ export const dmApi = createApi({
       transformErrorResponse: createErrorResponse('Name'),
     }),
 
+    getReferredUser: builder.query({
+      query: (addr) => ({ url: `get_valid_referred_user` }),
+      transformResponse: async (response: any) => {
+        log('✅[GET][ReferredUser]:', response)
+
+        const resp = response[0]?.referralcode
+
+        return resp || null
+      },
+      transformErrorResponse: createErrorResponse('Referral'),
+    }),
+
     getChatData: builder.query({
       queryFn: fetchAndStoreChatData,
     }),
@@ -714,6 +726,7 @@ export const {
   endpoints,
   useGetPfpQuery,
   useGetNameQuery,
+  useGetReferredUserQuery,
   useGetChatDataQuery,
   useGetReadChatItemsQuery,
   useGetInboxQuery,

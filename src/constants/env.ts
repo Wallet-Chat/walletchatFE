@@ -27,6 +27,8 @@ export const REACT_APP_SUPPORT_HEADER = import.meta.env
   .VITE_REACT_APP_SUPPORT_HEADER
 export const REACT_APP_WALLETCONNECT_PROJECT_ID = import.meta.env
 .VITE_REACT_APP_WALLETCONNECT_PROJECT_ID
+export const REACT_APP_GIPHY_API_KEY = import.meta.env
+.VITE_REACT_APP_GIPHY_API_KEY
 
 // --- GoodDollar ---
 
@@ -143,3 +145,6 @@ export const REACT_APP_APP_URL_TESTHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_TESTHOST
 export const REACT_APP_ORIGIN_NAME_TESTHOST = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_TESTHOST
+
+export const REACT_APP_SNAP_VERSION = import.meta.env
+  .VITE_REACT_APP_SNAP_VERSION

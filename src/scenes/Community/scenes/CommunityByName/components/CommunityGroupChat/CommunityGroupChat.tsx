@@ -7,20 +7,23 @@ import {
   Tag,
   Text,
   Icon, 
-  InputRightElement,
-  InputGroup, 
+  Input,
   Popover, 
   PopoverTrigger, 
   PopoverContent, 
   Textarea,
   Container, 
+  useDisclosure
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
+import { GiphyFetch } from "@giphy/js-fetch-api";
+import { IGif } from '@giphy/js-types';
+import { Grid } from "@giphy/react-components";
 import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
-import { Link as RLink } from 'react-router-dom'
+import { Link, Link as RLink } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
 import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
@@ -28,17 +31,19 @@ import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
+import { getSupportWallet } from '@/helpers/widget'
 
 import {
   GroupMessageType,
   MessageUIType,
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
+
+const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
 const CommunityGroupChat = ({
   account,
@@ -55,20 +60,29 @@ const CommunityGroupChat = ({
   const [msgInput, setMsgInput] = useState<string>('')
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+  const [searchInput, setSearchInput] = useState<string>("")
+  const { onClose } = useDisclosure();
+  const prevMessage = useRef<null | string>()
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
-  const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
- ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
-   /* Initialize analytics instance */
-   const analyticsGA4 = Analytics({
-    app: 'WalletChatApp',
-    plugins: [
-      /* Load Google Analytics v4 */
-      googleAnalyticsPlugin({
-        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-      }),
-    ],
-  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+    /* Initialize analytics instance */
+    const analyticsGA4 = Analytics({
+      app: 'WalletChatApp',
+      plugins: [
+        /* Load Google Analytics v4 */
+        googleAnalyticsPlugin({
+          measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+        }),
+      ],
+    })
+
+  const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
+
+  function FetchSearchedGIfs() {
+    const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
+    return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
+  }
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -119,22 +133,19 @@ const CommunityGroupChat = ({
   const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      sendMessage()
+      sendMessage(msgInput)
     }
   }
 
-  const sendMessage = async () => {
+  const sendMessage = async (msgInput: string) => {
     if (msgInput.length <= 0) return
     if (!account) {
       log('No account connected')
       return
     }
 
-    analytics.track('SendCommunityMessage', {
-       site: document.referrer,
-       community,
-       account
-     });
+    if(prevMessage.current == msgInput) return;
+
     // ReactGA.event({
     //   category: "SendCommunityMessageCategory",
     //   action: "SendCommunityMessage",
@@ -148,6 +159,7 @@ const CommunityGroupChat = ({
 
     // Make a copy and clear input field
     const msgInputCopy = (' ' + msgInput).slice(1)
+    prevMessage.current = msgInput
     setMsgInput('')
 
     const timestamp = new Date()
@@ -231,35 +243,49 @@ const CommunityGroupChat = ({
     setMsgInput(msgInput + emoji);
   }
 
+  const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+    e.preventDefault();
+
+    const gifUrl = gif.images.original.url;
+    const updatedMsgInput = msgInput + gifUrl;
+
+    sendMessage(updatedMsgInput);
+    onClose();
+  }
+
   const supportHeader =
     ENV.REACT_APP_SUPPORT_HEADER ||
-    'Please use the support tab on the left for direct team support'
+    'Check the leaderboard, share referral codes to earn more points! Chat to earn!'
 
-  const AlertBubble = ({
+    const AlertBubble = ({
       children,
       color,
+      to, // Add a prop to specify the target route
     }: {
-      children: string
-      color: 'green' | 'red'
+      children: string;
+      color: 'green' | 'red';
+      to: string; // Specify the target route
     }) => (
-      <Flex
-        justifyContent='center'
-        alignItems='center'
-        borderRadius='lg'
-        background={color === 'green' ? 'green.200' : 'red.200'}
-        p={4}
-        position='sticky'
-        top={0}
-        right={0}
-        zIndex={1}
-      >
-        <Box fontSize='md'>{children}</Box>
-      </Flex>
-    )
+      <Link to={to}>
+        <Flex
+          justifyContent='center'
+          alignItems='center'
+          borderRadius='lg'
+          background={color === 'green' ? 'green.200' : 'red.200'}
+          p={4}
+          position='sticky'
+          top={0}
+          right={0}
+          zIndex={1}
+        >
+          <Box fontSize='md'>{children}</Box>
+        </Flex>
+      </Link>
+    );
 
   return (
     <Flex flexDirection='column' height='100%'>
-      <AlertBubble color='green'>{supportHeader}</AlertBubble>
+      <AlertBubble to={`https://leaderboard.walletchat.fun`}color="green">{supportHeader}</AlertBubble>
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex
@@ -349,6 +375,56 @@ const CommunityGroupChat = ({
             />
           </PopoverContent>
         </Popover>
+        {/* <Popover placement='top-start' isLazy onClose={onClose}>
+          <PopoverTrigger>
+            <Container 
+              w={0}
+              centerContent
+              bgColor="lightgray.500"
+              borderRadius={2}
+              cursor="pointer"
+              children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
+            />
+          </PopoverTrigger>
+          <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
+            <Box 
+              maxH="100%" 
+              overflowY="scroll" 
+              alignItems="center"
+              css={{
+                "&::-webkit-scrollbar": {
+                  width: "0.4em",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0, 0, 0, 0)",
+                },
+              }}
+            >
+              <Input 
+                my={5}
+                placeholder='Search GiFs' 
+                size='md' 
+                bgColor="black"
+                border="none"
+                focusBorderColor="black"
+                color="white"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              {searchInput ? (
+                <FetchSearchedGIfs />
+              ) : (
+                <Grid
+                  onGifClick={onGifClick}
+                  fetchGifs={fetchGifs}
+                  width={400}
+                  columns={4}
+                  gutter={6}
+                />
+              )}
+            </Box>
+          </PopoverContent>
+        </Popover> */}
 
         <Textarea 
           placeholder='Write a message...'
@@ -364,7 +440,7 @@ const CommunityGroupChat = ({
         <Flex alignItems='flex-end'>
           <Button
             variant='black'
-            onClick={sendMessage}
+            onClick={() => sendMessage(msgInput)}
             borderRadius='full'
             minH='full'
             px='0'

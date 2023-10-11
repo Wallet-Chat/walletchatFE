@@ -6,6 +6,7 @@ import {
    Input,
    Spinner,
    Text,
+   useColorMode,
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
@@ -22,6 +23,7 @@ export default function InboxSearchInput() {
    const [isResolvingENS, setIsResolvingENS] = useState(false)
    const [isSuggestionListOpen, setIsSuggestionListOpen] = useState(false)
    const { provider, web3 } = useWallet()
+   const { colorMode } = useColorMode();
 
    const ref = useRef(null)
 
@@ -74,13 +76,14 @@ export default function InboxSearchInput() {
                type="text"
                value={toAddr}
                placeholder="Enter ENS/BNB/BTC/ARB or (0x...) to chat"
+               _placeholder={{ color: colorMode === "dark" ? "white" : ""}}
                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setToAddr(e.target.value)
                }
                onFocus={(e: React.ChangeEvent<HTMLInputElement>) => {
                   if (resolvedAddr) setIsSuggestionListOpen(true)
                }}
-               background="lightgray.300"
+               background={colorMode === "dark" ? "lightgray.300": ""}
             />
             {isResolvingENS && (
                <Box

@@ -14,7 +14,6 @@ import generateItems from '../../helpers/generateGroupedByDays'
 import { DottedBackground } from '../../../../styled/DottedBackground'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ChatTextAreaInput from '../../../../components/Chat/ChatTextAreaInput'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
@@ -36,10 +35,8 @@ const NFTGroupChat = ({
   const [userPfpImage, setUserPfpImage] = useState<PfpType[]>([])
   let navigate = useNavigate()
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+  const prevMessage = useRef<null | string>()
 
-  const analytics = AnalyticsBrowser.load({
-    writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
-  })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
@@ -101,10 +98,6 @@ const NFTGroupChat = ({
   }
 
   const sendMessage = async (msgInput: string) => {
-    analytics.track('SendNftGroupMessage', {
-      site: document.referrer,
-      account: account,
-    })
     // ReactGA.event({
     //   category: "SendNftGroupMessageCategory",
     //   action: "SendNftGroupMessage",
@@ -121,6 +114,9 @@ const NFTGroupChat = ({
       return
     }
 
+    if(prevMessage.current == msgInput) return;
+
+    prevMessage.current = msgInput
     // Make a copy
     const msgInputCopy = (' ' + msgInput).slice(1)
 
