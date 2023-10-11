@@ -267,7 +267,7 @@ const CommunityByName = () => {
 				flexGrow={1}
 				background='lightgray.200'
 			>
-				<Box
+				{/* <Box
 					bg='lightgray.100'
 					p={2}
 					borderRightWidth={1}
@@ -364,7 +364,7 @@ const CommunityByName = () => {
 					) : (
 						<></>
 					)}
-				</Box>
+				</Box> */}
 				<Box
 					overflowY='auto'
 					className='custom-scrollbar'
