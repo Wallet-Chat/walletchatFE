@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Divider,
@@ -13,10 +14,16 @@ import {
   Tabs,
   Text,
   Tooltip,
+  useDisclosure,
 } from '@chakra-ui/react'
-import { IconBrandTwitter, IconCircleCheck } from '@tabler/icons'
+import {
+	IconBrandTwitter,
+	IconCircleCheck,
+	IconChevronDown,
+	IconExternalLink,
+} from '@tabler/icons'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, NavLink, Route, Routes, useMatch } from 'react-router-dom'
 import equal from 'fast-deep-equal/es6'
 import * as ENV from '@/constants/env'
 
@@ -29,17 +36,21 @@ import { getJwtForAccount } from '@/helpers/jwt'
 import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
 import { log } from '@/helpers/log'
+import CommunityModal from './components/CommunityModal'
+import pluralize from 'pluralize'
 
 const CommunityByName = () => {
   const account = useAppSelector((state) => selectAccount(state))
 
-  const { community = '' } = useParams()
+	let { community = '' } = useParams()
+	const match = useMatch('/community/:community/*')
 
   const [communityData, setCommunityData] = useState<CommunityType>()
   const [
     isFetchingCommunityDataFirstTime,
     setIsFetchingCommunityDataFirstTime,
   ] = useState(true)
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [joined, setJoined] = useState<boolean | null>(null)
   const [joinBtnIsHovering, joinBtnHoverProps] = useHover()
   const [isFetchingJoining, setIsFetchingJoining] = useState(false)
@@ -105,7 +116,11 @@ const CommunityByName = () => {
       )
         .then((response) => response.json())
         .then(async (data: CommunityType) => {
-          if (!equal(data?.messages, communityData?.messages)) {
+					if (
+						!equal(data?.messages, communityData?.messages) ||
+						!equal(data?.name, communityData?.name) ||
+						!equal(data?.social?.length, communityData?.social?.length)
+					) {
             log('✅[GET][Community]:', data)
             setCommunityData({
               ...data,
@@ -114,11 +129,6 @@ const CommunityByName = () => {
               discord: data?.social?.find((i) => i.type === 'discord')
                 ?.username,
             })
-          }
-          if (data?.joined === true && joined !== true) {
-            setJoined(true)
-          } else if (data?.joined === false && joined !== false) {
-            setJoined(false)
           }
         })
         .catch((error) => {
@@ -132,286 +142,292 @@ const CommunityByName = () => {
     }
   }
 
-  const joinGroup = () => {
-    if (!isFetchingJoining) {
-      setIsFetchingJoining(true)
-      fetch(
-        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_bookmark`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${getJwtForAccount(account)}`,
-          },
-          body: JSON.stringify({
-            walletaddr: account,
-            nftaddr: community,
-          }),
-        }
-      )
-        .then((response) => response.json())
-        .then((response) => {
-          log('✅[POST][Community][Join]', response)
-          setJoined(true)
-        })
-        .catch((error) => {
-          console.error('🚨[POST][Community][Join]:', error)
-        })
-        .then(() => {
-          setIsFetchingJoining(false)
-        })
-    }
-  }
 
-  const leaveGroup = () => {
-    if (!isFetchingJoining) {
-      setIsFetchingJoining(true)
-      fetch(
-        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/delete_bookmark`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${getJwtForAccount(account)}`,
-          },
-          body: JSON.stringify({
-            walletaddr: account,
-            nftaddr: community,
-          }),
-        }
-      )
-        .then((response) => response.json())
-        .then((count: number) => {
-          log('✅[POST][Community][Leave]')
-          setJoined(false)
-        })
-        .catch((error) => {
-          console.error('🚨[POST][Community][Leave]:', error)
-        })
-        .then(() => {
-          setIsFetchingJoining(false)
-        })
-    }
-  }
 
-  return (
-    <Flex flexGrow={1} flexDirection='column' background='white' flex='1'>
-      <Flex alignItems='center' px={5} pt={4} pb={2}>
-        <Flex flex='1' alignItems='flex-start' p={2} borderRadius='md'>
-          {communityData?.logo && (
-            <Image
-              src={communityData.logo}
-              alt=''
-              height='60px'
-              borderRadius='var(--chakra-radii-xl)'
-              mr={3}
-            />
-          )}
-          <Box>
-            {communityData?.name && (
-              <Flex alignItems='center'>
-                <Heading
-                  size='md'
-                  mr='1'
-                  maxWidth={[140, 140, 200, 300]}
-                  overflow='hidden'
-                  textOverflow='ellipsis'
-                  whiteSpace='nowrap'
-                >
-                  {communityData.name}
-                </Heading>
-                <Tooltip label='OpenSea Verified'>
-                  <Box>
-                    <IconCircleCheck
-                      stroke='2'
-                      color='white'
-                      fill='var(--chakra-colors-success-600)'
-                    />
-                  </Box>
-                </Tooltip>
-                <Button
-                  ml={2}
-                  size='xs'
-                  variant={joined ? 'black' : 'outline'}
-                  isLoading={isFetchingJoining}
-                  onClick={() => {
-                    if (joined === null) return
-                    else if (joined === false) {
-                      joinGroup()
-                    } else if (joined === true) {
-                      leaveGroup()
-                    }
-                  }}
-                  // @ts-ignore
-                  {...joinBtnHoverProps}
-                >
-                  <Text ml={1}>
-                    {joinBtnIsHovering
-                      ? joined
-                        ? 'Leave?'
-                        : '+ Join'
-                      : joined
-                      ? 'Joined'
-                      : '+ Join'}
-                  </Text>
-                </Button>
-              </Flex>
-            )}
-            <Flex alignItems='center'>
-              {communityData?.discord && (
-                <Tooltip label='Discord'>
-                  <Link
-                    href={`https://www.discord.gg/${communityData.discord}`}
-                    target='_blank'
-                    d='inline-block'
-                    verticalAlign='middle'
-                    mr={1}
-                  >
-                    <Image
-                      src={IconDiscord}
-                      alt=''
-                      height='24px'
-                      width='24px'
-                    />
-                  </Link>
-                </Tooltip>
-              )}
-              {communityData?.twitter && (
-                <Tooltip label='Twitter'>
-                  <Link
-                    href={`https://twitter.com/${communityData?.twitter}`}
-                    target='_blank'
-                    d='inline-block'
-                    verticalAlign='middle'
-                  >
-                    <IconBrandTwitter
-                      stroke={1.5}
-                      color='white'
-                      fill='var(--chakra-colors-lightgray-800)'
-                    />
-                  </Link>
-                </Tooltip>
-              )}
-              <Divider orientation='vertical' height='12px' mx={2} />
+	return (
+		<Flex flexDirection='column' background='white' height='100vh' flex='1'>
+			<Flex
+				alignItems='center'
+				px={5}
+				py={2}
+				borderBottomWidth={1}
+				borderBottomColor='lightgray.300'
+			>
+				<Flex
+					justifyContent='space-between'
+					width='100%'
+					alignItems='center'
+				>
+					<Flex alignItems='flex-start' p={2} borderRadius='md' flex='1'>
+						<Avatar
+							size='md'
+							name={communityData?.name}
+							src={communityData?.logo}
+							mr={1}
+							overflow='hidden'
+							data-group
+						/>
+						<Box>
+							<Button
+								onClick={onOpen}
+								display='inline-flex'
+								textAlign='unset'
+								height='unset'
+								py={1}
+								lineHeight='unset'
+								flex='1'
+								alignItems='center'
+								background='white'
+								_hover={{
+									border: 'none',
+									background: 'gray.100',
+								}}
+								rightIcon={<IconChevronDown size={20} />}
+							>
+								{communityData?.name && (
+									<Flex alignItems='center' d='inline-flex'>
+										<Heading
+											size='md'
+											mr='1'
+											maxWidth={[140, 140, 200, 300]}
+											overflow='hidden'
+											textOverflow='ellipsis'
+											whiteSpace='nowrap'
+										>
+											{communityData.name}
+										</Heading>
+									</Flex>
+								)}
+							</Button>
+							<Box px={4}>
+								{communityData?.member_count && (
+									<Box>
+										<Text fontSize='md'>
+											{communityData.member_count}{' '}
+											{pluralize(
+												'member',
+												communityData?.member_count
+											)}
+										</Text>
+									</Box>
+								)}
+							</Box>
+						</Box>
+					</Flex>
 
-              {communityData?.member_count && (
-                <Box>
-                  <Text fontSize='md'>{communityData.member_count} members</Text>
-                </Box>
-              )}
-            </Flex>
-            {/* 
-                  <Box mb={2}>
-                     {nftData?.collection?.external_url && (
-                        <Tooltip label="Visit website">
-                           <Link
-                              href={nftData.collection.external_url}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <IconLink stroke={1.5} color="var(--chakra-colors-lightgray-800)" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.collection?.discord_url && (
-                        <Tooltip label="Discord">
-                           <Link
-                              href={nftData.collection.discord_url}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <Image src={IconDiscord} alt="" height="24px" width="24px" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.collection?.twitter_username && (
-                        <Tooltip label="Twitter">
-                           <Link
-                              href={`https://twitter.com/${nftData.collection.twitter_username}`}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <IconBrandTwitter stroke={1.5} color="white"
-                                 fill="var(--chakra-colors-lightgray-800)" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.address && (
-                        <Tooltip label="Etherscan">
-                           <Link
-                              href={`https://etherscan.io/address/${nftData.address}`}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                              mr={1}
-                           >
-                              <Image src={IconEtherscan} alt="" height="21px" width="21px" padding="2px" />
-                           </Link>
-                        </Tooltip>
-                     )}
-                     {nftData?.collection?.medium_username && (
-                        <Tooltip label="Medium">
-                           <Link
-                              href={`https://medium.com/${nftData.collection.medium_username}`}
-                              target="_blank"
-                              d="inline-block"
-                              verticalAlign="middle"
-                           >
-                              <IconBrandMedium
-                                 stroke={1.5}
-                                 color="white"
-                                 fill="var(--chakra-colors-lightgray-800)"
-                              />
-                           </Link>
-                        </Tooltip>
-                     )}
-                  </Box> */}
-          </Box>
-        </Flex>
-      </Flex>
-      <Tabs
-        display='flex'
-        flexDirection='column'
-        overflowY='auto'
-        className='custom-scrollbar'
-        flex='10 100px'
-        variant='enclosed'
-        isLazy
-      >
-        <TabList padding='0 var(--chakra-space-5)'>
-          <Tab>Chat</Tab>
-          {communityData?.tweets && communityData.tweets.length > 0 ? (
-            <Tab>Tweets </Tab>
-          ) : (
-            <></>
-          )}
-        </TabList>
+					<Flex py={2}>
+						{communityData?.discord && (
+							<Tooltip
+								label={
+									<Flex>
+										<Box mr={1}>Discord</Box>{' '}
+										<IconExternalLink strokeWidth={1.5} size={15} />
+									</Flex>
+								}
+							>
+								<Button
+									as={Link}
+									href={`https://www.discord.gg/${communityData.discord}`}
+									target='_blank'
+									d='flex'
+									textAlign='center'
+									p={0}
+									width='2rem'
+									minWidth='unset'
+									height='2rem'
+									mr={1}
+									borderRadius='50%'
+									borderWidth={1}
+									borderColor='gray.300'
+									background='white'
+								>
+									<Image
+										src={IconDiscord}
+										alt=''
+										height='22px'
+										width='22px'
+									/>
+								</Button>
+							</Tooltip>
+						)}
+						{communityData?.twitter && (
+							<Tooltip
+								label={
+									<Flex>
+										<Box mr={1}>Twitter</Box>{' '}
+										<IconExternalLink strokeWidth={1.5} size={15} />
+									</Flex>
+								}
+							>
+								<Button
+									as={Link}
+									href={`https://twitter.com/${communityData?.twitter}`}
+									target='_blank'
+									d='flex'
+									textAlign='center'
+									p={0}
+									width='2rem'
+									minWidth='unset'
+									height='2rem'
+									mr={1}
+									borderRadius='50%'
+									borderWidth={1}
+									borderColor='gray.300'
+									background='white'
+								>
+									<IconBrandTwitter
+										stroke={1.5}
+										size='20'
+										color='transparent'
+										fill='var(--chakra-colors-lightgray-800)'
+									/>
+								</Button>
+							</Tooltip>
+						)}
+					</Flex>
+				</Flex>
+			</Flex>
 
-        <TabPanels overflowY='auto' className='custom-scrollbar' height='100%'>
-          <TabPanel px='0' height='100%' padding='0'>
-            <CommunityGroupChat
-              account={account}
-              community={community}
-              chatData={communityData?.messages || []}
-              isFetchingCommunityDataFirstTime={
-                isFetchingCommunityDataFirstTime
-              }
-            />
-          </TabPanel>
-          <TabPanel p={5}>
-            <CommunityTweets tweets={communityData?.tweets || []} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Flex>
+			<Box
+				display='flex'
+				overflowY='auto'
+				flexGrow={1}
+				background='lightgray.200'
+			>
+				{/* <Box
+					bg='lightgray.100'
+					p={2}
+					borderRightWidth={1}
+					borderRightColor='lightgray.300'
+				>
+					<Button
+						as={NavLink}
+						end
+						to={`${match?.pathnameBase}`}
+						relative='path'
+						size='sm'
+						fontWeight='bold'
+						fontSize='md'
+						d='block'
+						variant='translucent80'
+						background='transparent'
+						mb={1}
+						px={3}
+						py={1.5}
+						lineHeight='unset'
+						color='darkgray.500'
+						_hover={{
+							textDecor: 'none',
+							background: 'lightgray.400',
+							color: 'darkgray.800',
+						}}
+						_activeLink={{
+							background: 'lightgray.400',
+							color: 'darkgray.600',
+							_before: {
+								opacity: 1,
+							},
+						}}
+						_before={{
+							content: '""',
+							opacity: 0,
+							display: 'inline-block',
+							position: ' absolute',
+							top: '50%',
+							left: '0.2rem',
+							width: '.25rem',
+							height: '.25rem',
+							borderRadius: '50%',
+							background: 'lightgray.700',
+							transform: 'translateY(-50%)',
+						}}
+					>
+						Chat
+					</Button>
+					{communityData?.tweets && communityData.tweets.length > 0 ? (
+						<Button
+							as={NavLink}
+							to={`${match?.pathnameBase}/tweets`}
+							relative='path'
+							size='sm'
+							fontWeight='bold'
+							fontSize='md'
+							d='block'
+							variant='translucent80'
+							background='transparent'
+							mb={1}
+							px={3}
+							py={1.5}
+							lineHeight='unset'
+							color='darkgray.500'
+							_hover={{
+								textDecor: 'none',
+								background: 'lightgray.400',
+								color: 'darkgray.800',
+							}}
+							_activeLink={{
+								background: 'lightgray.400',
+								color: 'darkgray.600',
+								_before: {
+									opacity: 1,
+								},
+							}}
+							_before={{
+								content: '""',
+								opacity: 0,
+								display: 'inline-block',
+								position: ' absolute',
+								top: '50%',
+								left: '0.2rem',
+								width: '.25rem',
+								height: '.25rem',
+								borderRadius: '50%',
+								background: 'lightgray.700',
+								transform: 'translateY(-50%)',
+							}}
+						>
+							Tweets
+						</Button>
+					) : (
+						<></>
+					)}
+				</Box> */}
+				<Box
+					overflowY='auto'
+					className='custom-scrollbar'
+					height='100%'
+					flexGrow={1}
+				>
+					<Routes>
+						<Route
+							index
+							element={
+								<CommunityGroupChat
+									account={account}
+									community={community}
+									chatData={communityData?.messages || []}
+									isFetchingCommunityDataFirstTime={
+										isFetchingCommunityDataFirstTime
+									}
+								/>
+							}
+						/>
+						<Route
+							path='tweets'
+							element={
+								<CommunityTweets tweets={communityData?.tweets || []} />
+							}
+						/>
+					</Routes>
+				</Box>
+			</Box>
+			<CommunityModal
+				isOpen={isOpen}
+				onClose={onClose}
+				communityData={communityData}
+				getCommunityData={getCommunityData}
+			/>
+		</Flex>
   )
 }
 
