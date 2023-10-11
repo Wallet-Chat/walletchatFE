@@ -17,6 +17,14 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
 import CommunityType from '../../../../../../../../types/Community'
+import * as ENV from '@/constants/env'
+import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import {
+  selectAccount,
+  selectIsAuthenticated,
+  setAccount,
+} from '@/redux/reducers/account'
 
 const CommunityModalEdit = ({
 	setPageState,
@@ -28,7 +36,7 @@ const CommunityModalEdit = ({
 	getCommunityData: () => void
 }) => {
 	const { community = '' } = useParams()
-
+	const account = useAppSelector((state) => selectAccount(state))
 	const [name, setName] = useState<string>('')
 	const [twitter, setTwitter] = useState<string>('')
 	const [twitterActive, setTwitterActive] = useState(false)
@@ -96,19 +104,18 @@ const CommunityModalEdit = ({
 
 		setIsFetching(true)
 
-		if (!process.env.REACT_APP_REST_API) {
-			console.log('REST API url not in .env', process.env)
-			return
+		if (!ENV.REACT_APP_REST_API) {
+			throw new Error('REST API url not in .env')
 		}
 
 		fetch(
-			`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/update_community`,
+			`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_community`,
 			{
 				method: 'POST',
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+					Authorization: `Bearer ${getJwtForAccount(account)}`,
 				},
 				body: JSON.stringify({
 					name: values?.name,

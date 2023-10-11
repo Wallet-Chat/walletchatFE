@@ -21,6 +21,14 @@ import CommunityModalLanding from './scenes/CommunityModalLanding'
 import { useWallet } from '../../../../../../context/WalletProvider'
 import { useNavigate, useParams } from 'react-router'
 import CommunityModalEdit from './scenes/CommunityModalEdit'
+import * as ENV from '@/constants/env'
+import { getJwtForAccount } from '@/helpers/jwt'
+import { useAppSelector } from '@/hooks/useSelector'
+import {
+  selectAccount,
+  selectIsAuthenticated,
+  setAccount,
+} from '@/redux/reducers/account'
 
 const CommunityModal = ({
 	isOpen,
@@ -35,7 +43,7 @@ const CommunityModal = ({
 }) => {
 	let navigate = useNavigate()
 
-	const { account } = useWallet()
+	const account = useAppSelector((state) => selectAccount(state))
 	const { community = '' } = useParams()
 	const [pageState, setPageState] = useState<string>('')
 
@@ -54,13 +62,13 @@ const CommunityModal = ({
 		if (!isFetchingJoining) {
 			setIsFetchingJoining(true)
 			fetch(
-				`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/create_bookmark`,
+				` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/create_bookmark`,
 				{
 					method: 'POST',
 					credentials: 'include',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+						Authorization: `Bearer ${getJwtForAccount(account)}`,
 					},
 					body: JSON.stringify({
 						walletaddr: account,
@@ -83,17 +91,16 @@ const CommunityModal = ({
 	}
 
 	const leaveGroup = () => {
-		console.log(account, community, localStorage.getItem('jwt'))
 		if (!isFetchingJoining) {
 			setIsFetchingJoining(true)
 			fetch(
-				`${process.env.REACT_APP_REST_API}/${process.env.REACT_APP_API_VERSION}/delete_bookmark`,
+				` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/delete_bookmark`,
 				{
 					method: 'POST',
 					credentials: 'include',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+						Authorization: `Bearer ${getJwtForAccount(account)}`,
 					},
 					body: JSON.stringify({
 						walletaddr: account,
