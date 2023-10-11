@@ -353,7 +353,7 @@ const CommunityGroupChat = ({
         ></Box>
       </DottedBackground>
 
-      <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+      <Flex p='4' background='white' alignItems='center' justifyContent='center' gap='4'>
         <Popover placement='top-start' isLazy>
           <PopoverTrigger>
             <Container 
