@@ -95,7 +95,7 @@ export const REACT_APP_ORIGIN_NAME_OPENPEER = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_OPENPEER
 // ------------------
 
-// --- OpenPeer ---
+// --- 7Heaven ---
 
 // Community
 export const REACT_APP_DEFAULT_COMMUNITY_7HEAVEN = import.meta.env
