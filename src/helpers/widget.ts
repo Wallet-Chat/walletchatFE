@@ -62,6 +62,10 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_OPENPEER'
   }
 
+  if (currentWidgetOrigin.toLowerCase().includes('7heaven.dev') || currentWidgetOrigin.toLowerCase().includes('7heaven.app')) {
+    return '_7HEAVEN'
+  }
+
   if (currentWidgetOrigin.toLowerCase().includes('sso.walletchat.fun')) {
     return '_SSO'
   }
