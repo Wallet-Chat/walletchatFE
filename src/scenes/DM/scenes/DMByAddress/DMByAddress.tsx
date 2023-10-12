@@ -51,10 +51,6 @@ const DMByAddress = () => {
   const { provider } = useWallet()
   const account = useAppSelector((state) => selectAccount(state))
 
-  const supportHeader =
-    ENV.REACT_APP_SUPPORT_HEADER ||
-    'We welcome all feedback and bug reports. Thank you! 😊'
-
   const maxPages = React.useRef(1)
 
   const selectorPageRef = React.useRef<number>(1)
@@ -288,7 +284,7 @@ const DMByAddress = () => {
 
       <DottedBackground ref={infiniteScrollRef} className='custom-scrollbar'>
         {toAddr.toLocaleLowerCase() === getSupportWallet() && (
-          <AlertBubble color='green'>{supportHeader}</AlertBubble>
+          <AlertBubble color='green'>{"Customer Support Chat"}</AlertBubble>
         )}
 
         {chatData.map((msg: ChatMessageType, i: number) => {

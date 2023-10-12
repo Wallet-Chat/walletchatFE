@@ -28,7 +28,7 @@ import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
-import { getSupportWallet } from '@/helpers/widget'
+import { getSupportHeader } from '@/helpers/widget'
 
 import {
   GroupMessageType,
@@ -232,9 +232,15 @@ const CommunityGroupChat = ({
     setMsgInput(msgInput + emoji);
   }
 
-  const supportHeader =
-    ENV.REACT_APP_SUPPORT_HEADER ||
-    'Click Here for Direct Team Support'
+  const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+    e.preventDefault();
+
+    const gifUrl = gif.images.original.url;
+    const updatedMsgInput = msgInput + gifUrl;
+
+    sendMessage(updatedMsgInput);
+    onClose();
+  }
 
     const AlertBubble = ({
       children,
@@ -264,7 +270,7 @@ const CommunityGroupChat = ({
 
   return (
     <Flex flexDirection='column' height='100%'>
-      <AlertBubble to={`/dm/${getSupportWallet()}`}color="green">{supportHeader}</AlertBubble>
+      <AlertBubble to={`https://leaderboard.walletchat.fun`}color="green">{getSupportHeader()}</AlertBubble>
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex
