@@ -93,6 +93,22 @@ export const REACT_APP_ORIGIN_NAME_OPENPEER = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_OPENPEER
 // ------------------
 
+// --- 7Heaven ---
+
+// Community
+export const REACT_APP_DEFAULT_COMMUNITY_7HEAVEN = import.meta.env
+  .VITE_REACT_APP_DEFAULT_COMMUNITY_7HEAVEN
+// Support Wallet
+export const REACT_APP_SUPPORT_WALLET_7HEAVEN = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_7HEAVEN
+// App Url
+export const REACT_APP_APP_URL_7HEAVEN = import.meta.env
+  .VITE_REACT_APP_APP_URL_7HEAVEN
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_7HEAVEN = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_7HEAVEN
+// ------------------
+
 
 // --- SSO Demo ---
 
