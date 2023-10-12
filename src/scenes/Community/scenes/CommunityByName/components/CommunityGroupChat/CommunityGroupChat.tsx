@@ -28,7 +28,7 @@ import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
-import { getSupportHeader } from '@/helpers/widget'
+import { getSupportHeader, getSupportWallet } from '@/helpers/widget'
 
 import {
   GroupMessageType,
