@@ -36,29 +36,15 @@ export const REACT_APP_DEFAULT_COMMUNITY_GOODDOLLAR = import.meta.env
 // Support Wallet
 export const REACT_APP_SUPPORT_WALLET_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_GOODDOLLAR
+// Support Header
+export const REACT_APP_SUPPORT_HEADER_GOODDOLLAR = import.meta.env
+  .VITE_REACT_APP_SUPPORT_HEADER_GOODDOLLAR
 // App Url
 export const REACT_APP_APP_URL_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_APP_URL_GOODDOLLAR
 // Origin Name
 export const REACT_APP_ORIGIN_NAME_GOODDOLLAR = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_GOODDOLLAR
-// ------------------
-
-
-// --- MysticSwap ---
-
-// Community
-export const REACT_APP_DEFAULT_COMMUNITY_MYSTICSWAP = import.meta.env
-  .VITE_REACT_APP_DEFAULT_COMMUNITY_MYSTICSWAP
-// Support Wallet
-export const REACT_APP_SUPPORT_WALLET_MYSTICSWAP = import.meta.env
-  .VITE_REACT_APP_SUPPORT_WALLET_MYSTICSWAP
-// App Url
-export const REACT_APP_APP_URL_MYSTICSWAP = import.meta.env
-  .VITE_REACT_APP_APP_URL_MYSTICSWAP
-// Origin Name
-export const REACT_APP_ORIGIN_NAME_MYSTICSWAP = import.meta.env
-  .VITE_REACT_APP_ORIGIN_NAME_MYSTICSWAP
 // ------------------
 
 // --- Segmint.io ---
@@ -85,6 +71,9 @@ export const REACT_APP_DEFAULT_COMMUNITY_OPENPEER = import.meta.env
 // Support Wallet
 export const REACT_APP_SUPPORT_WALLET_OPENPEER = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_OPENPEER
+// Support Header
+export const REACT_APP_SUPPORT_HEADER_OPENPEER = import.meta.env
+  .VITE_REACT_APP_SUPPORT_HEADER_OPENPEER
 // App Url
 export const REACT_APP_APP_URL_OPENPEER = import.meta.env
   .VITE_REACT_APP_APP_URL_OPENPEER
@@ -101,6 +90,9 @@ export const REACT_APP_DEFAULT_COMMUNITY_7HEAVEN = import.meta.env
 // Support Wallet
 export const REACT_APP_SUPPORT_WALLET_7HEAVEN = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_7HEAVEN
+// Support Header
+export const REACT_APP_SUPPORT_HEADER_7HEAVEN = import.meta.env
+  .VITE_REACT_APP_SUPPORT_HEADER_7HEAVEN
 // App Url
 export const REACT_APP_APP_URL_7HEAVEN = import.meta.env
   .VITE_REACT_APP_APP_URL_7HEAVEN
@@ -118,6 +110,9 @@ export const REACT_APP_DEFAULT_COMMUNITY_SSO = import.meta.env
 // Support Wallet
 export const REACT_APP_SUPPORT_WALLET_SSO = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_SSO
+// Support Header
+export const REACT_APP_SUPPORT_HEADER_SSO = import.meta.env
+  .VITE_REACT_APP_SUPPORT_HEADER_SSO
 // App Url
 export const REACT_APP_APP_URL_SSO = import.meta.env
   .VITE_REACT_APP_APP_URL_SSO
@@ -148,6 +143,8 @@ export const REACT_APP_DEFAULT_COMMUNITY_LOCALHOST = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY_LOCALHOST
 export const REACT_APP_SUPPORT_WALLET_LOCALHOST = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_LOCALHOST
+export const REACT_APP_SUPPORT_HEADER_LOCALHOST = import.meta.env
+  .VITE_REACT_APP_SUPPORT_HEADER_LOCALHOST
 export const REACT_APP_APP_URL_LOCALHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_LOCALHOST
 export const REACT_APP_ORIGIN_NAME_LOCALHOST = import.meta.env
@@ -155,6 +152,8 @@ export const REACT_APP_ORIGIN_NAME_LOCALHOST = import.meta.env
 
 export const REACT_APP_SUPPORT_WALLET_TESTHOST = import.meta.env
   .VITE_REACT_APP_SUPPORT_WALLET_TESTHOST
+export const REACT_APP_SUPPORT_HEADER_TESTHOST = import.meta.env
+  .VITE_REACT_APP_SUPPORT_HEADER_TESTHOST
 export const REACT_APP_APP_URL_TESTHOST = import.meta.env
   .VITE_REACT_APP_APP_URL_TESTHOST
 export const REACT_APP_ORIGIN_NAME_TESTHOST = import.meta.env
