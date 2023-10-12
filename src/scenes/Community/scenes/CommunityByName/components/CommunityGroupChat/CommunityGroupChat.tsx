@@ -30,6 +30,7 @@ import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
+import { getSupportHeader } from '@/helpers/widget'
 
 import {
   GroupMessageType,
@@ -254,10 +255,6 @@ const CommunityGroupChat = ({
     onClose();
   }
 
-  const supportHeader =
-    ENV.REACT_APP_SUPPORT_HEADER ||
-    'Please use the support tab on the left for direct team support'
-
   const AlertBubble = ({
       children,
       color,
@@ -283,6 +280,7 @@ const CommunityGroupChat = ({
   return (
     <Flex flexDirection='column' height='100%'>
       <AlertBubble color='green'>{supportHeader}</AlertBubble>
+      <AlertBubble to={`https://leaderboard.walletchat.fun`}color="green">{getSupportHeader()}</AlertBubble>
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex
