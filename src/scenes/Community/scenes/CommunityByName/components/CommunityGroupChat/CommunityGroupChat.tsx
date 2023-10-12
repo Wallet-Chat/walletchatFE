@@ -20,7 +20,7 @@ import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
-import { Link as RLink } from 'react-router-dom'
+import { Link, Link as RLink } from 'react-router-dom'
 import TextareaAutosize from 'react-textarea-autosize'
 import ChatMessage from '../../../../../../components/Chat/ChatMessage'
 import { getFormattedDate } from '../../../../../../helpers/date'
@@ -243,12 +243,15 @@ const CommunityGroupChat = ({
   }
 
   const AlertBubble = ({
-      children,
-      color,
-    }: {
-      children: string
-      color: 'green' | 'red'
-    }) => (
+    children,
+    color,
+    to, // Add a prop to specify the target route
+  }: {
+    children: string;
+    color: 'green' | 'red';
+    to: string; // Specify the target route
+  }) => (
+    <Link to={to}>
       <Flex
         justifyContent='center'
         alignItems='center'
@@ -262,7 +265,8 @@ const CommunityGroupChat = ({
       >
         <Box fontSize='md'>{children}</Box>
       </Flex>
-    )
+    </Link>
+  );
 
   return (
     <Flex flexDirection='column' height='100%'>
