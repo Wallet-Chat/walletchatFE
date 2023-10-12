@@ -3,8 +3,6 @@ import * as wagmi from '@wagmi/core'
 import React from 'react'
 import Web3 from 'web3'
 import { SiweMessage } from 'siwe'
-
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
@@ -52,10 +50,6 @@ const isWidget = getIsWidgetContext()
 const WalletProviderContext = (chains: any) => {
   const dispatch = useAppDispatch()
 
-  // help debug issues and watch for high traffic conditions
-  const analytics = AnalyticsBrowser.load({
-    writeKey: ENV.REACT_APP_SEGMENT_KEY,
-  })
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
     app: 'WalletChatApp',
@@ -249,10 +243,8 @@ const WalletProviderContext = (chains: any) => {
   }, [dispatch, initialJwt, accountAuthenticated])
 
   React.useEffect(() => {
-    if (analytics && accountAddress && name && email) {
-      analytics.identify(accountAddress, { name, email })
+    if (accountAddress && name && email) {
       analyticsGA4.identify(accountAddress, { name, email })
-      
     }
   }, [accountAddress, email, name])
 
@@ -561,10 +553,6 @@ const WalletProviderContext = (chains: any) => {
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
         if (currentTime - lastTimestamp > oneDay) {
-          analytics.track('ConnectWallet_GoodDollar', {
-            site: document.referrer,
-            account: accountAddress,
-          })
           // ReactGA.event({
           //   category: "ConnectWallet",
           //   action: "ConnectWallet",

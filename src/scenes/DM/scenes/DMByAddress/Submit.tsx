@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
@@ -36,9 +35,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const [msgInput, setMsgInput] = useState<string>("")
-  const analytics = AnalyticsBrowser.load({
-    writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
-  })
+ 
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
     app: 'WalletChatApp',
@@ -189,11 +186,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     const value = msgInput
 
     if (value.length <= 0) return
-
-    analytics.track('SendMessage:GoodDollar', {
-      site: document.referrer,
-      account,
-    })
+    
     // ReactGA.event({
     //   category: "SendMessageCategory",
     //   action: "SendMessage",
