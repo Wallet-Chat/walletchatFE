@@ -236,7 +236,7 @@ const WalletProviderContext = (chains: any) => {
     dispatch(setIsAuthenticated(accountAuthenticated))
 
     if (storage.get('app-version') !== APP.VERSION) {
-      localStorage.clear()
+      try { if(localStorage) { localStorage.clear() } } catch (e) {}
       storage.set('app-version', APP.VERSION)
       window.location.reload()
     }
