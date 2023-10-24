@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
 	Box,
@@ -12,7 +12,9 @@ import {
 	Input,
 	Spinner,
 	Switch,
+	Image,
 	Text,
+	Tooltip
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import { isMobile } from 'react-device-detect'
@@ -26,6 +28,7 @@ import * as ENV from '@/constants/env'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from '@/redux/reducers/account'
+import { createResizedImage } from '@/utils/resizer'
 
 const CreateNewCommunity = () => {
 	const [name, setName] = useState<string>('')
@@ -35,8 +38,42 @@ const CreateNewCommunity = () => {
 	const [discordActive, setDiscordActive] = useState(false)
 	const account = useAppSelector((state) => selectAccount(state))
 	const [isFetching, setIsFetching] = useState(false)
+	const [file, setFile] = useState<Blob | MediaSource>()
+	const [filePreview, setFilePreview] = useState('')
+	const [resizedFile, setResizedFile] = useState<string>('');
+
+	const resizeAndSetFile = (file: File) => {
+		resizeFile(file) // Call the resize function
+		.then((resizedData: any) => setResizedFile(resizedData));
+	};
 
 	let navigate = useNavigate()
+
+	useEffect(() => {
+		// create the preview
+		if (file) {
+		  const objectUrl = URL.createObjectURL(file)
+		  setFilePreview(objectUrl)
+		  // free memory whenever this component is unmounted
+		  return () => URL.revokeObjectURL(objectUrl)
+		}
+	}, [file])
+
+	const resizeFile = (file: File) =>
+    new Promise((resolve) => {
+      createResizedImage(
+        file,
+        64,
+        64,
+        'JPEG',
+        100,
+        0,
+        (uri) => {
+          resolve(uri)
+        },
+        'base64'
+      )
+    })
 
 	const {
 		handleSubmit,
@@ -75,7 +112,8 @@ const CreateNewCommunity = () => {
 					Authorization: `Bearer ${getJwtForAccount(account)}`,
 				},
 				body: JSON.stringify({
-					name: values?.name,
+					name: name,
+					image: resizedFile,
 					social,
 				}),
 			}
@@ -160,6 +198,37 @@ const CreateNewCommunity = () => {
 						{errors?.name && errors?.name.type === 'validate' && (
 							<FormErrorMessage>Name is not valid</FormErrorMessage>
 						)}
+
+						<FormLabel fontWeight='bold' mt={5}>Upload Image</FormLabel>
+						<label>
+							{file && (
+							<Tooltip label='Change PFP'>
+								<Image
+									src={filePreview}
+									alt=''
+									maxW='80px'
+									maxH='80px'
+									border='2px solid #000'
+									borderRadius='lg'
+									cursor='pointer'
+									_hover={{ borderColor: 'gray.400' }}
+								/>
+							</Tooltip>
+							)}
+							<input
+								type='file'
+								onChange={(e: any) => {
+									const selectedFile = e.target.files[0];
+									setFile(selectedFile);
+									resizeAndSetFile(selectedFile);
+								}}
+								name='img'
+								style={{
+									position: file ? 'absolute' : 'relative',
+									opacity: file ? '0' : '1',
+								}}
+							/>
+						</label>
 					</FormControl>
 					<FormControl mb={5}>
 						<FormLabel>

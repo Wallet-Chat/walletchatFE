@@ -7,10 +7,12 @@ import {
 	FormErrorMessage,
 	FormLabel,
 	HStack,
+	Image,
 	Input,
 	Spinner,
 	Switch,
 	Text,
+	Tooltip,
 } from '@chakra-ui/react'
 import { IconArrowRight, IconBrandTwitter } from '@tabler/icons'
 import { useEffect, useState } from 'react'
@@ -25,6 +27,7 @@ import {
   selectIsAuthenticated,
   setAccount,
 } from '@/redux/reducers/account'
+import { createResizedImage } from '@/utils/resizer'
 
 const CommunityModalEdit = ({
 	setPageState,
@@ -42,8 +45,42 @@ const CommunityModalEdit = ({
 	const [twitterActive, setTwitterActive] = useState(false)
 	const [discord, setDiscord] = useState<string>('')
 	const [discordActive, setDiscordActive] = useState(false)
+	const [file, setFile] = useState<Blob | MediaSource>()
+	const [filePreview, setFilePreview] = useState('')
+	const [resizedFile, setResizedFile] = useState<string>('');
+
+	const resizeAndSetFile = (file: File) => {
+		resizeFile(file) // Call the resize function
+		.then((resizedData: any) => setResizedFile(resizedData));
+	};
 
 	const [isFetching, setIsFetching] = useState(false)
+
+	useEffect(() => {
+		// create the preview
+		if (file) {
+		  const objectUrl = URL.createObjectURL(file)
+		  setFilePreview(objectUrl)
+		  // free memory whenever this component is unmounted
+		  return () => URL.revokeObjectURL(objectUrl)
+		}
+	}, [file])
+
+	const resizeFile = (file: File) =>
+    new Promise((resolve) => {
+      createResizedImage(
+        file,
+        64,
+        64,
+        'JPEG',
+        100,
+        0,
+        (uri) => {
+          resolve(uri)
+        },
+        'base64'
+      )
+    })
 
 	const {
 		handleSubmit,
@@ -118,7 +155,8 @@ const CommunityModalEdit = ({
 					Authorization: `Bearer ${getJwtForAccount(account)}`,
 				},
 				body: JSON.stringify({
-					name: values?.name,
+					name: name,
+					image: resizedFile,
 					slug: community,
 					social,
 				}),
@@ -157,6 +195,37 @@ const CommunityModalEdit = ({
 						{errors?.name && errors?.name.type === 'validate' && (
 							<FormErrorMessage>Name is not valid</FormErrorMessage>
 						)}
+
+					<FormLabel fontWeight='bold' mt={5}>Upload Image</FormLabel>
+						<label>
+							{file && (
+							<Tooltip label='Change PFP'>
+								<Image
+									src={filePreview}
+									alt=''
+									maxW='80px'
+									maxH='80px'
+									border='2px solid #000'
+									borderRadius='lg'
+									cursor='pointer'
+									_hover={{ borderColor: 'gray.400' }}
+								/>
+							</Tooltip>
+							)}
+							<input
+								type='file'
+								onChange={(e: any) => {
+									const selectedFile = e.target.files[0];
+									setFile(selectedFile);
+									resizeAndSetFile(selectedFile);
+								}}
+								name='img'
+								style={{
+									position: file ? 'absolute' : 'relative',
+									opacity: file ? '0' : '1',
+								}}
+							/>
+						</label>
 					</FormControl>
 					<FormControl mb={5}>
 						<FormLabel>
