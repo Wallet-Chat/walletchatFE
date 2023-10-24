@@ -113,7 +113,7 @@ const CreateNewCommunity = () => {
 				},
 				body: JSON.stringify({
 					name: name,
-					logo: resizedFile,
+					image: resizedFile,
 					social,
 				}),
 			}
