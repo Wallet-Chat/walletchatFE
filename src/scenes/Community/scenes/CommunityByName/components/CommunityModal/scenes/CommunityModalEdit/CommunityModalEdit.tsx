@@ -156,7 +156,7 @@ const CommunityModalEdit = ({
 				},
 				body: JSON.stringify({
 					name: name,
-					logo: resizedFile,
+					image: resizedFile,
 					slug: community,
 					social,
 				}),

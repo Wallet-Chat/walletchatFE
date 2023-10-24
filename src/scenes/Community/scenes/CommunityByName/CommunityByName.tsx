@@ -115,8 +115,6 @@ const CommunityByName = () => {
     }
   }
 
-
-
 	return (
 		<Flex flexDirection='column' background='white' height='100vh' flex='1'>
 			<Flex
