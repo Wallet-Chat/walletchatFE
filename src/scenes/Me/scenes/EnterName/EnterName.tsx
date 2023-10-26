@@ -28,7 +28,6 @@ import { selectAccount } from '@/redux/reducers/account'
 import { log } from '@/helpers/log'
 import { createResizedImage } from '@/utils/resizer'
 import { getCommunity } from '@/helpers/widget'
-import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 

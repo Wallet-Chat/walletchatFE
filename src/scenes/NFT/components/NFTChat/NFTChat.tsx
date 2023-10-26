@@ -28,7 +28,6 @@ import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
 import ReactGA from "react-ga4";
-import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 

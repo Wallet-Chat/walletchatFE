@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import ReactGA from "react-ga4";
-import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
 import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent } from '@chakra-ui/react'

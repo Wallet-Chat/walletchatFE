@@ -3,7 +3,6 @@ import * as wagmi from '@wagmi/core'
 import React from 'react'
 import Web3 from 'web3'
 import { SiweMessage } from 'siwe'
-import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 

@@ -36,7 +36,6 @@ import {
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
 import ReactGA from "react-ga4";
-import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 
