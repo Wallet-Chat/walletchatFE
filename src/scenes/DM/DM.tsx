@@ -10,17 +10,6 @@ import ExtensionCloseButton from '@/components/ExtensionCloseButton'
 const Inbox = () => {
   const isSmallLayout = useIsSmallLayout()
 
-  // const communities = React.useMemo(() => inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')), [inboxData])
-
-  // const [encryptedChatData, setEncChatData] = useState<InboxItemType[]>(
-  //   localStorage[localStorageKey] ? JSON.parse(localStorage[localStorageKey]) : []
-  // )
-  // const { unreadCount } = useUnreadCount()
-
-  // if (isFetchingInboxData && inboxData.length === 0) {
-  //    return <InboxListLoadingSkeleton />
-  // }
-
   return (
     <Flex
       direction='column'
