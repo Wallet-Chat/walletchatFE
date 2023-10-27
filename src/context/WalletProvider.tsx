@@ -42,6 +42,7 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
+import Analytics from 'analytics'
 
 const isWidget = getIsWidgetContext()
 

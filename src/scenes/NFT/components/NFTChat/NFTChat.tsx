@@ -30,6 +30,7 @@ import ChatMessage from '../../../../components/Chat/ChatMessage'
 import ReactGA from "react-ga4";
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
+import Analytics from 'analytics'
 
 const NFTChat = ({
   recipientAddr,

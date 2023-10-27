@@ -30,6 +30,7 @@ import { createResizedImage } from '@/utils/resizer'
 import { getCommunity } from '@/helpers/widget'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
+import Analytics from 'analytics'
 
 const EnterName = () => {
   const {
