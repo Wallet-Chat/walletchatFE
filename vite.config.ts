@@ -36,6 +36,7 @@ export default defineConfig({
             format: 'es',
             dir: 'dist',
             entryFileNames: 'assets/[name].js',
+            sourcemap: true, 
           },
         },
       },
