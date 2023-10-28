@@ -14,7 +14,6 @@ export type StoreKeys =
 const storage = {
   set: (key: StoreKeys, data: any) => {
     try {
-      console.log("localStorage:  2")
       if (localStorage) {
         return localStorage.setItem(key, JSON.stringify(data))
       }
@@ -27,7 +26,6 @@ const storage = {
 
   get: (key: StoreKeys) => {
     try {
-      console.log("localStorage:  3")
       if (localStorage) {
         const data = localStorage.getItem(key)
         if (data) {
@@ -45,7 +43,6 @@ const storage = {
 
   push: (key: StoreKeys, data: any) => {
     try {
-      console.log("localStorage:  4")
       const currentData = localStorage.getItem(key)
 
       const parsedData = new Set(currentData ? JSON.parse(currentData) : [])
