@@ -108,6 +108,14 @@ const NFTGroupChat = ({
       account: account,
     })
 
+    try {
+      window.dataLayer = window.dataLayer || []; //initialising data layer
+      window.dataLayer.push({
+          event: "sendNftGroupMessage", // event name
+          walletaddr: account.toLocaleLowerCase(), 
+      });
+    } catch(e) {}
+
     if (msgInput.length <= 0) return
     if (!account) {
       log('No account connected')
