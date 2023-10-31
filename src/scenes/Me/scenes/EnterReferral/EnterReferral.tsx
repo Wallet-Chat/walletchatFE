@@ -48,6 +48,7 @@ const EnterReferral = () => {
   const account = useAppSelector((state) => selectAccount(state))
   const toast = useToast()
   const [isFetching, setIsFetching] = useState(false)
+  //const bypassReferral = useRef()
 
   useEffect(() => {
     log(errors)
@@ -70,6 +71,8 @@ const EnterReferral = () => {
 
     if (values?.referralCode) {
       setIsFetching(true)
+
+      console.log("its here....: ", referralCode)
 
       fetch(` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/redeem_referral_code/${referralCode}`, {
         method: 'GET',
@@ -162,18 +165,8 @@ const EnterReferral = () => {
             </a>
             <br></br>
             <br></br>
-            No Twitter?  No problem proceed without the extra chat points: 
-            <br></br>       
-            <Button
-              variant='black'
-              height='auto'
-              type='submit'
-              onClick={() => {
-                setReferralCode("wc-test")
-              }}
-            >
-              {'Proceed Without Referral Points'}
-            </Button>
+            No Twitter?  No problem, proceed without referral chat points by using: <b>wc-test</b>
+            <br></br>
           </FormLabel>
           {errors.referralCode &&
             errors.referralCode.type === 'required' &&
