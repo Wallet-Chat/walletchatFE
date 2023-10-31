@@ -160,6 +160,19 @@ const EnterReferral = () => {
             >
                 Tweet @wallet_chat!
             </a>
+            <br></br>
+            No Twitter?  No problem proceed without the extra chat points: &nbsp;       
+            <Button
+              variant='black'
+              height='auto'
+              type='submit'
+              isLoading={isFetching}
+              onClick={() => {
+                setReferralCode("wc-test")
+              }}
+            >
+              {'Proceed Without Referral Points'}
+            </Button>
           </FormLabel>
           {errors.referralCode &&
             errors.referralCode.type === 'required' &&
