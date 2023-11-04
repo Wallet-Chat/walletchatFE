@@ -249,11 +249,15 @@ const ChatMessage = ({
         }
       )
         .then((response) => response.json())
-        .then((data) => {
+        .then(async (data) => {
           log('✅[PUT][Message]:', data)
 
+          //WalletGuard API To check for scam links
+          const updatedMessageNoBadLinks = await handleScanAndRemoveURL(message);
+          //console.log("updatedMessageNoBadLinks: ", updatedMessageNoBadLinks)
+
           dispatch(
-            updateQueryChatData({ account, toAddr: fromAddr }, () => {
+              updateQueryChatData({ account, toAddr: fromAddr }, () => {
               let currentChatData: any = (
                 getLocalDmDataForAccountToAddr(account, fromAddr) || []
               )
@@ -261,7 +265,8 @@ const ChatMessage = ({
               currentChatData = currentChatData.map((dataMsg: MessageUIType, i: number) => {
                 if (dataMsg.Id === msg.Id) {
                   // Update the 'read' property to true for the matching message
-                  return { ...dataMsg, read: true };
+                  // also update the message data locally in case WGuard blocked a bad link 
+                  return { ...dataMsg, read: true, message: updatedMessageNoBadLinks};
                 }
                 return dataMsg; // Return the original message for non-matching messages
               });
@@ -280,9 +285,6 @@ const ChatMessage = ({
               return JSON.stringify({ messages: newChatData })
             })
           )
-
-          //WalletGuard API To check for scam links
-          handleScanAndRemoveURL(message);
 
           if (account !== fromAddr) {
             dispatch(
@@ -352,12 +354,13 @@ const ChatMessage = ({
     return messageIn;
   }
 
-  const handleScanAndRemoveURL = (messageIn) => {
+  const handleScanAndRemoveURL = async (messageIn) => {
+    let returnVal = messageIn
     if (message.includes("https") || message.includes("http")) {
 
       const urls = extractUrlsFromMessage(message)
 
-      fetch(
+      await fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/wallet_guard_check`,
         {
           method: 'POST',
@@ -371,17 +374,19 @@ const ChatMessage = ({
       )
         .then((response) => response.json())
         .then((recommendedActions: string[]) => {
-          console.log('✅[POST][WalletGuard Link Check]:', recommendedActions)
+          log('✅[POST][WalletGuard Link Check]:', recommendedActions)
 
           const updatedMessage = replaceBlockedUrls(recommendedActions, messageIn) 
-          console.log('Updated Message:', updatedMessage)
+          log('Updated Message:', updatedMessage)
           setMessage(updatedMessage); // Update the local variable
-          
+          returnVal = updatedMessage
         })
         .catch((error) => {
           console.error('🚨[GET][WalletGuard URL Check]:', error)
         })
      }
+
+     return returnVal
   };
 
   return (
