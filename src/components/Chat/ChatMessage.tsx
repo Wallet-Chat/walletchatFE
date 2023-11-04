@@ -3,10 +3,7 @@ import {
   Button,
   Flex,
   Image,
-  SkeletonText,
-  Spinner,
   Text,
-  Tooltip,
 } from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -14,7 +11,6 @@ import {
   IconCheck,
   IconChecks,
   IconExternalLink,
-  IconAlertCircle,
 } from '@tabler/icons'
 import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
@@ -171,7 +167,7 @@ const ChatMessage = ({
   })
 
   const dispatch = useAppDispatch()
-
+  const [message, setMessage] = useState(msg.message);
   const [nftData, setNftData] = useState<NFT>()
   const fromAddr = msg?.fromaddr || msg?.fromAddr
 
@@ -239,7 +235,7 @@ const ChatMessage = ({
   }, [msg, account, context, nftData])
 
   const setMessageAsRead = useCallback(() => {
-    if (msg.toaddr && fromAddr && msg.timestamp && account) {
+    if (msg.toaddr && fromAddr && msg.timestamp && account && !msg.read) {
       fetch(
         ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/update_chatitem/${fromAddr}/${msg.toaddr}}`,
         {
@@ -253,20 +249,27 @@ const ChatMessage = ({
         }
       )
         .then((response) => response.json())
-        .then((data) => {
+        .then(async (data) => {
           log('✅[PUT][Message]:', data)
 
+          //WalletGuard API To check for scam links
+          const updatedMessageNoBadLinks = await handleScanAndRemoveURL(message);
+          //console.log("updatedMessageNoBadLinks: ", updatedMessageNoBadLinks)
+
           dispatch(
-            updateQueryChatData({ account, toAddr: fromAddr }, () => {
-              const currentChatData: any = (
+              updateQueryChatData({ account, toAddr: fromAddr }, () => {
+              let currentChatData: any = (
                 getLocalDmDataForAccountToAddr(account, fromAddr) || []
               )
               
-              currentChatData.map((dataMsg: MessageUIType, i: number) => {
+              currentChatData = currentChatData.map((dataMsg: MessageUIType, i: number) => {
                 if (dataMsg.Id === msg.Id) {
-                  return { ...currentChatData[i], read: true }
+                  // Update the 'read' property to true for the matching message
+                  // also update the message data locally in case WGuard blocked a bad link 
+                  return { ...dataMsg, read: true, message: updatedMessageNoBadLinks};
                 }
-              })
+                return dataMsg; // Return the original message for non-matching messages
+              });
 
               updateLocalDmDataForAccountToAddr(
                 account,
@@ -323,6 +326,69 @@ const ChatMessage = ({
     }
   }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
 
+  function extractUrlsFromMessage(messageIn) {
+    // Regular expression to match both http and https URLs
+    const urlRegex = /(https?|http):\/\/[^\s/$.?#].[^\s]*/g;
+  
+    // Use the regular expression to find all URLs in the message
+    const urls = messageIn.match(urlRegex);
+  
+    return urls || [];
+  }
+
+  function replaceBlockedUrls(statusArray, messageIn) {
+    // Regular expression to match both http and https URLs
+    const urlRegex = /(https?|http):\/\/[^\s/$.?#].[^\s]*/g;
+  
+    // Extract all URLs from the message
+    const urlsInMessage = messageIn.match(urlRegex) || [];
+  
+    // Iterate through the URLs and their corresponding statuses
+    urlsInMessage.forEach((url, index) => {
+      const status = statusArray[index];
+      if (status === "BLOCK") {
+        messageIn = messageIn.replace(url, "URL_BLOCKED_BY_WALLETGUARD");
+      }
+    });
+  
+    return messageIn;
+  }
+
+  const handleScanAndRemoveURL = async (messageIn) => {
+    let returnVal = messageIn
+    if (message.includes("https") || message.includes("http")) {
+
+      const urls = extractUrlsFromMessage(message)
+
+      await fetch(
+        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/wallet_guard_check`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          },
+          body: JSON.stringify(urls),
+        }
+      )
+        .then((response) => response.json())
+        .then((recommendedActions: string[]) => {
+          log('✅[POST][WalletGuard Link Check]:', recommendedActions)
+
+          const updatedMessage = replaceBlockedUrls(recommendedActions, messageIn) 
+          log('Updated Message:', updatedMessage)
+          setMessage(updatedMessage); // Update the local variable
+          returnVal = updatedMessage
+        })
+        .catch((error) => {
+          console.error('🚨[GET][WalletGuard URL Check]:', error)
+        })
+     }
+
+     return returnVal
+  };
+
   return (
     <Flex
       alignItems='flex-start'
@@ -375,7 +441,9 @@ const ChatMessage = ({
               marginBottom='2'
             />
           ) : ( */}
-            <Box>{msg.message}</Box>
+            <Box>
+              {message}
+            </Box>
           {/* )} */}
           <Box
             d='inline-block'
