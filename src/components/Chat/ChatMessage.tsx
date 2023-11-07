@@ -7,6 +7,7 @@ import {
 } from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
+import { parseDomain } from 'parse-domain'
 import {
   IconCheck,
   IconChecks,
@@ -234,6 +235,87 @@ const ChatMessage = ({
     }
   }, [msg, account, context, nftData])
 
+  function extractUrlsFromMessage(messageIn) {
+    // Regular expression to match URLs in the message
+    const urlRegex = /((https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b[\w-]+(\.[\w-]+)+\b)/ig;
+  
+    // Use the regular expression to find all URLs in the message
+    const urls = messageIn.match(urlRegex);
+  
+    // Filter out invalid URLs
+    const validUrls = urls.filter((url) => {
+      //standardize what we send to parse-domain
+      url = url.replace('https://', '');
+      url = url.replace('http://', '');
+      url = url.replace('www.', '');
+    
+      const backslashIndex = url.indexOf('/');
+      if (backslashIndex !== -1) {
+        url = url.substring(0, backslashIndex);
+      }
+
+      const parsedDomain = parseDomain(url);
+      // Check if the top-level domain is valid
+      return parsedDomain && parsedDomain.type == 'LISTED';
+    });
+  
+    return validUrls;
+  }    
+
+  function replaceBlockedUrls(statusArray, messageIn) {
+    // Regular expression to match both http and https URLs
+    const urlRegex = /((https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b[\w-]+(\.[\w-]+)+\b)/ig;
+  
+    // Extract all URLs from the message
+    const urlsInMessage = messageIn.match(urlRegex) || [];
+  
+    // Iterate through the URLs and their corresponding statuses
+    urlsInMessage.forEach((url, index) => {
+      const status = statusArray[index];
+      if (status === "BLOCK") {
+        messageIn = messageIn.replace(url, "URL_BLOCKED_BY_WALLETGUARD");
+      }
+    });
+  
+    return messageIn;
+  }
+
+  const handleScanAndRemoveURL = async (messageIn) => {
+    let returnVal = messageIn
+    //if (message.includes("https") || message.includes("http")) {
+
+      const urls = extractUrlsFromMessage(message)
+
+      await fetch(
+        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/wallet_guard_check`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          },
+          body: JSON.stringify(urls),
+        }
+      )
+        .then((response) => response.json())
+        .then((recommendedActions: string[]) => {
+          log('✅[POST][WalletGuard Link Check]:', recommendedActions)
+
+          const updatedMessage = replaceBlockedUrls(recommendedActions, messageIn) 
+          log('Updated Message:', updatedMessage)
+          setMessage(updatedMessage); // Update the local variable
+          returnVal = updatedMessage
+        })
+        .catch((error) => {
+          console.error('🚨[GET][WalletGuard URL Check]:', error)
+        })
+     //}
+
+     return returnVal
+  };
+
+
   const setMessageAsRead = useCallback(() => {
     if (msg.toaddr && fromAddr && msg.timestamp && account && !msg.read) {
       fetch(
@@ -325,69 +407,6 @@ const ChatMessage = ({
       setMessageAsRead()
     }
   }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
-
-  function extractUrlsFromMessage(messageIn) {
-    // Regular expression to match both http and https URLs
-    const urlRegex = /(https?|http):\/\/[^\s/$.?#].[^\s]*/g;
-  
-    // Use the regular expression to find all URLs in the message
-    const urls = messageIn.match(urlRegex);
-  
-    return urls || [];
-  }
-
-  function replaceBlockedUrls(statusArray, messageIn) {
-    // Regular expression to match both http and https URLs
-    const urlRegex = /(https?|http):\/\/[^\s/$.?#].[^\s]*/g;
-  
-    // Extract all URLs from the message
-    const urlsInMessage = messageIn.match(urlRegex) || [];
-  
-    // Iterate through the URLs and their corresponding statuses
-    urlsInMessage.forEach((url, index) => {
-      const status = statusArray[index];
-      if (status === "BLOCK") {
-        messageIn = messageIn.replace(url, "URL_BLOCKED_BY_WALLETGUARD");
-      }
-    });
-  
-    return messageIn;
-  }
-
-  const handleScanAndRemoveURL = async (messageIn) => {
-    let returnVal = messageIn
-    if (message.includes("https") || message.includes("http")) {
-
-      const urls = extractUrlsFromMessage(message)
-
-      await fetch(
-        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/wallet_guard_check`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${getJwtForAccount(account)}`,
-          },
-          body: JSON.stringify(urls),
-        }
-      )
-        .then((response) => response.json())
-        .then((recommendedActions: string[]) => {
-          log('✅[POST][WalletGuard Link Check]:', recommendedActions)
-
-          const updatedMessage = replaceBlockedUrls(recommendedActions, messageIn) 
-          log('Updated Message:', updatedMessage)
-          setMessage(updatedMessage); // Update the local variable
-          returnVal = updatedMessage
-        })
-        .catch((error) => {
-          console.error('🚨[GET][WalletGuard URL Check]:', error)
-        })
-     }
-
-     return returnVal
-  };
 
   return (
     <Flex
