@@ -353,6 +353,56 @@ const CommunityGroupChat = ({
             />
           </PopoverContent>
         </Popover>
+        <Popover placement='top-start' isLazy onClose={onClose}>
+          <PopoverTrigger>
+            <Container 
+              w={0}
+              centerContent
+              bgColor="lightgray.500"
+              borderRadius={2}
+              cursor="pointer"
+              children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
+            />
+          </PopoverTrigger>
+          <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
+            <Box 
+              maxH="100%" 
+              overflowY="scroll" 
+              alignItems="center"
+              css={{
+                "&::-webkit-scrollbar": {
+                  width: "0.4em",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0, 0, 0, 0)",
+                },
+              }}
+            >
+              <Input 
+                my={5}
+                placeholder='Search GiFs' 
+                size='md' 
+                bgColor="black"
+                border="none"
+                focusBorderColor="black"
+                color="white"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              {searchInput ? (
+                <FetchSearchedGIfs />
+              ) : (
+                <Grid
+                  onGifClick={onGifClick}
+                  fetchGifs={fetchGifs}
+                  width={400}
+                  columns={4}
+                  gutter={6}
+                />
+              )}
+            </Box>
+          </PopoverContent>
+        </Popover>
 
         <Textarea 
           placeholder='Write a message...'

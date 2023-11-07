@@ -475,7 +475,13 @@ const ChatMessage = ({
             />
           ) : ( */}
             <Box>
-              {message}
+              {msg.message?.includes("giphy.com") 
+                ? 
+                  <Image src={msg.message} alt='' height={60} width={60} />
+                : 
+                  msg.message
+              }
+              {/* {msg.message} */}
             </Box>
           {/* )} */}
           <Box
