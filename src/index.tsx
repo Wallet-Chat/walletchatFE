@@ -98,13 +98,13 @@ ReactDOM.render(
         <WagmiConfig client={wagmiClient}>
           <RainbowKitProvider chains={chains}>
             <WalletProvider chains={chains}>
-              <UnreadCountProvider>
-                <ChakraProvider theme={theme}>
-                  <Flex w='100vw' h='100vh'>
-                    <App />
-                  </Flex>
-                </ChakraProvider>
-              </UnreadCountProvider>
+                <UnreadCountProvider>
+                  <ChakraProvider theme={theme}>
+                    <Flex w='100vw' h='100vh'>
+                      <App />
+                    </Flex>
+                  </ChakraProvider>
+                </UnreadCountProvider>
             </WalletProvider>
           </RainbowKitProvider>
         </WagmiConfig>

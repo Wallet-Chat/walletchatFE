@@ -30,7 +30,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
   const { onOpen, onClose, } = useDisclosure();
   const { colorMode } = useColorMode();
-
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -307,7 +306,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
           />
         </PopoverContent>
       </Popover>
-      {/* <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
+      <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
         <PopoverTrigger>
           <Container 
             w={0}
@@ -356,7 +355,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             )}
           </Box>
         </PopoverContent>
-      </Popover> */}
+      </Popover>
 
       <Textarea 
         placeholder='Write a message...'
