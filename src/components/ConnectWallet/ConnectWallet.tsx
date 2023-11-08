@@ -91,7 +91,7 @@ const ConnectWalletButton = () => {
 
           return (
             <Flex direction='column' gap={2} alignItems='start'>
-              {canUseWidgetConnection ? (
+              {canUseWidgetConnection && handleLogin() ? (
                 <Button variant='black' size='lg' onClick={handleLogin}>
                   <Tag
                     variant='solid'
