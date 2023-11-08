@@ -236,30 +236,33 @@ const ChatMessage = ({
   }, [msg, account, context, nftData])
 
   function extractUrlsFromMessage(messageIn) {
+    let returnUrls = []
     // Regular expression to match URLs in the message
     const urlRegex = /((https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b[\w-]+(\.[\w-]+)+\b)/ig;
   
     // Use the regular expression to find all URLs in the message
     const urls = messageIn.match(urlRegex);
   
-    // Filter out invalid URLs
-    const validUrls = urls.filter((url) => {
-      //standardize what we send to parse-domain
-      url = url.replace('https://', '');
-      url = url.replace('http://', '');
-      url = url.replace('www.', '');
-    
-      const backslashIndex = url.indexOf('/');
-      if (backslashIndex !== -1) {
-        url = url.substring(0, backslashIndex);
-      }
+    if (urls?.length > 0) {
+      // Filter out invalid URLs
+      returnUrls = urls.filter((url) => {
+        //standardize what we send to parse-domain
+        url = url.replace('https://', '');
+        url = url.replace('http://', '');
+        url = url.replace('www.', '');
+      
+        const backslashIndex = url.indexOf('/');
+        if (backslashIndex !== -1) {
+          url = url.substring(0, backslashIndex);
+        }
 
-      const parsedDomain = parseDomain(url);
-      // Check if the top-level domain is valid
-      return parsedDomain && parsedDomain.type == 'LISTED';
-    });
+        const parsedDomain = parseDomain(url);
+        // Check if the top-level domain is valid
+        return parsedDomain && parsedDomain.type == 'LISTED';
+      });
+    }
   
-    return validUrls;
+    return returnUrls;
   }    
 
   function replaceBlockedUrls(statusArray, messageIn) {
@@ -286,30 +289,32 @@ const ChatMessage = ({
 
       const urls = extractUrlsFromMessage(message)
 
-      await fetch(
-        ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/wallet_guard_check`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${getJwtForAccount(account)}`,
-          },
-          body: JSON.stringify(urls),
-        }
-      )
-        .then((response) => response.json())
-        .then((recommendedActions: string[]) => {
-          log('✅[POST][WalletGuard Link Check]:', recommendedActions)
+      if (urls?.length > 0) {
+        await fetch(
+          ` ${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/wallet_guard_check`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${getJwtForAccount(account)}`,
+            },
+            body: JSON.stringify(urls),
+          }
+        )
+          .then((response) => response.json())
+          .then((recommendedActions: string[]) => {
+            log('✅[POST][WalletGuard Link Check]:', recommendedActions)
 
-          const updatedMessage = replaceBlockedUrls(recommendedActions, messageIn) 
-          log('Updated Message:', updatedMessage)
-          setMessage(updatedMessage); // Update the local variable
-          returnVal = updatedMessage
-        })
-        .catch((error) => {
-          console.error('🚨[GET][WalletGuard URL Check]:', error)
-        })
+            const updatedMessage = replaceBlockedUrls(recommendedActions, messageIn) 
+            log('Updated Message:', updatedMessage)
+            setMessage(updatedMessage); // Update the local variable
+            returnVal = updatedMessage
+          })
+          .catch((error) => {
+            console.error('🚨[GET][WalletGuard URL Check]:', error)
+          })
+      }
      //}
 
      return returnVal
@@ -397,14 +402,19 @@ const ChatMessage = ({
     }
   }, [msg, account, fromAddr, dispatch])
 
-  useEffect(() => {
+  useEffect(async () => {
     if (
-      context === 'dm' &&
+      context == 'dm' &&
       isInViewport &&
       msg?.read === false &&
       !msgSentByMe
     ) {
-      setMessageAsRead()
+        setMessageAsRead()
+    } else if (context != 'dm') {
+      //WalletGuard API To check for scam links
+      const updatedMessageNoBadLinks = await handleScanAndRemoveURL(message);
+      //console.log("updatedMessageNoBadLinks: ", updatedMessageNoBadLinks)
+      setMessage(updatedMessageNoBadLinks)
     }
   }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
 
