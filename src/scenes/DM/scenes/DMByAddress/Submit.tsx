@@ -220,8 +220,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       });
     } catch(e) {}
 
-    prevMessage.current = msgInput
-
     // // clear input field
     setMsgInput('');
 
