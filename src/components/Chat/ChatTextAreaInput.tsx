@@ -2,17 +2,24 @@ import {
    Button, 
    Flex, 
    Icon, 
-   InputRightElement, 
-   InputGroup, 
+   Input,
+   Box,
    Popover, 
    PopoverTrigger, 
    PopoverContent, 
    Textarea,
-   Container
+   Container,
+   useDisclosure,
+   Menu,
+   MenuButton,
+   MenuList,
+   MenuItem
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
+import { GrAddCircle, GrImage } from "react-icons/gr"
+import { AiOutlineFileGif } from "react-icons/ai"
 import { IconSend } from '@tabler/icons'
 import React, { KeyboardEvent, useEffect, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize'
@@ -25,6 +32,16 @@ const ChatTextAreaInput = ({
    sendMessage: (msg: string) => void
 }) => {
    const [msgInput, setMsgInput] = useState<string>('')
+   const [searchInput, setSearchInput] = useState<string>("")
+   const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
+   const { onClose, onToggle, isOpen } = useDisclosure();
+
+   const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
+
+    function FetchSearchedGIfs() {
+      const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
+      return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
+    }
 
    useEffect(() => {
       setMsgInput('');
@@ -50,77 +67,108 @@ const ChatTextAreaInput = ({
       setMsgInput(msgInput + emoji);
     }
 
-   return (
-    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <Popover placement='top-start' isLazy>
-        <PopoverTrigger>
-          <Container 
-            w={0}
-            centerContent
-            children={<Icon as={BsEmojiSmile} color="black.500" h={6} w={6} />}
-          />
-        </PopoverTrigger>
-        <PopoverContent w="283px">  
-          <Picker 
-            data={data}
-            emojiSize={20}
-            emojiButtonSize={28}
-            onEmojiSelect={addEmoji}
-            maxFrequentRows={4}
-          />
-        </PopoverContent>
-      </Popover>
-      <Popover placement='top-start' isLazy onClose={onClose}>
-        <PopoverTrigger>
-          <Container 
-            w={0}
-            centerContent
-            bgColor="lightgray.500"
-            borderRadius={2}
-            cursor="pointer"
-            children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
-          />
-        </PopoverTrigger>
-        <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
-          <Box 
-            maxH="100%" 
-            overflowY="scroll" 
-            alignItems="center"
-            css={{
-              "&::-webkit-scrollbar": {
-                width: "0.4em",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "rgba(0, 0, 0, 0)",
-              },
-            }}
-          >
-            <Input 
-              my={5}
-              placeholder='Search GiFs' 
-              size='md' 
-              bgColor="black"
-              border="none"
-              focusBorderColor="black"
-              color="white"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            {searchInput ? (
-              <FetchSearchedGIfs />
-            ) : (
-              <Grid
-                onGifClick={onGifClick}
-                fetchGifs={fetchGifs}
-                width={400}
-                columns={4}
-                gutter={6}
-              />
-            )}
-          </Box>
-        </PopoverContent>
-      </Popover>
+    const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+      e.preventDefault();
+  
+      const gifUrl = gif.images.original.url;
+      const updatedMsgInput = msgInput + gifUrl;
+  
+      sendMessage(updatedMsgInput);
+      onClose();
+    }
 
+    const onToggleMenu = (item: string) => {
+      setSelectedMenuItem(item);
+      onToggle();
+    }
+
+    const renderPopoverContent = () => {
+      if (selectedMenuItem === 'emoji') {
+        return (
+          <PopoverContent w="283px">
+            <Picker 
+              data={data}
+              emojiSize={20}
+              emojiButtonSize={28}
+              onEmojiSelect={addEmoji}
+              maxFrequentRows={4}
+            />
+          </PopoverContent>
+        );
+      } else if (selectedMenuItem === 'gif') {
+        return (
+          <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
+            <Box 
+              maxH="100%" 
+              overflowY="scroll" 
+              alignItems="center"
+              css={{
+                "&::-webkit-scrollbar": {
+                  width: "0.4em",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0, 0, 0, 0)",
+                },
+              }}
+            >
+              <Input 
+                my={5}
+                placeholder='Search GiFs' 
+                size='md' 
+                bgColor="black"
+                border="none"
+                focusBorderColor="black"
+                color="white"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              {searchInput ? (
+                <FetchSearchedGIfs />
+              ) : (
+                <Grid
+                  onGifClick={onGifClick}
+                  fetchGifs={fetchGifs}
+                  width={400}
+                  columns={4}
+                  gutter={6}
+                />
+              )}
+            </Box>
+          </PopoverContent>
+        );
+      } else if (selectedMenuItem === 'photo') {
+        return (
+          <PopoverContent w="283px">
+            {/* Photo content here */}
+          </PopoverContent>
+        );
+      }
+      return null;
+    };
+
+   return (
+    <Flex p='4' alignItems='center' justifyContent='center' gap='4'> 
+      <Popover isOpen={isOpen} onClose={onClose} placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            centerContent
+            cursor="pointer"
+          >
+            <Menu>
+              <MenuButton>
+                <Icon as={GrAddCircle} color="black.500" h={6} w={6} marginTop={2} />
+              </MenuButton>
+              <MenuList>
+                <MenuItem icon={<BsEmojiSmile />} onClick={() => onToggleMenu("emoji")} >Add an Emoji</MenuItem>
+                <MenuItem icon={<AiOutlineFileGif />} onClick={() => onToggleMenu("gif")} >Add a GIF</MenuItem>
+                <MenuItem icon={<GrImage />} onClick={() => onToggleMenu("photo")}>Add a Photo</MenuItem>
+              </MenuList>
+            </Menu>
+          </Container>
+        </PopoverTrigger>
+        {renderPopoverContent()}
+      </Popover>
       <Textarea 
         placeholder='Write a message...'
         onChange={(e) => setMsgInput(e.target.value)}
@@ -131,7 +179,6 @@ const ChatTextAreaInput = ({
         pt={3.5}
         resize='none'
       />
-      
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
