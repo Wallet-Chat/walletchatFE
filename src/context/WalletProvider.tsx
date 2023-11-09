@@ -243,7 +243,7 @@ const dispatch = useAppDispatch()
   }, [dispatch, initialJwt, accountAuthenticated])
 
   React.useEffect(() => {
-    if (analytics && accountAddress && name && email) {
+    if (accountAddress && name && email) {
       analyticsGA4.identify(accountAddress, { name, email }) 
     }
   }, [accountAddress, email, name])
