@@ -62,6 +62,71 @@ interface URLChangedEvent extends Event {
   detail?: string
 }
 
+//can delete this if we get leaderboard inside the app, then we don't need the external sidebar link
+const ExternalSidebarLink = styled(
+  ({
+    children,
+    className,
+    to,
+    end,
+  }: {
+    children: any
+    className?: string
+    to: string
+    end?: boolean
+  }) => {
+    return (
+      <a href={to} target="_blank" className={className}>
+        {children}
+      </a>
+    )
+  }
+)`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: ${isMobile ? '50px' : '60px'};  // Adjusted width
+  height: ${isMobile ? '50px' : '60px'};  // Adjusted height
+  padding: var(--chakra-space-2);
+  margin-bottom: ${isMobile ? '0' : '0.2rem'};
+  margin-right: ${isMobile ? '0.2rem' : '0.2rem'};
+  border-radius: 0.5rem;
+  text-align: center;
+  box-sizing: border-box;
+  background: #fff;
+
+  &::before {
+    content: '';
+    width: 5px;
+    height: 35%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: transparent;
+    border-top-right-radius: 0.2rem;
+    border-bottom-right-radius: 0.2rem;
+  }
+
+  img {
+    opacity: 0.6;
+  }
+
+  &:hover,
+  &.active {
+    background: var(--chakra-colors-lightgray-400);
+
+    &::before {
+      background: var(--chakra-colors-darkgray-900);
+    }
+
+    img {
+      opacity: 1;
+    }
+  }
+`
+
 const SidebarLink = styled(
   ({
     children,
@@ -386,18 +451,14 @@ export default function Sidebar() {
           </SidebarLink>
         )}
 
+        <ExternalSidebarLink to='https://leaderboard.walletchat.fun'>
+          <Image src={IconLeaderboard} alt='' />
+        </ExternalSidebarLink>
+
           {/* active this when we finally add the leaderboard into the app */}
         {/* <SidebarLink to='/leaderboard'>
           <Image src={IconLeaderboard} alt='' />
         </SidebarLink> */}
-
-        <Flex align="center">
-          <a href="https://leaderboard.walletchat.fun" target="_blank">
-            <button>
-              <Image src={IconLeaderboard} alt='leaderboard icon'/>
-            </button>
-          </a>
-        </Flex>
 
         {metadata && (
           <NFTSidebarLink to={`/nft/${chainName}/${nftContractAddr}/${nftId}`}>

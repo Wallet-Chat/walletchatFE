@@ -217,6 +217,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       account,
     })
 
+    try {
+      window.dataLayer = window.dataLayer || []; //initialising data layer
+      window.dataLayer.push({
+          event: "sendMessage", // event name
+          walletaddr: account.toLocaleLowerCase(), 
+      });
+    } catch(e) {}
+
     prevMessage.current = msgInput
 
     // // clear input field

@@ -165,6 +165,14 @@ const CommunityGroupChat = ({
       account
     });
 
+    try {
+      window.dataLayer = window.dataLayer || []; //initialising data layer
+      window.dataLayer.push({
+          event: "sendCommunityMessage", // event name
+          walletaddr: account.toLocaleLowerCase(), 
+      });
+    } catch(e) {}
+
     // Make a copy and clear input field
     const msgInputCopy = (' ' + msgInput).slice(1)
     prevMessage.current = msgInput
