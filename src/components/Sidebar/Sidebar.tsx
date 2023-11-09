@@ -86,8 +86,8 @@ const ExternalSidebarLink = styled(
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: ${isMobile ? '60px' : '60px'};  // Adjusted width
-  height: ${isMobile ? '60px' : '60px'};  // Adjusted height
+  width: ${isMobile ? '50px' : '60px'};  // Adjusted width
+  height: ${isMobile ? '50px' : '60px'};  // Adjusted height
   padding: var(--chakra-space-2);
   margin-bottom: ${isMobile ? '0' : '0.2rem'};
   margin-right: ${isMobile ? '0.2rem' : '0.2rem'};
