@@ -3,7 +3,7 @@ import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input, useDisclosure, useColorMode } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input, useDisclosure, useColorMode, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react'
 import { BsEmojiSmile } from 'react-icons/bs';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -23,12 +23,14 @@ import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
+import { AiOutlineFileGif } from 'react-icons/ai';
+import { GrAddCircle, GrImage } from 'react-icons/gr';
 
 const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
-  const { onOpen, onClose, } = useDisclosure();
+  const { onOpen, onClose, isOpen, onToggle } = useDisclosure();
   const { colorMode } = useColorMode();
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
@@ -39,6 +41,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const [msgInput, setMsgInput] = useState<string>("")
   const [searchInput, setSearchInput] = useState<string>("")
+  const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
   const [onShow, setOnShow] = useState<boolean>(true)
   const prevMessage = useRef<null | string>()
 
@@ -284,19 +287,16 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     sendMessage(updatedMsgInput);
     onClose();
   }
-  
-  return (
-    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <Popover placement='top-start' isLazy>
-        <PopoverTrigger>
-          <Container 
-            w={0}
-            centerContent
-            cursor="pointer"
-            children={<Icon as={BsEmojiSmile} color={colorMode === "dark" ? "white" : "black.500"} h={6} w={6} />}
-          />
-        </PopoverTrigger>
-        <PopoverContent w="283px">  
+
+  const onToggleMenu = (item: string) => {
+    setSelectedMenuItem(item);
+    onToggle();
+  }
+
+  const renderPopoverContent = () => {
+    if (selectedMenuItem === 'emoji') {
+      return (
+        <PopoverContent w="283px">
           <Picker 
             data={data}
             emojiSize={20}
@@ -305,18 +305,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             maxFrequentRows={4}
           />
         </PopoverContent>
-      </Popover>
-      <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
-        <PopoverTrigger>
-          <Container 
-            w={0}
-            centerContent
-            bgColor={colorMode === "dark" ? "white" : "lightgray.500"}
-            borderRadius={2}
-            cursor="pointer"
-            children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
-          />
-        </PopoverTrigger>
+      );
+    } else if (selectedMenuItem === 'gif') {
+      return (
         <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
           <Box 
             maxH="100%" 
@@ -355,8 +346,41 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             )}
           </Box>
         </PopoverContent>
-      </Popover>
+      );
+    } else if (selectedMenuItem === 'photo') {
+      return (
+        <PopoverContent w="283px">
+          {/* Photo content here */}
+        </PopoverContent>
+      );
+    }
+    return null;
+  };
 
+  
+  return (
+    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+      <Popover isOpen={isOpen} onClose={onClose} placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            centerContent
+            cursor="pointer"
+          >
+            <Menu>
+              <MenuButton>
+                <Icon as={GrAddCircle} color="black.500" h={6} w={6} marginTop={2} />
+              </MenuButton>
+              <MenuList>
+                <MenuItem icon={<BsEmojiSmile />} onClick={() => onToggleMenu("emoji")} >Add an Emoji</MenuItem>
+                <MenuItem icon={<AiOutlineFileGif />} onClick={() => onToggleMenu("gif")} >Add a GIF</MenuItem>
+                <MenuItem icon={<GrImage />} onClick={() => onToggleMenu("photo")}>Add a Photo</MenuItem>
+              </MenuList>
+            </Menu>
+          </Container>
+        </PopoverTrigger>
+        {renderPopoverContent()}
+      </Popover>
       <Textarea 
         placeholder='Write a message...'
         ref={textAreaRef}
@@ -373,7 +397,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         background={colorMode === "dark" ? "white" : "lightgray.400"}
         borderRadius='xl'
       />
-
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
