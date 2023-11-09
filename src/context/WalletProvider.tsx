@@ -4,7 +4,6 @@ import React from 'react'
 import Web3 from 'web3'
 import { SiweMessage } from 'siwe'
 
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
@@ -52,12 +51,8 @@ const isWidget = getIsWidgetContext()
 
 /* eslint-disable react/display-name */
 const WalletProviderContext = (chains: any) => {
-  const dispatch = useAppDispatch()
+const dispatch = useAppDispatch()
 
-  // help debug issues and watch for high traffic conditions
-  const analytics = AnalyticsBrowser.load({
-    writeKey: ENV.REACT_APP_SEGMENT_KEY,
-  })
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
     app: 'WalletChatApp',
@@ -249,9 +244,7 @@ const WalletProviderContext = (chains: any) => {
 
   React.useEffect(() => {
     if (analytics && accountAddress && name && email) {
-      analytics.identify(accountAddress, { name, email })
-      analyticsGA4.identify(accountAddress, { name, email })
-      
+      analyticsGA4.identify(accountAddress, { name, email }) 
     }
   }, [accountAddress, email, name])
 
@@ -543,10 +536,6 @@ const WalletProviderContext = (chains: any) => {
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
         //if (currentTime - lastTimestamp > oneDay) {
-          analytics.track('ConnectWallet', {
-            site: document.referrer,
-            account: accountAddress,
-          })
           // ReactGA.event({
           //   category: "ConnectWallet",
           //   action: "ConnectWallet",

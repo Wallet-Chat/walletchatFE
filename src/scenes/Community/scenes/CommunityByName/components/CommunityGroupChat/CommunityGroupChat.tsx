@@ -37,7 +37,6 @@ import {
   MessageUIType,
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
@@ -56,15 +55,14 @@ const CommunityGroupChat = ({
   chatData: GroupMessageType[]
   isFetchingCommunityDataFirstTime: boolean
 }) => {
-  const [firstLoad, setFirstLoad] = useState(true)
-  const [msgInput, setMsgInput] = useState<string>('')
-  const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
-  const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-  const [searchInput, setSearchInput] = useState<string>("")
-  const { onClose } = useDisclosure();
+const [firstLoad, setFirstLoad] = useState(true)
+const [msgInput, setMsgInput] = useState<string>('')
+const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
+const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+const [searchInput, setSearchInput] = useState<string>("")
+const { onClose } = useDisclosure();
 
-  const scrollToBottomRef = useRef<HTMLDivElement>(null)
-  const analytics = AnalyticsBrowser.load({ writeKey: ENV.REACT_APP_SEGMENT_KEY as string })
+const scrollToBottomRef = useRef<HTMLDivElement>(null)
  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
    /* Initialize analytics instance */
    const analyticsGA4 = Analytics({
@@ -144,11 +142,6 @@ const CommunityGroupChat = ({
       return
     }
 
-    analytics.track('SendCommunityMessage', {
-       site: document.referrer,
-       community,
-       account
-     });
     // ReactGA.event({
     //   category: "SendCommunityMessageCategory",
     //   action: "SendCommunityMessage",
