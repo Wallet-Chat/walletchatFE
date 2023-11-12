@@ -47,6 +47,7 @@ import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { AiOutlineFileGif } from 'react-icons/ai';
 import { GrAddCircle, GrImage } from 'react-icons/gr';
+import { createResizedImage } from '@/utils/resizer';
 
 const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
@@ -69,7 +70,30 @@ const CommunityGroupChat = ({
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
   const { onClose, onToggle, isOpen } = useDisclosure();
   const prevMessage = useRef<null | string>()
-  const chatDataLengthRef = useRef(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<Blob | MediaSource>()
+	const [resizedFile, setResizedFile] = useState<string>('');
+
+  const resizeFile = (file: File) =>
+  new Promise((resolve) => {
+    createResizedImage(
+      file,
+      64,
+      64,
+      'JPEG',
+      100,
+      0,
+      (uri) => {
+        resolve(uri)
+      },
+      'base64'
+    )
+  })
+
+  const resizeAndSetFile = (file: File) => {
+		resizeFile(file) // Call the resize function
+		.then((resizedData: any) => setResizedFile(resizedData));
+	};
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
@@ -239,6 +263,53 @@ const CommunityGroupChat = ({
     setLoadedMsgs(newLoadedMsgs)
   }
 
+  //TODO upload image in community
+  const imageUpload = () => {
+    if (!account) {
+      log('No account connected')
+      return
+    }
+    
+    setIsSendingMessage(true);
+
+    fetch(
+			`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/imageraw`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${getJwtForAccount(account)}`,
+				},
+				body: JSON.stringify({
+					addr: "",
+          imageid: "",
+					image: resizedFile,
+				}),
+			}
+		)
+      .then((response) => response.json())
+      .then((data) => {
+        log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
+      })
+      .catch((error) => {
+        console.error(
+          '🚨[POST][Community][Message]:',
+          error,
+          JSON.stringify(data)
+        )
+      })
+      .finally(() => {
+        setIsSendingMessage(false)
+      })
+  }
+
+  const onAddPhotoClick = () => {
+    if(fileInputRef?.current){
+      fileInputRef?.current.click();
+    } 
+  };
+
   const addEmoji = (e: any) => {
     const sym = e.unified.split("_");
     const codeArray: any[] = [];
@@ -316,14 +387,20 @@ const CommunityGroupChat = ({
           </Box>
         </PopoverContent>
       );
-    } else if (selectedMenuItem === 'photo') {
+    } else {
       return (
-        <PopoverContent w="283px">
-          {/* Photo content here */}
-        </PopoverContent>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={(e: any) => {
+            const selectedFile = e.target.files[0];
+            setFile(selectedFile);
+            resizeAndSetFile(selectedFile);
+          }}
+        />
       );
     }
-    return null;
   };
 
   const AlertBubble = ({
@@ -440,7 +517,7 @@ const CommunityGroupChat = ({
                 <MenuList>
                   <MenuItem icon={<BsEmojiSmile />} onClick={() => onToggleMenu("emoji")} >Add an Emoji</MenuItem>
                   <MenuItem icon={<AiOutlineFileGif />} onClick={() => onToggleMenu("gif")} >Add a GIF</MenuItem>
-                  <MenuItem icon={<GrImage />} onClick={() => onToggleMenu("photo")}>Add a Photo</MenuItem>
+                  <MenuItem icon={<GrImage />} onClick={onAddPhotoClick}>Add a Photo</MenuItem>
                 </MenuList>
               </Menu>
             </Container>

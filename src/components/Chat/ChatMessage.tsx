@@ -324,6 +324,47 @@ const ChatMessage = ({
      return returnVal
   };
 
+  const removeSubstring = (input: string) => {
+    return input.replace(/\.walletChatImage/g, '');
+  }
+
+  useEffect(() => {
+    const getUploadedImage = () => {
+      if (!account) {
+        log('No account connected')
+        return
+      }
+
+      if(msg.message?.includes(".walletChatImage")){
+        const imageid = removeSubstring(msg?.message);
+        fetch(
+          `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/imageraw/${imageid}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${getJwtForAccount(account)}`,
+            },
+          }
+        )
+          .then(async (response) => {
+            const res = await response.json()
+            console.log("image res:", res)
+            setMessage(res);
+          })
+          .then((data) => {
+            log('✅[GET][Image]::', data)
+          })
+          .catch((error) => {
+            console.error('🚨[GET][Image]::', error)
+          })
+      }   
+    }
+
+    getUploadedImage();
+  }, [msg.message?.includes(".walleChatImage")])
+
 
   const setMessageAsRead = useCallback(() => {
     if (msg.toaddr && fromAddr && msg.timestamp && account && !msg.read) {
@@ -419,8 +460,23 @@ const ChatMessage = ({
       const updatedMessageNoBadLinks = await handleScanAndRemoveURL(message);
       //console.log("updatedMessageNoBadLinks: ", updatedMessageNoBadLinks)
       setMessage(updatedMessageNoBadLinks)
+      // getUploadedImage()
     }
   }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
+
+  const renderMessage = () => {
+    if(msg.message?.includes("giphy.com")){
+      return(
+        <Image src={msg.message} alt='' height={60} width={60} />
+      )
+    } else if (message?.includes("data:image/jpeg;base64")) {
+      return(
+        <Image src={message} alt='' height={60} width={60} />
+      )
+    } else {
+      return msg?.message
+    }
+  }
 
   return (
     <Flex
@@ -475,13 +531,7 @@ const ChatMessage = ({
             />
           ) : ( */}
             <Box>
-              {msg.message?.includes("giphy.com") 
-                ? 
-                  <Image src={msg.message} alt='' height={60} width={60} />
-                : 
-                  msg.message
-              }
-              {/* {msg.message} */}
+              {renderMessage()}
             </Box>
           {/* )} */}
           <Box
