@@ -196,7 +196,9 @@ export default function Sidebar() {
   const urlToCheck = (window.location != window.parent.location)
                         ? document.referrer
                         : document.location.href
-  const supportDisabled = urlToCheck.includes("good") //skip support for goodDollar
+  const supportDisabled = false//urlToCheck.includes("openpeer") //skip support - move to .env sometime
+  const nftDisabled = urlToCheck.includes("openpeer") //skip nft tab - move to .env sometime
+  const communityDisabled = urlToCheck.includes("openpeer") //skip community tab - move to .env sometime
 
   const nftNotificationCount = 0
   const [url, setUrl] = useState<string | undefined>('')
@@ -362,21 +364,25 @@ export default function Sidebar() {
           {unreadCount?.dm > 0 && <UnreadBadge>{unreadCount?.dm}</UnreadBadge>}
         </SidebarLink>
 
-        <SidebarLink to='/nft' end={!metadata}>
-          <Image src={IconNFT} alt='' />
-          {unreadCount?.nft > 0 && (
-            <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
-          )}
-        </SidebarLink>
+        {!nftDisabled && (  //skip nft tab 
+          <SidebarLink to='/nft' end={!metadata}>
+            <Image src={IconNFT} alt='' />
+            {unreadCount?.nft > 0 && (
+              <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
+            )}
+          </SidebarLink>
+         )}
 
-        <SidebarLink to='/community'>
-          <Image src={IconCommunity} alt='' />
-          {unreadCount?.community > 0 && (
-            <UnreadBadge>{unreadCount?.community}</UnreadBadge>
-          )}
-        </SidebarLink>
+        {!communityDisabled && (  //skip community tab 
+          <SidebarLink to='/community'>
+            <Image src={IconCommunity} alt='' />
+            {unreadCount?.community > 0 && (
+              <UnreadBadge>{unreadCount?.community}</UnreadBadge>
+            )}
+          </SidebarLink>
+        )}
 
-        {!supportDisabled && (  //skip support for goodDollar
+        {!supportDisabled && (  //skip support 
           <SidebarLink to={`/dm/${getSupportWallet()}`}>
             <Image src={IconSupport} alt='' />
           </SidebarLink>
