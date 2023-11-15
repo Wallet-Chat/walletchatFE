@@ -93,7 +93,7 @@ export const App = () => {
 
   if (!isAuthenticated) {
     return (
-      <Flex flex={1} padding='15px'>
+      <Flex flex={1} padding='15px' w="100%" h="100vh">
         <ExtensionCloseButton />
 
         <Box

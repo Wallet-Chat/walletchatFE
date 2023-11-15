@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorModeScript, ChakraProvider, Flex } from '@chakra-ui/react'
+import { ColorModeScript, ChakraProvider } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -100,9 +100,7 @@ ReactDOM.render(
             <WalletProvider chains={chains}>
               <UnreadCountProvider>
                 <ChakraProvider theme={theme}>
-                  <Flex w='100vw' h='100vh'>
-                    <App />
-                  </Flex>
+                  <App />
                 </ChakraProvider>
               </UnreadCountProvider>
             </WalletProvider>
