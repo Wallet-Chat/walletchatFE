@@ -44,16 +44,18 @@ import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import * as ENV from '@/constants/env'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 import CreateNewCommunity from './scenes/Community/scenes/CreateNewCommunity'
 import { useWallet } from './context/WalletProvider'
 import Leaderboard from './Leaderboard';
+import { isSnapInstalled } from './utils/snaps'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
 
 export const App = () => {
+  const [isSnapEnabled, setIsSnapEnabled] = useState(false);
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
@@ -80,6 +82,15 @@ export const App = () => {
     })
   }, [navigate])
 
+  useEffect(() => {
+    const fetchSnapStatus = async () => {
+      const snapStatus = await isSnapInstalled('walletchat-metamask-snap');
+      setIsSnapEnabled(snapStatus);
+    };
+
+    fetchSnapStatus();
+  }, []);
+
   const isSmallLayout = useIsSmallLayout()
   const { colorMode } = useColorMode();
 
@@ -102,7 +113,7 @@ export const App = () => {
           <ConnectWalletButton />
 
           <Heading size='2xl' mb={8} />
-          <HStack>
+          {/* <HStack>
             <Heading size='s'>Delegate.cash supported</Heading>
             <Link
               href='https://twitter.com/delegatecash'
@@ -114,7 +125,7 @@ export const App = () => {
             >
               <Image src={logoDelegateCash} width='25px' />
             </Link>
-          </HStack>
+          </HStack> */}
           <HStack>
             <Heading size='s'>Powered by WalletChat.fun</Heading>
             <Link
@@ -130,7 +141,7 @@ export const App = () => {
           </HStack>
 
           <HStack>
-          {!isMobile && !isChromeExtension() && (
+          {!isMobile && !isChromeExtension() && !isSnapEnabled && (
             <div>
             <HStack><br></br></HStack>
 
