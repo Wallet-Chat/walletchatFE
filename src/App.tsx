@@ -84,7 +84,7 @@ export const App = () => {
 
   useEffect(() => {
     const fetchSnapStatus = async () => {
-      const snapStatus = await isSnapInstalled('walletchat-metamask-snap');
+      const snapStatus = await isSnapInstalled('npm:walletchat-metamask-snap');
       setIsSnapEnabled(snapStatus);
     };
 
