@@ -9749,6 +9749,11 @@ react-textarea-autosize@^8.3.3:
     use-composed-ref "^1.3.0"
     use-latest "^1.2.1"
 
+react-twitter-pixel@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/react-twitter-pixel/-/react-twitter-pixel-0.0.3.tgz#55af493c70604f4c8c31351ed96bf3941a660d94"
+  integrity sha512-PIIOCVkV7GDcbDcpUx13Bln0roYnGhp6Np80/qBOYDIKlcC35cxeG5RhOcXzWzKaVq4jg/uXfYHYp77bzyI/BA==
+
 react-universal-interface@^0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/react-universal-interface/-/react-universal-interface-0.6.2.tgz#5e8d438a01729a4dbbcbeeceb0b86be146fe2b3b"

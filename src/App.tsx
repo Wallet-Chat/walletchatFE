@@ -50,9 +50,13 @@ import CreateNewCommunity from './scenes/Community/scenes/CreateNewCommunity'
 import { useWallet } from './context/WalletProvider'
 import Leaderboard from './Leaderboard';
 import { isSnapInstalled } from './utils/snaps'
+import TwitterPixel from 'react-twitter-pixel';
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
+
+// Initialize Twitter Pixel with your Pixel ID
+TwitterPixel.init('tw-ofu6x-ohexu');
 
 export const App = () => {
   const [isSnapEnabled, setIsSnapEnabled] = useState(false);
@@ -162,6 +166,12 @@ export const App = () => {
                       ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
                     },
                   });
+                    // Trigger Twitter Pixel event
+                    TwitterPixel.track('MetamaskSnapInstall', {
+                      value: null,
+                      conversion_id: null,
+                      email_address: null,
+                    });
                 }}
               >
                 Install WalletChat Metamask Snap
