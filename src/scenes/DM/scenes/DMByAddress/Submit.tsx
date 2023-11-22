@@ -55,10 +55,10 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   new Promise((resolve) => {
     createResizedImage(
       file,
-      64,
-      64,
+      500,
+      500,
       'JPEG',
-      100,
+      300,
       0,
       (uri) => {
         resolve(uri)
@@ -258,7 +258,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 			}
 		)
       .then((response) => {
-        console.log("api response:", response)
         sendMessage(uploadValue);
       })
       .then((data) => {
@@ -335,7 +334,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     // Already show message on the UI with the spinner as Loading
     // because it will begin to encrypt the message and only confirm
     // it was sent after a successful response
-    addPendingMessageToUI(newMessage)
+    if(!value.includes(".walletChatImage")){
+      addPendingMessageToUI(newMessage)
+    }
 
     postMessageToAPI(createMessageData, newMessage, timestamp)
   }
