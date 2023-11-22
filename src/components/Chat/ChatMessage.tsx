@@ -350,7 +350,6 @@ const ChatMessage = ({
         )
           .then(async (response) => {
             const res = await response.json()
-            console.log("image res:", res)
             setMessage(res);
           })
           .then((data) => {
