@@ -56,7 +56,7 @@ window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
 
 // Initialize Twitter Pixel with your Pixel ID
-TwitterPixel.init('tw-ofu6x-ohexu');
+TwitterPixel.init('tw-ofu6x-ohk5b');
 
 export const App = () => {
   const [isSnapEnabled, setIsSnapEnabled] = useState(false);
