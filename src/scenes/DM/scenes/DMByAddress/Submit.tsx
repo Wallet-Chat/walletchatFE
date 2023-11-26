@@ -33,7 +33,7 @@ const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
-  const { onOpen, onClose, isOpen, onToggle } = useDisclosure();
+  const { onClose, isOpen, onToggle } = useDisclosure();
   const { colorMode } = useColorMode();
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
@@ -45,18 +45,16 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const [msgInput, setMsgInput] = useState<string>("")
   const [searchInput, setSearchInput] = useState<string>("")
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
-  const [onShow, setOnShow] = useState<boolean>(true)
   const prevMessage = useRef<null | string>()
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<Blob | MediaSource>()
-	// const [resizedFile, setResizedFile] = useState<string>('');
 
   const resizeFile = (file: File) =>
   new Promise((resolve) => {
     createResizedImage(
       file,
       500,
-      500,
+      600,
       'JPEG',
       300,
       0,
