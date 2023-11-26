@@ -466,7 +466,7 @@ const ChatMessage = ({
       )
     } else if (message?.includes("data:image/jpeg;base64")) {
       return(
-        <Image src={message} alt='' height={60} width={60} />
+        <Image src={message} alt='' />
       )
     } else {
       return msg?.message
