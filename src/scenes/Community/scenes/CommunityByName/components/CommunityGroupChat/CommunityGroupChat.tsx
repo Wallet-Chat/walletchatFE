@@ -18,6 +18,10 @@ import {
   Menu,
   MenuButton,
   MenuList,
+  MenuItem,
+  Menu,
+  MenuButton,
+  MenuList,
   MenuItem
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
