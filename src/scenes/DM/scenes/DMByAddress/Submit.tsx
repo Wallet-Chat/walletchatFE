@@ -2,8 +2,9 @@ import React, { useState, useRef } from 'react'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
+import { v4 as uuidv4 } from 'uuid';
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input, useDisclosure, useColorMode } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input, useDisclosure, useColorMode, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react'
 import { BsEmojiSmile } from 'react-icons/bs';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -23,14 +24,17 @@ import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
+import { AiOutlineFileGif } from 'react-icons/ai';
+import { GrAddCircle, GrImage } from 'react-icons/gr';
+import { createResizedImage } from '@/utils/resizer';
+import { getJwtForAccount } from '@/helpers/jwt';
 
 const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
-  const { onOpen, onClose, } = useDisclosure();
+  const { onClose, isOpen, onToggle } = useDisclosure();
   const { colorMode } = useColorMode();
-
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -40,8 +44,33 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const [msgInput, setMsgInput] = useState<string>("")
   const [searchInput, setSearchInput] = useState<string>("")
-  const [onShow, setOnShow] = useState<boolean>(true)
+  const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
   const prevMessage = useRef<null | string>()
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<Blob | MediaSource>()
+
+  const resizeFile = (file: File) =>
+  new Promise((resolve) => {
+    createResizedImage(
+      file,
+      500,
+      600,
+      'JPEG',
+      300,
+      0,
+      (uri) => {
+        resolve(uri)
+      },
+      'base64'
+    )
+  })
+
+  const resizeAndSetFile = (file: File) => {
+		resizeFile(file) // Call the resize function
+		.then((resizedFile: any) => {
+      imageUpload(resizedFile); //upload image to API
+    });
+	};
 
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
@@ -196,10 +225,49 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     [account]
   )
 
+  const imageUpload = (resizedFile: string) => {
+    if (!account) {
+      log('No account connected')
+      return
+    }
+
+    if(!resizedFile) {
+      log('No photo selected')
+      return
+    }
+
+    const imageid = account.toLocaleLowerCase() + "_" + toAddr.toLocaleLowerCase() + "_" + uuidv4();
+    const uploadValue = imageid + ".walletChatImage";
+    
+    fetch(
+			`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/imageraw`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${getJwtForAccount(account)}`,
+				},
+				body: JSON.stringify({
+					addr: account.toLocaleLowerCase(),
+          imageid: imageid,
+					base64data: resizedFile,
+				}),
+			}
+		)
+      .then((response) => {
+        sendMessage(uploadValue);
+      })
+      .then((data) => {
+        log('✅[POST][Send Message]::', data)
+      })
+      .catch((error) => {
+        console.error('🚨[POST][Send Message]::', error)
+      })
+  }
+
   const sendMessage = async (msgInput: string) => {
     const value = msgInput
-
-    console.log("the value:", value)
 
     if (value.length <= 0) return
 
@@ -264,7 +332,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     // Already show message on the UI with the spinner as Loading
     // because it will begin to encrypt the message and only confirm
     // it was sent after a successful response
-    addPendingMessageToUI(newMessage)
+    if(!value.includes(".walletChatImage")){
+      addPendingMessageToUI(newMessage)
+    }
 
     postMessageToAPI(createMessageData, newMessage, timestamp)
   }
@@ -275,6 +345,12 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       sendMessage(msgInput)
     }
   }
+
+  const onAddPhotoClick = () => {
+    if(fileInputRef?.current){
+      fileInputRef?.current.click();
+    } 
+  };
 
   const addEmoji = (e: any) => {
     const sym = e.unified.split("_");
@@ -293,19 +369,16 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     sendMessage(updatedMsgInput);
     onClose();
   }
-  
-  return (
-    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <Popover placement='top-start' isLazy>
-        <PopoverTrigger>
-          <Container 
-            w={0}
-            centerContent
-            cursor="pointer"
-            children={<Icon as={BsEmojiSmile} color={colorMode === "dark" ? "white" : "black.500"} h={6} w={6} />}
-          />
-        </PopoverTrigger>
-        <PopoverContent w="283px">  
+
+  const onToggleMenu = (item: string) => {
+    setSelectedMenuItem(item);
+    onToggle();
+  }
+
+  const renderPopoverContent = () => {
+    if (selectedMenuItem === 'emoji') {
+      return (
+        <PopoverContent w="283px">
           <Picker 
             data={data}
             emojiSize={20}
@@ -314,18 +387,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             maxFrequentRows={4}
           />
         </PopoverContent>
-      </Popover>
-      {/* <Popover placement='top-start' isLazy onOpen={onOpen} onClose={onClose} >
-        <PopoverTrigger>
-          <Container 
-            w={0}
-            centerContent
-            bgColor={colorMode === "dark" ? "white" : "lightgray.500"}
-            borderRadius={2}
-            cursor="pointer"
-            children={<Text fontSize="lg" as="b" color="black.400" >GIF</Text>}
-          />
-        </PopoverTrigger>
+      );
+    } else if (selectedMenuItem === 'gif') {
+      return (
         <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
           <Box 
             maxH="100%" 
@@ -364,8 +428,48 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
             )}
           </Box>
         </PopoverContent>
-      </Popover> */}
-
+      );
+    } else {
+      return (
+        // <form onSubmit={imageUpload}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={(e: any) => {
+              const selectedFile = e.target.files[0];
+              setFile(selectedFile);
+              resizeAndSetFile(selectedFile);
+            }}
+          />
+        // </form>
+      );
+    }
+  };
+  
+  return (
+    <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
+      <Popover isOpen={isOpen} onClose={onClose} placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            centerContent
+            cursor="pointer"
+          >
+            <Menu>
+              <MenuButton>
+                <Icon as={GrAddCircle} color="black.500" h={6} w={6} marginTop={2} />
+              </MenuButton>
+              <MenuList>
+                <MenuItem icon={<BsEmojiSmile />} onClick={() => onToggleMenu("emoji")} >Add an Emoji</MenuItem>
+                <MenuItem icon={<AiOutlineFileGif />} onClick={() => onToggleMenu("gif")} >Add a GIF</MenuItem>
+                <MenuItem icon={<GrImage />} onClick={onAddPhotoClick}>Add a Photo</MenuItem>
+              </MenuList>
+            </Menu>
+          </Container>
+        </PopoverTrigger>
+        {renderPopoverContent()}
+      </Popover>
       <Textarea 
         placeholder='Write a message...'
         ref={textAreaRef}
@@ -382,7 +486,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         background={colorMode === "dark" ? "white" : "lightgray.400"}
         borderRadius='xl'
       />
-
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
