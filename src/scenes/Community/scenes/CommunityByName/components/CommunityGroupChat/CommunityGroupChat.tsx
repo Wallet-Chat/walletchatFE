@@ -21,6 +21,9 @@ import {
   MenuItem,
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
+import { GiphyFetch } from "@giphy/js-fetch-api";
+import { IGif } from '@giphy/js-types';
+import { Grid } from "@giphy/react-components";
 import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
@@ -34,7 +37,6 @@ import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
 import { getSupportHeader, getSupportWallet } from '@/helpers/widget'
-import { GiphyFetch } from "@giphy/js-fetch-api";
 
 import {
   GroupMessageType,
@@ -109,6 +111,11 @@ const CommunityGroupChat = ({
     ],
   })
 
+  const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
+  function FetchSearchedGIfs() {
+    const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
+    return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
+  }
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
 
@@ -158,11 +165,11 @@ const CommunityGroupChat = ({
   const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      sendMessage()
+      sendMessage(msgInput)
     }
   }
 
-  const sendMessage = async () => {
+  const sendMessage = async (msgInput: string) => {
     if (msgInput.length <= 0) return
     if (!account) {
       log('No account connected')
@@ -539,7 +546,7 @@ const CommunityGroupChat = ({
         <Flex alignItems='flex-end'>
           <Button
             variant='black'
-            onClick={sendMessage}
+            onClick={() => sendMessage(msgInput)}
             borderRadius='full'
             minH='full'
             px='0'

@@ -15,6 +15,9 @@ import {
    MenuList,
    MenuItem
 } from '@chakra-ui/react'
+import { GiphyFetch } from "@giphy/js-fetch-api";
+import { IGif } from '@giphy/js-types';
+import { Grid } from "@giphy/react-components";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { BsEmojiSmile } from "react-icons/bs"
@@ -22,8 +25,9 @@ import { GrAddCircle, GrImage } from "react-icons/gr"
 import { AiOutlineFileGif } from "react-icons/ai"
 import { IconSend } from '@tabler/icons'
 import React, { KeyboardEvent, useEffect, useState } from 'react'
-import ReactTextareaAutosize from 'react-textarea-autosize'
-import { GiphyFetch } from "@giphy/js-fetch-api";
+import * as ENV from '@/constants/env'
+
+const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
 const ChatTextAreaInput = ({
    isSendingMessage,
