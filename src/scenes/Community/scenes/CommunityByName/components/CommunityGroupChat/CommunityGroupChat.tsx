@@ -19,10 +19,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -38,6 +34,7 @@ import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
 import { getSupportHeader, getSupportWallet } from '@/helpers/widget'
+import { GiphyFetch } from "@giphy/js-fetch-api";
 
 import {
   GroupMessageType,

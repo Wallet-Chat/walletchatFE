@@ -23,6 +23,7 @@ import { AiOutlineFileGif } from "react-icons/ai"
 import { IconSend } from '@tabler/icons'
 import React, { KeyboardEvent, useEffect, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize'
+import { GiphyFetch } from "@giphy/js-fetch-api";
 
 const ChatTextAreaInput = ({
    isSendingMessage,

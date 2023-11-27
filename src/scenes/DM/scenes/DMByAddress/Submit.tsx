@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
@@ -28,6 +28,7 @@ import { AiOutlineFileGif } from 'react-icons/ai';
 import { GrAddCircle, GrImage } from 'react-icons/gr';
 import { createResizedImage } from '@/utils/resizer';
 import { getJwtForAccount } from '@/helpers/jwt';
+import { GiphyFetch } from "@giphy/js-fetch-api";
 
 const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
