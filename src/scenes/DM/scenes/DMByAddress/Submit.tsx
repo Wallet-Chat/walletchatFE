@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useState, useRef } from 'react'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
@@ -8,6 +8,9 @@ import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, Popov
 import { BsEmojiSmile } from 'react-icons/bs';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
+import { GiphyFetch } from "@giphy/js-fetch-api";
+import { IGif } from '@giphy/js-types';
+import { Grid } from "@giphy/react-components";
 import { postFetchOptions } from '@/helpers/fetch'
 import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
@@ -28,7 +31,6 @@ import { AiOutlineFileGif } from 'react-icons/ai';
 import { GrAddCircle, GrImage } from 'react-icons/gr';
 import { createResizedImage } from '@/utils/resizer';
 import { getJwtForAccount } from '@/helpers/jwt';
-import { GiphyFetch } from "@giphy/js-fetch-api";
 
 const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
 
@@ -92,6 +94,11 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       timestamp: string
     }[]
   >([])
+  const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
+  function FetchSearchedGIfs() {
+    const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
+    return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
+  }
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
@@ -333,7 +340,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      sendMessage()
+      sendMessage(msgInput)
     }
   }
 
@@ -473,13 +480,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         py='3'
         w='100%'
         fontSize='md'
-        background='lightgray.400'
+        _placeholder={{ color: colorMode === "dark" ? "darkgray.500" : "lightgray.900"  }}
+        background={colorMode === "dark" ? "white" : "lightgray.400"}
         borderRadius='xl'
       />
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
-          onClick={sendMessage}
+          onClick={() => sendMessage(msgInput)}
           borderRadius='full'
           minH='full'
           px='0'
