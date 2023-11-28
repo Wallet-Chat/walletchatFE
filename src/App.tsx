@@ -10,7 +10,9 @@ import {
   Tag,
   Button,
   useColorMode,
+  IconButton
 } from '@chakra-ui/react'
+import { LinkIcon, QuestionIcon } from '@chakra-ui/icons';
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
 import logoThumb from './images/logo-thumb.svg'
@@ -154,8 +156,6 @@ export const App = () => {
           {!isMobile && !isChromeExtension() && !isSnapEnabled && (
             <div>
             <HStack><br></br></HStack>
-
-            <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
             <Button
                 variant='black'
                 size='lg'
@@ -174,8 +174,12 @@ export const App = () => {
                     });
                 }}
               >
-                Install WalletChat Metamask Snap
+                Install WalletChat In Metamask
             </Button> 
+            <IconButton
+              icon={<QuestionIcon />}
+              onClick={() => window.open('https://docs.walletchat.fun/metamask-integration', '_blank')}
+            />
             </div>
           )}
           </HStack>
