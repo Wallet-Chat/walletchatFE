@@ -179,6 +179,8 @@ export const App = () => {
             <IconButton
               icon={<QuestionIcon />}
               onClick={() => window.open('https://docs.walletchat.fun/metamask-integration', '_blank')}
+              bg="transparent"
+              fontSize="2xl"
             />
             </div>
           )}
