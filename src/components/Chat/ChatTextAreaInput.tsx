@@ -2,8 +2,6 @@ import {
    Button, 
    Flex, 
    Icon, 
-   Input,
-   Box,
    Popover, 
    PopoverTrigger, 
    PopoverContent, 
@@ -15,11 +13,9 @@ import {
    MenuList,
    MenuItem
 } from '@chakra-ui/react'
-import { GiphyFetch } from "@giphy/js-fetch-api";
-import { IGif } from '@giphy/js-types';
-import { Grid } from "@giphy/react-components";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
+import GifPicker, { TenorImage } from 'gif-picker-react';
 import { BsEmojiSmile } from "react-icons/bs"
 import { GrAddCircle, GrImage } from "react-icons/gr"
 import { AiOutlineFileGif } from "react-icons/ai"
@@ -27,7 +23,7 @@ import { IconSend } from '@tabler/icons'
 import React, { KeyboardEvent, useEffect, useState } from 'react'
 import * as ENV from '@/constants/env'
 
-const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
+const tenorApiKey = ENV.REACT_APP_TENOR_API_KEY;
 
 const ChatTextAreaInput = ({
    isSendingMessage,
@@ -37,16 +33,8 @@ const ChatTextAreaInput = ({
    sendMessage: (msg: string) => void
 }) => {
    const [msgInput, setMsgInput] = useState<string>('')
-   const [searchInput, setSearchInput] = useState<string>("")
    const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
    const { onClose, onToggle, isOpen } = useDisclosure();
-
-   const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
-
-    function FetchSearchedGIfs() {
-      const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
-      return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
-    }
 
    useEffect(() => {
       setMsgInput('');
@@ -72,16 +60,14 @@ const ChatTextAreaInput = ({
       setMsgInput(msgInput + emoji);
     }
 
-    const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
-      e.preventDefault();
-  
-      const gifUrl = gif.images.original.url;
+    const onGifClick = async (gif: TenorImage) => {    
+      const gifUrl = gif.url;
       const updatedMsgInput = msgInput + gifUrl;
-  
+      
       sendMessage(updatedMsgInput);
       onClose();
     }
-
+  
     const onToggleMenu = (item: string) => {
       setSelectedMenuItem(item);
       onToggle();
@@ -102,43 +88,8 @@ const ChatTextAreaInput = ({
         );
       } else if (selectedMenuItem === 'gif') {
         return (
-          <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
-            <Box 
-              maxH="100%" 
-              overflowY="scroll" 
-              alignItems="center"
-              css={{
-                "&::-webkit-scrollbar": {
-                  width: "0.4em",
-                },
-                "&::-webkit-scrollbar-thumb": {
-                  backgroundColor: "rgba(0, 0, 0, 0)",
-                },
-              }}
-            >
-              <Input 
-                my={5}
-                placeholder='Search GiFs' 
-                size='md' 
-                bgColor="black"
-                border="none"
-                focusBorderColor="black"
-                color="white"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-              {searchInput ? (
-                <FetchSearchedGIfs />
-              ) : (
-                <Grid
-                  onGifClick={onGifClick}
-                  fetchGifs={fetchGifs}
-                  width={400}
-                  columns={4}
-                  gutter={6}
-                />
-              )}
-            </Box>
+          <PopoverContent>
+            <GifPicker tenorApiKey={tenorApiKey} onGifClick={(gif) => onGifClick(gif)} />
           </PopoverContent>
         );
       } else if (selectedMenuItem === 'photo') {
