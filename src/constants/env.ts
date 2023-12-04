@@ -140,6 +140,23 @@ export const REACT_APP_ORIGIN_NAME_NFT_DEMO = import.meta.env
 
 // ------------------
 
+// --- NF3  ---
+
+// Community
+export const REACT_APP_DEFAULT_COMMUNITY_NF3 = import.meta.env
+  .VITE_REACT_APP_DEFAULT_COMMUNITY_NF3
+// Support Wallet
+export const REACT_APP_SUPPORT_WALLET_NF3 = import.meta.env
+  .VITE_REACT_APP_SUPPORT_WALLET_NF3
+// App Url
+export const REACT_APP_APP_URL_NF3 = import.meta.env
+  .VITE_REACT_APP_APP_URL_NF3
+// Origin Name
+export const REACT_APP_ORIGIN_NAME_NF3 = import.meta.env
+  .VITE_REACT_APP_ORIGIN_NAME_NF3
+
+// ------------------
+
 export const REACT_APP_DEFAULT_COMMUNITY_LOCALHOST = import.meta.env
   .VITE_REACT_APP_DEFAULT_COMMUNITY_LOCALHOST
 export const REACT_APP_SUPPORT_WALLET_LOCALHOST = import.meta.env

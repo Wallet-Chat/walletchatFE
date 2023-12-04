@@ -10,7 +10,9 @@ import {
   Tag,
   Button,
   useColorMode,
+  IconButton
 } from '@chakra-ui/react'
+import { LinkIcon, QuestionIcon } from '@chakra-ui/icons';
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
 import logoThumb from './images/logo-thumb.svg'
@@ -44,16 +46,22 @@ import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import * as ENV from '@/constants/env'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 import CreateNewCommunity from './scenes/Community/scenes/CreateNewCommunity'
 import { useWallet } from './context/WalletProvider'
 import Leaderboard from './Leaderboard';
+import { isSnapInstalled } from './utils/snaps'
+import TwitterPixel from 'react-twitter-pixel';
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
 
+// Initialize Twitter Pixel with your Pixel ID
+TwitterPixel.init('tw-ofu6x-ohk5b');
+
 export const App = () => {
+  const [isSnapEnabled, setIsSnapEnabled] = useState(false);
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
@@ -80,6 +88,21 @@ export const App = () => {
     })
   }, [navigate])
 
+  useEffect(() => {
+    const fetchSnapStatus = async () => {
+      if (!isMobile) {
+        const snaps = await window.ethereum.request({
+          method: 'wallet_getSnaps',
+        }); 
+        if( Object.keys(snaps).includes('npm:walletchat-metamask-snap') ) {
+          setIsSnapEnabled(true);
+        }
+      }
+    };
+
+    fetchSnapStatus();
+  }, []);
+
   const isSmallLayout = useIsSmallLayout()
   const { colorMode } = useColorMode();
 
@@ -104,7 +127,7 @@ export const App = () => {
           <ConnectWalletButton />
 
           <Heading size='2xl' mb={8} />
-          <HStack>
+          {/* <HStack>
             <Heading size='s'>Delegate.cash supported</Heading>
             <Link
               href='https://twitter.com/delegatecash'
@@ -116,7 +139,7 @@ export const App = () => {
             >
               <Image src={logoDelegateCash} width='25px' />
             </Link>
-          </HStack>
+          </HStack> */}
           <HStack>
             <Heading size='s'>Powered by WalletChat.fun</Heading>
             <Link
@@ -132,11 +155,9 @@ export const App = () => {
           </HStack>
 
           <HStack>
-          {!isMobile && !isChromeExtension() && (
+          {!isMobile && !isChromeExtension() && !isSnapEnabled && (
             <div>
             <HStack><br></br></HStack>
-
-            <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
             <Button
                 variant='black'
                 size='lg'
@@ -147,10 +168,22 @@ export const App = () => {
                       ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
                     },
                   });
+                    // Trigger Twitter Pixel event
+                    TwitterPixel.track('MetamaskSnapInstall', {
+                      value: null,
+                      conversion_id: null,
+                      email_address: null,
+                    });
                 }}
               >
-                Install WalletChat Metamask Snap
+                Install WalletChat In Metamask
             </Button> 
+            <IconButton
+              icon={<QuestionIcon />}
+              onClick={() => window.open('https://docs.walletchat.fun/metamask-integration', '_blank')}
+              bg="transparent"
+              fontSize="2xl"
+            />
             </div>
           )}
           </HStack>

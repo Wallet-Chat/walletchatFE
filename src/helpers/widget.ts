@@ -50,6 +50,10 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_NFT_DEMO'
   }
 
+  if (currentWidgetOrigin.toLowerCase().includes('netlify.app')) {
+    return '_NF3'
+  }
+
   if (currentWidgetOrigin.toLowerCase().includes('mysticswap.io')) {
     return '_MYSTICSWAP'
   }
