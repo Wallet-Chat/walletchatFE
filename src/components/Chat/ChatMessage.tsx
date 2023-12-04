@@ -460,9 +460,9 @@ const ChatMessage = ({
   }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
 
   const renderMessage = () => {
-    if(msg.message?.includes("giphy.com")){
+    if(msg.message?.includes("tenor.com")){
       return(
-        <Image src={msg.message} alt='' height={60} width={60} />
+        <Image src={msg.message} alt='' />
       )
     } else if (message?.includes("data:image/jpeg;base64")) {
       return(

@@ -106,6 +106,8 @@ export const App = () => {
   const isSmallLayout = useIsSmallLayout()
   const { colorMode } = useColorMode();
 
+  console.log("acc:", isAuthenticated)
+
   if (!isAuthenticated) {
     return (
       <Flex bg="lightgray" flex={1} padding='15px' w="100%" h="100vh">
