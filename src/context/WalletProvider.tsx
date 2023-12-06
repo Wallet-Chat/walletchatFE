@@ -111,9 +111,10 @@ const WalletProviderContext = (chains: any) => {
     selectIsAuthenticated(state)
   )
 
+  console.log(accountAddress, chainId, wagmiConnected)
   const initialJwt = accountAddress && storage.get('jwt')
   const accountAuthenticated =
-    accountAddress && chainId && wagmiConnected
+    accountAddress
       ? getHasJwtForAccount(accountAddress)
       : null
 
