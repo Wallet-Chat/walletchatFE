@@ -7,8 +7,6 @@ import {
   Tag,
   Text,
   Icon, 
-  InputRightElement,
-  InputGroup, 
   Popover, 
   PopoverTrigger, 
   PopoverContent, 
@@ -18,13 +16,11 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem,
+  MenuItem
 } from '@chakra-ui/react'
 import data from '@emoji-mart/data'
-import { GiphyFetch } from "@giphy/js-fetch-api";
-import { IGif } from '@giphy/js-types';
-import { Grid } from "@giphy/react-components";
 import Picker from '@emoji-mart/react'
+import GifPicker, { TenorImage } from 'gif-picker-react';
 import { BsEmojiSmile } from "react-icons/bs"
 import { IconSend } from '@tabler/icons'
 import { useEffect, useState, KeyboardEvent, useRef } from 'react'
@@ -36,23 +32,21 @@ import { truncateAddress } from '../../../../../../helpers/truncateString'
 import { DottedBackground } from '../../../../../../styled/DottedBackground'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
-import { getSupportHeader, getSupportWallet } from '@/helpers/widget'
+import { getSupportHeader } from '@/helpers/widget'
 
 import {
   GroupMessageType,
   MessageUIType,
 } from '../../../../../../types/Message'
 import generateItems from '../../../../helpers/generateGroupedByDays'
-
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { AiOutlineFileGif } from 'react-icons/ai';
-import { GrAddCircle, GrImage } from 'react-icons/gr';
-import { createResizedImage } from '@/utils/resizer';
+import { GrAddCircle } from 'react-icons/gr';
 
-const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
+const tenorApiKey = ENV.REACT_APP_TENOR_API_KEY;
 
 const CommunityGroupChat = ({
   account,
@@ -69,53 +63,23 @@ const CommunityGroupChat = ({
   const [msgInput, setMsgInput] = useState<string>('')
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
-  const [searchInput, setSearchInput] = useState<string>("")
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
   const { onClose, onToggle, isOpen } = useDisclosure();
   const prevMessage = useRef<null | string>()
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<Blob | MediaSource>()
-	const [resizedFile, setResizedFile] = useState<string>('');
-
-  const resizeFile = (file: File) =>
-  new Promise((resolve) => {
-    createResizedImage(
-      file,
-      64,
-      64,
-      'JPEG',
-      100,
-      0,
-      (uri) => {
-        resolve(uri)
-      },
-      'base64'
-    )
-  })
-
-  const resizeAndSetFile = (file: File) => {
-		resizeFile(file) // Call the resize function
-		.then((resizedData: any) => setResizedFile(resizedData));
-	};
 
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
- ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
-   /* Initialize analytics instance */
-   const analyticsGA4 = Analytics({
-    app: 'WalletChatApp',
-    plugins: [
-      /* Load Google Analytics v4 */
-      googleAnalyticsPlugin({
-        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-      }),
-    ],
-  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+    /* Initialize analytics instance */
+    const analyticsGA4 = Analytics({
+      app: 'WalletChatApp',
+      plugins: [
+        /* Load Google Analytics v4 */
+        googleAnalyticsPlugin({
+          measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+        }),
+      ],
+    })
 
-  const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
-  function FetchSearchedGIfs() {
-    const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
-    return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
-  }
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
 
@@ -175,6 +139,9 @@ const CommunityGroupChat = ({
       log('No account connected')
       return
     }
+
+    if(prevMessage.current == msgInput) return;
+
     // ReactGA.event({
     //   category: "SendCommunityMessageCategory",
     //   action: "SendCommunityMessage",
@@ -196,6 +163,7 @@ const CommunityGroupChat = ({
 
     // Make a copy and clear input field
     const msgInputCopy = (' ' + msgInput).slice(1)
+    prevMessage.current = msgInput
     setMsgInput('')
 
     const timestamp = new Date()
@@ -271,53 +239,6 @@ const CommunityGroupChat = ({
     setLoadedMsgs(newLoadedMsgs)
   }
 
-  //TODO upload image in community
-  const imageUpload = () => {
-    if (!account) {
-      log('No account connected')
-      return
-    }
-    
-    setIsSendingMessage(true);
-
-    fetch(
-			`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/imageraw`,
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${getJwtForAccount(account)}`,
-				},
-				body: JSON.stringify({
-					addr: "",
-          imageid: "",
-					image: resizedFile,
-				}),
-			}
-		)
-      .then((response) => response.json())
-      .then((data) => {
-        log('✅[POST][Community][Message]:', data, latestLoadedMsgs)
-      })
-      .catch((error) => {
-        console.error(
-          '🚨[POST][Community][Message]:',
-          error,
-          JSON.stringify(data)
-        )
-      })
-      .finally(() => {
-        setIsSendingMessage(false)
-      })
-  }
-
-  const onAddPhotoClick = () => {
-    if(fileInputRef?.current){
-      fileInputRef?.current.click();
-    } 
-  };
-
   const addEmoji = (e: any) => {
     const sym = e.unified.split("_");
     const codeArray: any[] = [];
@@ -326,12 +247,10 @@ const CommunityGroupChat = ({
     setMsgInput(msgInput + emoji);
   }
 
-  const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
-    e.preventDefault();
-
-    const gifUrl = gif.images.original.url;
+  const onGifClick = async (gif: TenorImage) => {    
+    const gifUrl = gif.url;
     const updatedMsgInput = msgInput + gifUrl;
-
+    
     sendMessage(updatedMsgInput);
     onClose();
   }
@@ -356,90 +275,42 @@ const CommunityGroupChat = ({
       );
     } else if (selectedMenuItem === 'gif') {
       return (
-        <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
-          <Box 
-            maxH="100%" 
-            overflowY="scroll" 
-            alignItems="center"
-            css={{
-              "&::-webkit-scrollbar": {
-                width: "0.4em",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "rgba(0, 0, 0, 0)",
-              },
-            }}
-          >
-            <Input 
-              my={5}
-              placeholder='Search GiFs' 
-              size='md' 
-              bgColor="black"
-              border="none"
-              focusBorderColor="black"
-              color="white"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            {searchInput ? (
-              <FetchSearchedGIfs />
-            ) : (
-              <Grid
-                onGifClick={onGifClick}
-                fetchGifs={fetchGifs}
-                width={400}
-                columns={4}
-                gutter={6}
-              />
-            )}
-          </Box>
+        <PopoverContent>
+          <GifPicker tenorApiKey={tenorApiKey} onGifClick={(gif) => onGifClick(gif)} />
         </PopoverContent>
-      );
-    } else {
-      return (
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={(e: any) => {
-            const selectedFile = e.target.files[0];
-            setFile(selectedFile);
-            resizeAndSetFile(selectedFile);
-          }}
-        />
       );
     }
   };
 
-  const AlertBubble = ({
-    children,
-    color,
-    to, // Add a prop to specify the target route
-  }: {
-    children: string;
-    color: 'green' | 'red';
-    to: string; // Specify the target route
-  }) => (
-    <Link to={to}>
-      <Flex
-        justifyContent='center'
-        alignItems='center'
-        borderRadius='lg'
-        background={color === 'green' ? 'green.200' : 'red.200'}
-        p={4}
-        position='sticky'
-        top={0}
-        right={0}
-        zIndex={1}
-      >
-        <Box fontSize='md'>{children}</Box>
-      </Flex>
-    </Link>
-  );
+    const AlertBubble = ({
+      children,
+      color,
+      to, // Add a prop to specify the target route
+    }: {
+      children: string;
+      color: 'green' | 'red';
+      to: string; // Specify the target route
+    }) => (
+      <Link to={to}>
+        <Flex
+          justifyContent='center'
+          alignItems='center'
+          borderRadius='lg'
+          background={color === 'green' ? 'green.200' : 'red.200'}
+          p={4}
+          position='sticky'
+          top={0}
+          right={0}
+          zIndex={1}
+        >
+          <Box fontSize='md'>{children}</Box>
+        </Flex>
+      </Link>
+    );
 
   return (
     <Flex flexDirection='column' height='100%'>
-      <AlertBubble to={`/dm/${getSupportWallet()}`}color="green">{getSupportHeader()}</AlertBubble>
+      <AlertBubble to={`https://leaderboard.walletchat.fun`}color="green">{getSupportHeader()}</AlertBubble>
       <DottedBackground className='custom-scrollbar'>
         {loadedMsgs.length === 0 && (
           <Flex
@@ -525,7 +396,6 @@ const CommunityGroupChat = ({
                 <MenuList>
                   <MenuItem icon={<BsEmojiSmile />} onClick={() => onToggleMenu("emoji")} >Add an Emoji</MenuItem>
                   <MenuItem icon={<AiOutlineFileGif />} onClick={() => onToggleMenu("gif")} >Add a GIF</MenuItem>
-                  <MenuItem icon={<GrImage />} onClick={onAddPhotoClick}>Add a Photo</MenuItem>
                 </MenuList>
               </Menu>
             </Container>

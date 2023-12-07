@@ -4,19 +4,15 @@ import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { v4 as uuidv4 } from 'uuid';
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, Text, Box, Input, useDisclosure, useColorMode, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, useDisclosure, useColorMode, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react'
 import { BsEmojiSmile } from 'react-icons/bs';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
-import { GiphyFetch } from "@giphy/js-fetch-api";
-import { IGif } from '@giphy/js-types';
-import { Grid } from "@giphy/react-components";
+import GifPicker, { TenorImage } from 'gif-picker-react';
 import { postFetchOptions } from '@/helpers/fetch'
-import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
 import {
   updateLocalDmDataForAccountToAddr,
-  addLocalDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
@@ -24,7 +20,6 @@ import {
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
-import { getAccessControlConditions } from '@/helpers/lit'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
 import { AiOutlineFileGif } from 'react-icons/ai';
@@ -32,7 +27,7 @@ import { GrAddCircle, GrImage } from 'react-icons/gr';
 import { createResizedImage } from '@/utils/resizer';
 import { getJwtForAccount } from '@/helpers/jwt';
 
-const giphyFetch = new GiphyFetch(ENV.REACT_APP_GIPHY_API_KEY);
+const tenorApiKey = ENV.REACT_APP_TENOR_API_KEY;
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
@@ -46,7 +41,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
   const [msgInput, setMsgInput] = useState<string>("")
-  const [searchInput, setSearchInput] = useState<string>("")
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
   const prevMessage = useRef<null | string>()
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,11 +88,6 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       timestamp: string
     }[]
   >([])
-  const fetchGifs = (offset: number) => giphyFetch.trending({ offset, limit: 10 });
-  function FetchSearchedGIfs() {
-    const fetchGifs = (offset: number) => giphyFetch.search(searchInput, { offset, limit: 10 });
-    return <Grid fetchGifs={fetchGifs} width={400} columns={4} gutter={6} />;
-  }
 
   const addPendingMessageToUI = (newMessage: ChatMessageType) =>
     dispatch(
@@ -271,6 +260,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     const value = msgInput
 
     if (value.length <= 0) return
+
+    if(prevMessage.current == msgInput) return;
+
     // ReactGA.event({
     //   category: "SendMessageCategory",
     //   action: "SendMessage",
@@ -358,10 +350,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     setMsgInput(msgInput + emoji);
   }
 
-  const onGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
-    e.preventDefault();
-    
-    const gifUrl = gif.images.original.url;
+  const onGifClick = async (gif: TenorImage) => {    
+    const gifUrl = gif.url;
     const updatedMsgInput = msgInput + gifUrl;
     
     sendMessage(updatedMsgInput);
@@ -388,59 +378,22 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       );
     } else if (selectedMenuItem === 'gif') {
       return (
-        <PopoverContent w="420px" h="500px" alignItems="center" paddingLeft={2} backgroundColor="lightgray.500">  
-          <Box 
-            maxH="100%" 
-            overflowY="scroll" 
-            alignItems="center"
-            css={{
-              "&::-webkit-scrollbar": {
-                width: "0.4em",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "rgba(0, 0, 0, 0)",
-              },
-            }}
-          >
-            <Input 
-              my={5}
-              placeholder='Search GiFs' 
-              size='md' 
-              bgColor="black"
-              border="none"
-              focusBorderColor="black"
-              color="white"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            {searchInput ? (
-              <FetchSearchedGIfs />
-            ) : (
-              <Grid
-                onGifClick={onGifClick}
-                fetchGifs={fetchGifs}
-                width={400}
-                columns={4}
-                gutter={6}
-              />
-            )}
-          </Box>
+        <PopoverContent>
+          <GifPicker tenorApiKey={tenorApiKey} onGifClick={(gif) => onGifClick(gif)} />
         </PopoverContent>
       );
     } else {
       return (
-        // <form onSubmit={imageUpload}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={(e: any) => {
-              const selectedFile = e.target.files[0];
-              setFile(selectedFile);
-              resizeAndSetFile(selectedFile);
-            }}
-          />
-        // </form>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={(e: any) => {
+            const selectedFile = e.target.files[0];
+            setFile(selectedFile);
+            resizeAndSetFile(selectedFile);
+          }}
+        />
       );
     }
   };

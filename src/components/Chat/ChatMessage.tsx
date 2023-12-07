@@ -3,10 +3,7 @@ import {
   Button,
   Flex,
   Image,
-  SkeletonText,
-  Spinner,
   Text,
-  Tooltip,
 } from '@chakra-ui/react'
 import { Link as RLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -15,7 +12,6 @@ import {
   IconCheck,
   IconChecks,
   IconExternalLink,
-  IconAlertCircle,
 } from '@tabler/icons'
 import { useCallback, useEffect, useState, memo, useRef } from 'react'
 import equal from 'fast-deep-equal/es6'
@@ -464,9 +460,9 @@ const ChatMessage = ({
   }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
 
   const renderMessage = () => {
-    if(msg.message?.includes("giphy.com")){
+    if(msg.message?.includes("tenor.com")){
       return(
-        <Image src={msg.message} alt='' height={60} width={60} />
+        <Image src={msg.message} alt='' />
       )
     } else if (message?.includes("data:image/jpeg;base64")) {
       return(

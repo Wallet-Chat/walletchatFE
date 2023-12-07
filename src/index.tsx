@@ -17,6 +17,8 @@ import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagm
 import { infuraProvider } from '@wagmi/core/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
+import 'focus-visible/dist/focus-visible'
+import { Global, css } from '@emotion/react'
 
 import { Provider } from 'react-redux'
 import { App } from './App'
@@ -29,6 +31,16 @@ import { store } from './redux/store'
 // import { getAutoConnect } from './helpers/widget'
 import * as ENV from '@/constants/env'
 import * as APP from './constants/app'
+
+const GlobalStyles = css`
+  /*
+    This will hide the focus indicator if the element receives focus    via the mouse,
+    but it will still show up on keyboard focus.
+  */  .js-focus-visible :focus:not([data-focus-visible-added]) {
+     outline: none;
+     box-shadow: none;
+   }
+`;
 
 export const { chains, provider, webSocketProvider } = configureChains(
   [mainnet, polygon, optimism, avalanche, avalancheFuji, celo],
@@ -100,6 +112,7 @@ ReactDOM.render(
             <WalletProvider chains={chains}>
                 <UnreadCountProvider>
                   <ChakraProvider theme={theme}>
+                    <Global styles={GlobalStyles} />
                     <Flex w='100vw' h='100vh'>
                       <App />
                     </Flex>
