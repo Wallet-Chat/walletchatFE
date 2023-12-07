@@ -92,14 +92,7 @@ const ChatTextAreaInput = ({
             <GifPicker tenorApiKey={tenorApiKey} onGifClick={(gif) => onGifClick(gif)} />
           </PopoverContent>
         );
-      } else if (selectedMenuItem === 'photo') {
-        return (
-          <PopoverContent w="283px">
-            {/* Photo content here */}
-          </PopoverContent>
-        );
       }
-      return null;
     };
 
    return (
@@ -118,7 +111,6 @@ const ChatTextAreaInput = ({
               <MenuList>
                 <MenuItem icon={<BsEmojiSmile />} onClick={() => onToggleMenu("emoji")} >Add an Emoji</MenuItem>
                 <MenuItem icon={<AiOutlineFileGif />} onClick={() => onToggleMenu("gif")} >Add a GIF</MenuItem>
-                <MenuItem icon={<GrImage />} onClick={() => onToggleMenu("photo")}>Add a Photo</MenuItem>
               </MenuList>
             </Menu>
           </Container>

@@ -52,6 +52,7 @@
     "react-twitter-pixel": "^0.0.3",
     "react-window": "^1.8.9",
     "redux": "^4.2.1",
+    "redux-persist": "^6.0.0",
     "siwe": "1.1.2",
     "styled-components": "^5.3.3",
     "uuid": "^9.0.1",
