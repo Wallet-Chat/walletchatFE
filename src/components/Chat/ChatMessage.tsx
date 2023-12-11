@@ -418,6 +418,20 @@ const ChatMessage = ({
     }
   }, [context, isInViewport, msg, msgSentByMe, setMessageAsRead])
 
+  const renderMessage = () => {
+    if(msg.message?.includes("tenor.com")){
+      return(
+        <Image src={msg.message} alt='' />
+      )
+    } else if (message?.includes("data:image/jpeg;base64")) {
+      return(
+        <Image src={message} alt='' />
+      )
+    } else {
+      return msg?.message
+    }
+  }
+
   return (
     <Flex
       alignItems='flex-start'
@@ -471,7 +485,7 @@ const ChatMessage = ({
             />
           ) : ( */}
             <Box>
-              {message}
+              {renderMessage()}
             </Box>
           {/* )} */}
           <Box

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ColorModeScript, ChakraProvider } from '@chakra-ui/react'
+import { ColorModeScript, ChakraProvider, Flex } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -14,9 +14,11 @@ import '@rainbow-me/rainbowkit/styles.css'
 import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
 import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagmi/chains'
-import { infuraProvider } from '@wagmi/core/providers/infura'
+import { infuraProvider } from 'wagmi/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
+import 'focus-visible/dist/focus-visible'
+import { Global, css } from '@emotion/react'
 
 import { Provider } from 'react-redux'
 import { App } from './App'
@@ -29,6 +31,16 @@ import { store } from './redux/store'
 // import { getAutoConnect } from './helpers/widget'
 import * as ENV from '@/constants/env'
 import * as APP from './constants/app'
+
+const GlobalStyles = css`
+  /*
+    This will hide the focus indicator if the element receives focus    via the mouse,
+    but it will still show up on keyboard focus.
+  */  .js-focus-visible :focus:not([data-focus-visible-added]) {
+     outline: none;
+     box-shadow: none;
+   }
+`;
 
 export const { chains, provider, webSocketProvider } = configureChains(
   [mainnet, polygon, optimism, avalanche, avalancheFuji, celo],
@@ -92,17 +104,20 @@ const wagmiClient = createClient({
 
 ReactDOM.render(
   <React.StrictMode>
-    <ColorModeScript />
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <Provider store={store}>
       <BrowserRouter>
         <WagmiConfig client={wagmiClient}>
           <RainbowKitProvider chains={chains}>
             <WalletProvider chains={chains}>
-              <UnreadCountProvider>
-                <ChakraProvider theme={theme}>
-                  <App />
-                </ChakraProvider>
-              </UnreadCountProvider>
+                <UnreadCountProvider>
+                  <ChakraProvider theme={theme}>
+                    <Global styles={GlobalStyles} />
+                    <Flex w='100vw' h='100vh'>
+                      <App />
+                    </Flex>
+                  </ChakraProvider>
+                </UnreadCountProvider>
             </WalletProvider>
           </RainbowKitProvider>
         </WagmiConfig>
