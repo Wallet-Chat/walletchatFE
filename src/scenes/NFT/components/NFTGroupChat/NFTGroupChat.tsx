@@ -18,6 +18,7 @@ import ReactGA from "react-ga4";
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { log } from '@/helpers/log'
+import { Analytics } from 'analytics'
 
 const NFTGroupChat = ({
   account,
