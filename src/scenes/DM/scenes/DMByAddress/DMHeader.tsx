@@ -7,6 +7,8 @@ import {
   IconCopy,
   IconExternalLink,
 } from '@tabler/icons'
+import { FaRegTrashCan } from "react-icons/fa6";
+import { ImBlocked } from "react-icons/im";
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { truncateAddress } from '../../../../helpers/truncateString'
 import { useGetNameQuery } from '@/redux/reducers/dm'
@@ -45,7 +47,7 @@ const DMHeader = () => {
 
   return (
     <Box
-      p={5}
+      p={2}
       pb={3}
       borderBottom='1px solid var(--chakra-colors-lightgray-400)'
     >
@@ -72,50 +74,66 @@ const DMHeader = () => {
                   <Text fontWeight='bold' color='darkgray.800' fontSize='md'>
                     {name}
                   </Text>
-                  <Text fontSize='sm' color='darkgray.500'>
-                    {truncateAddress(toAddr)}
-                  </Text>
+                  <Flex alignItems='center'>
+                    <Text onClick={() => copyToClipboard()} cursor='pointer' as='u' fontSize='sm' color='darkgray.500'>
+                      {truncateAddress(toAddr)}
+                    </Text>
+                    <Box>
+                      <Button
+                        href={`https://etherscan.io/address/${toAddr}`}
+                        target='_blank'
+                        as={CLink}
+                        size='xs'
+                        ml={2}
+                      >
+                        <IconExternalLink
+                          size={15}
+                          color='var(--chakra-colors-lightgray-900)'
+                          stroke='1.5'
+                        />
+                      </Button>
+                    </Box>
+                  </Flex>
                 </Box>
               ) : (
-                <Text fontWeight='bold' color='darkgray.800' fontSize='md'>
-                  {truncateAddress(toAddr)}
-                </Text>
+                <Box mt={5}>
+                  <Flex alignItems='center'>
+                    <Text onClick={() => copyToClipboard()} cursor='pointer' as='u' fontWeight='bold' color='darkgray.800' fontSize='md'>
+                      {truncateAddress(toAddr)}
+                    </Text>
+                    <Box>
+                      <Button
+                        href={`https://etherscan.io/address/${toAddr}`}
+                        target='_blank'
+                        as={CLink}
+                        size='xs'
+                        ml={2}
+                      >
+                        <IconExternalLink
+                          size={15}
+                          color='var(--chakra-colors-lightgray-900)'
+                          stroke='1.5'
+                        />
+                      </Button>
+                    </Box>
+                  </Flex>
+                </Box>  
               )}
             </Box>
           </Flex>
-          <Box>
+          <Box mt={5}>
             <Button
-              onClick={() => copyToClipboard()}
+              onClick={() => {}}
               size='xs'
-              disabled={copiedAddr}
-              ml={3}
             >
-              {copiedAddr ? (
-                <IconCheck
-                  size={20}
-                  color='var(--chakra-colors-darkgray-500)'
-                  stroke='1.5'
-                />
-              ) : (
-                <IconCopy
-                  size={20}
-                  color='var(--chakra-colors-lightgray-900)'
-                  stroke='1.5'
-                />
-              )}
+              <FaRegTrashCan size={15} color='var(--chakra-colors-lightgray-900)' stroke='1.5' />
             </Button>
             <Button
-              href={`https://etherscan.io/address/${toAddr}`}
-              target='_blank'
-              as={CLink}
+              onClick={() => {}}
               size='xs'
               ml={2}
             >
-              <IconExternalLink
-                size={20}
-                color='var(--chakra-colors-lightgray-900)'
-                stroke='1.5'
-              />
+              <ImBlocked size={15} color='var(--chakra-colors-lightgray-900)' stroke='1.5' />
             </Button>
           </Box>
         </Flex>
