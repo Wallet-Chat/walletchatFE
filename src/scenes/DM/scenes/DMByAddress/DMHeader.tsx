@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box, Button, Flex, Text, Link as CLink } from '@chakra-ui/react'
 import { useParams, Link } from 'react-router-dom'
 import {
@@ -6,6 +6,7 @@ import {
   IconExternalLink,
 } from '@tabler/icons'
 import { FaRegTrashCan } from "react-icons/fa6";
+import { MdVerified } from "react-icons/md";
 import { ImBlocked } from "react-icons/im";
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { truncateAddress } from '../../../../helpers/truncateString'
@@ -27,8 +28,14 @@ const DMHeader = ({ account }: Props) => {
   const timerRef: { current: NodeJS.Timeout | null } = React.useRef(null)
 
   const [copiedAddr, setCopiedAddr] = React.useState(false)
+  const [isVerifiedUser, setIsVerifiedUser] = React.useState<boolean>()
 
   const { data: name } = useGetNameQuery(toAddr)
+
+  useEffect(() => {
+    isVerified();
+  }, [account])
+  
 
   async function copyToClipboard() {
     if (toAddr) {
@@ -47,6 +54,33 @@ const DMHeader = ({ account }: Props) => {
           }, 3000)
         }
       }
+    }
+  }
+
+  const isVerified = async () => {
+    if (!account) {
+      log('No account connected')
+      return
+    }
+    
+    try {
+      await fetch(
+        `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/is_moderator/gooddollar/${toAddr}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          }
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        setIsVerifiedUser(data);
+      })
+    } catch (error) {
+      console.error('🚨[GET][isVerified User]::', error)
     }
   }
 
@@ -125,9 +159,12 @@ const DMHeader = ({ account }: Props) => {
             <Box ml={2}>
               {name ? (
                 <Box>
-                  <Text fontWeight='bold' color='darkgray.800' fontSize='md'>
-                    {name}
-                  </Text>
+                  <Flex alignItems='center'>
+                    <Text fontWeight='bold' color='darkgray.800' mr={1} fontSize='md'>
+                      {name}
+                    </Text>
+                    {isVerifiedUser && <MdVerified size={15} color='#63b3ed' stroke='1.5' /> }
+                  </Flex>
                   <Flex alignItems='center'>
                     <Text onClick={() => copyToClipboard()} cursor='pointer' as='u' fontSize='sm' color='darkgray.500'>
                       {truncateAddress(toAddr)}

@@ -19,7 +19,6 @@ import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { log } from '@/helpers/log'
-import { Analytics } from 'analytics'
 
 const NFTGroupChat = ({
   account,
