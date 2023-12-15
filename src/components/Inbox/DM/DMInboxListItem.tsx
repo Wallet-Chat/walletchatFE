@@ -6,6 +6,7 @@ import { truncateAddress } from '../../../helpers/truncateString'
 import { InboxItemType } from '../../../types/InboxItem'
 import { InboxItemNotificationCount, InboxItemRecipientAddress, InboxItemWrapper } from '../../../styled/InboxItem'
 import Avatar from './Avatar'
+import { getLocalDmDataForAccountToAddr } from '@/redux/reducers/dm'
 
 const DMInboxItem = ({
    data,
@@ -32,6 +33,8 @@ const DMInboxItem = ({
       displayName = truncateAddress(recipientAddress) || ''
    }
 
+   const localDmData = getLocalDmDataForAccountToAddr(account, recipientAddress) || []
+
    return (
       <Link
          to={
@@ -49,7 +52,7 @@ const DMInboxItem = ({
                   </Box>
                   <Box minWidth="0">
                      <InboxItemRecipientAddress>{displayName}</InboxItemRecipientAddress>
-                     {data.message && (
+                     {data.message && localDmData.length > 0 && (
                         <Box fontSize="md" color="darkgray.100" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                            {data.message.substring(0, 25)}{data.message.length > 25 && '...'}
                         </Box>

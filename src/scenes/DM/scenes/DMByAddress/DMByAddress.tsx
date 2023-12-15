@@ -293,7 +293,7 @@ const DMByAddress = () => {
 
   return (
     <Flex background='white' flexDirection='column' flex='1'>
-      <DMHeader />
+      <DMHeader account={account} />
 
       <DottedBackground ref={infiniteScrollRef} className='custom-scrollbar' id="chat-container">
         {toAddr.toLocaleLowerCase() === getSupportWallet() && (

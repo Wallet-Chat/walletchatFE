@@ -3,18 +3,23 @@ import { Box, Button, Flex, Text, Link as CLink } from '@chakra-ui/react'
 import { useParams, Link } from 'react-router-dom'
 import {
   IconArrowLeft,
-  IconCheck,
-  IconCopy,
   IconExternalLink,
 } from '@tabler/icons'
 import { FaRegTrashCan } from "react-icons/fa6";
 import { ImBlocked } from "react-icons/im";
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { truncateAddress } from '../../../../helpers/truncateString'
-import { useGetNameQuery } from '@/redux/reducers/dm'
+import { deleteLocalDmDataForAccountToAddr, useGetNameQuery } from '@/redux/reducers/dm'
 import Avatar from '@/components/Inbox/DM/Avatar'
+import * as ENV from '@/constants/env'
+import { log } from '@/helpers/log'
+import { getJwtForAccount } from '@/helpers/jwt';
 
-const DMHeader = () => {
+interface Props {
+  account: string | undefined
+}
+
+const DMHeader = ({ account }: Props) => {
   const isSmallLayout = useIsSmallLayout()
 
   const { address: toAddr = '' } = useParams()
@@ -42,6 +47,55 @@ const DMHeader = () => {
           }, 3000)
         }
       }
+    }
+  }
+
+  const deleteConvo = async () => {
+    if (!account) {
+      log('No account connected')
+      return
+    }
+    
+    try {
+      await fetch(
+        `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/deleteall_chatitems/${toAddr}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          }
+      })
+      deleteLocalDmDataForAccountToAddr(account, toAddr)
+    } catch (error) {
+      console.error('🚨[GET][Delete Convo]::', error)
+    }
+  }
+
+  const blockUser = async () => {
+    if (!account) {
+      log('No account connected')
+      return
+    }
+
+    try {
+      await fetch(
+        `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/block_user/${toAddr}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          }
+        }
+      )
+      .then((data) => {
+        log('✅[GET][Block user]::', data)
+      })
+    } catch (error) {
+      console.error('🚨[GET][Block user]::', error)
     }
   }
 
@@ -123,13 +177,13 @@ const DMHeader = () => {
           </Flex>
           <Box mt={5}>
             <Button
-              onClick={() => {}}
+              onClick={deleteConvo}
               size='xs'
             >
               <FaRegTrashCan size={15} color='var(--chakra-colors-lightgray-900)' stroke='1.5' />
             </Button>
             <Button
-              onClick={() => {}}
+              onClick={blockUser}
               size='xs'
               ml={2}
             >
