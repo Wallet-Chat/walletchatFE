@@ -27,11 +27,10 @@ import { DottedBackground } from '../../../../styled/DottedBackground'
 import { BlockieWrapper } from '../../../../styled/BlockieWrapper'
 import ChatMessage from '../../../../components/Chat/ChatMessage'
 // import { getIpfsData, postIpfsData } from '../../../../services/ipfs'
-import { AnalyticsBrowser } from '@segment/analytics-next'
 import ReactGA from "react-ga4";
-import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import { getJwtForAccount } from '@/helpers/jwt'
+import Analytics from 'analytics'
 
 const NFTChat = ({
   recipientAddr,
@@ -52,9 +51,6 @@ const NFTChat = ({
   )
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
 
-  const analytics = AnalyticsBrowser.load({
-    writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
-  })
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     /* Initialize analytics instance */
     const analyticsGA4 = Analytics({
@@ -131,16 +127,12 @@ const NFTChat = ({
   }
 
   const sendMessage = async () => {
-    analytics.track('SendNftMessage', {
-      site: document.referrer,
-      account: account,
-    })
     // ReactGA.event({
     //   category: "SendNftMessageCategory",
     //   action: "SendNftMessage",
     //   label: "SendNftMessageLabel", // optional
     // });
-    analyticsGA4.track('SendNftMessage_TRACK', {
+    analyticsGA4.track('SendNftMessage', {
       site: document.referrer,
       account: account,
     })

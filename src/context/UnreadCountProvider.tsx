@@ -39,6 +39,15 @@ const UnreadCountProvider = ({ children }: { children: any }) => {
           if (!equal(data, unreadCount)) {
             log('✅[GET][Unread Count]:', data)
 
+            try {
+              //code specific to being loaded in a WebView - send if we are in Android app - otherwise just fail out of the catch
+              const message = {
+                target: 'unread_cnt',
+                data: data.dm,
+              };
+              window.ReactNativeWebView.postMessage(JSON.stringify(message));
+            } catch {}
+  
             // send message to parent for notifications when using widget
             if (isWidget) {
               window.parent.postMessage(
@@ -73,6 +82,15 @@ const UnreadCountProvider = ({ children }: { children: any }) => {
       return () => clearInterval(interval)
     }
     else {
+      try {
+        //code specific to being loaded in a WebView - send if we are in Android app - otherwise just fail out of the catch
+        const message = {
+          target: 'unread_cnt',
+          data: 1,
+        };
+        window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      } catch {}
+
       // send message to parent for notifications when using widget
       if (isWidget) {
         setUnreadCount(1)

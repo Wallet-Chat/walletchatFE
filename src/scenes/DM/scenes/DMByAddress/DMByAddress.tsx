@@ -51,10 +51,6 @@ const DMByAddress = () => {
   const { provider } = useWallet()
   const account = useAppSelector((state) => selectAccount(state))
 
-  const supportHeader =
-    ENV.REACT_APP_SUPPORT_HEADER ||
-    'We welcome all feedback and bug reports. Thank you! 😊'
-
   const maxPages = React.useRef(1)
 
   const selectorPageRef = React.useRef<number>(1)
@@ -67,6 +63,7 @@ const DMByAddress = () => {
   const topMostItem = React.useRef<number>()
   const prevTopMostItem = React.useRef(topMostItem.current)
   const shouldScrollBack = React.useRef<boolean>(false)
+  const chatDataLengthRef = React.useRef(0);
 
   const dispatch = useAppDispatch()
 
@@ -240,6 +237,18 @@ const DMByAddress = () => {
   )
 
   React.useEffect(() => {
+    if (chatData && chatData.length > chatDataLengthRef.current) {
+      // New message(s) added, scroll to the bottom
+      const chatContainer = document.getElementById('chat-container');
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      // Update the chat data length reference
+      chatDataLengthRef.current = chatData.length;
+    }
+  }, [chatData]);
+
+  React.useEffect(() => {
     if (account && toAddr) {
       const pendingMessages = getPendingDmDataForAccountToAddr(account, toAddr)
 
@@ -286,9 +295,9 @@ const DMByAddress = () => {
     <Flex background='white' flexDirection='column' flex='1'>
       <DMHeader />
 
-      <DottedBackground ref={infiniteScrollRef} className='custom-scrollbar'>
+      <DottedBackground ref={infiniteScrollRef} className='custom-scrollbar' id="chat-container">
         {toAddr.toLocaleLowerCase() === getSupportWallet() && (
-          <AlertBubble color='green'>{supportHeader}</AlertBubble>
+          <AlertBubble color='green'>{"Customer Support Chat"}</AlertBubble>
         )}
 
         {chatData.map((msg: ChatMessageType, i: number) => {

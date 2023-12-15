@@ -3,22 +3,12 @@ import { Link } from 'react-router-dom'
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import InboxSearchInput from './components/InboxSearchInput'
 import InboxList from '../../components/Inbox/InboxList'
+import ExtensionCloseButton from '@/components/ExtensionCloseButton'
 // import InboxListLoadingSkeleton from '../../components/Inbox/InboxListLoadingSkeleton'
 
 // TODO -- on submit new message, also update here
 const Inbox = () => {
   const isSmallLayout = useIsSmallLayout()
-
-  // const communities = React.useMemo(() => inboxData.filter((d) => d.context_type === 'community' && !(d.chain === 'none')), [inboxData])
-
-  // const [encryptedChatData, setEncChatData] = useState<InboxItemType[]>(
-  //   localStorage[localStorageKey] ? JSON.parse(localStorage[localStorageKey]) : []
-  // )
-  // const { unreadCount } = useUnreadCount()
-
-  // if (isFetchingInboxData && inboxData.length === 0) {
-  //    return <InboxListLoadingSkeleton />
-  // }
 
   return (
     <Flex

@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, Outlet } from 'react-router-dom'
+import { Route, Routes, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import {
   Link,
   HStack,
@@ -41,7 +41,10 @@ import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import { ReactComponent as FlaskFox } from '@/images/flask_fox.svg';
-
+import { useEffect } from 'react'
+import { API } from 'react-wallet-chat/dist/src/types'
+import { postMessage } from '@/helpers/widget'
+import * as ENV from '@/constants/env'
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -54,12 +57,43 @@ export const App = () => {
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
+  const navigate = useNavigate()
+  useEffect(() => {
+    window.addEventListener('message', (e) => {
+      const { target, data }: API = e.data
+
+      if (data) {
+        const { contractAddress, itemId, network, redirect, ownerAddress } = data
+
+        //console.log("got message with data: ", data)
+
+        if (ownerAddress) {
+          console.log("got message with ownerAddress: ", ownerAddress)
+          //debug Android App
+          fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+            body: JSON.stringify({
+              event: "Should Set DM ownerAddress"
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          })
+          //end debug android app webview
+          navigate(`/dm/${ownerAddress}`)
+        }
+      }
+    })
+  }, [navigate])
+
+  useEffect(() => {
+    console.log("goodwallet is awake!")
+    postMessage({ target: 'goodwallet_is_awake' })
+  }, [])
 
   const isSmallLayout = useIsSmallLayout()
 
   if (!isAuthenticated) {
     return (
-      <Flex flex={1} padding='15px'>
+      <Flex flex={1} padding='15px' w="100%" h="100vh">
         <ExtensionCloseButton />
 
         <Box

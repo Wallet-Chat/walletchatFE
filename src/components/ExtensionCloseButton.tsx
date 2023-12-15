@@ -2,14 +2,15 @@ import { IconX } from '@tabler/icons'
 import { Button, Flex } from '@chakra-ui/react'
 import { isChromeExtension } from '@/helpers/chrome'
 import { getIsWidgetContext } from '@/utils/context'
+import * as ENV from '@/constants/env'
 
 const isWidget = getIsWidgetContext()
 const isExtension = isChromeExtension()
 
 function ExtensionCloseButton() {
-  if (!isExtension && !isWidget) {
-    return null
-  }
+  // if (!isExtension && !isWidget) {
+  //   return null
+  // }
 
   return (
     <Flex textAlign='right' position='fixed' top={0} right={0} zIndex={10000}>
@@ -23,11 +24,23 @@ function ExtensionCloseButton() {
         px={1}
         h='4'
         w='12'
-        onClick={() =>
-          isExtension
-            ? window.close()
-            : window.parent.postMessage({ target: 'close_widget' }, '*')
-        }
+        onClick={() => {
+          try {
+            //code specific to being loaded in a WebView
+            const message = {
+              target: 'close_widget',
+              data: 'No need to have this',
+            };
+            window.ReactNativeWebView.postMessage(JSON.stringify(message));
+          } catch {}
+
+          //end debug android app webview
+          if (isExtension) { 
+            window.close();
+          } else if (window.parent) {
+            window.parent.postMessage({ target: 'close_widget' }, '*');
+          }
+        }}
       >
         <IconX size={14} color='var(--chakra-colors-darkgray-700)' />
       </Button>

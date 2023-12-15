@@ -7,6 +7,7 @@ import { getWidgetOriginName } from '@/helpers/widget'
 import { log } from '@/helpers/log'
 import { getJwtForAccount } from '@/helpers/jwt'
 import { useAppSelector } from '@/hooks/useSelector'
+import storage from '@/utils/extension-storage'
 import {
   selectAccount,
   selectIsAuthenticated,
@@ -58,7 +59,7 @@ const ConnectWalletButton = () => {
     selectIsAuthenticated(state)
   )
 
-  const canUseWidgetConnection = isWidget && previousWidgetData?.current
+  const canUseWidgetConnection = isWidget
   const siweFailed = Boolean(siweLastFailure)
 
   const hasPendingAuth = siwePending || isAuthenticated === undefined
@@ -84,7 +85,8 @@ const ConnectWalletButton = () => {
     //TODO: check for existing JWT (account is usually null here though)
     postMessage({ target: 'do_parent_sign_in' })
 
-    // resetWidgetDataWithSignature()
+    //resetWidgetDataWithSignature()
+    
     // const canSignIn = await requestSIWEandFetchJWT()
     // if (canSignIn && account) {
     //   signIn(account, getJwtForAccount(account) || '')
@@ -99,6 +101,7 @@ const ConnectWalletButton = () => {
         React.useEffect(() => {
           if (connectedAccount) {
             // setNonce(null)
+            //storage.set('current-address', connectedAccount.address)
             dispatch(setAccount(connectedAccount.address))
           }
         }, [connectedAccount])

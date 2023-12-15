@@ -1,30 +1,38 @@
-import React from 'react'
-import { AnalyticsBrowser } from '@segment/analytics-next'
+import React, { useState, useRef } from 'react'
 import ReactGA from "react-ga4";
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
+import { v4 as uuidv4 } from 'uuid';
 import { IconSend } from '@tabler/icons'
-import { Textarea, Button, Flex } from '@chakra-ui/react'
+import { Textarea, Button, Flex, PopoverTrigger, Popover, Container, Icon, PopoverContent, useDisclosure, useColorMode, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react'
+import { BsEmojiSmile } from 'react-icons/bs';
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
+import GifPicker, { TenorImage } from 'gif-picker-react';
 import { postFetchOptions } from '@/helpers/fetch'
-import lit from '../../../../utils/lit'
 import * as ENV from '@/constants/env'
 import {
   updateLocalDmDataForAccountToAddr,
-  addLocalDmDataForAccountToAddr,
-  addPendingDmDataForAccountToAddr,
   getLocalDmDataForAccountToAddr,
   endpoints,
   updateQueryChatData,
+  addPendingDmDataForAccountToAddr,
 } from '@/redux/reducers/dm'
 import { useAppDispatch } from '@/hooks/useDispatch'
 import { ChatMessageType, CreateChatMessageType } from '@/types/Message'
-import { getAccessControlConditions } from '@/helpers/lit'
 import { useWallet } from '@/context/WalletProvider'
 import { log } from '@/helpers/log'
+import { AiOutlineFileGif } from 'react-icons/ai';
+import { GrAddCircle, GrImage } from 'react-icons/gr';
+import { createResizedImage } from '@/utils/resizer';
+import { getJwtForAccount } from '@/helpers/jwt';
+
+const tenorApiKey = ENV.REACT_APP_TENOR_API_KEY;
 
 function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const { provider } = useWallet()
-
+  const { onClose, isOpen, onToggle } = useDisclosure();
+  const { colorMode } = useColorMode();
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -32,10 +40,35 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const dispatch = useAppDispatch()
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
-  const msgInput = React.useRef<string>('')
-  const analytics = AnalyticsBrowser.load({
-    writeKey: ENV.REACT_APP_SEGMENT_KEY as string,
+  const [msgInput, setMsgInput] = useState<string>("")
+  const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
+  const prevMessage = useRef<null | string>()
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<Blob | MediaSource>()
+
+  const resizeFile = (file: File) =>
+  new Promise((resolve) => {
+    createResizedImage(
+      file,
+      500,
+      600,
+      'JPEG',
+      300,
+      0,
+      (uri) => {
+        resolve(uri)
+      },
+      'base64'
+    )
   })
+
+  const resizeAndSetFile = (file: File) => {
+		resizeFile(file) // Call the resize function
+		.then((resizedFile: any) => {
+      imageUpload(resizedFile); //upload image to API
+    });
+	};
+
   /* Initialize analytics instance */
   const analyticsGA4 = Analytics({
     app: 'WalletChatApp',
@@ -182,15 +215,54 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     [account]
   )
 
-  const sendMessage = async () => {
-    const value = msgInput.current
+  const imageUpload = (resizedFile: string) => {
+    if (!account) {
+      log('No account connected')
+      return
+    }
+
+    if(!resizedFile) {
+      log('No photo selected')
+      return
+    }
+
+    const imageid = account.toLocaleLowerCase() + "_" + toAddr.toLocaleLowerCase() + "_" + uuidv4();
+    const uploadValue = imageid + ".walletChatImage";
+    
+    fetch(
+			`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/imageraw`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${getJwtForAccount(account)}`,
+				},
+				body: JSON.stringify({
+					addr: account.toLocaleLowerCase(),
+          imageid: imageid,
+					base64data: resizedFile,
+				}),
+			}
+		)
+      .then((response) => {
+        sendMessage(uploadValue);
+      })
+      .then((data) => {
+        log('✅[POST][Send Message]::', data)
+      })
+      .catch((error) => {
+        console.error('🚨[POST][Send Message]::', error)
+      })
+  }
+
+  const sendMessage = async (msgInput: string) => {
+    const value = msgInput
 
     if (value.length <= 0) return
 
-    analytics.track('SendMessage', {
-      site: document.referrer,
-      account,
-    })
+    if(prevMessage.current == msgInput) return;
+
     // ReactGA.event({
     //   category: "SendMessageCategory",
     //   action: "SendMessage",
@@ -200,10 +272,19 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       site: document.referrer,
       account,
     })
-    
 
-    // clear input field
-    if (textAreaRef.current) textAreaRef.current.value = ''
+    try {
+      window.dataLayer = window.dataLayer || []; //initialising data layer
+      window.dataLayer.push({
+          event: "sendMessage", // event name
+          walletaddr: account.toLocaleLowerCase(), 
+      });
+    } catch(e) {}
+
+    prevMessage.current = msgInput
+
+    // // clear input field
+    setMsgInput('');
 
     const createMessageData: CreateChatMessageType = {
       message: value,
@@ -241,7 +322,9 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     // Already show message on the UI with the spinner as Loading
     // because it will begin to encrypt the message and only confirm
     // it was sent after a successful response
-    addPendingMessageToUI(newMessage)
+    if(!value.includes(".walletChatImage")){
+      addPendingMessageToUI(newMessage)
+    }
 
     postMessageToAPI(createMessageData, newMessage, timestamp)
   }
@@ -249,13 +332,96 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      sendMessage()
+      sendMessage(msgInput)
     }
   }
 
+  const onAddPhotoClick = () => {
+    if(fileInputRef?.current){
+      fileInputRef?.current.click();
+    } 
+  };
+
+  const addEmoji = (e: any) => {
+    const sym = e.unified.split("_");
+    const codeArray: any[] = [];
+    sym.forEach((el: string) => codeArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codeArray)
+    setMsgInput(msgInput + emoji);
+  }
+
+  const onGifClick = async (gif: TenorImage) => {    
+    const gifUrl = gif.url;
+    const updatedMsgInput = msgInput + gifUrl;
+    
+    sendMessage(updatedMsgInput);
+    onClose();
+  }
+
+  const onToggleMenu = (item: string) => {
+    setSelectedMenuItem(item);
+    onToggle();
+  }
+
+  const renderPopoverContent = () => {
+    if (selectedMenuItem === 'emoji') {
+      return (
+        <PopoverContent w="283px">
+          <Picker 
+            data={data}
+            emojiSize={20}
+            emojiButtonSize={28}
+            onEmojiSelect={addEmoji}
+            maxFrequentRows={4}
+          />
+        </PopoverContent>
+      );
+    } else if (selectedMenuItem === 'gif') {
+      return (
+        <PopoverContent>
+          <GifPicker tenorApiKey={tenorApiKey} onGifClick={(gif) => onGifClick(gif)} />
+        </PopoverContent>
+      );
+    } else {
+      return (
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={(e: any) => {
+            const selectedFile = e.target.files[0];
+            setFile(selectedFile);
+            resizeAndSetFile(selectedFile);
+          }}
+        />
+      );
+    }
+  };
+  
   return (
     <Flex p='4' alignItems='center' justifyContent='center' gap='4'>
-      <Textarea
+      <Popover isOpen={isOpen} onClose={onClose} placement='top-start' isLazy>
+        <PopoverTrigger>
+          <Container 
+            w={0}
+            centerContent
+            cursor="pointer"
+          >
+            <Menu>
+              <MenuButton>
+                <Icon as={GrAddCircle} color="black.500" h={6} w={6} marginTop={2} />
+              </MenuButton>
+              <MenuList>
+                <MenuItem icon={<BsEmojiSmile />} onClick={() => onToggleMenu("emoji")} >Add an Emoji</MenuItem>
+                <MenuItem icon={<AiOutlineFileGif />} onClick={() => onToggleMenu("gif")} >Add a GIF</MenuItem>
+                <MenuItem icon={<GrImage />} onClick={onAddPhotoClick}>Add a Photo</MenuItem>
+              </MenuList>
+            </Menu>
+          </Container>
+        </PopoverTrigger>
+        {renderPopoverContent()}
+      </Popover>
+      <Textarea 
         placeholder='Write a message...'
         ref={textAreaRef}
         onChange={(e) => {
@@ -268,14 +434,14 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
         py='3'
         w='100%'
         fontSize='md'
-        background='lightgray.400'
+        _placeholder={{ color: colorMode === "dark" ? "darkgray.500" : "lightgray.900"  }}
+        background={colorMode === "dark" ? "white" : "lightgray.400"}
         borderRadius='xl'
       />
-
       <Flex alignItems='flex-end'>
         <Button
           variant='black'
-          onClick={sendMessage}
+          onClick={() => sendMessage(msgInput)}
           borderRadius='full'
           minH='full'
           px='0'

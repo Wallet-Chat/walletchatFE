@@ -3,9 +3,6 @@ import * as wagmi from '@wagmi/core'
 import React from 'react'
 import Web3 from 'web3'
 import { SiweMessage } from 'siwe'
-
-import { AnalyticsBrowser } from '@segment/analytics-next'
-import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 
@@ -45,28 +42,25 @@ import {
 import { useAppSelector } from '@/hooks/useSelector'
 import { getWidgetUrl, postMessage } from '@/helpers/widget'
 import * as APP from '@/constants/app'
-
-// help debug issues and watch for high traffic conditions
-const analytics = AnalyticsBrowser.load({
-  writeKey: ENV.REACT_APP_SEGMENT_KEY,
-})
-/* Initialize analytics instance */
-const analyticsGA4 = Analytics({
-  app: 'WalletChatApp',
-  plugins: [
-    /* Load Google Analytics v4 */
-    googleAnalyticsPlugin({
-      measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
-    }),
-  ],
-})
-ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
+import Analytics from 'analytics'
 
 const isWidget = getIsWidgetContext()
 
 /* eslint-disable react/display-name */
 const WalletProviderContext = (chains: any) => {
   const dispatch = useAppDispatch()
+
+  /* Initialize analytics instance */
+  const analyticsGA4 = Analytics({
+    app: 'WalletChatApp',
+    plugins: [
+      /* Load Google Analytics v4 */
+      googleAnalyticsPlugin({
+        measurementIds: [ENV.REACT_APP_GOOGLE_GA4_KEY],
+      }),
+    ],
+  })
+  ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
 
   const didDisconnect = React.useRef<boolean>(false)
   const prevAccount = React.useRef<null | string>()
@@ -109,7 +103,7 @@ const WalletProviderContext = (chains: any) => {
   const { disconnect, disconnectAsync } = useDisconnect()
 
   const accountAddress = useAppSelector(
-    (state) => selectAccount(state) || wagmiAddress
+    (state) => selectAccount(state) || wagmiAddress //|| storage.get('current-address')
   )
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
@@ -197,7 +191,7 @@ const WalletProviderContext = (chains: any) => {
 
   const signIn = React.useCallback(
     (address: string, jwt: string) => {
-   
+      
       //TODO: make sure this request doesn't get called on mobile (window.ethereum doesn;'t exist here)
       // window.ethereum.request({
       //   method: 'wallet_invokeSnap',
@@ -224,10 +218,14 @@ const WalletProviderContext = (chains: any) => {
         dispatch(setAccount(walletInJWT))
       }
 
-      dispatch(endpoints.getName.initiate(accountAddress?.toLocaleLowerCase()))
-
       getSettings(address)
       dispatch(setIsAuthenticated(true))
+
+      if(accountAddress) {
+        dispatch(endpoints.getName.initiate(accountAddress.toLocaleLowerCase()))
+      } else {
+        dispatch(endpoints.getName.initiate(address.toLocaleLowerCase()))
+      }
 
       pendingConnect.current = false
     },
@@ -238,17 +236,15 @@ const WalletProviderContext = (chains: any) => {
     dispatch(setIsAuthenticated(accountAuthenticated))
 
     if (storage.get('app-version') !== APP.VERSION) {
-      localStorage.clear()
+      try { if(localStorage) { localStorage.clear() } } catch (e) {}
       storage.set('app-version', APP.VERSION)
       window.location.reload()
     }
   }, [dispatch, initialJwt, accountAuthenticated])
 
   React.useEffect(() => {
-    if (analytics && accountAddress && name && email) {
-      analytics.identify(accountAddress, { name, email })
+    if (accountAddress && name && email) {
       analyticsGA4.identify(accountAddress, { name, email })
-      
     }
   }, [accountAddress, email, name])
 
@@ -267,6 +263,22 @@ const WalletProviderContext = (chains: any) => {
       })
   }
 
+  async function getNonceAsync(address: string) {
+    let retVal = ""
+    await fetch(` ${ENV.REACT_APP_REST_API}/users/${address}/nonce`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then(async (usersData: { Nonce: string }) => {
+        log('✅[GET][Nonce Local]:', usersData)
+        retVal = usersData.Nonce
+      })
+      .catch((error) => {
+        log('🚨[GET][Nonce Local]:', error)
+      })
+      return retVal;
+  }
   React.useEffect(() => {
     if (isWidget) {
       if (!accountAddress) {
@@ -339,6 +351,8 @@ const WalletProviderContext = (chains: any) => {
           requestSignature: Boolean(withSignature),
         }
 
+        console.log("set account 5: updateAccountFromWidget: ", widgetWalletDataRef.current.account)
+        //storage.set('current-address', widgetWalletDataRef.current.account)
         dispatch(setAccount(widgetWalletDataRef.current.account))
         setChainId(widgetWalletDataRef.current.chainId)
         didDisconnect.current = false
@@ -362,7 +376,7 @@ const WalletProviderContext = (chains: any) => {
   }, [])
 
   React.useEffect(() => {
-    if (!isWidget) return
+    //if (!isWidget) return
 
     const eventListener = async (e: MessageEvent) => {
       const { data, origin }: { data: API; origin: string } = e
@@ -372,7 +386,9 @@ const WalletProviderContext = (chains: any) => {
       }
 
       const currentOrigin = storage.get('current-widget-origin')
-      if (currentOrigin !== origin) {
+      //don't overwrite the current-widget-origin with the current host (weird metamask messages when changing chain)
+      const currentSite = window.location.protocol + "//" + window.location.host
+      if (currentOrigin !== origin && origin != currentSite) {
         storage.set('current-widget-origin', origin)
       }
 
@@ -383,12 +399,60 @@ const WalletProviderContext = (chains: any) => {
       const { data: messageData, target }: API = data
 
       if (target === 'signed_message') {
+        //debug Android App
+      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+        body: JSON.stringify({
+          data,
+          origin,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      //end debug android app webview
+      
+        //TODO, should probably clean this up to pass in account and chain ID?
         log("*** Setting Widget Auth Sig ***", messageData)
         setWidgetAuthSig(messageData)
-      }
-      
-      if (target === 'parent_provider') {
-        log("*** Parent Provider ***", data)
+        const regex = /0x[a-fA-F0-9]{40}/;
+        const matches = messageData.msgToSign.match(regex);
+
+        const regexChainID = /Chain ID: (\d+)/;
+        const matchesChainID = messageData.msgToSign.match(regexChainID);
+
+        let chainID = '1'
+        if (matchesChainID && matchesChainID.length > 1) {
+           chainID = matches[1];
+        }
+
+        if (matches && matches.length > 0) {
+          const matchedAccount = matches[0]
+          let localNonce = await getNonceAsync(matchedAccount)
+          log("signed_message from: ", matchedAccount)
+          
+          fetch(`${ENV.REACT_APP_REST_API}/signin`, {
+            body: JSON.stringify({
+              name: chainID,
+              address: matchedAccount,
+              nonce: localNonce,
+              msg: messageData.msgToSign,
+              sig: messageData.signature,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+          })
+            .then((response) => response.json())
+            .then(async (signInData) => {
+              storeJwtForAccount(matchedAccount, signInData.access)
+    
+              const currentSigs = storage.get('lit-auth-signature-by-account')
+              storage.set('lit-auth-signature-by-account', {
+                ...currentSigs,
+                [matchedAccount.toLocaleLowerCase()]: widgetAuthSig,
+              })
+    
+              signIn(matchedAccount, signInData.access)
+            })
+        }
       }
 
       if (data === 'debugON') {
@@ -489,16 +553,12 @@ const WalletProviderContext = (chains: any) => {
         const oneDay = 1 * 24 * 60 * 60 * 1000
 
         if (currentTime - lastTimestamp > oneDay) {
-          analytics.track('ConnectWallet', {
-            site: document.referrer,
-            account: accountAddress,
-          })
           // ReactGA.event({
           //   category: "ConnectWallet",
           //   action: "ConnectWallet",
           //   label: "TestLabel123", // optional
           // });
-          analyticsGA4.track('ConnectWallet', {
+          analyticsGA4.track('ConnectWallet_GoodDollar', {
             site: document.referrer,
             account: accountAddress,
           })
@@ -521,10 +581,12 @@ const WalletProviderContext = (chains: any) => {
         // revert prevAccount to default state so can log back in
         prevAccount.current = undefined
       }
+      return //we don't want to overwrite account to undefined (ex: GoodDollar)
     } else {
       didDisconnect.current = false
     }
 
+    console.log("set account 3: wagmiAddress: ", wagmiAddress)
     dispatch(setAccount(wagmiAddress))
   }, [wagmiAddress, dispatch])
 
@@ -535,11 +597,11 @@ const WalletProviderContext = (chains: any) => {
   const requestSIWEandFetchJWT = React.useCallback(async () => {
     let _accountAddress = accountAddress
     if(!accountAddress && widgetAuthSig?.account) {
+      console.log("set account 2: requestSIWEandFetchJWT: ", widgetAuthSig?.account)
       dispatch(setAccount(widgetAuthSig?.account)) 
       getNonce(widgetAuthSig?.account)
       _accountAddress = widgetAuthSig?.account
     }
-
     const walletIsConnected = _accountAddress && chainId
 
     const accountHasNoJwt =
@@ -675,6 +737,7 @@ const WalletProviderContext = (chains: any) => {
     disconnect()
 
     widgetWalletDataRef.current = undefined
+    console.log("set account 1: disconnectWallet")
     dispatch(setAccount(null))
     setSiweLastFailure(null)
     siweFailedRef.current = false
