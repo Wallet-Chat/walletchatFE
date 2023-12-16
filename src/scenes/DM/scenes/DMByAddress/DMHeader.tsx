@@ -76,7 +76,6 @@ const DMHeader = ({ account }: Props) => {
       })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
         setIsVerifiedUser(data);
       })
     } catch (error) {
