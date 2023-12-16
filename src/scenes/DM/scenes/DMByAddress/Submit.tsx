@@ -215,7 +215,7 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
     [account]
   )
 
-  const imageUpload = (resizedFile: string) => {
+  const imageUpload = async (resizedFile: string) => {
     if (!account) {
       log('No account connected')
       return
@@ -226,34 +226,35 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       return
     }
 
-    const imageid = account.toLocaleLowerCase() + "_" + toAddr.toLocaleLowerCase() + "_" + uuidv4();
-    const uploadValue = imageid + ".walletChatImage";
-    
-    fetch(
-			`${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/imageraw`,
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${getJwtForAccount(account)}`,
-				},
-				body: JSON.stringify({
-					addr: account.toLocaleLowerCase(),
-          imageid: imageid,
-					base64data: resizedFile,
-				}),
-			}
-		)
-      .then((response) => {
-        sendMessage(uploadValue);
-      })
-      .then((data) => {
-        log('✅[POST][Send Message]::', data)
-      })
-      .catch((error) => {
-        console.error('🚨[POST][Send Message]::', error)
-      })
+    try {
+      const imageid = account.toLocaleLowerCase() + "_" + toAddr.toLocaleLowerCase() + "_" + uuidv4();
+      const uploadValue = imageid + ".walletChatImage";
+      
+      await fetch(
+        `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/imageraw`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          },
+          body: JSON.stringify({
+            addr: account.toLocaleLowerCase(),
+            imageid: imageid,
+            base64data: resizedFile,
+          }),
+        }
+      )
+        .then((response) => {
+          sendMessage(uploadValue);
+        })
+        .then((data) => {
+          log('✅[POST][Send Message]::', data)
+        })
+    } catch (error) {
+      console.error('🚨[POST][Send Message]::', error) 
+    }
   }
 
   const sendMessage = async (msgInput: string) => {

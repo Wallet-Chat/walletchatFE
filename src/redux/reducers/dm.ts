@@ -237,6 +237,17 @@ export function getLocalDmDataForAccountToAddr(
   return [...localDmData]
 }
 
+export function deleteLocalDmDataForAccountToAddr(
+  account: string,
+  toAddr: string,
+){
+  let localDmData = getLocalDmDataForAccountToAddr(account, toAddr) || []
+
+  localDmData.splice(0, localDmData.length)
+
+  updateLocalDmDataForAccountToAddr(account, toAddr, localDmData)
+}
+
 export function updatePendingDmDataForAccountToAddr(
   account: string,
   toAddr: string,
