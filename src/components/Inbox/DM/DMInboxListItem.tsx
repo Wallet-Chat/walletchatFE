@@ -7,7 +7,6 @@ import { truncateAddress } from '../../../helpers/truncateString'
 import { InboxItemType } from '../../../types/InboxItem'
 import { InboxItemNotificationCount, InboxItemRecipientAddress, InboxItemWrapper } from '../../../styled/InboxItem'
 import Avatar from './Avatar'
-import { getLocalDmDataForAccountToAddr } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
 import { getJwtForAccount } from '@/helpers/jwt'
 import * as ENV from '@/constants/env'
@@ -38,7 +37,6 @@ const DMInboxItem = ({
       displayName = truncateAddress(recipientAddress) || ''
    }
    const [isVerifiedUser, setIsVerifiedUser] = React.useState<boolean>()
-   const localDmData = getLocalDmDataForAccountToAddr(account, recipientAddress) || []
 
    useEffect(() => {
       isVerified();
@@ -90,7 +88,7 @@ const DMInboxItem = ({
                         <InboxItemRecipientAddress>{displayName}</InboxItemRecipientAddress>
                         {isVerifiedUser && <MdVerified size={15} color='#63b3ed' stroke='1.5' /> }
                      </Flex>
-                     {data.message && localDmData.length > 0 && (
+                     {data.message && (
                         <Box fontSize="md" color="darkgray.100" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                            {data.message.substring(0, 25)}{data.message.length > 25 && '...'}
                         </Box>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Box, Button, Flex, Text, Link as CLink } from '@chakra-ui/react'
+import { Box, Button, Flex, Text, Link as CLink, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, Spinner } from '@chakra-ui/react'
 import { useParams, Link } from 'react-router-dom'
 import {
   IconArrowLeft,
@@ -10,7 +10,7 @@ import { MdVerified } from "react-icons/md";
 import { ImBlocked } from "react-icons/im";
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { truncateAddress } from '../../../../helpers/truncateString'
-import { deleteLocalDmDataForAccountToAddr, useGetNameQuery } from '@/redux/reducers/dm'
+import { deleteLocalDmDataForAccountToAddr, deleteToAddrFromInboxData, getAllInboxDmMessagesForAccount, getInboxDmDataForAccount, useGetNameQuery } from '@/redux/reducers/dm'
 import Avatar from '@/components/Inbox/DM/Avatar'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
@@ -22,21 +22,38 @@ interface Props {
 
 const DMHeader = ({ account }: Props) => {
   const isSmallLayout = useIsSmallLayout()
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { address: toAddr = '' } = useParams()
 
   const timerRef: { current: NodeJS.Timeout | null } = React.useRef(null)
 
   const [copiedAddr, setCopiedAddr] = React.useState(false)
+  const [deleteModal, setDeleteModal] = React.useState(false)
+  const [blockModal, setBlockModal] = React.useState(false)
+  const [loading, setLoading] = React.useState(false);
   const [isVerifiedUser, setIsVerifiedUser] = React.useState<boolean>()
 
   const { data: name } = useGetNameQuery(toAddr)
 
   useEffect(() => {
+    const inboxDms = getInboxDmDataForAccount(account)
+    console.log(inboxDms)
     isVerified();
   }, [account])
-  
 
+  const onShowDeleteModal = () => {
+    setBlockModal(false);
+    setDeleteModal(true);
+    onOpen();
+  }
+
+  const onShowBlockModal = () => {
+    setDeleteModal(false);
+    setBlockModal(true);
+    onOpen();
+  }
+  
   async function copyToClipboard() {
     if (toAddr) {
       let didCopy = false
@@ -88,6 +105,8 @@ const DMHeader = ({ account }: Props) => {
       log('No account connected')
       return
     }
+
+    setLoading(true);
     
     try {
       await fetch(
@@ -100,7 +119,12 @@ const DMHeader = ({ account }: Props) => {
             Authorization: `Bearer ${getJwtForAccount(account)}`,
           }
       })
-      deleteLocalDmDataForAccountToAddr(account, toAddr)
+      .then(() => {
+        deleteLocalDmDataForAccountToAddr(account, toAddr)
+        deleteToAddrFromInboxData(account, toAddr)
+        setLoading(false)
+        onClose()
+      })
     } catch (error) {
       console.error('🚨[GET][Delete Convo]::', error)
     }
@@ -111,6 +135,8 @@ const DMHeader = ({ account }: Props) => {
       log('No account connected')
       return
     }
+
+    setLoading(true);
 
     try {
       await fetch(
@@ -125,7 +151,9 @@ const DMHeader = ({ account }: Props) => {
         }
       )
       .then((data) => {
+        setLoading(false);
         log('✅[GET][Block user]::', data)
+        onClose()
       })
     } catch (error) {
       console.error('🚨[GET][Block user]::', error)
@@ -213,13 +241,13 @@ const DMHeader = ({ account }: Props) => {
           </Flex>
           <Box mt={5}>
             <Button
-              onClick={deleteConvo}
+              onClick={() => onShowDeleteModal()}
               size='xs'
             >
               <FaRegTrashCan size={15} color='var(--chakra-colors-lightgray-900)' stroke='1.5' />
             </Button>
             <Button
-              onClick={blockUser}
+              onClick={() => onShowBlockModal()}
               size='xs'
               ml={2}
             >
@@ -228,6 +256,56 @@ const DMHeader = ({ account }: Props) => {
           </Box>
         </Flex>
       )}
+        {deleteModal && 
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Delete Conversation</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <span>Are you sure you want to delete this conversation?</span>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme='blackAlpha' mr={3} onClick={onClose}>
+                  Close
+                </Button>
+                <Button colorScheme='red' onClick={deleteConvo}>
+                  {loading ? (
+                    <Spinner />
+                  ) : (
+                    <span>Delete</span>
+                  )}
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        }
+        {blockModal && 
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Block User</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <span>Are you sure you want to block this user?</span>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme='blackAlpha' mr={3} onClick={onClose}>
+                  Close
+                </Button>
+                <Button colorScheme='red' onClick={blockUser}>
+                  {loading ? (
+                    <Spinner />
+                  ) : (
+                    <span>Block</span>
+                  )}
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        }
     </Box>
   )
 }
