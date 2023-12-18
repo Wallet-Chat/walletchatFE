@@ -97,10 +97,6 @@ const NFTGroupChat = ({
   }
 
   const sendMessage = async (msgInput: string) => {
-    analytics.track('SendNftGroupMessage:GoodDollar', {
-      site: document.referrer,
-      account: account,
-    })
     // ReactGA.event({
     //   category: "SendNftGroupMessageCategory",
     //   action: "SendNftGroupMessage",
