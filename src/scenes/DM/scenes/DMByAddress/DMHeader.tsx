@@ -10,7 +10,7 @@ import { MdVerified } from "react-icons/md";
 import { ImBlocked } from "react-icons/im";
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { truncateAddress } from '../../../../helpers/truncateString'
-import { deleteLocalDmDataForAccountToAddr, deleteToAddrFromInboxData, getAllInboxDmMessagesForAccount, getInboxDmDataForAccount, useGetNameQuery } from '@/redux/reducers/dm'
+import { deleteLocalDmDataForAccountToAddr, useGetNameQuery } from '@/redux/reducers/dm'
 import Avatar from '@/components/Inbox/DM/Avatar'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
@@ -37,8 +37,6 @@ const DMHeader = ({ account }: Props) => {
   const { data: name } = useGetNameQuery(toAddr)
 
   useEffect(() => {
-    const inboxDms = getInboxDmDataForAccount(account)
-    console.log(inboxDms)
     isVerified();
   }, [account])
 
