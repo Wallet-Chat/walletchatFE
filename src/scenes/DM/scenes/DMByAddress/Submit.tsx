@@ -262,14 +262,16 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
 
     if (value.length <= 0) return
 
-    if(prevMessage.current == msgInput) return;
-
+    analytics.track('SendMessage:GoodDollar', {
+      site: document.referrer,
+      account,
+    })
     // ReactGA.event({
     //   category: "SendMessageCategory",
     //   action: "SendMessage",
     //   label: "SendMessageLabel", // optional
     // });
-    analyticsGA4.track('SendMessage', {
+    analyticsGA4.track('SendMessage:GoodDollar', {
       site: document.referrer,
       account,
     })

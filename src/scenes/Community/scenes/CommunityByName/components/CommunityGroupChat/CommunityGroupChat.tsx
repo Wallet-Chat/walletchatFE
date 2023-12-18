@@ -140,14 +140,17 @@ const CommunityGroupChat = ({
       return
     }
 
-    if(prevMessage.current == msgInput) return;
-
+    analytics.track('SendCommunityMessage:GoodDollar', {
+       site: document.referrer,
+       community,
+       account
+     });
     // ReactGA.event({
     //   category: "SendCommunityMessageCategory",
     //   action: "SendCommunityMessage",
     //   label: "SendCommunityLabel", // optional
     // });
-    analyticsGA4.track('SendCommunityMessage', {
+    analyticsGA4.track('SendCommunityMessage:GoodDollar', {
       site: document.referrer,
       community,
       account

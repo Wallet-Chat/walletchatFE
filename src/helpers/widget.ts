@@ -27,10 +27,11 @@ function getWidgetEnvSuffix(addDev?: boolean, bypass?: boolean) {
   let currentWidgetOrigin = storage.get('current-widget-origin')
   const isWidget = getIsWidgetContext()
   if(!bypass) {
-  if (!isWidget) return null
+    if (!isWidget) return null
   } else {
     if (!isWidget) currentWidgetOrigin = window.location.host
   }
+
   if (!currentWidgetOrigin) return null
 
   if (addDev && currentWidgetOrigin.toLowerCase().includes('localhost')) {
@@ -79,7 +80,7 @@ export function getCommunity() {
   return defaultCommunity
 }
 export function getSupportWallet() {
-  const suffix = getWidgetEnvSuffix(true, true)
+  const suffix = getWidgetEnvSuffix(true, false)
   const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_WALLET${suffix}`] : walletChatEth
   return retWallet ? retWallet : walletChatEth
 }

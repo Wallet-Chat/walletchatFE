@@ -127,12 +127,16 @@ const NFTChat = ({
   }
 
   const sendMessage = async () => {
+    analytics.track('SendNftMessage:GoodDollar', {
+      site: document.referrer,
+      account: account,
+    })
     // ReactGA.event({
     //   category: "SendNftMessageCategory",
     //   action: "SendNftMessage",
     //   label: "SendNftMessageLabel", // optional
     // });
-    analyticsGA4.track('SendNftMessage', {
+    analyticsGA4.track('SendNftMessage:GoodDollar', {
       site: document.referrer,
       account: account,
     })
