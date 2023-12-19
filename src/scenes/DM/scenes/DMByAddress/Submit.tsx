@@ -425,9 +425,8 @@ function Submit({ toAddr, account }: { toAddr: string; account: string }) {
       <Textarea 
         placeholder='Write a message...'
         ref={textAreaRef}
-        onChange={(e) => {
-          msgInput.current = e.target.value
-        }}
+        onChange={(e) => setMsgInput(e.target.value)}
+        value={msgInput}
         onKeyPress={handleKeyPress}
         minH='full'
         resize='none'
