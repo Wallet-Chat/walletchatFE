@@ -94,11 +94,13 @@ const NFTInbox = () => {
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
       width={isSmallLayout ? '100vw' : '360px'}
       maxW='100%'
+      ml={50}
     >
       <Box
         px={5}
         pt={5}
         pb={3}
+        ml={5}
         pos='sticky'
         top='0'
         background='white'
@@ -116,6 +118,7 @@ const NFTInbox = () => {
             overflowX='auto'
             overflowY='visible'
             className='custom-scrollbar'
+            ml={10}
           >
             <Tab marginBottom='0'>
               Joined{' '}
@@ -130,7 +133,7 @@ const NFTInbox = () => {
 
           <TabPanels>
             <TabPanel p={0}>
-              <Box px={4} pt={2}>
+              <Box ml={5} w='100%' px={4} pt={2}>
                 <ChainFilters
                   chainFilters={chainFilters}
                   setChainFilters={setChainFilters}
@@ -138,7 +141,7 @@ const NFTInbox = () => {
               </Box>
               <InboxList context='nft' web3={web3} account={account} />
             </TabPanel>
-            <TabPanel p={0}>
+            <TabPanel ml={5} p={0}>
               <MyNFTs account={account} />
             </TabPanel>
           </TabPanels>

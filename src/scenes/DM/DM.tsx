@@ -18,12 +18,14 @@ const Inbox = () => {
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
       width={isSmallLayout ? '100vw' : '360px'}
       maxW='100%'
+      ml={50}
     >
       <Box
         px={5}
         pt={5}
         pb={3}
         pos='sticky'
+        ml={5}
         top='0'
         background='white'
         zIndex='sticky'

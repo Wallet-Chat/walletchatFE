@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Box, Button, Flex, Text, Link as CLink, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, Spinner } from '@chakra-ui/react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
   IconArrowLeft,
   IconExternalLink,
@@ -10,7 +10,7 @@ import { MdVerified } from "react-icons/md";
 import { ImBlocked } from "react-icons/im";
 import useIsSmallLayout from '@/hooks/useIsSmallLayout'
 import { truncateAddress } from '../../../../helpers/truncateString'
-import { deleteLocalDmDataForAccountToAddr, useGetNameQuery } from '@/redux/reducers/dm'
+import { deleteToAddrFromInboxData, useGetNameQuery } from '@/redux/reducers/dm'
 import Avatar from '@/components/Inbox/DM/Avatar'
 import * as ENV from '@/constants/env'
 import { log } from '@/helpers/log'
@@ -24,6 +24,7 @@ const DMHeader = ({ account }: Props) => {
   const isSmallLayout = useIsSmallLayout()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const navigate = useNavigate()
   const { address: toAddr = '' } = useParams()
 
   const timerRef: { current: NodeJS.Timeout | null } = React.useRef(null)
@@ -118,9 +119,9 @@ const DMHeader = ({ account }: Props) => {
           }
       })
       .then(() => {
-        deleteLocalDmDataForAccountToAddr(account, toAddr)
         deleteToAddrFromInboxData(account, toAddr)
         setLoading(false)
+        navigate("/dm")
         onClose()
       })
     } catch (error) {
@@ -150,6 +151,7 @@ const DMHeader = ({ account }: Props) => {
       )
       .then((data) => {
         setLoading(false);
+        navigate("/dm")
         log('✅[GET][Block user]::', data)
         onClose()
       })
@@ -165,7 +167,7 @@ const DMHeader = ({ account }: Props) => {
       borderBottom='1px solid var(--chakra-colors-lightgray-400)'
     >
       {isSmallLayout && (
-        <Box mb={4}>
+        <Box mb={4} pl={20}>
           <Link to='/dm' style={{ textDecoration: 'none' }}>
             <Button colorScheme='gray' background='lightgray.300' size='sm'>
               <Flex alignItems='center'>
@@ -178,7 +180,7 @@ const DMHeader = ({ account }: Props) => {
       )}
 
       {toAddr && (
-        <Flex alignItems='center' justifyContent='space-between'>
+        <Flex pl={[20, 20, 0, 0]} alignItems='center' justifyContent='space-between'>
           <Flex alignItems='center'>
             <Avatar account={toAddr} />
             <Box ml={2}>
@@ -255,7 +257,7 @@ const DMHeader = ({ account }: Props) => {
         </Flex>
       )}
         {deleteModal && 
-          <Modal isOpen={isOpen} onClose={onClose}>
+          <Modal isOpen={isOpen} onClose={onClose} size="xs">
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Delete Conversation</ModalHeader>
@@ -280,7 +282,7 @@ const DMHeader = ({ account }: Props) => {
           </Modal>
         }
         {blockModal && 
-          <Modal isOpen={isOpen} onClose={onClose}>
+          <Modal isOpen={isOpen} onClose={onClose} size="xs">
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Block User</ModalHeader>

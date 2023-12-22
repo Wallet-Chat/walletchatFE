@@ -290,6 +290,7 @@ const NFTByContract = () => {
               height='60px'
               borderRadius='var(--chakra-radii-xl)'
               mr={3}
+              ml={[12, 12, 0, 0]}
             />
           )}
           <Box>
@@ -529,6 +530,7 @@ const NFTByContract = () => {
         flex='10 100px'
         variant='enclosed'
         isLazy
+        ml={[50, 50, 0, 0]}
       >
         <TabList padding='0 var(--chakra-space-5)'>
           <Tab>

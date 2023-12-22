@@ -362,6 +362,23 @@ export function getInboxDmDataForAccount(account: string) {
   return inboxDataObj
 }
 
+export function deleteToAddrFromInboxData(account: string, toAddr: string) {
+  let localInboxData = getInboxDmDataForAccount(account);
+
+  const filteredObject = Object.fromEntries(
+    Object.entries(localInboxData.dm).filter(([key, value]) => value.toaddr !== toAddr)
+  );
+
+  console.log(filteredObject);
+  localInboxData.dm = filteredObject;
+
+  console.log("new", localInboxData)
+
+  storage.set(STORAGE_KEYS.INBOX_DATA, {
+    [account.toLocaleLowerCase()]: localInboxData,
+  })
+}
+
 export function getInboxFrom(account: string, item: InboxMessageType) {
   const isCommunityOrNFT =
     item.context_type === 'community' || item.context_type === 'nft'
