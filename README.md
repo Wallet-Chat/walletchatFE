@@ -1,4 +1,4 @@
-WalletChat is a web app, Widget and browser extension that makes communication easy in web3!
+WalletChat is a web app, Widget and browser extension that makes communication easy in web3! 
 
 ### Features
 - Chat with any wallet address
