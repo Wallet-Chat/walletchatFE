@@ -28,7 +28,7 @@ const InboxList = ({
 
   // TODO: use unread counts from unread count provider instead
   return (
-    <Box className='custom-scrollbar' ml={5} flex='1 1 0px' overflowY='scroll'>
+    <Box className='custom-scrollbar' ml={[0, 0, 5, 0]} flex='1 1 0px' overflowY='scroll'>
       {inboxList?.map((conversation, i) => {
         if (conversation.context_type === 'nft') {
           return (

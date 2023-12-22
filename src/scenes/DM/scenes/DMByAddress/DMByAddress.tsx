@@ -321,7 +321,7 @@ const DMByAddress = () => {
           }
 
           return (
-            <Box ml={[ 50, 50, 0, 0 ]} key={key} ref={ref}>
+            <Box ml={[ 0, 0, 50, 0 ]} key={key} ref={ref}>
               <ChatMessage
                 pending={decryptionPending}
                 hasPendingMsgs={pendingMsgs?.length > 1}

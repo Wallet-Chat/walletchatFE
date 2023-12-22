@@ -359,7 +359,7 @@ const CommunityByName = () => {
         flex='10 100px'
         variant='enclosed'
         isLazy
-        ml={[50, 50, 0, 0]}
+        ml={[0, 0, 50, 0]}
       >
         <TabList padding='0 var(--chakra-space-5)'>
           <Tab>Chat</Tab>

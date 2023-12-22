@@ -167,7 +167,7 @@ const DMHeader = ({ account }: Props) => {
       borderBottom='1px solid var(--chakra-colors-lightgray-400)'
     >
       {isSmallLayout && (
-        <Box mb={4} pl={20}>
+        <Box mb={4} pl={[0, 0, 20, 0]}>
           <Link to='/dm' style={{ textDecoration: 'none' }}>
             <Button colorScheme='gray' background='lightgray.300' size='sm'>
               <Flex alignItems='center'>
@@ -180,7 +180,7 @@ const DMHeader = ({ account }: Props) => {
       )}
 
       {toAddr && (
-        <Flex pl={[20, 20, 0, 0]} alignItems='center' justifyContent='space-between'>
+        <Flex pl={[0, 0, 20, 0]} alignItems='center' justifyContent='space-between'>
           <Flex alignItems='center'>
             <Avatar account={toAddr} />
             <Box ml={2}>

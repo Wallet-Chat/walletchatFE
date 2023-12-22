@@ -179,9 +179,9 @@ export const App = () => {
       >
         <ExtensionCloseButton />
 
-        <Box position='absolute'>
+        {/* <Box position='absolute'> */}
           <Sidebar />
-        </Box>
+        {/* </Box> */}
 
         <Flex
           flex='1 1 0px'
