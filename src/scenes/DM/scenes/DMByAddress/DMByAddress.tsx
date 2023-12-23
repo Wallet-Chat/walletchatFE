@@ -42,6 +42,7 @@ const AlertBubble = ({
     top={0}
     right={0}
     zIndex={1}
+    ml={[20, 20, 0, 0]}
   >
     <Box fontSize='md'>{children}</Box>
   </Flex>
@@ -320,7 +321,7 @@ const DMByAddress = () => {
           }
 
           return (
-            <Box key={key} ref={ref}>
+            <Box ml={[ 0, 0, 50, 0 ]} key={key} ref={ref}>
               <ChatMessage
                 pending={decryptionPending}
                 hasPendingMsgs={pendingMsgs?.length > 1}

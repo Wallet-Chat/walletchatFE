@@ -11,10 +11,11 @@ const Inbox = () => {
       background='white'
       height={isSmallLayout ? 'unset' : '100vh'}
       borderRight='1px solid var(--chakra-colors-lightgray-400)'
-      width={isSmallLayout ? '100vw' : '360px'}
+      width={isSmallLayout ? '100vw' : '400px'}
       maxW='100%'
+      pl={[0, 0, 50, 0]}
     >
-      <Box px={5} pt={5} pb={3} pos='sticky' top='0' background='white'>
+      <Box px={5} pt={5} pb={3} ml={5} pos='sticky' top='0' background='white'>
         <Flex justifyContent='space-between' mb={2}>
           <Heading size='lg'>Communities</Heading>
         </Flex>
