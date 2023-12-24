@@ -68,15 +68,15 @@ export const App = () => {
         //console.log("got message with data: ", data)
 
         if (ownerAddress) {
-          console.log("got message with ownerAddress: ", ownerAddress)
+          //console.log("got message with ownerAddress: ", ownerAddress)
           //debug Android App
-          fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-            body: JSON.stringify({
-              event: "Should Set DM ownerAddress"
-            }),
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-          })
+          // fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+          //   body: JSON.stringify({
+          //     event: "Should Set DM ownerAddress"
+          //   }),
+          //   headers: { 'Content-Type': 'application/json' },
+          //   method: 'POST',
+          // })
           //end debug android app webview
           navigate(`/dm/${ownerAddress}`)
         }

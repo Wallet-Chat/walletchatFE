@@ -400,14 +400,14 @@ const WalletProviderContext = (chains: any) => {
 
       if (target === 'signed_message') {
         //debug Android App
-      fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
-        body: JSON.stringify({
-          data,
-          origin,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
+      // fetch(`${ENV.REACT_APP_REST_API}/debug_print`, {
+      //   body: JSON.stringify({
+      //     data,
+      //     origin,
+      //   }),
+      //   headers: { 'Content-Type': 'application/json' },
+      //   method: 'POST',
+      // })
       //end debug android app webview
       
         //TODO, should probably clean this up to pass in account and chain ID?
