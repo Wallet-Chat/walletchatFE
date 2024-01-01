@@ -180,7 +180,7 @@ const CommunityByName = () => {
               height='60px'
               borderRadius='var(--chakra-radii-xl)'
               mr={3}
-              ml={[12, 12, 0, 0]}
+              // ml={[0, 0, 0, 0]}
             />
           )}
           <Box>

@@ -42,7 +42,7 @@ const AlertBubble = ({
     top={0}
     right={0}
     zIndex={1}
-    ml={[20, 20, 0, 0]}
+    ml={[0, 0, 20, 0]}
   >
     <Box fontSize='md'>{children}</Box>
   </Flex>

@@ -15,7 +15,7 @@ const Inbox = () => {
       maxW='100%'
       pl={[0, 0, 50, 0]}
     >
-      <Box px={5} pt={5} pb={3} ml={5} pos='sticky' top='0' background='white'>
+      <Box px={5} pt={5} pb={3} pos='sticky' top='0' background='white'>
         <Flex justifyContent='space-between' mb={2}>
           <Heading size='lg'>Communities</Heading>
         </Flex>

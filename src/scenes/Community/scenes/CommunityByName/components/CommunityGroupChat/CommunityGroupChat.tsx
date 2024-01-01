@@ -302,7 +302,7 @@ const CommunityGroupChat = ({
           top={0}
           right={0}
           zIndex={1}
-          ml={[8, 8, 0, 0]}
+          // ml={[0, 0, 0, 0]}
         >
           <Box fontSize='md'>{children}</Box>
         </Flex>

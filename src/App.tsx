@@ -9,6 +9,7 @@ import {
   Spinner,
   Tag,
   Button,
+  useBreakpointValue,
 } from '@chakra-ui/react'
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
@@ -54,6 +55,7 @@ export const App = () => {
   const isAuthenticated = useAppSelector((state) =>
     selectIsAuthenticated(state)
   )
+  const isSmallLayout = useIsSmallLayout()
   const { currentData: name } = endpoints.getName.useQueryState(
     account?.toLocaleLowerCase()
   )
@@ -88,8 +90,6 @@ export const App = () => {
     console.log("goodwallet is awake!")
     postMessage({ target: 'goodwallet_is_awake' })
   }, [])
-
-  const isSmallLayout = useIsSmallLayout()
 
   if (!isAuthenticated) {
     return (
@@ -179,9 +179,13 @@ export const App = () => {
       >
         <ExtensionCloseButton />
 
-        {/* <Box position='absolute'> */}
+        {isMobile ? (
           <Sidebar />
-        {/* </Box> */}
+        ) : (
+          <Box>
+            <Sidebar />
+          </Box>
+        )}
 
         <Flex
           flex='1 1 0px'
