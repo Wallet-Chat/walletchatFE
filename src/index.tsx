@@ -13,7 +13,7 @@ import {
 import '@rainbow-me/rainbowkit/styles.css'
 import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { createClient, WagmiConfig, configureChains } from 'wagmi'
-import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo } from 'wagmi/chains'
+import { mainnet, polygon, optimism, avalanche, avalancheFuji, celo, sepolia } from 'wagmi/chains'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
@@ -43,7 +43,7 @@ const GlobalStyles = css`
 `;
 
 export const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, polygon, optimism, avalanche, avalancheFuji, celo],
+  [mainnet, polygon, optimism, avalanche, avalancheFuji, celo, sepolia],
   [
     infuraProvider({ apiKey: ENV.REACT_APP_INFURA_ID }),
     alchemyProvider({ apiKey: ENV.REACT_APP_ALCHEMY_API_KEY_ETHEREUM }),
