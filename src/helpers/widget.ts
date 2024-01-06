@@ -54,7 +54,7 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_MYSTICSWAP'
   }
 
-  if (currentWidgetOrigin.toLowerCase().includes('segmint.io')) {
+  if (currentWidgetOrigin.toLowerCase().includes('segmint')) {
     return '_SEGMINT'
   }
 
