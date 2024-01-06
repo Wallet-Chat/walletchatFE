@@ -62,6 +62,9 @@ export const REACT_APP_APP_URL_SEGMINT = import.meta.env
 // Origin Name
 export const REACT_APP_ORIGIN_NAME_SEGMINT = import.meta.env
   .VITE_REACT_APP_ORIGIN_NAME_SEGMINT
+// Support Header
+export const REACT_APP_SUPPORT_HEADER_SEGMINT = import.meta.env
+.VITE_REACT_APP_SUPPORT_HEADER_SEGMINT
 // ------------------
 
 // --- OpenPeer ---
