@@ -51,23 +51,28 @@ const tenorApiKey = ENV.REACT_APP_TENOR_API_KEY;
 const CommunityGroupChat = ({
   account,
   community,
-  chatData,
+  // chatData,
   isFetchingCommunityDataFirstTime,
 }: {
   account: string | undefined
   community: string
-  chatData: GroupMessageType[]
+  // chatData: GroupMessageType[]
   isFetchingCommunityDataFirstTime: boolean
 }) => {
   const [firstLoad, setFirstLoad] = useState(true)
   const [msgInput, setMsgInput] = useState<string>('')
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false)
+  const [chatData, setChatData] = useState<GroupMessageType[]>([]);
+  const [chatPrevData, setChatPrevData] = useState<GroupMessageType[]>([]);
   const [loadedMsgs, setLoadedMsgs] = useState<MessageUIType[]>([])
+  const [pageNum, setPageNum] = useState<number>(1)
+  const [loading, setLoading] = useState<boolean>(false)
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
   const { onClose, onToggle, isOpen } = useDisclosure();
   const prevMessage = useRef<null | string>()
-
   const scrollToBottomRef = useRef<HTMLDivElement>(null)
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  
   ReactGA.initialize(ENV.REACT_APP_GOOGLE_GA4_KEY);
     /* Initialize analytics instance */
     const analyticsGA4 = Analytics({
@@ -79,6 +84,28 @@ const CommunityGroupChat = ({
         }),
       ],
     })
+
+  useEffect(() => {
+    fetching()
+  }, [])
+
+  useEffect(() => {
+    if (chatPrevData.length !== null && scrollerRef.current) {
+      if (
+        scrollerRef.current.scrollTop < 100 &&
+        chatData &&
+        chatData.length !== chatPrevData.length
+      ) {
+        const heightBeforeRender = scrollerRef.current.scrollHeight;
+        setTimeout(() => {
+          if(scrollerRef.current){
+            scrollerRef.current.scrollTop = scrollerRef.current.scrollHeight - heightBeforeRender;
+          }
+        }, 120);
+      }
+    }
+    chatPrevData.length = chatData ? chatData.length : 0;
+  }, [chatData]);
 
   useEffect(() => {
     const toAddToUI = [] as MessageUIType[]
@@ -116,7 +143,6 @@ const CommunityGroupChat = ({
   }, [chatData, account])
 
   useEffect(() => {
-    // Scroll to bottom of chat once all messages are loaded
     if (scrollToBottomRef?.current && firstLoad) {
       scrollToBottomRef.current.scrollIntoView()
 
@@ -125,6 +151,45 @@ const CommunityGroupChat = ({
       }, 5000)
     }
   }, [loadedMsgs])
+
+  useEffect(() => {
+    if (scrollToBottomRef?.current) {
+      scrollToBottomRef.current.scrollIntoView()
+    }
+  }, [isSendingMessage])
+
+  const fetching = () => {
+    setLoading(true)
+    try {
+      fetch(
+        `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/community_pagenum/${community}/${pageNum}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getJwtForAccount(account)}`,
+          },
+        }
+      )
+      .then(async (response) => {
+        const res = await response.json()
+        if(pageNum > 1){
+          setChatData(prev => [...res, ...prev])
+          setChatPrevData(chatData)
+        } else {
+          setChatData(prev => [...prev, ...res])
+        }
+      })
+      .finally(() => {
+        if(loading){
+          setLoading(false)
+        }
+      })
+    } catch (error) {
+			console.error('🚨[GET][Error Getting More Community Data]:', error)  
+    }
+  }
 
   const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
@@ -214,7 +279,7 @@ const CommunityGroupChat = ({
       .finally(() => {
         setIsSendingMessage(false)
       })
-  }
+  }  
 
   const addMessageToUI = (
     type: string,
@@ -308,11 +373,18 @@ const CommunityGroupChat = ({
       </Link>
     );
 
+    const handleScroll = () => {
+      if(scrollerRef.current?.scrollTop && scrollerRef.current?.scrollTop < 100 && chatData.length >= 100)
+      {
+        setPageNum(prev => prev + 1)
+        fetching()
+      }
+    } 
   return (
     <Flex flexDirection='column' height='100%'>
       <AlertBubble to={`https://leaderboard.walletchat.fun`}color="green">{getSupportHeader()}</AlertBubble>
-      <DottedBackground className='custom-scrollbar'>
-        {loadedMsgs.length === 0 && (
+      <DottedBackground className='custom-scrollbar' onScroll={handleScroll} ref={scrollerRef}>
+  	    {loadedMsgs.length === 0 && (
           <Flex
             justifyContent='center'
             alignItems='center'
@@ -327,6 +399,11 @@ const CommunityGroupChat = ({
                 'Be the first to post something here 😉'
               )}
             </Box>
+          </Flex>
+        )}
+        {loading && pageNum > 1 && (
+          <Flex justifyContent='center' alignItems='center'>
+            <Spinner />
           </Flex>
         )}
         {loadedMsgs.map((msg, i) => {

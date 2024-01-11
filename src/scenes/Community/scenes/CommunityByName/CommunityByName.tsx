@@ -42,8 +42,8 @@ import pluralize from 'pluralize'
 const CommunityByName = () => {
   const account = useAppSelector((state) => selectAccount(state))
 
-	let { community = '' } = useParams()
-	const match = useMatch('/community/:community/*')
+  let { community = '' } = useParams()
+  const match = useMatch('/community/:community/*')
 
   const [communityData, setCommunityData] = useState<CommunityType>()
   const [
@@ -403,7 +403,7 @@ const CommunityByName = () => {
 								<CommunityGroupChat
 									account={account}
 									community={community}
-									chatData={communityData?.messages || []}
+									// chatData={communityData?.messages || []}
 									isFetchingCommunityDataFirstTime={
 										isFetchingCommunityDataFirstTime
 									}
