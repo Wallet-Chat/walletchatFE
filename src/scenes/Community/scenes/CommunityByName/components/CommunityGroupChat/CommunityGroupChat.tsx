@@ -87,7 +87,7 @@ const CommunityGroupChat = ({
 
   useEffect(() => {
     fetching()
-  }, [])
+  }, [community])
 
   useEffect(() => {
     if (chatPrevData.length !== null && scrollerRef.current) {
@@ -150,6 +150,12 @@ const CommunityGroupChat = ({
         setFirstLoad(false)
       }, 5000)
     }
+  }, [loadedMsgs, chatData])
+
+  useEffect(() => {
+    if (scrollToBottomRef?.current) {
+      scrollToBottomRef.current.scrollIntoView()
+    }
   }, [loadedMsgs])
 
   useEffect(() => {
@@ -178,7 +184,7 @@ const CommunityGroupChat = ({
           setChatData(prev => [...res, ...prev])
           setChatPrevData(chatData)
         } else {
-          setChatData(prev => [...prev, ...res])
+          setChatData(res)
         }
       })
       .finally(() => {
