@@ -86,7 +86,7 @@ export function getSupportWallet() {
 }
 export function getSupportHeader() {
   const suffix = getWidgetEnvSuffix(true)
-  const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_HEADER${suffix}`] : 'Check the leaderboard, share referral codes to earn more points! Chat to earn!'
+  const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_HEADER${suffix}`] : 'Click Here for Direct Support'
   return retWallet ? retWallet : walletChatEth
 }
 export function getWidgetUrl() {
