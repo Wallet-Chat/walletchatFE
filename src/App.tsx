@@ -45,6 +45,7 @@ import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import * as ENV from '@/constants/env'
+import Joyride, { STATUS } from "react-joyride";
 
 import { useEffect, useState } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
@@ -60,7 +61,75 @@ window.debugOFF = disableDebugPrints
 // Initialize Twitter Pixel with your Pixel ID
 TwitterPixel.init('tw-ofu6x-ohk5b');
 
+const referralInput = "referral";
+const accountDetails = "account";
+const newDm = "new";
+const dm = "dm";
+const nft = "nft";
+const community = "community";
+const support = "support";
+const leaderboard = "leaderboard";
+
 export const App = () => {
+  const [{ run, steps }, setState] = useState({
+    run: true,
+    steps: [
+      {
+        content: <h2><b>Let's take you on a tour!</b></h2>,
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "center",
+        target: "body"
+      },
+      {
+        content: "Please Enter a referral code if you have one or proceed without referral chat points by using: wc-test",
+        placement: "bottom",
+        target: `.${referralInput}`,
+        title: <h2><b>Here is your first step!</b></h2>
+      },
+      {
+        content: "Here you have access to your account details. You can change your Name, update your profile picture, sign out etc.",
+        placement: "right",
+        target: `.${accountDetails}`,
+        title: <h2><b>Get access to your account details!</b></h2>
+      },
+      {
+        content: "Here you can initiate a conversation with any wallet address and start chatting right away",
+        placement: "right",
+        target: `.${newDm}`,
+        title: <h2><b>Chat with a new wallet address!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to your list of Dms.",
+        placement: "right",
+        target: `.${dm}`,
+        title: <h2><b>Your list of DMs goes here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to NFT groups you belong to",
+        placement: "right",
+        target: `.${nft}`,
+        title: <h2><b>Your NFT groups lives here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to Communities you belong to",
+        placement: "right",
+        target: `.${community}`,
+        title: <h2><b>Communities you belong to!</b></h2>
+      },
+      {
+        content: "Facing any issues?...Click on this icon to communicate with the support team",
+        placement: "right",
+        target: `.${support}`,
+        title: <h2><b>Support channel lives here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to the WalletChat Leaderboard and see where you rank",
+        placement: "right",
+        target: `.${leaderboard}`,
+        title: <h2><b>WalletChat Leaderboard!</b></h2>
+      },
+    ]
+  });
   const [isSnapEnabled, setIsSnapEnabled] = useState(false);
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
@@ -204,7 +273,26 @@ export const App = () => {
         >
           <ExtensionCloseButton />
 
-          <Sidebar />
+          <Sidebar 
+            accountDetails={accountDetails}
+            newDm={newDm} 
+            dm={dm} 
+            nft={nft} 
+            community={community} 
+            support={support} 
+            leaderboard={leaderboard} 
+          />
+
+          <Joyride
+            continuous
+            callback={() => {}}
+            run={run}
+            steps={steps}
+            hideCloseButton
+            scrollToFirstStep
+            showSkipButton
+            showProgress
+          />
 
           {referralCode === undefined ? (
             <Flex
@@ -216,7 +304,7 @@ export const App = () => {
               <Spinner />
             </Flex>
           ) : (
-            <EnterReferral />
+            <EnterReferral referralInput={referralInput} />
           )}
         </Flex>
       </Box>

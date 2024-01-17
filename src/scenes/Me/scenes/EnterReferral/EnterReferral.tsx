@@ -23,7 +23,11 @@ import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { useWallet } from '@/context/WalletProvider'
 
-const EnterReferral = () => {
+interface Props {
+  referralInput: string;
+}
+
+const EnterReferral = ({ referralInput }: Props) => {
   const {
     handleSubmit,
     register,
@@ -123,7 +127,7 @@ const EnterReferral = () => {
         verticalAlign='middle'
       />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl>
+        <FormControl className={referralInput}>
           <FormLabel fontSize='2xl'>Please Enter the Referral Code:</FormLabel>
           <Flex>
             <Input
