@@ -452,7 +452,7 @@ const WalletProviderContext = (chains: any) => {
 
           let connector
           const walletIs = (walletName: string) =>
-            messageData.walletName.toLowerCase().includes(walletName)
+            messageData?.walletName?.toLowerCase().includes(walletName)
 
           if (walletIs('metamask')) {
             connector = new MetaMaskConnector({
