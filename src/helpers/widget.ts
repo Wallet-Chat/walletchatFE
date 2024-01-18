@@ -50,7 +50,7 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_NFT_DEMO'
   }
 
-  if (currentWidgetOrigin.toLowerCase().includes('netlify.app')) {
+  if (currentWidgetOrigin.toLowerCase().includes('nf3.exchange') || currentWidgetOrigin.toLowerCase().includes('netlify.app')) {
     return '_NF3'
   }
 
