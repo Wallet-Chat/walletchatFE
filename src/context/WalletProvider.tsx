@@ -513,9 +513,14 @@ const WalletProviderContext = (chains: any) => {
           setWidgetWalletData(widgetWalletDataRef.current)
 
           let connector
-          const walletIs = (walletName: string) =>
-            messageData.walletName.toLowerCase().includes(walletName)
-
+          const walletIs = (walletName: string) => {
+            if (messageData.walletName) {
+              return messageData.walletName.toLowerCase().includes(walletName)
+            } else {
+              return false
+            }   
+          }
+          
           if (walletIs('metamask')) {
             connector = new MetaMaskConnector({
               chains,
