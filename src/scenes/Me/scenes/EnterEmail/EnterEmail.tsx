@@ -28,6 +28,10 @@ import { selectAccount } from '@/redux/reducers/account'
 import { useAppSelector } from '@/hooks/useSelector'
 import { log } from '@/helpers/log'
 import { isMobile } from 'react-device-detect'
+import Joyride from "react-joyride";
+
+const emailInput = "email";
+const metamaskSnap = "metamaskSnap";
 
 const EnterEmail = () => {
   const account = useAppSelector((state) => selectAccount(state))
@@ -52,6 +56,25 @@ const EnterEmail = () => {
   const [twitterUsername, setTwitterUsername] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [isDialogOn, setIsDialogOn] = useState(false)
+  const [{ thirdTour, thirdStep }] = useState({
+    thirdTour: true,
+    thirdStep: [
+      {
+        content: "Please enter your Email or Telegram handle to receive notifications.",
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "bottom",
+        target: `.${emailInput}`,
+        title: <h2><b>Notifications!</b></h2>
+      },
+      {
+        content: "Install Metamask Snap to Use WalletChat in the Metamask Browser Extension.",
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "right",
+        target: `.${metamaskSnap}`,
+        title: <h2><b>Metamask Snap!</b></h2>
+      },
+    ]
+  });
 
   const handleChangeOne = (checked: boolean) => {
     //setCheckedItems([checked, checkedItems[1]])
@@ -203,7 +226,17 @@ const EnterEmail = () => {
   }
 
   return (
-    <Box p={6} pt={16} background='white' width='100%'>
+    <Box p={6} background='white' width='100%'>
+      <Joyride
+        continuous
+        callback={() => {}}
+        run={thirdTour}
+        steps={thirdStep}
+        hideCloseButton
+        scrollToFirstStep
+        showSkipButton
+        showProgress
+      />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
           Optional Notifications
@@ -212,14 +245,14 @@ const EnterEmail = () => {
         <FormControl>
           <Stack pl={0} mt={6} spacing={2}>
             <Checkbox
-              size='lg'
+              size='md'
               isChecked={dmBool}
               onChange={(e) => handleChangeOne(e.target.checked)}
             >
               Receive an email for every incoming DM
             </Checkbox>
             <Checkbox
-              size='lg'
+              size='md'
               isChecked={dailyBool}
               onChange={(e) => handleChangeTwo(e.target.checked)}
             >
@@ -233,22 +266,27 @@ const EnterEmail = () => {
           >
             Receive New Message Pop-Ups/Respond to New Messages In Metamask
           </Checkbox> */}
-          <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
-            <Button
-                variant='black'
-                size='lg'
-                onClick={() => {
-                  window.ethereum.request({
-                    method: 'wallet_requestSnaps',
-                    params: {
-                      ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
-                    },
-                  });
-                }}
-                style={{ maxWidth: 'fit-content' }}
-              >
-                Install WalletChat Metamask Snap
-            </Button> 
+          {!isMobile && (
+            <>
+              <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
+                <Button
+                    className={metamaskSnap}
+                    variant='black'
+                    size='lg'
+                    onClick={() => {
+                      window.ethereum.request({
+                        method: 'wallet_requestSnaps',
+                        params: {
+                          ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
+                        },
+                      });
+                    }}
+                    style={{ maxWidth: 'fit-content' }}
+                  >
+                    Install WalletChat Metamask Snap
+                </Button> 
+            </>
+          )}
           </Stack>
           <Divider
             orientation='horizontal'
@@ -256,31 +294,32 @@ const EnterEmail = () => {
             d='inline-block'
             verticalAlign='middle'
           />
-          <FormLabel fontSize='2xl'>
+          <FormLabel fontSize='md'>
             Enter email/TG to receive notifications (optional)
           </FormLabel>
-          <Flex>
+          <Flex mb={5}>
             <Input
               type='text'
               size='lg'
+              variant='outline'
               value={email}
               placeholder='somone@somewhere.com'
-              borderColor='black'
               {...register('email', {
                         required: false,
               })}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
+              className={emailInput}
             />
-            </Flex>
-            <Flex>
+          </Flex>
+            <Flex mb={5}>
               <Input
                   type="text"
                   size="lg"
+                  variant='outline'
                   value={tgHandle}
                   placeholder="myFunTelegramHandle"
-                  borderColor="black"
                   {...register('telegramhandle', {
                     required: false,
                   })}
@@ -289,13 +328,13 @@ const EnterEmail = () => {
                   }
               />
             </Flex>
-            <Flex>
+            <Flex mb={5}>
               <Input
                   type="text"
                   size="lg"
+                  variant='outline'
                   value={twitterUsername}
                   placeholder="@funTwitterUsername"
-                  borderColor="black"
                   {...register('twitterusername', {
                     required: false,
                   })}
@@ -304,10 +343,11 @@ const EnterEmail = () => {
                   }
               />
             </Flex>
-            <Flex>
+            <Stack spacing={4} direction='row'>
               <Button
                 variant='black'
                 height='10'
+                size="lg"
                 type='submit'
                 isLoading={isFetching}
               >
@@ -316,12 +356,13 @@ const EnterEmail = () => {
               <Button
                 variant='black'
                 height='10'
+                size="lg"
                 type='submit'
                 onClick={handleCancel}
               >
                 <IconX size="20" color="red"/>
               </Button>
-          </Flex>
+          </Stack>
           <FormHelperText>
             You can change it anytime in your settings
           </FormHelperText>

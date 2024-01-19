@@ -31,8 +31,13 @@ import { getCommunity } from '@/helpers/widget'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
+import Joyride from "react-joyride";
 
-const EnterName = () => {
+interface Props {
+  nameInput: string;
+}
+
+const EnterName = ({ nameInput }: Props) => {
   const {
     handleSubmit,
     register,
@@ -57,7 +62,7 @@ const EnterName = () => {
 
   const { setName: globalSetName } = useWallet()
   const navigate = useNavigate()
-
+  
   const [name, setName] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
@@ -292,7 +297,7 @@ const EnterName = () => {
         verticalAlign='middle'
       />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl>
+        <FormControl className={nameInput}>
           <FormLabel fontSize='2xl'>What's your name?</FormLabel>
           <Flex>
             <Input

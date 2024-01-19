@@ -45,7 +45,7 @@ import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
 import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import * as ENV from '@/constants/env'
-import Joyride, { STATUS } from "react-joyride";
+import Joyride from "react-joyride";
 
 import { useEffect, useState } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
@@ -69,11 +69,12 @@ const nft = "nft";
 const community = "community";
 const support = "support";
 const leaderboard = "leaderboard";
+const nameInput = "name";
 
 export const App = () => {
-  const [{ run, steps }, setState] = useState({
-    run: true,
-    steps: [
+  const [{ firstTour, firstSteps }] = useState({
+    firstTour: true,
+    firstSteps: [
       {
         content: <h2><b>Let's take you on a tour!</b></h2>,
         locale: { skip: <strong>SKIP</strong> },
@@ -130,6 +131,20 @@ export const App = () => {
       },
     ]
   });
+
+  const [{ secondTour, secondStep }] = useState({
+    secondTour: true,
+    secondStep: [
+      {
+        content: "Please enter your or ENS assosiated with your address if you have one.",
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "bottom",
+        target: `.${nameInput}`,
+        title: <h2><b>Your name goes here!</b></h2>
+      },
+    ]
+  });
+
   const [isSnapEnabled, setIsSnapEnabled] = useState(false);
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
@@ -174,8 +189,6 @@ export const App = () => {
 
   const isSmallLayout = useIsSmallLayout()
   const { colorMode } = useColorMode();
-
-  console.log("acc:", isAuthenticated)
 
   if (!isAuthenticated) {
     return (
@@ -286,8 +299,8 @@ export const App = () => {
           <Joyride
             continuous
             callback={() => {}}
-            run={run}
-            steps={steps}
+            run={firstTour}
+            steps={firstSteps}
             hideCloseButton
             scrollToFirstStep
             showSkipButton
@@ -323,7 +336,18 @@ export const App = () => {
 
           <Sidebar />
 
-          {name === undefined ? (
+          <Joyride
+            // continuous
+            // callback={() => {}}
+            run={secondTour}
+            steps={secondStep}
+            hideCloseButton
+            scrollToFirstStep
+            // showSkipButton
+            // showProgress
+          />
+
+          {name === undefined ? (  
             <Flex
               flexGrow={1}
               justifyContent='center'
@@ -333,7 +357,7 @@ export const App = () => {
               <Spinner />
             </Flex>
           ) : (
-            <EnterName />
+            <EnterName nameInput={nameInput} />
           )}
         </Flex>
       </Box>
