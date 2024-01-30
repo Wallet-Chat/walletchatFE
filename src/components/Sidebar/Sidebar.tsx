@@ -20,7 +20,7 @@ import {
   Button,
 } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import {
   IconLogout,
@@ -57,7 +57,6 @@ import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
 import ToggleColorMode from '../ToggleColorMode'
-
 interface URLChangedEvent extends Event {
   detail?: string
 }
@@ -355,9 +354,6 @@ export default function Sidebar({ accountDetails, newDm, dm, nft, community, sup
       }
     }
   }, [])
-
-  // -- Widget iFrame API for receiving NFT data --
-  
 
   return (
     <Flex

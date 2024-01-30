@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { Route, Routes, Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   Link,
   HStack,
@@ -12,12 +12,11 @@ import {
   useColorMode,
   IconButton
 } from '@chakra-ui/react'
-import { LinkIcon, QuestionIcon } from '@chakra-ui/icons';
+import { QuestionIcon } from '@chakra-ui/icons';
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
 import logoThumb from './images/logo-thumb.svg'
 import logoTwitter from './images/twitter-logo.svg'
-import logoDelegateCash from './images/delegateCash.svg'
 import './App.scss'
 import Inbox from './scenes/DM'
 import NewConversation from './scenes/NewConversation'
@@ -43,17 +42,16 @@ import ConnectWalletButton from '@/components/ConnectWallet'
 import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
-import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
+import { enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import * as ENV from '@/constants/env'
-import Joyride from "react-joyride";
+import Joyride, { CallBackProps, EVENTS } from "react-joyride";
 
 import { useEffect, useState } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 import CreateNewCommunity from './scenes/Community/scenes/CreateNewCommunity'
-import { useWallet } from './context/WalletProvider'
 import Leaderboard from './Leaderboard';
-import { isSnapInstalled } from './utils/snaps'
 import TwitterPixel from 'react-twitter-pixel';
+import storage from './utils/extension-storage';
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -72,79 +70,7 @@ const leaderboard = "leaderboard";
 const nameInput = "name";
 
 export const App = () => {
-  const [{ firstTour, firstSteps }] = useState({
-    firstTour: true,
-    firstSteps: [
-      {
-        content: <h2><b>Let's take you on a tour!</b></h2>,
-        locale: { skip: <strong>SKIP</strong> },
-        placement: "center",
-        target: "body"
-      },
-      {
-        content: "Please Enter a referral code if you have one or proceed without referral chat points by using: wc-test",
-        placement: "bottom",
-        target: `.${referralInput}`,
-        title: <h2><b>Here is your first step!</b></h2>
-      },
-      {
-        content: "Here you have access to your account details. You can change your Name, update your profile picture, sign out etc.",
-        placement: "right",
-        target: `.${accountDetails}`,
-        title: <h2><b>Get access to your account details!</b></h2>
-      },
-      {
-        content: "Here you can initiate a conversation with any wallet address and start chatting right away",
-        placement: "right",
-        target: `.${newDm}`,
-        title: <h2><b>Chat with a new wallet address!</b></h2>
-      },
-      {
-        content: "Click on this icon to navigate to your list of Dms.",
-        placement: "right",
-        target: `.${dm}`,
-        title: <h2><b>Your list of DMs goes here!</b></h2>
-      },
-      {
-        content: "Click on this icon to navigate to NFT groups you belong to",
-        placement: "right",
-        target: `.${nft}`,
-        title: <h2><b>Your NFT groups lives here!</b></h2>
-      },
-      {
-        content: "Click on this icon to navigate to Communities you belong to",
-        placement: "right",
-        target: `.${community}`,
-        title: <h2><b>Communities you belong to!</b></h2>
-      },
-      {
-        content: "Facing any issues?...Click on this icon to communicate with the support team",
-        placement: "right",
-        target: `.${support}`,
-        title: <h2><b>Support channel lives here!</b></h2>
-      },
-      {
-        content: "Click on this icon to navigate to the WalletChat Leaderboard and see where you rank",
-        placement: "right",
-        target: `.${leaderboard}`,
-        title: <h2><b>WalletChat Leaderboard!</b></h2>
-      },
-    ]
-  });
-
-  const [{ secondTour, secondStep }] = useState({
-    secondTour: true,
-    secondStep: [
-      {
-        content: "Please enter your or ENS assosiated with your address if you have one.",
-        locale: { skip: <strong>SKIP</strong> },
-        placement: "bottom",
-        target: `.${nameInput}`,
-        title: <h2><b>Your name goes here!</b></h2>
-      },
-    ]
-  });
-
+  const location = useLocation()
   const [isSnapEnabled, setIsSnapEnabled] = useState(false);
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
@@ -155,7 +81,9 @@ export const App = () => {
   )
   const { currentData: referralCode } = endpoints.getReferredUser.useQueryState(
     account?.toLocaleLowerCase()
-  ) 
+  )
+  const isNewUserFirstPage = location.pathname.startsWith('/community/walletchat')
+  const firstTimeLogin = storage.get('first-time-login');
 
   const navigate = useNavigate()
   useEffect(() => {
@@ -187,8 +115,58 @@ export const App = () => {
     fetchSnapStatus();
   }, []);
 
+  const [{ finalTour, finalStep }, setFinalTour] = useState({
+    finalTour: true,
+    finalStep: [
+      {
+        content: "Click on this icon to navigate to your list of Dms.",
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "right",
+        target: `.${dm}`,
+        disableBeacon: true,
+        title: <h2><b>Your list of DMs goes here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to NFT groups you belong to",
+        placement: "right",
+        target: `.${nft}`,
+        disableBeacon: true,
+        title: <h2><b>Your NFT groups lives here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to Communities you belong to",
+        placement: "right",
+        target: `.${community}`,
+        disableBeacon: true,
+        title: <h2><b>Communities you belong to!</b></h2>
+      },
+      {
+        content: "Facing any issues?...Click on this icon to communicate with the support team",
+        placement: "right",
+        target: `.${support}`,
+        disableBeacon: true,
+        title: <h2><b>Support channel lives here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to the WalletChat Leaderboard and see where you rank",
+        placement: "right",
+        target: `.${leaderboard}`,
+        disableBeacon: true,
+        title: <h2><b>WalletChat Leaderboard!</b></h2>
+      },
+    ]
+  });
+
   const isSmallLayout = useIsSmallLayout()
   const { colorMode } = useColorMode();
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { type } = data;
+    if (type === EVENTS.TOUR_END) {
+      storage.set('first-time-login', "false");
+      localStorage.removeItem('first-time-login');
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -289,22 +267,6 @@ export const App = () => {
           <Sidebar 
             accountDetails={accountDetails}
             newDm={newDm} 
-            dm={dm} 
-            nft={nft} 
-            community={community} 
-            support={support} 
-            leaderboard={leaderboard} 
-          />
-
-          <Joyride
-            continuous
-            callback={() => {}}
-            run={firstTour}
-            steps={firstSteps}
-            hideCloseButton
-            scrollToFirstStep
-            showSkipButton
-            showProgress
           />
 
           {referralCode === undefined ? (
@@ -317,7 +279,7 @@ export const App = () => {
               <Spinner />
             </Flex>
           ) : (
-            <EnterReferral referralInput={referralInput} />
+            <EnterReferral referralInput={referralInput} accountDetails={accountDetails} newDm={newDm} />
           )}
         </Flex>
       </Box>
@@ -335,17 +297,6 @@ export const App = () => {
           <ExtensionCloseButton />
 
           <Sidebar />
-
-          <Joyride
-            // continuous
-            // callback={() => {}}
-            run={secondTour}
-            steps={secondStep}
-            hideCloseButton
-            scrollToFirstStep
-            // showSkipButton
-            // showProgress
-          />
 
           {name === undefined ? (  
             <Flex
@@ -373,7 +324,30 @@ export const App = () => {
       >
         <ExtensionCloseButton />
 
-        <Sidebar />
+        {isNewUserFirstPage && firstTimeLogin === "true" ? (
+          <>
+            <Joyride
+              callback={handleJoyrideCallback}
+              continuous
+              run={finalTour}
+              steps={finalStep}
+              showProgress
+              showSkipButton
+              hideCloseButton
+              scrollToFirstStep
+            />
+            <Sidebar
+              dm={dm}
+              nft={nft}
+              community={community}
+              support={support}
+              leaderboard={leaderboard}
+            />
+          
+          </>
+        ) : (
+          <Sidebar />
+        )}
 
         <Flex
           flex='1 1 0px'

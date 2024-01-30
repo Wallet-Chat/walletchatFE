@@ -64,13 +64,14 @@ const EnterEmail = () => {
         locale: { skip: <strong>SKIP</strong> },
         placement: "bottom",
         target: `.${emailInput}`,
+        disableBeacon: true,
         title: <h2><b>Notifications!</b></h2>
       },
       {
         content: "Install Metamask Snap to Use WalletChat in the Metamask Browser Extension.",
-        locale: { skip: <strong>SKIP</strong> },
         placement: "right",
         target: `.${metamaskSnap}`,
+        disableBeacon: true,
         title: <h2><b>Metamask Snap!</b></h2>
       },
     ]
@@ -229,7 +230,6 @@ const EnterEmail = () => {
     <Box p={6} background='white' width='100%'>
       <Joyride
         continuous
-        callback={() => {}}
         run={thirdTour}
         steps={thirdStep}
         hideCloseButton
@@ -238,12 +238,35 @@ const EnterEmail = () => {
         showProgress
       />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
+        {!isMobile && (
+          <>
+            {/* <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading> */}
+              <Button
+                  className={metamaskSnap}
+                  variant='black'
+                  size='lg'
+                  mb={10}
+                  onClick={() => {
+                    window.ethereum.request({
+                      method: 'wallet_requestSnaps',
+                      params: {
+                        ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
+                      },
+                    });
+                  }}
+                  style={{ maxWidth: 'fit-content' }}
+                >
+                  Install WalletChat Metamask Snap
+              </Button> 
+          </>
+        )}
+
+        <Text fontSize='3xl' fontWeight='bold' maxWidth='280px'>
           Optional Notifications
           <br />
         </Text>
         <FormControl>
-          <Stack pl={0} mt={6} spacing={2}>
+          <Stack pl={0} mt={3} spacing={2}>
             <Checkbox
               size='md'
               isChecked={dmBool}
@@ -266,27 +289,6 @@ const EnterEmail = () => {
           >
             Receive New Message Pop-Ups/Respond to New Messages In Metamask
           </Checkbox> */}
-          {!isMobile && (
-            <>
-              <Heading size='lg'>Use WalletChat in the Metamask Browser Extension:</Heading>
-                <Button
-                    className={metamaskSnap}
-                    variant='black'
-                    size='lg'
-                    onClick={() => {
-                      window.ethereum.request({
-                        method: 'wallet_requestSnaps',
-                        params: {
-                          ["npm:walletchat-metamask-snap"]: { "version": ENV.REACT_APP_SNAP_VERSION },
-                        },
-                      });
-                    }}
-                    style={{ maxWidth: 'fit-content' }}
-                  >
-                    Install WalletChat Metamask Snap
-                </Button> 
-            </>
-          )}
           </Stack>
           <Divider
             orientation='horizontal'
