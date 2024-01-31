@@ -362,7 +362,7 @@ const EnterEmail = () => {
                 type='submit'
                 onClick={handleCancel}
               >
-                <IconX size="20" color="red"/>
+                <Text color="red" fontSize={15}>Skip</Text>
               </Button>
           </Stack>
           <FormHelperText>
