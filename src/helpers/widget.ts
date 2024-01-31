@@ -50,7 +50,7 @@ function getWidgetEnvSuffix(addDev?: boolean) {
     return '_NFT_DEMO'
   }
 
-  if (currentWidgetOrigin.toLowerCase().includes('netlify.app')) {
+  if (currentWidgetOrigin.toLowerCase().includes('nf3.exchange') || currentWidgetOrigin.toLowerCase().includes('netlify.app')) {
     return '_NF3'
   }
 
@@ -90,7 +90,12 @@ export function getSupportWallet() {
 }
 export function getSupportHeader() {
   const suffix = getWidgetEnvSuffix(true)
-  const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_HEADER${suffix}`] : 'Check the leaderboard, share referral codes to earn more points! Chat to earn!'
+  const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_HEADER${suffix}`] : 'Click Here For Direct Support'
+  return retWallet ? retWallet : walletChatEth
+}
+export function getSupportLink() {
+  const suffix = getWidgetEnvSuffix(true)
+  const retWallet = suffix ? ENV[`REACT_APP_SUPPORT_LINK${suffix}`] : 'https://leaderboard.walletchat.fun'
   return retWallet ? retWallet : walletChatEth
 }
 export function getWidgetUrl() {
