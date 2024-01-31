@@ -20,7 +20,7 @@ import {
   Button,
 } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import {
   IconLogout,
@@ -57,7 +57,6 @@ import { selectAccount } from '@/redux/reducers/account'
 import { endpoints } from '@/redux/reducers/dm'
 import { log } from '@/helpers/log'
 import ToggleColorMode from '../ToggleColorMode'
-
 interface URLChangedEvent extends Event {
   detail?: string
 }
@@ -256,7 +255,17 @@ const UnreadBadge = ({ children }: { children: string }) => (
   </Box>
 )
 
-export default function Sidebar() {
+interface Props {
+  accountDetails?: string;
+  newDm?: string;
+  dm?: string;
+  nft?: string;
+  community?: string;
+  support?: string;
+  leaderboard?: string;
+}
+
+export default function Sidebar({ accountDetails, newDm, dm, nft, community, support, leaderboard }: Props) {
   const navigate = useNavigate()
   const location = useLocation()
   const isSupportPage = location.pathname.includes(getSupportWallet())
@@ -346,9 +355,6 @@ export default function Sidebar() {
     }
   }, [])
 
-  // -- Widget iFrame API for receiving NFT data --
-  
-
   return (
     <Flex
       justifyContent='space-between'
@@ -426,19 +432,19 @@ export default function Sidebar() {
           </>
         )}
 
-        <SidebarLink to='/dm' end={isSupportPage || isNewDMPage}>
+        <SidebarLink to='/dm' className={dm} end={isSupportPage || isNewDMPage}>
           <Image src={IconDM} alt='' />
           {unreadCount?.dm > 0 && <UnreadBadge>{unreadCount?.dm}</UnreadBadge>}
         </SidebarLink>
 
-        <SidebarLink to='/nft' end={!metadata}>
+        <SidebarLink to='/nft' className={nft} end={!metadata}>
           <Image src={IconNFT} alt='' />
           {unreadCount?.nft > 0 && (
             <UnreadBadge>{unreadCount?.nft}</UnreadBadge>
           )}
         </SidebarLink>
 
-        <SidebarLink to='/community'>
+        <SidebarLink to='/community' className={community}>
           <Image src={IconCommunity} alt='' />
           {unreadCount?.community > 0 && (
             <UnreadBadge>{unreadCount?.community}</UnreadBadge>
@@ -446,12 +452,12 @@ export default function Sidebar() {
         </SidebarLink>
 
         {!supportDisabled && (  //skip support for goodDollar
-          <SidebarLink to={`/dm/${getSupportWallet()}`}>
+          <SidebarLink to={`/dm/${getSupportWallet()}`} className={support}>
             <Image src={IconSupport} alt='' />
           </SidebarLink>
         )}
 
-        <ExternalSidebarLink to='https://leaderboard.walletchat.fun'>
+        <ExternalSidebarLink to='https://leaderboard.walletchat.fun' className={leaderboard}>
           <Image src={IconLeaderboard} alt='' />
         </ExternalSidebarLink>
 
@@ -487,7 +493,7 @@ export default function Sidebar() {
       </Flex>
       <Flex flexDirection={isMobile ? 'row' : 'column'} alignItems='center'>
         {/* <ToggleColorMode /> */}
-        <SidebarLink to='/dm/new'>
+        <SidebarLink to='/dm/new' className={newDm}>
           <Button
             size='sm'
             variant='outline'
@@ -504,7 +510,7 @@ export default function Sidebar() {
         </SidebarLink>
 
         <Menu isLazy>
-          <MenuButton as={AccountInfo}>
+          <MenuButton as={AccountInfo} className={accountDetails}>
             {account && (
               <>
                 <Avatar account={account} />

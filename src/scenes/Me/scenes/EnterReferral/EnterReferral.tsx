@@ -22,8 +22,49 @@ import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
 import { useWallet } from '@/context/WalletProvider'
+import Joyride from "react-joyride";
 
-const EnterReferral = () => {
+interface Props {
+  referralInput: string;
+  accountDetails: string;
+  newDm: string;
+}
+
+const EnterReferral = ({ referralInput, accountDetails, newDm }: Props) => {
+  const [{ firstTour, firstSteps }] = useState({
+    disableBeacon: true,
+    firstTour: true,
+    firstSteps: [
+      {
+        content: <h2><b>Let's take you on a tour!</b></h2>,
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "center",
+        target: "body",
+        disableBeacon: true
+      },
+      {
+        content: "Please Enter a referral code if you have one or proceed without referral chat points by using: wc-test",
+        placement: "bottom",
+        target: `.${referralInput}`,
+        title: <h2><b>Here is your first step!</b></h2>,
+        disableBeacon: true
+      },
+      {
+        content: "Here you have access to your account details. You can change your Name, update your profile picture, sign out etc.",
+        placement: "right",
+        target: `.${accountDetails}`,
+        title: <h2><b>Get access to your account details!</b></h2>,
+        disableBeacon: true
+      },
+      {
+        content: "Here you can initiate a conversation with any wallet address and start chatting right away",
+        placement: "right",
+        target: `.${newDm}`,
+        title: <h2><b>Chat with a new wallet address!</b></h2>,
+        disableBeacon: true
+      },
+    ]
+  });
   const {
     handleSubmit,
     register,
@@ -113,6 +154,15 @@ const EnterReferral = () => {
 
   return (
     <Box flexGrow={1} p={6} pt={16} background='white' width='100%'>
+      <Joyride
+        continuous
+        run={firstTour}
+        steps={firstSteps}
+        hideCloseButton
+        scrollToFirstStep
+        showSkipButton
+        showProgress
+      />
       <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
         Welcome to the WalletChat Community!
       </Text>
@@ -123,12 +173,13 @@ const EnterReferral = () => {
         verticalAlign='middle'
       />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl>
+        <FormControl className={referralInput}>
           <FormLabel fontSize='2xl'>Please Enter the Referral Code:</FormLabel>
           <Flex>
             <Input
               type='text'
               size='lg'
+              mr={5}
               value={referralCode}
               placeholder='wc-xxxxxxxxx'
               borderColor='black'

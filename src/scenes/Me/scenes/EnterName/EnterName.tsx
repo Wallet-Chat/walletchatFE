@@ -31,8 +31,27 @@ import { getCommunity } from '@/helpers/widget'
 import Analytics from 'analytics'
 import googleAnalyticsPlugin from '@analytics/google-analytics'
 import ReactGA from "react-ga4";
+import Joyride from "react-joyride";
+import storage from '@/utils/extension-storage'
 
-const EnterName = () => {
+interface Props {
+  nameInput: string;
+}
+
+const EnterName = ({ nameInput }: Props) => {
+  const [{ secondTour, secondStep }] = useState({
+    secondTour: true,
+    secondStep: [
+      {
+        content: "Please enter your or ENS assosiated with your address if you have one.",
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "bottom",
+        target: `.${nameInput}`,
+        disableBeacon: true,
+        title: <h2><b>Your name goes here!</b></h2>
+      },
+    ]
+  });
   const {
     handleSubmit,
     register,
@@ -57,7 +76,7 @@ const EnterName = () => {
 
   const { setName: globalSetName } = useWallet()
   const navigate = useNavigate()
-
+  
   const [name, setName] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [ownedENS, setOwnedENS] = useState<OpenSeaNFT[]>([])
@@ -222,15 +241,17 @@ const EnterName = () => {
           
           //log new user event
           // ReactGA.event({
-          //   category: "NewSignup_ReactGA4",
-          //   action: "NewSignupAction",
-          //   label: "NewSignupLabel", // optional
-          // });
-          analyticsGA4.track('NewSignup_AnalyticsGA4', {
-            site: document.referrer,
-            account,
-          })
-        } catch { log ("failed to auto-join user to community") }
+            //   category: "NewSignup_ReactGA4",
+            //   action: "NewSignupAction",
+            //   label: "NewSignupLabel", // optional
+            // });
+            analyticsGA4.track('NewSignup_AnalyticsGA4', {
+              site: document.referrer,
+              account,
+            })
+          } catch { log ("failed to auto-join user to community") }
+          
+          storage.set('first-time-login', "true")
           
           navigate('/me/enter-email')
         })
@@ -254,6 +275,14 @@ const EnterName = () => {
   const onSubmitPFP = (values: any) => {}
   return (
     <Box flexGrow={1} p={6} pt={16} background='white' width='100%'>
+      <Joyride
+        run={secondTour}
+        steps={secondStep}
+        hideCloseButton
+        showSkipButton
+        showProgress
+        scrollToFirstStep
+      />
       <Text fontSize='3xl' fontWeight='bold' maxWidth='280px' mb={4}>
         Welcome to the WalletChat Community!
       </Text>
@@ -292,12 +321,13 @@ const EnterName = () => {
         verticalAlign='middle'
       />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl>
+        <FormControl className={nameInput}>
           <FormLabel fontSize='2xl'>What's your name?</FormLabel>
           <Flex>
             <Input
               type='text'
               size='lg'
+              mr={5}
               value={name}
               placeholder='Real or anon name'
               borderColor='black'

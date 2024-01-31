@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { Route, Routes, Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   Link,
   HStack,
@@ -12,12 +12,11 @@ import {
   useColorMode,
   IconButton
 } from '@chakra-ui/react'
-import { LinkIcon, QuestionIcon } from '@chakra-ui/icons';
+import { QuestionIcon } from '@chakra-ui/icons';
 import { isMobile } from 'react-device-detect'
 import * as PAGES from '@/constants/pages'
 import logoThumb from './images/logo-thumb.svg'
 import logoTwitter from './images/twitter-logo.svg'
-import logoDelegateCash from './images/delegateCash.svg'
 import './App.scss'
 import Inbox from './scenes/DM'
 import NewConversation from './scenes/NewConversation'
@@ -43,16 +42,16 @@ import ConnectWalletButton from '@/components/ConnectWallet'
 import { useAppSelector } from './hooks/useSelector'
 import { selectAccount, selectIsAuthenticated } from './redux/reducers/account'
 import { endpoints } from './redux/reducers/dm'
-import { log, enableDebugPrints, disableDebugPrints } from '@/helpers/log'
+import { enableDebugPrints, disableDebugPrints } from '@/helpers/log'
 import * as ENV from '@/constants/env'
+import Joyride, { CallBackProps, EVENTS } from "react-joyride";
 
 import { useEffect, useState } from 'react'
 import { API } from 'react-wallet-chat/dist/src/types'
 import CreateNewCommunity from './scenes/Community/scenes/CreateNewCommunity'
-import { useWallet } from './context/WalletProvider'
 import Leaderboard from './Leaderboard';
-import { isSnapInstalled } from './utils/snaps'
 import TwitterPixel from 'react-twitter-pixel';
+import storage from './utils/extension-storage';
 //for debug printing manually on/off from console
 window.debugON = enableDebugPrints
 window.debugOFF = disableDebugPrints
@@ -60,7 +59,18 @@ window.debugOFF = disableDebugPrints
 // Initialize Twitter Pixel with your Pixel ID
 TwitterPixel.init('tw-ofu6x-ohk5b');
 
+const referralInput = "referral";
+const accountDetails = "account";
+const newDm = "new";
+const dm = "dm";
+const nft = "nft";
+const community = "community";
+const support = "support";
+const leaderboard = "leaderboard";
+const nameInput = "name";
+
 export const App = () => {
+  const location = useLocation()
   const [isSnapEnabled, setIsSnapEnabled] = useState(false);
   const account = useAppSelector((state) => selectAccount(state))
   const isAuthenticated = useAppSelector((state) =>
@@ -71,7 +81,9 @@ export const App = () => {
   )
   const { currentData: referralCode } = endpoints.getReferredUser.useQueryState(
     account?.toLocaleLowerCase()
-  ) 
+  )
+  const isNewUserFirstPage = location.pathname.startsWith('/community/walletchat')
+  const firstTimeLogin = storage.get('first-time-login');
 
   const navigate = useNavigate()
   useEffect(() => {
@@ -103,10 +115,58 @@ export const App = () => {
     fetchSnapStatus();
   }, []);
 
+  const [{ finalTour, finalStep }, setFinalTour] = useState({
+    finalTour: true,
+    finalStep: [
+      {
+        content: "Click on this icon to navigate to your list of Dms.",
+        locale: { skip: <strong>SKIP</strong> },
+        placement: "right",
+        target: `.${dm}`,
+        disableBeacon: true,
+        title: <h2><b>Your list of DMs goes here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to NFT groups you belong to",
+        placement: "right",
+        target: `.${nft}`,
+        disableBeacon: true,
+        title: <h2><b>Your NFT groups lives here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to Communities you belong to",
+        placement: "right",
+        target: `.${community}`,
+        disableBeacon: true,
+        title: <h2><b>Communities you belong to!</b></h2>
+      },
+      {
+        content: "Facing any issues?...Click on this icon to communicate with the support team",
+        placement: "right",
+        target: `.${support}`,
+        disableBeacon: true,
+        title: <h2><b>Support channel lives here!</b></h2>
+      },
+      {
+        content: "Click on this icon to navigate to the WalletChat Leaderboard and see where you rank",
+        placement: "right",
+        target: `.${leaderboard}`,
+        disableBeacon: true,
+        title: <h2><b>WalletChat Leaderboard!</b></h2>
+      },
+    ]
+  });
+
   const isSmallLayout = useIsSmallLayout()
   const { colorMode } = useColorMode();
 
-  console.log("acc:", isAuthenticated)
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { type } = data;
+    if (type === EVENTS.TOUR_END) {
+      storage.set('first-time-login', "false");
+      localStorage.removeItem('first-time-login');
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -204,7 +264,10 @@ export const App = () => {
         >
           <ExtensionCloseButton />
 
-          <Sidebar />
+          <Sidebar 
+            accountDetails={accountDetails}
+            newDm={newDm} 
+          />
 
           {referralCode === undefined ? (
             <Flex
@@ -216,7 +279,7 @@ export const App = () => {
               <Spinner />
             </Flex>
           ) : (
-            <EnterReferral />
+            <EnterReferral referralInput={referralInput} accountDetails={accountDetails} newDm={newDm} />
           )}
         </Flex>
       </Box>
@@ -235,7 +298,7 @@ export const App = () => {
 
           <Sidebar />
 
-          {name === undefined ? (
+          {name === undefined ? (  
             <Flex
               flexGrow={1}
               justifyContent='center'
@@ -245,7 +308,7 @@ export const App = () => {
               <Spinner />
             </Flex>
           ) : (
-            <EnterName />
+            <EnterName nameInput={nameInput} />
           )}
         </Flex>
       </Box>
@@ -261,7 +324,30 @@ export const App = () => {
       >
         <ExtensionCloseButton />
 
-        <Sidebar />
+        {isNewUserFirstPage && firstTimeLogin === "true" ? (
+          <>
+            <Joyride
+              callback={handleJoyrideCallback}
+              continuous
+              run={finalTour}
+              steps={finalStep}
+              showProgress
+              showSkipButton
+              hideCloseButton
+              scrollToFirstStep
+            />
+            <Sidebar
+              dm={dm}
+              nft={nft}
+              community={community}
+              support={support}
+              leaderboard={leaderboard}
+            />
+          
+          </>
+        ) : (
+          <Sidebar />
+        )}
 
         <Flex
           flex='1 1 0px'
