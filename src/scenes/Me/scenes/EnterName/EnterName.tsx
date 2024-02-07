@@ -356,7 +356,7 @@ const EnterName = ({ nameInput }: Props) => {
           {ownedENS.length > 0 && (
             <Box mt={2}>
               {ownedENS.map((item: OpenSeaNFT, i) =>
-                item?.name && item?.name !== 'Unknown ENS name' ? (
+                item?.nft.name && item?.nft.name !== 'Unknown ENS name' ? (
                   <Button
                     variant='outline'
                     key={i}

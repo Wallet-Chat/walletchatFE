@@ -215,7 +215,7 @@ const NFTByContract = () => {
       })
         .then((response) => response.json())
         .then((result: OpenSeaNFTCollection) => {
-          if (result?.collection?.name) {
+          if (result.name) {
             log(`✅[GET][NFT]:`, result)
             setNftData(openseaToGeneralNFTCollectionType(result))
           }
