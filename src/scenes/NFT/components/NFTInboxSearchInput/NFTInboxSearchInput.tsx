@@ -62,7 +62,7 @@ export default function NFTInboxSearchInput() {
       })
          .then((response) => response.json())
          .then((result: OpenSeaNFTCollection) => {
-            if (result?.collection?.name) {
+            if (result.name) {
                // log(`✅[GET][NFT Contract]:`, result)
                setNft(openseaToGeneralNFTCollectionType(result))
                setIsSuggestionListOpen(true)
