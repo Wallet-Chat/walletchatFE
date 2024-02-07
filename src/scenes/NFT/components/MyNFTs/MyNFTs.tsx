@@ -80,9 +80,7 @@ export default function MyNFTs({ account }: { account: string }) {
                         return {
                            ..._nft,
                            chain_id: '137',
-                           image: _nft?.image?.includes('ipfs://')
-                              ? convertIpfsUriToUrl(_nft.image)
-                              : _nft.image,
+                           image: convertIpfsUriToUrl(_nft.image)
                         }
                      })
                }
@@ -95,6 +93,7 @@ export default function MyNFTs({ account }: { account: string }) {
                            return {
                               ..._nft,
                               chain_id: '1',
+                              image: convertIpfsUriToUrl(_nft.image)
                            }
                         })
                   )
