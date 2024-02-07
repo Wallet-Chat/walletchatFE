@@ -86,9 +86,9 @@ export default function MyNFTs({ account }: { account: string }) {
                         }
                      })
                }
-               if (ethereumData?.assets?.length > 0) {
+               if (ethereumData?.nfts?.length > 0) {
                   transformed = transformed.concat(
-                     ethereumData.assets
+                     ethereumData.nfts
                         .filter((nft: OpenSeaNFT) => nft.name || nft.image_url)
                         .map((nft: OpenSeaNFT) => {
                            const _nft = openseaToGeneralNFTType(nft)

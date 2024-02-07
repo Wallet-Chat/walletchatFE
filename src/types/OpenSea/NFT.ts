@@ -28,10 +28,10 @@ export default interface OpenSeaNFT {
 
 export function openseaToGeneralNFTType(data: OpenSeaNFT) : GeneralNFT {
    return {
-     name: data?.nft?.name,
-     image: data?.nft?.image_url,
-     description: data?.nft?.description,
-     attributes: data?.nft?.traits,
-     contract_address: data?.nft?.contract
+     name: data?.name,
+     image: data?.image_url,
+     description: data?.description,
+     attributes: data?.traits,
+     contract_address: data?.contract
    }
  }
