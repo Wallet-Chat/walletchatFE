@@ -269,33 +269,13 @@ const ChangeEmail = () => {
           <br />
         </Text>
         <Stack pl={0} mt={6} spacing={2}>
-          <Checkbox
-            size='lg'
-            isChecked={dmBool}
-            onChange={(e) => handleChangeOne(e.target.checked)}
-          >
-            Receive an email for every incoming DM
-          </Checkbox>
-          <Checkbox
-            size='lg'
-            isChecked={dailyBool}
-            onChange={(e) => handleChangeTwo(e.target.checked)}
-          >
-            Receive notifications summary email every 24 hours
-          </Checkbox>
-          <Checkbox
-            size='lg'
-            isChecked={isDialogOn}
-            onChange={(e) => handleChangeMM(e.target.checked)}
-          >
-            Receive New Message Pop-Ups/Respond to New Messages In Metamask
-          </Checkbox>
-          {!isSnapInstalled && (
+        {!isSnapInstalled && (
           <div>
-          <Heading size='m'>Use WalletChat in the Metamask Browser Extension:</Heading>
+          {/* <Heading size='m'>Use WalletChat in the Metamask Browser Extension:</Heading> */}
             <Button
                 variant='black'
                 size='lg'
+                mb={5}
                 onClick={() => {
                   window.ethereum.request({
                     method: 'wallet_requestSnaps',
@@ -310,6 +290,27 @@ const ChangeEmail = () => {
             </Button> 
             </div>
         )}
+          <Checkbox
+            size='md'
+            isChecked={dmBool}
+            onChange={(e) => handleChangeOne(e.target.checked)}
+          >
+            Receive an email for every incoming DM
+          </Checkbox>
+          <Checkbox
+            size='md'
+            isChecked={dailyBool}
+            onChange={(e) => handleChangeTwo(e.target.checked)}
+          >
+            Receive notifications summary email every 24 hours
+          </Checkbox>
+          <Checkbox
+            size='md'
+            isChecked={isDialogOn}
+            onChange={(e) => handleChangeMM(e.target.checked)}
+          >
+            Receive New Message Pop-Ups/Respond to New Messages In Metamask
+          </Checkbox>
         </Stack>
         <Divider
           orientation='horizontal'
@@ -356,7 +357,7 @@ const ChangeEmail = () => {
               />
             </Flex>
             <Text color="darkgray.300" fontSize="md" mb={1}>Current Twitter Username: <b>{twitterUsername}</b>     Verified w/WalletChat: <b>{twitterVerified}</b></Text>
-            <Flex>
+            <Flex mb={5}>
               <Input
                   type="text"
                   size="lg"
@@ -375,6 +376,7 @@ const ChangeEmail = () => {
               <Button
                 variant='black'
                 height='10'
+                size="lg"
                 type='submit'
                 isLoading={isFetching}
               >
