@@ -1,7 +1,7 @@
 import { ChainObjectType } from './types/Chain'
 
 export const POLLING_QUERY_OPTS = {
-  pollingInterval: 5000, // 5 sec
+  pollingInterval: 30000, // 30 sec
 }
 
 export const CHAT_CONTEXT_TYPES = ['dm', 'community', 'nft'] as const
