@@ -646,7 +646,7 @@ export const dmApi = createApi({
     getInbox: builder.query({
       queryFn: async (queryArgs, { dispatch }, extraOptions, fetchWithBQ) => {
         try {
-          const account = queryArgs
+          const {account, unreadCount} = queryArgs;
 
           if (!ENV.REACT_APP_REST_API) {
             throw new Error('REST API url not in .env')
@@ -655,61 +655,63 @@ export const dmApi = createApi({
             throw new Error('No account connected')
           }
 
-          const data = (
-            await fetchWithBQ(
-              `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_inbox/${account}`
-            )
-          ).data as unknown as InboxMessageType[]
-
-          if (!data) {
-            updateLocalInboxDataForAccount(account, [])
-            return { data: '' }
-          }
-
-          const storedInboxData = getInboxDmDataForAccount(account)
-          const newDms: InboxMessageType[] = []
-
-          const newDecryptedMessages = data.filter((inboxItem) => {
-            const currentInbox =
-              storedInboxData[inboxItem.context_type][
-                getInboxFrom(account, inboxItem)
-              ]
-
-            if (
-              !currentInbox ||
-              new Date(inboxItem.timestamp).getTime() >
-                new Date(currentInbox.timestamp).getTime()
-            ) {
-              if (
-                inboxItem.context_type === 'dm' &&
-                inboxItem.encrypted_sym_lit_key !== ''
-              ) {
-                newDms.push(inboxItem)
-                return false
-              }
-
-              return true
+          if(unreadCount.dm || unreadCount.nft || unreadCount.community > 0){
+            const data = (
+              await fetchWithBQ(
+                `${ENV.REACT_APP_REST_API}/${ENV.REACT_APP_API_VERSION}/get_inbox/${account}`
+              )
+            ).data as unknown as InboxMessageType[]
+  
+            if (!data) {
+              updateLocalInboxDataForAccount(account, [])
+              return { data: '' }
             }
-
-            return false
-          })
-
-          // DM inbox messages -> go to the decryption queue
-          if (newDms.length > 0) {
-            log('✅[GET][New Inbox Encrypted DMs]:', newDms)
-
-            await decryptInboxMessages(newDms, account, dispatch)
-          }
-
-          // Other inbox messages -> update local inbox data
-          if (newDecryptedMessages.length > 0) {
-            log(
-              '✅[GET][New Plain Text Inbox Messages]:',
-              newDecryptedMessages
-            )
-
-            updateLocalInboxDataForAccount(account, newDecryptedMessages)
-            return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
+  
+            const storedInboxData = getInboxDmDataForAccount(account)
+            const newDms: InboxMessageType[] = []
+  
+            const newDecryptedMessages = data.filter((inboxItem) => {
+              const currentInbox =
+                storedInboxData[inboxItem.context_type][
+                  getInboxFrom(account, inboxItem)
+                ]
+  
+              if (
+                !currentInbox ||
+                new Date(inboxItem.timestamp).getTime() >
+                  new Date(currentInbox.timestamp).getTime()
+              ) {
+                if (
+                  inboxItem.context_type === 'dm' &&
+                  inboxItem.encrypted_sym_lit_key !== ''
+                ) {
+                  newDms.push(inboxItem)
+                  return false
+                }
+  
+                return true
+              }
+  
+              return false
+            })
+  
+            // DM inbox messages -> go to the decryption queue
+            if (newDms.length > 0) {
+              log('✅[GET][New Inbox Encrypted DMs]:', newDms)
+  
+              await decryptInboxMessages(newDms, account, dispatch)
+            }
+  
+            // Other inbox messages -> update local inbox data
+            if (newDecryptedMessages.length > 0) {
+              log(
+                '✅[GET][New Plain Text Inbox Messages]:',
+                newDecryptedMessages
+              )
+  
+              updateLocalInboxDataForAccount(account, newDecryptedMessages)
+              return { data: JSON.stringify(getInboxDmDataForAccount(account)) }
+            }
           }
         } catch (error) {
           log('🚨[GET][Inbox]:', error)
