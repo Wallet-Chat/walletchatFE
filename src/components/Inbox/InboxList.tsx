@@ -100,7 +100,6 @@ const InboxList = ({
 					// 		replica[i].message = decryptMessageWithLit(replica[i])
 					// 	}
 					// }
-					console.log("i got called")
 					setInboxData(replica)
 					//setInboxData(data)
 					localStorage['inbox_' + account] = JSON.stringify(replica)
