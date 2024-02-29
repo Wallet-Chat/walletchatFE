@@ -149,7 +149,7 @@ const InboxList = ({
             />
           )
         }
-        return <Box></Box>
+        // return <Box></Box>
       })}
       {inboxData?.length === 0 && context === 'dm' && (
         <Box p={5}>
