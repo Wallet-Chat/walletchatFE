@@ -107,6 +107,7 @@ const ConnectWalletButton = () => {
                 </Button>
               ) : (
                 <Button
+                  className='connect-button'
                   variant='black'
                   size='lg'
                   onClick={
