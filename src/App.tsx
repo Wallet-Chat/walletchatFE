@@ -180,7 +180,7 @@ export const App = () => {
           flexGrow={1}
         >
           <Image src={logoThumb} mb={5} width='40px' />
-          <Heading size='2xl' mb={8}>
+          <Heading data-cy='page-title' size='2xl' mb={8}>
           Log in to start chatting & earning 🏆
           </Heading>
 

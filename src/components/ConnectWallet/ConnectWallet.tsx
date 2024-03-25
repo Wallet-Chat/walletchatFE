@@ -107,7 +107,7 @@ const ConnectWalletButton = () => {
                 </Button>
               ) : (
                 <Button
-                  className='connect-button'
+                  data-cy='connect-button'
                   variant='black'
                   size='lg'
                   onClick={
