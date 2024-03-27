@@ -1,5 +1,5 @@
 import './commands'
-import "@synthetixio/synpress/support";
+// import "@synthetixio/synpress/support";
 
 Cypress.on('uncaught:exception', (err, runnable) => {
     // returning false here prevents Cypress from
